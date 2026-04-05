@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,8 @@ import static com.restroly.qrmenu.common.util.ApiConstants.SECURE_API_VERSION;
 @Tag(name = "Admin Section Template Management", description = "APIs for managing section templates")
 public class AdminSectionTemplateController {
 
-    private final SectionService sectionService;
+    @Autowired
+    private SectionService sectionService;
 
     @GetMapping
     @Operation(summary = "Get all available section templates")
