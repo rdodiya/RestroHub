@@ -13,25 +13,117 @@ We welcome contributions! Please follow these simple guidelines.
 
 ## 🚀 Getting Started
 
+### Prerequisites
+
+Before you start contributing, ensure you have:
+
+1. **Fork the Repository**
+   - Click the "Fork" button on [GitHub](https://github.com/rdodiya/RestroHub)
+
+2. **Clone Your Fork**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/RestroHub.git
+   cd RestroHub
+   ```
+
+3. **Add Upstream Remote**
+   ```bash
+   git remote add upstream https://github.com/rdodiya/RestroHub.git
+   ```
+
+4. **Install Dependencies**
+   
+   **For Backend:**
+   ```bash
+   cd RestroHub
+   ./gradlew build
+   ```
+   
+   **For Frontend:**
+   ```bash
+   cd RestroHub-FrontEnd
+   npm install
+   ```
+
+5. **Set Up Local Environment**
+   - Follow the setup instructions in [README.md](README.md#-quick-start)
+   - Ensure both backend and frontend run locally without errors
+
+---
+
+## 📋 Development Workflow
+
+### 1. Create a Feature Branch
+
+Always create a new branch from gssoc_develop for your work:
+
 ```bash
-# Fork and clone
-git clone https://github.com/YOUR_USERNAME/RestroHub.git
-cd RestroHub
+# Update gssoc_develop branch
+git checkout gssoc_develop
+git pull upstream gssoc_develop
 
 # Create feature branch
-git checkout -b feature/your-feature-name
+git checkout -b feature/your-feature-name gssoc_develop
 
-# Install dependencies
-cd RestroHub && ./gradlew build
-cd ../RestroHub-FrontEnd && npm install
+# Or for bug fixes
+git checkout -b fix/bug-description gssoc_develop
 
-# Make your changes and test locally
-# npm run dev (frontend)
-# ./gradlew bootRun (backend)
+# Or for documentation
+git checkout -b docs/description gssoc_develop
+```
 
-# Commit and push
+### 2. Make Your Changes
+
+- Write clean, readable code
+- Add comments for complex logic
+- Keep changes focused and atomic
+- Don't mix multiple features in one branch
+
+### 3. Test Your Changes Locally
+
+**Backend:**
+```bash
+cd RestroHub
+
+# Build project
+./gradlew clean build
+
+# Run tests
+./gradlew test #skip this currently, add config
+
+# Run application
+./gradlew bootRun #skip this currently, add config
+```
+
+**Frontend:**
+```bash
+cd RestroHub-FrontEnd
+
+# Install dependencies (if needed)
+npm install
+
+# Run development server
+npm run dev
+
+# Run tests (if available)
+npm test #skip this currently, add config
+```
+
+### 4. Commit Your Changes
+
+Follow our commit message conventions (see below)
+
+### 5. Push to Your Fork
+
+```bash
 git push origin feature/your-feature-name
 ```
+
+### 6. Create a Pull Request
+
+See [Pull Request Process](#-pull-request-process) section
+
+---
 
 ---
 
@@ -71,28 +163,178 @@ Tested locally - working as expected
 
 ---
 
-## 🎨 Code Style
 
-**Backend (Java):** 4 spaces, PascalCase for classes, camelCase for methods
-**Frontend (React):** 2 spaces, PascalCase for components, camelCase for functions
+## 📝 Additional Notes
+Any additional information reviewers should know.
+```
+
+### PR Requirements
+
+- **Title** must follow commit conventions
+- **Description** must be clear and detailed
+- **At least 1 test** for new features or bug fixes
+- **All tests passing** locally
+- **No breaking changes** without discussion (or marked as `BREAKING CHANGE`)
+- **Code reviewed** by yourself first (self-review)
 
 ---
 
-## ⏱️ Review Timeline
+## 🎨 Code Style Guidelines
 
-- Initial review: 24-48 hours
-- Response to comments: 24 hours
+### Backend (Java)
+
+**Naming Conventions:**
+- Classes: `PascalCase` (e.g., `MenuController`, `FoodService`)
+- Methods: `camelCase` (e.g., `getFoodById`, `createMenu`)
+- Constants: `UPPER_SNAKE_CASE` (e.g., `MAX_ITEMS_PER_PAGE`)
+- Packages: `lowercase.hierarchical` (e.g., `com.restroly.service`)
+
+**Code Format:**
+```java
+// Use 4 spaces for indentation
+public class MenuController {
+    
+    private final MenuService menuService;
+    
+    // Constructor injection preferred
+    public MenuController(MenuService menuService) {
+        this.menuService = menuService;
+    }
+    
+    // Meaningful names
+    @GetMapping("/{id}")
+    public ResponseEntity<MenuDTO> getMenuById(@PathVariable Long id) {
+        Menu menu = menuService.findById(id);
+        return ResponseEntity.ok(new MenuDTO(menu));
+    }
+    
+    // Add comments for complex logic
+    @PostMapping
+    public ResponseEntity<MenuDTO> createMenu(@RequestBody CreateMenuRequest request) {
+        // Validate input before processing
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Menu name cannot be empty");
+        }
+        
+        Menu menu = menuService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MenuDTO(menu));
+    }
+}
+```
+
+**Best Practices:**
+- Use Spring dependency injection
+- Leverage annotations properly
+- Return DTOs instead of entities
+- Use meaningful variable names
+- Keep methods focused and small
+- Add JavaDoc for public APIs
+- Use enums for fixed values
+- Avoid null checks; use Optional
+
+### Frontend (React/JavaScript)
+
+**Naming Conventions:**
+- Components: `PascalCase` (e.g., `MenuCard`, `FoodItem`)
+- Files: `PascalCase` for components (e.g., `MenuCard.jsx`)
+- Hooks: `camelCase` prefixed with `use` (e.g., `useMenu`, `useFetch`)
+- Constants: `UPPER_SNAKE_CASE` (e.g., `MAX_ITEMS`)
+- Functions: `camelCase` (e.g., `handleClick`, `formatPrice`)
+
+**Code Format:**
+```jsx
+// Use 2 spaces for indentation
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const MenuCard = ({ menuId, onSelect }) => {
+  const [menu, setMenu] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`/api/v1/menus/${menuId}`);
+        setMenu(response.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
+  }, [menuId]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div className="menu-card">
+      <h2>{menu.name}</h2>
+      <p>{menu.description}</p>
+      <button onClick={() => onSelect(menu)}>
+        View Menu
+      </button>
+    </div>
+  );
+};
+
+export default MenuCard;
+```
+
+**Best Practices:**
+- Use functional components with hooks
+- Keep components focused and small
+- Extract reusable logic into custom hooks
+- Use descriptive variable names
+- Add propTypes or TypeScript for validation
+- Use CSS classes from Tailwind
+- Handle loading and error states
+- Comment complex logic
 
 ---
 
 ## ❓ Need Help?
 
-- 📝 [Open an issue](https://github.com/rdodiya/RestroHub/issues)
-- 📧 Email: rdodiya2601@gmail.com
-- 📚 Check [README.md](README.md) for setup help
+
+
+### Getting Stuck?
+
+1. **Read the Documentation**
+   - Check [README.md](README.md)
+   - Review existing code patterns
+   - Check past PR discussions
+
+2. **Ask for Help**
+   - Comment on the issue you're working on
+   - Create a draft PR and ask questions
+
+3. **Contact Maintainers**
+   - GitHub Issues for technical questions
+   - Email: rdodiya2601@gmail.com
+   - LinkedIn: [@rdodiya](https://www.linkedin.com/in/rdodiya/)
+
 
 ---
 
-**Thank you for contributing!** 🎉
+### Useful Resources
+
+- 📚 [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- ⚛️ [React Documentation](https://react.dev)
+- 🎨 [Tailwind CSS Documentation](https://tailwindcss.com)
+- 🔧 [Git Documentation](https://git-scm.com/doc)
+- 📋 [Conventional Commits](https://www.conventionalcommits.org/)
+
+---
+
+## 🎉 Thank You!
+
+Thank you for contributing to RestroHub! Your efforts help make this project better for everyone.
+
+**Happy coding!** 🚀
+
 
 
