@@ -25,8 +25,8 @@ public class JwtTokenProvider {
     @Value("${security.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${security.jwt.expiration}")
-    private long jwtExpiration;
+    @Value("${security.jwt.access-expiration}")
+    private long jwtAccessExpiration;
 
     @Value("${security.jwt.refresh-expiration:604800000}")
     private long refreshExpiration;
@@ -45,7 +45,7 @@ public class JwtTokenProvider {
 
     public String generateAccessToken(UserDetails userDetails) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpiration);
+        Date expiryDate = new Date(now.getTime() + jwtAccessExpiration);
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -113,6 +113,20 @@ public class JwtTokenProvider {
         return false;
     }
 
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = getUsernameFromToken(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    public boolean isTokenExpired(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.getExpiration().before(new Date());
+    }
     public boolean isRefreshToken(String token) {
         try {
             Claims claims = Jwts.parser()
@@ -127,10 +141,23 @@ public class JwtTokenProvider {
     }
 
     public long getExpirationInSeconds() {
-        return jwtExpiration / 1000;
+        return jwtAccessExpiration / 1000;
     }
 
     public long getRefreshExpirationInSeconds() {
         return refreshExpiration / 1000;
+    }
+
+    public String extractTokenType(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return claims.get("type", String.class);
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

@@ -29,7 +29,7 @@ public class OrderBuilderImpl implements OrderBuilder {
     }
 
     @Override
-    public void reset() {
+    public final void reset() {
         this.branch = null;
         this.table = null;
         this.customerName = null;

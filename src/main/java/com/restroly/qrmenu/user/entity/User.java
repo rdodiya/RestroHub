@@ -1,6 +1,7 @@
 package com.restroly.qrmenu.user.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -45,6 +46,11 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<Role> roles;
+
+    // ─── One user → many tokens ───
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<UserToken> tokens = new ArrayList<UserToken>();
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

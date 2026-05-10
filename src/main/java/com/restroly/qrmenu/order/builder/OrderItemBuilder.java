@@ -18,7 +18,7 @@ public class OrderItemBuilder {
         reset();
     }
 
-    public void reset() {
+    private void reset() {
         this.food = null;
         this.quantity = 1;
         this.specialRequest = null;
