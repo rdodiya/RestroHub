@@ -1,0 +1,134 @@
+/* ============================================
+   DYNAMIC THEME VARIABLES
+   Change these values to update entire site theme
+   ============================================ */
+
+:root {
+    /* Primary Colors */
+    --color-primary: #f59e0b;
+    --color-primary-hover: #fbbf24;
+    --color-primary-dark: #d97706;
+    
+    /* Background Colors */
+    --color-bg-primary: #000000;
+    --color-bg-secondary: #0a0a0a;
+    --color-bg-tertiary: #171717;
+    --color-bg-card: #1a1a1a;
+    
+    /* Text Colors */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #9ca3af;
+    --color-text-muted: #6b7280;
+    --color-text-accent: var(--color-primary);
+    
+    /* Border Colors */
+    --color-border-primary: #374151;
+    --color-border-secondary: #1f2937;
+    --color-border-accent: var(--color-primary);
+    
+    /* Overlay Colors */
+    --color-overlay-dark: rgba(0, 0, 0, 0.5);
+    --color-overlay-darker: rgba(0, 0, 0, 0.6);
+    --color-overlay-light: rgba(0, 0, 0, 0.2);
+    
+    /* Typography */
+    --font-primary: 'Montserrat', sans-serif;
+    --font-heading: 'Playfair Display', serif;
+    
+    /* Font Sizes */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    --text-6xl: 3.75rem;
+    --text-7xl: 4.5rem;
+    --text-8xl: 6rem;
+    --text-9xl: 8rem;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+    --spacing-4xl: 6rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-full: 9999px;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    
+    /* Z-Index */
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal: 400;
+    --z-tooltip: 500;
+}
+
+/* ============================================
+   ALTERNATIVE THEMES
+   Uncomment to switch themes
+   ============================================ */
+
+/* Elegant Gold Theme */
+/*
+:root {
+    --color-primary: #d4af37;
+    --color-primary-hover: #e6c558;
+    --color-primary-dark: #b8941f;
+    --color-bg-primary: #0d0d0d;
+    --color-bg-secondary: #1a1a1a;
+}
+*/
+
+/* Modern Teal Theme */
+/*
+:root {
+    --color-primary: #14b8a6;
+    --color-primary-hover: #2dd4bf;
+    --color-primary-dark: #0d9488;
+    --color-bg-primary: #0f172a;
+    --color-bg-secondary: #1e293b;
+}
+*/
+
+/* Warm Rose Theme */
+/*
+:root {
+    --color-primary: #f43f5e;
+    --color-primary-hover: #fb7185;
+    --color-primary-dark: #e11d48;
+    --color-bg-primary: #18181b;
+    --color-bg-secondary: #27272a;
+}
+*/
+
+/* Classic Burgundy Theme */
+/*
+:root {
+    --color-primary: #9f1239;
+    --color-primary-hover: #be123c;
+    --color-primary-dark: #881337;
+    --color-bg-primary: #1c1917;
+    --color-bg-secondary: #292524;
+}
+*/

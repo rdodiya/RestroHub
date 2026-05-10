@@ -1,3 +1,38 @@
+# RestroHub-Frontend
+
+# Node
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+dist/
+build/
+
+# Java / Spring Boot
+target/
+*.class
+*.jar
+*.war
+*.iml
+
+# IDE settings
+.idea/
+.vscode/
+*.log
+*.project
+*.classpath
+*.settings/
+bin/
+out/
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+
+
+# RestroHub
+
 HELP.md
 .gradle
 build/
