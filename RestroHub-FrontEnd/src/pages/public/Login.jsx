@@ -12,7 +12,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 const validationSchema = Yup.object({
-    username: Yup.string().required("Email or username is required"),
+    email: Yup.string().email("Invalid email address").required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
@@ -179,7 +179,7 @@ const Login = () => {
         }
       } catch (err) {
         toast.error(
-          err.response?.data?.message || "Invalid username or password"
+          err.response?.data?.message || "Invalid email or password"
         );
       } finally {
         setIsLoading(false);
@@ -253,15 +253,15 @@ const Login = () => {
                     Email
                   </label>
                   <div className="relative">
-                   <input
-                      id="username"
-                      name="username"
-                      type="text"
-                      placeholder="Enter email or username"
-                      value={formik.values.username}
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={formik.values.email}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      className={inputClass("username")}
+                      className={inputClass("email")}
                     />
                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
                       <EmailIcon />

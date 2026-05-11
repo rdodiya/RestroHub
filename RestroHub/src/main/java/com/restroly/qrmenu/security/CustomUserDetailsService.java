@@ -28,8 +28,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public void init() {
         // Create sample users for testing
         // Password: admin123
-        users.put("admin", User.builder()
-                .username("admin")
+        users.put("admin@restroly.com", User.builder()
+                .username("admin@restroly.com")
                 .password(passwordEncoder.encode("admin123"))
                 .authorities(List.of(
                         new SimpleGrantedAuthority("ROLE_ADMIN"),
@@ -38,8 +38,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .build());
 
         // Password: owner123
-        users.put("restaurant_owner", User.builder()
-                .username("restaurant_owner")
+        users.put("owner@restroly.com", User.builder()
+                .username("owner@restroly.com")
                 .password(passwordEncoder.encode("owner123"))
                 .authorities(List.of(
                         new SimpleGrantedAuthority("ROLE_RESTAURANT_OWNER"),
@@ -48,8 +48,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .build());
 
         // Password: user123
-        users.put("user", User.builder()
-                .username("user")
+        users.put("user@restroly.com", User.builder()
+                .username("user@restroly.com")
                 .password(passwordEncoder.encode("user123"))
                 .authorities(List.of(
                         new SimpleGrantedAuthority("ROLE_USER")
