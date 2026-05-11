@@ -22,6 +22,7 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("Professional");
 
   // ============================
   // DATA
@@ -415,13 +416,14 @@ const Landing = () => {
             {plans.map((plan, i) => (
               <div
                 key={i}
+                onClick={() => setSelectedPlan(plan.name)}
                 className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
-                  plan.popular
+                  selectedPlan === plan.name
                     ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50'
                     : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg'
                 }`}
               >
-                {plan.popular && (
+                {selectedPlan === plan.name && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="rounded-full bg-blue-600 px-4 py-1 text-xs font-bold text-white shadow-md">
                       MOST POPULAR
@@ -449,7 +451,7 @@ const Landing = () => {
                 <Link
                   to="/admin"
                   className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
-                    plan.popular
+                    selectedPlan === plan.name
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700'
                       : 'border border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600'
                   }`}
