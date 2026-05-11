@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   UtensilsCrossed,
@@ -79,6 +80,15 @@ const Landing = () => {
     { num: '04', icon: BarChart3, title: 'Grow Revenue', desc: 'Track analytics and optimize your business.' },
   ];
 
+  const customerSteps = [
+    { num: '01', icon: QrCode, title: 'Scan QR', desc: 'Scan the QR code at your table to get started.' },
+    { num: '02', icon: UtensilsCrossed, title: 'Select Food', desc: 'Browse the menu and pick your favorite items.' },
+    { num: '03', icon: ShoppingCart, title: 'Add to Cart', desc: 'Review your selection and add them to your cart.' },
+    { num: '04', icon: CheckCircle2, title: 'Place Order', desc: 'Confirm your order and send it to the kitchen.' },
+    { num: '05', icon: MessageSquare, title: 'Live Updates', desc: 'Receive real-time notifications on your order status.' },
+    { num: '06', icon: CreditCard, title: 'UPI Payment', desc: 'Pay instantly and securely using any UPI app.' },
+  ];
+
   const plans = [
     {
       name: 'Starter',
@@ -110,7 +120,7 @@ const Landing = () => {
     {
       name: 'Ramesh Patel',
       role: 'Owner, Rajkot Dhaba',
-      text: 'Restroly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
+      text: 'RestroHub doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
       rating: 5,
     },
     {
@@ -159,7 +169,7 @@ const Landing = () => {
                 <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
-                Restro<span className="text-blue-600">ly</span>
+                Restro<span className="text-blue-600">Hub</span>
               </span>
             </Link>
 
@@ -373,13 +383,27 @@ const Landing = () => {
 
           <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, i) => (
-              <div key={i} className="relative text-center">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+                className="relative text-center"
+              >
                 {/* Connector */}
                 {i < steps.length - 1 && (
-                  <div className="absolute right-0 top-10 hidden h-0.5 w-full -translate-x-1/2 bg-blue-200 lg:block" />
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: i * 0.15 + 0.3 }}
+                    style={{ originX: 0 }}
+                    className="absolute left-1/2 top-10 hidden h-0.5 w-full bg-blue-200 lg:block"
+                  />
                 )}
 
-                <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md">
+                <div className="relative z-10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md">
                   <step.icon className="h-8 w-8 text-blue-600" />
                   <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
                     {step.num}
@@ -388,7 +412,56 @@ const Landing = () => {
 
                 <h3 className="mb-2 text-lg font-bold text-slate-900">{step.title}</h3>
                 <p className="text-sm text-slate-600">{step.desc}</p>
-              </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================ */}
+      {/* CUSTOMER JOURNEY                                 */}
+      {/* ================================================ */}
+      <section id="customer-flow" className="bg-white py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+              Customer Journey
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Seamless Ordering Experience
+            </h2>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-6">
+            {customerSteps.map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+                className="relative text-center"
+              >
+                {/* Connector line for all but last */}
+                {i < customerSteps.length - 1 && (
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: i * 0.15 + 0.3 }}
+                    style={{ originX: 0 }}
+                    className="absolute left-1/2 top-10 hidden h-0.5 w-full bg-blue-200 lg:block"
+                  />
+                )}
+                <div className="relative z-10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md">
+                  <step.icon className="h-8 w-8 text-blue-600" />
+                  <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
+                    {step.num}
+                  </span>
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-slate-900">{step.title}</h3>
+                <p className="text-sm text-slate-600">{step.desc}</p>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -520,7 +593,7 @@ const Landing = () => {
               Ready to Digitize Your Restaurant?
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-lg text-blue-100/90">
-              Join 5+ restaurants across India already using Restroly to
+              Join 5+ restaurants across India already using RestroHub to
               serve customers faster.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -538,6 +611,7 @@ const Landing = () => {
           </div>
         </div>
       </section>
+  <div className="my-12 border-t border-gray-200" />
 
       {/* ================================================ */}
       {/* FOOTER                                           */}
@@ -552,7 +626,7 @@ const Landing = () => {
                   <UtensilsCrossed className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xl font-extrabold text-white">
-                  Restro<span className="text-blue-400">ly</span>
+                  Restro<span className="text-blue-400">Hub</span>
                 </span>
               </Link>
               <p className="mt-4 max-w-xs text-sm text-slate-400">
@@ -585,7 +659,7 @@ const Landing = () => {
           {/* Bottom Bar */}
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row">
             <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} Restroly. All rights reserved.
+              © {new Date().getFullYear()} RestroHub. All rights reserved.
             </p>
             <p className="text-sm text-slate-500">Made with ❤️ in India</p>
           </div>
