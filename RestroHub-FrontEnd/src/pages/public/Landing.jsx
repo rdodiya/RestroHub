@@ -22,10 +22,6 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(
-  plans.find(plan => plan.popular)?.name || plans[0].name
-);
-
   // ============================
   // DATA
   // ============================
@@ -82,32 +78,55 @@ const Landing = () => {
     { num: '04', icon: BarChart3, title: 'Grow Revenue', desc: 'Track analytics and optimize your business.' },
   ];
 
-  const plans = [
-    {
-      name: 'Starter',
-      price: '₹499',
-      period: '/month',
-      desc: 'Perfect for small restaurants',
-      features: ['2 Branches', '15 Tables', '500 WhatsApp/month', 'Basic Analytics', 'Email Support'],
-      popular: false,
-    },
-    {
-      name: 'Professional',
-      price: '₹999',
-      period: '/month',
-      desc: 'Best for growing businesses',
-      features: ['5 Branches', 'Unlimited Tables', '2000 WhatsApp/month', 'Advanced Analytics', 'Priority Support', 'Custom Domain'],
-      popular: true,
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: '',
-      desc: 'For restaurant chains',
-      features: ['Unlimited Everything', 'Dedicated Manager', 'Custom Integrations', 'SLA Guarantee', '24/7 Phone Support', 'On-site Training'],
-      popular: false,
-    },
-  ];
+const plans = [
+  {
+    name: 'Starter',
+    price: '₹499',
+    period: '/month',
+    desc: 'Perfect for small restaurants',
+    features: [
+      '2 Branches',
+      '15 Tables',
+      '500 WhatsApp/month',
+      'Basic Analytics',
+      'Email Support'
+    ],
+    popular: false,
+  },
+  {
+    name: 'Professional',
+    price: '₹999',
+    period: '/month',
+    desc: 'Best for growing businesses',
+    features: [
+      '5 Branches',
+      'Unlimited Tables',
+      '2000 WhatsApp/month',
+      'Advanced Analytics',
+      'Priority Support',
+      'Custom Domain'
+    ],
+    popular: true,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: '',
+    desc: 'For restaurant chains',
+    features: [
+      'Unlimited Everything',
+      'Dedicated Manager',
+      'Custom Integrations',
+      'SLA Guarantee',
+      '24/7 Phone Support',
+      'On-site Training'
+    ],
+    popular: false,
+  },
+];
+  const [selectedPlan, setSelectedPlan] = useState(
+  plans.find(plan => plan.popular)?.name || plans[0].name
+  );
 
   const testimonials = [
     {
@@ -413,19 +432,21 @@ const Landing = () => {
               Start free. No credit card required. Upgrade anytime.
             </p>
           </div>
-
+  
           <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
             {plans.map((plan, i) => (
-              <div
-                key={i}
-                onClick={() => setSelectedPlan(plan.name)}
-                className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
-                  selectedPlan === plan.name
-                    ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50'
-                    : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg'
-                }`}
-              >
-                {selectedPlan === plan.name && (
+
+          <button
+          key={i}
+          type="button"
+          onClick={() => setSelectedPlan(plan.name)}
+          className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
+          selectedPlan === plan.name
+          ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50'
+          : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg'
+          }`}
+          >
+          {selectedPlan === plan.name && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="rounded-full bg-blue-600 px-4 py-1 text-xs font-bold text-white shadow-md">
                       MOST POPULAR
@@ -461,7 +482,7 @@ const Landing = () => {
                   Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-              </div>
+              </button>
             ))}
           </div>
         </div>
