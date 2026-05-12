@@ -1,4 +1,4 @@
-# 🍽️ RestroHub - Digital Menu & Restaurant Management Platform
+# 🍽️ Restroly - Digital Menu & Restaurant Management Platform
 
 <div align="center">
 
@@ -37,9 +37,9 @@
 
 ## 🎯 About
 
-**RestroHub** is a comprehensive digital solution designed specifically for Indian restaurants. From street-side dhabas to fine dining establishments, RestroHub helps restaurants create digital menus, accept payments, manage orders, and build their online presence with minimal effort.
+**Restroly** is a comprehensive digital solution designed specifically for Indian restaurants. From street-side dhabas to fine dining establishments, Restroly helps restaurants create digital menus, accept payments, manage orders, and build their online presence with minimal effort.
 
-### Why RestroHub?
+### Why Restroly?
 
 | Challenge | Our Solution |
 |-----------|--------------|
