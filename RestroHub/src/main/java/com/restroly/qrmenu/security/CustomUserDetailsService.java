@@ -1,77 +1,47 @@
 package com.restroly.qrmenu.security;
 
-import jakarta.annotation.PostConstruct;
+import com.restroly.qrmenu.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    // In-memory user store for demo purposes
-    // TODO: Replace with actual database-backed implementation
-    private final Map<String, UserDetails> users = new HashMap<>();
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @PostConstruct
-    public void init() {
-        // Create sample users for testing
-        // Password: admin123
-        users.put("admin@restroly.com", User.builder()
-                .username("admin@restroly.com")
-                .password(passwordEncoder.encode("admin123"))
-                .authorities(List.of(
-                        new SimpleGrantedAuthority("ROLE_ADMIN"),
-                        new SimpleGrantedAuthority("ROLE_USER")
-                ))
-                .build());
-
-        // Password: owner123
-        users.put("owner@restroly.com", User.builder()
-                .username("owner@restroly.com")
-                .password(passwordEncoder.encode("owner123"))
-                .authorities(List.of(
-                        new SimpleGrantedAuthority("ROLE_RESTAURANT_OWNER"),
-                        new SimpleGrantedAuthority("ROLE_USER")
-                ))
-                .build());
-
-        // Password: user123
-        users.put("user@restroly.com", User.builder()
-                .username("user@restroly.com")
-                .password(passwordEncoder.encode("user123"))
-                .authorities(List.of(
-                        new SimpleGrantedAuthority("ROLE_USER")
-                ))
-                .build());
-
-        log.info("Initialized {} sample users for authentication", users.size());
-    }
+    private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username)
+    public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
-        log.debug("Loading user by username: {}", username);
+        log.debug("Loading user by email: {}", email);
 
-        UserDetails userDetails = users.get(username);
+        com.restroly.qrmenu.user.entity.User user = userRepository.findByEmailWithRoles(email)
+                .orElseThrow(() -> {
+                    log.warn("User not found with email: {}", email);
+                    return new UsernameNotFoundException("User not found with email: " + email);
+                });
 
-        if (userDetails == null) {
-            log.warn("User not found: {}", username);
-            throw new UsernameNotFoundException("User not found: " + username);
-        }
+        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
 
-        log.debug("User found: {} with roles: {}", username, userDetails.getAuthorities());
-        return userDetails;
+        log.debug("User found: {} with roles: {}", email, authorities);
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities(authorities)
+                .disabled(!user.isActive())
+                .accountLocked(user.isLocked())
+                .build();
     }
 }
