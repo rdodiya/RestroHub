@@ -22,7 +22,9 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("Professional");
+  const [selectedPlan, setSelectedPlan] = useState(
+  plans.find(plan => plan.popular)?.name || plans[0].name
+);
 
   // ============================
   // DATA
