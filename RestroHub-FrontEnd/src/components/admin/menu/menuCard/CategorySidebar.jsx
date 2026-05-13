@@ -84,7 +84,7 @@ const CategorySidebar = ({ selectedCategory, onCategoryChange, onAddCategory, se
             {categories.map((cat) => (
               <button
                 key={cat.categoryId}
-                onClick={() => {debugger; onCategoryChange(cat.categoryId)}}
+                onClick={() => onCategoryChange(cat.categoryId)}
                 className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedCategory === cat.categoryId
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
                   : 'hover:bg-blue-50 text-gray-600'

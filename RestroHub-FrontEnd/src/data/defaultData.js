@@ -12,9 +12,15 @@ export const defaultSiteData = {
         bgPrimary: "#000000",
         bgSecondary: "#0a0a0a",
         bgTertiary: "#171717",
+        bgCard: "#1a1a1a",
         textPrimary: "#ffffff",
         textSecondary: "#9ca3af",
-        textMuted: "#6b7280"
+        textMuted: "#6b7280",
+        borderPrimary: "#374151",
+        borderSecondary: "#1f2937",
+        overlayDark: "rgba(0,0,0,0.5)",
+        overlayDarker: "rgba(0,0,0,0.6)",
+        overlayLight: "rgba(0,0,0,0.2)"
     },
 
     // Brand Information

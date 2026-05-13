@@ -5,6 +5,10 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  // Use .admin-dark class on <html> (set by AdminThemeContext) to activate dark: variants.
+  // This is intentionally scoped to "admin-dark" so it never interferes with the
+  // customer-facing website template which uses CSS variables instead.
+  darkMode: ['selector', '.admin-dark'],
   theme: {
     extend: {
       colors: {
