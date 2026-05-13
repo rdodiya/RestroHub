@@ -257,6 +257,7 @@ const Login = () => {
                       id="username"
                       name="username"
                       type="text"
+                      autoComplete="username"
                       placeholder="Enter email or username"
                       value={formik.values.username}
                       onChange={formik.handleChange}
