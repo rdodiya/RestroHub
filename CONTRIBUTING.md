@@ -46,7 +46,7 @@ Before you start contributing, ensure you have:
    ```
 
 5. **Set Up Local Environment**
-   - Follow the setup instructions in [README.md](README.md#-quick-start)
+   - Follow the setup instructions in [ReadMe.md](ReadMe.md#-quick-start)
    - Ensure both backend and frontend run locally without errors
 
 ---
@@ -89,10 +89,10 @@ cd RestroHub
 ./gradlew clean build
 
 # Run tests
-./gradlew test #skip this currently, add config
+./gradlew test
 
-# Run application
-./gradlew bootRun #skip this currently, add config
+# Run application (requires PostgreSQL; see README)
+./gradlew bootRun
 ```
 
 **Frontend:**
@@ -105,8 +105,8 @@ npm install
 # Run development server
 npm run dev
 
-# Run tests (if available)
-npm test #skip this currently, add config
+# Lint (no unit test script in package.json yet)
+npm run lint
 ```
 
 ### 4. Commit Your Changes
@@ -121,7 +121,7 @@ git push origin feature/your-feature-name
 
 ### 6. Create a Pull Request
 
-See [Pull Request Process](#-pull-request-process) section
+Open the PR against the **`gssoc_develop`** branch on the upstream repository (not `main`, unless maintainers ask otherwise). See [Pull Requests](#-pull-requests) for the description template.
 
 ---
 
@@ -159,21 +159,16 @@ Brief summary of changes.
 
 ## Testing
 Tested locally - working as expected
-```
 
----
-
-
-## 📝 Additional Notes
-Any additional information reviewers should know.
+## Additional notes
+Anything else reviewers should know.
 ```
 
 ### PR Requirements
 
 - **Title** must follow commit conventions
 - **Description** must be clear and detailed
-- **At least 1 test** for new features or bug fixes
-- **All tests passing** locally
+- **Manual verification**: run backend and frontend locally when your change affects behavior (automated tests are not fully wired yet; `./gradlew test` is currently disabled in `build.gradle`)
 - **No breaking changes** without discussion (or marked as `BREAKING CHANGE`)
 - **Code reviewed** by yourself first (self-review)
 
@@ -304,7 +299,7 @@ export default MenuCard;
 ### Getting Stuck?
 
 1. **Read the Documentation**
-   - Check [README.md](README.md)
+   - Check [ReadMe.md](ReadMe.md)
    - Review existing code patterns
    - Check past PR discussions
 
