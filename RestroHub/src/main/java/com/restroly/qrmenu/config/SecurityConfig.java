@@ -37,8 +37,12 @@ public class SecurityConfig {
 			"/h2-console/**",
 			// Auth endpoints
 			"/api/v1/auth/**",
+
+			"/api/v1/users/register",
 			// Public api endpoints
 			"/public/api/v1/**"
+
+			
 	};
 
 	private static final String[] PUBLIC_GET_URLS = {

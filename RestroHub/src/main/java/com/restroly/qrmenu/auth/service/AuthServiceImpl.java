@@ -21,14 +21,25 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.user.repository.UserRepository;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
@@ -116,4 +127,39 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.clearContext();
         log.info("User logged out successfully");
     }
+
+    @Override
+    public void forgotPassword(String email) {
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = UUID.randomUUID().toString();
+
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(30));
+
+        userRepository.save(user);
+
+        emailService.sendResetEmail(user.getEmail(), token);
+    }
+    @Override
+public void resetPassword(String token, String newPassword) {
+
+    User user = userRepository.findByResetToken(token)
+            .orElseThrow(() -> new RuntimeException("Invalid reset token"));
+
+    if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+        throw new RuntimeException("Reset token expired");
+    }
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+
+    user.setResetToken(null);
+    user.setResetTokenExpiry(null);
+
+    userRepository.save(user);
+
+    System.out.println("Password reset successful");
+}
 }
