@@ -115,6 +115,8 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(authResponse, "Login successful"));
     }
 
+
+
     @PostMapping("/refresh")
     @Operation(
             summary = "Refresh access token",
@@ -147,7 +149,24 @@ public class AuthController {
 
         return ResponseEntity.ok(ApiResponse.success(authResponse, "Token refreshed successfully"));
     }
+    @PostMapping("/forgot-password")
+public ResponseEntity<String> forgotPassword(@RequestParam String email) {
 
+    authService.forgotPassword(email);
+
+    return ResponseEntity.ok("Reset token generated successfully");
+}
+
+@PostMapping("/reset-password")
+public ResponseEntity<String> resetPassword(
+        @RequestParam String token,
+        @RequestParam String newPassword) {
+
+    authService.resetPassword(token, newPassword);
+
+    return ResponseEntity.ok("Password reset successful");
+}
+   
     @PostMapping("/logout")
     @Operation(
             summary = "Logout user",
