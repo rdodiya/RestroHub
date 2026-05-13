@@ -176,7 +176,11 @@ const plans = [
           <div className="flex h-16 items-center justify-between sm:h-20">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2.5"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-200 sm:h-10 sm:w-10">
                 <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
