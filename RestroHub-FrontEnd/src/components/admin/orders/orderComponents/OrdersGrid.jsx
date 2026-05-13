@@ -2,48 +2,7 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
 import OrderCard from './OrderCard';
 import api from "@services/common/api";
-
-// ============================================
-// SKELETON (Private)
-// ============================================
-const OrderCardSkeleton = () => (
-  <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-pulse">
-    <div className="flex items-start justify-between mb-4">
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gray-100 rounded-xl" />
-        <div>
-          <div className="w-28 h-5 bg-gray-100 rounded mb-1" />
-          <div className="w-20 h-3 bg-gray-100 rounded" />
-        </div>
-      </div>
-      <div className="w-8 h-8 bg-gray-100 rounded-lg" />
-    </div>
-    <div className="p-3 bg-gray-50 rounded-xl mb-4">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-gray-100 rounded-full" />
-        <div>
-          <div className="w-24 h-4 bg-gray-100 rounded mb-1" />
-          <div className="w-20 h-3 bg-gray-100 rounded" />
-        </div>
-      </div>
-    </div>
-    <div className="space-y-2 mb-4">
-      <div className="flex justify-between">
-        <div className="w-32 h-4 bg-gray-100 rounded" />
-        <div className="w-12 h-4 bg-gray-100 rounded" />
-      </div>
-      <div className="flex justify-between">
-        <div className="w-24 h-4 bg-gray-100 rounded" />
-        <div className="w-12 h-4 bg-gray-100 rounded" />
-      </div>
-      <div className="flex justify-between pt-2 border-t">
-        <div className="w-16 h-5 bg-gray-100 rounded" />
-        <div className="w-16 h-6 bg-gray-100 rounded" />
-      </div>
-    </div>
-    <div className="w-full h-10 bg-gray-100 rounded-xl" />
-  </div>
-);
+import AdminSkeleton from '../../AdminSkeleton';
 
 // ============================================
 // MAIN COMPONENT
@@ -172,7 +131,7 @@ const OrdersGrid = ({ activeFilter, searchQuery }) => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <OrderCardSkeleton key={i} />
+          <AdminSkeleton key={i} variant="order-card" />
         ))}
       </div>
     );

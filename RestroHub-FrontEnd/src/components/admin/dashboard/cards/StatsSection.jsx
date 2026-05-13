@@ -8,6 +8,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 
 // ============================================
 // STAT CARD (Private to this file)
@@ -62,20 +63,6 @@ const StatCard = ({ title, value, change, positive, subtitle, icon: Icon, color,
     </div>
   );
 };
-
-// ============================================
-// SKELETON LOADER (Private to this file)
-// ============================================
-const StatCardSkeleton = () => (
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-pulse">
-    <div className="flex items-center justify-between mb-4">
-      <div className="w-12 h-12 rounded-xl bg-gray-200" />
-      <div className="w-16 h-5 rounded bg-gray-200" />
-    </div>
-    <div className="w-24 h-4 rounded bg-gray-200 mb-2" />
-    <div className="w-32 h-7 rounded bg-gray-200" />
-  </div>
-);
 
 // ============================================
 // MAIN COMPONENT (Exported)
@@ -179,7 +166,7 @@ const StatsSection = () => {
     return (
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {[1, 2, 3, 4].map(i => (
-          <StatCardSkeleton key={i} />
+           <AdminSkeleton key={i} variant="stats" />
         ))}
       </div>
     );

@@ -10,6 +10,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 
 // ============================================
 // MAIN COMPONENT (Exported)
@@ -82,9 +83,7 @@ const RevenueChart = () => {
       <div className="h-64">
         {loading ? (
           // Skeleton
-          <div className="w-full h-full bg-gray-100 rounded-xl animate-pulse flex items-center justify-center">
-            <RefreshCw className="w-8 h-8 text-gray-300 animate-spin" />
-          </div>
+          <AdminSkeleton variant="chart" />
         ) : error && data.length === 0 ? (
           // Error
           <div className="w-full h-full flex flex-col items-center justify-center">

@@ -1,17 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight, RefreshCw, FolderPlus } from 'lucide-react';
 import api from "@services/common/api";
-
-// ============================================
-// SKELETON (Private)
-// ============================================
-const CategorySkeleton = () => (
-  <div className="space-y-2">
-    {[1, 2, 3, 4].map(i => (
-      <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />
-    ))}
-  </div>
-);
+import AdminSkeleton from '../../AdminSkeleton';
 
 // ============================================
 // MAIN COMPONENT
@@ -78,7 +68,7 @@ const CategorySidebar = ({ selectedCategory, onCategoryChange, onAddCategory, se
 
         {/* Categories List */}
         {loading ? (
-          <CategorySkeleton />
+          <AdminSkeleton variant="category" />
         ) : (
           <div className="space-y-2">
             {categories.map((cat) => (

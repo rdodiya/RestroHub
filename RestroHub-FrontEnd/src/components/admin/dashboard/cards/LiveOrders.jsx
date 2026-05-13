@@ -7,6 +7,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 
 // ============================================
 // STATUS BADGE (Private to this file)
@@ -52,7 +53,7 @@ const OrderCard = ({ order }) => (
 // ============================================
 // SKELETON (Private to this file)
 // ============================================
-const OrderSkeleton = () => (
+/*const OrderSkeleton = () => (
   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl animate-pulse">
     <div className="flex items-center gap-4">
       <div className="w-12 h-12 bg-gray-200 rounded-xl" />
@@ -63,7 +64,7 @@ const OrderSkeleton = () => (
     </div>
     <div className="w-16 h-5 bg-gray-200 rounded" />
   </div>
-);
+);*/
 
 // ============================================
 // MAIN COMPONENT (Exported)
@@ -149,9 +150,9 @@ const LiveOrders = () => {
       {/* Content */}
       <div className="space-y-4">
         {loading ? (
-          // Skeleton Loading
-          [1, 2, 3, 4].map(i => <OrderSkeleton key={i} />)
-        ) : error && orders.length === 0 ? (
+          [1, 2, 3, 4].map(i => (
+          <AdminSkeleton key={i} variant="order" />))
+          ) : error && orders.length === 0 ? (
           // Error State
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-3" />
