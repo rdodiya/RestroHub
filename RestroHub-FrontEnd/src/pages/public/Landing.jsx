@@ -24,10 +24,8 @@ import {
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isDark, toggle } = useTheme();
-  // ============================
-  // DATA
-  // ============================
-  const navLinks = [
+  // =====================  // DATA
+  // =====================  const navLinks = [
     { label: 'Features', href: '#features' },
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Pricing', href: '#pricing' },
@@ -156,6 +154,7 @@ const plans = [
       name: 'Ramesh Patel',
       role: 'Owner, Rajkot Dhaba',
       text: 'Restroly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
+      text: 'Restorly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
       rating: 5,
     },
     {
@@ -206,10 +205,8 @@ const plans = [
     { value: '4.9', label: 'App Rating' },
   ];
 
-  // ============================
-  // RENDER
-  // ============================
-  return (
+  // =====================  // RENDER
+  // =====================  return (
     <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
 
       {/* ================================================ */}
@@ -609,6 +606,7 @@ const plans = [
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-lg text-blue-100/90">
               Join 5+ restaurants across India already using Restroly to
+              Join 5+ restaurants across India already using Restorly to
               serve customers faster.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -674,6 +672,7 @@ const plans = [
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row">
             <p className="text-sm text-slate-500">
               © {new Date().getFullYear()} Restroly. All rights reserved.
+              © {new Date().getFullYear()} Restorly. All rights reserved.
             </p>
             <p className="text-sm text-slate-500">Made with ❤️ in India</p>
           </div>
