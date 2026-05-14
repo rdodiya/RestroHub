@@ -66,8 +66,9 @@ dependencies {
     // Testing
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  //  testImplementation 'org.springframework.boot:spring-boot-starter-test';
-    testImplementation 'org.springframework.security:spring-security-test';
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'com.h2database:h2'  // In-memory DB for tests — no PostgreSQL needed
 
     //OpenAPI Documentation
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
@@ -84,10 +85,6 @@ dependencies {
 }
 
 tasks.named('test') {
-    enabled = false
-}
-
-
-//tasks.withType<Test> {
-//	useJUnitPlatform()
-//}
+    useJUnitPlatform()   // required for JUnit 5 (Jupiter)
+    systemProperty 'spring.profiles.active', 'test'
+}
