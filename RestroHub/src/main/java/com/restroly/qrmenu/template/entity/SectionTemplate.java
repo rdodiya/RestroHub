@@ -47,15 +47,15 @@ public class SectionTemplate {
     private String previewImageUrl;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "default_content", columnDefinition = "jsonb")
+    @Column(name = "default_content")
     private Map<String, Object> defaultContent; // Default content structure
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "default_settings", columnDefinition = "jsonb")
+    @Column(name = "default_settings")
     private Map<String, Object> defaultSettings;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "schema", columnDefinition = "jsonb")
+    @Column(name = "template_schema")
     private Map<String, Object> schema; // JSON schema for content validation
 
     @Column(name = "is_active")

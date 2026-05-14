@@ -16,7 +16,7 @@ const OrdersHeader = ({ searchQuery, onSearchChange }) => {
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search by order ID, customer..."
+          placeholder="Search by order ID, customer, table, status or item..."
           className="bg-transparent outline-none flex-1 text-sm text-gray-800 placeholder-gray-400"
         />
         {searchQuery && (

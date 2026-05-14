@@ -48,11 +48,17 @@ const OrderCardSkeleton = () => (
 // ============================================
 // MAIN COMPONENT
 // ============================================
-const OrdersGrid = ({ activeFilter, searchQuery }) => {
+const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Sync orders up to parent so OrderFilters gets real counts
+  const syncOrders = (updated) => {
+    setOrders(updated);
+    onOrdersChange?.(updated);
+  };
 
   // ------------------------------------
   // FALLBACK DATA
@@ -128,11 +134,11 @@ const OrdersGrid = ({ activeFilter, searchQuery }) => {
 
       // 🎭 MOCK
       await new Promise((resolve) => setTimeout(resolve, 700));
-      setOrders(fallbackOrders);
+      syncOrders(fallbackOrders);
     } catch (err) {
       console.error('Failed to fetch orders:', err);
       setError('Failed to load orders');
-      setOrders(fallbackOrders);
+      syncOrders(fallbackOrders);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -144,26 +150,27 @@ const OrdersGrid = ({ activeFilter, searchQuery }) => {
   // ------------------------------------
   const handleStatusUpdate = (orderId, newStatus) => {
     if (newStatus === 'complete') {
-      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      syncOrders(orders.filter((o) => o.id !== orderId));
     } else {
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
-      );
+      syncOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)));
     }
   };
 
-  // ------------------------------------
-  // FILTER + SEARCH
-  // ------------------------------------
+  const query = searchQuery.trim().toLowerCase();
+
   const filteredOrders = orders
     .filter((o) => activeFilter === 'all' || o.status === activeFilter)
-    .filter(
-      (o) =>
-        !searchQuery ||
-        o.id.toString().includes(searchQuery) ||
-        o.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        o.table.toString().includes(searchQuery)
-    );
+    .filter((o) => {
+      if (!query) return true;
+      return (
+        o.id.toString().includes(query) ||
+        o.customer.toLowerCase().includes(query) ||
+        o.table.toString().includes(query) ||
+        o.status.toLowerCase().includes(query) ||
+        o.phone.includes(query) ||
+        o.items.some((item) => item.name.toLowerCase().includes(query))
+      );
+    });
 
   // ------------------------------------
   // RENDER
