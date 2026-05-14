@@ -51,6 +51,40 @@ Before you start contributing, ensure you have:
 
 ---
 
+##  Creating Issues
+
+### Before Creating a New Issue
+
+**Always check existing issues first** to avoid duplicates:
+1. Search the [Issues page](https://github.com/rdodiya/RestroHub/issues) using relevant keywords
+2. Check both open and closed issues
+3. If a similar issue exists, comment on it instead of creating a new one
+
+### Issue Requirements
+
+**Every issue must include:**
+
+- **Clear Title**: Describe the feature/bug concisely
+- **Detailed Description**: Provide enough context for others to understand the issue
+  - What is the problem/feature request?
+  - Why is it needed?
+  - Expected vs. actual behavior (for bugs)
+  - Steps to reproduce (for bugs)
+- **Scope**: Clearly mention which part can be changed:
+  - `[FRONTEND ONLY]` - React/Tailwind changes only
+  - `[BACKEND ONLY]` - Java/Spring Boot changes only
+  - `[FULL STACK]` - Both frontend and backend changes
+- **Expected Outcome**: What should be the result after implementation?
+
+### Issue Assignment
+
+- **Maximum 2 people per issue** - One primary contributor and one reviewer
+- **No duplicate assignments** - Each issue is assigned only once
+- Maintainers will assign issues; contributors should wait for assignment
+- Comment on an issue to express interest; assignment will follow
+
+---
+
 ## 📋 Development Workflow
 
 ### 1. Create a Feature Branch
@@ -78,6 +112,16 @@ git checkout -b docs/description gssoc_develop
 - Add comments for complex logic
 - Keep changes focused and atomic
 - Don't mix multiple features in one branch
+- **UI Changes**: You can refactor/improve code, but don't change the entire UI unnecessarily
+  - Only make UI changes that are discussed and approved in the issue
+  - Avoid cosmetic changes that don't add value
+- **Follow Issue Scope**: Only implement what's specified in the assigned issue
+  - Don't add extra features or unrelated changes
+  - Discuss any scope expansion with maintainers first
+- **Code Refactoring**: 
+  - You can optimize and refactor code
+  - But avoid large formatting changes that hide actual code logic
+  - Keep refactoring minimal and focused
 
 ### 3. Test Your Changes Locally
 
@@ -119,7 +163,24 @@ Follow our commit message conventions (see below)
 git push origin feature/your-feature-name
 ```
 
-### 6. Create a Pull Request
+### 6. Sync Before Creating PR
+
+**IMPORTANT:** Before creating your Pull Request, always sync with the latest changes from `gssoc_develop`:
+
+```bash
+# Update gssoc_develop branch
+git checkout gssoc_develop
+git pull upstream gssoc_develop
+
+# Rebase your feature branch on latest gssoc_develop
+git checkout feature/your-feature-name
+git rebase gssoc_develop
+
+# If there are conflicts, resolve them locally, then:
+git push origin feature/your-feature-name --force
+```
+
+### 7. Create a Pull Request
 
 Open the PR against the **`gssoc_develop`** branch on the upstream repository (not `main`, unless maintainers ask otherwise). See [Pull Requests](#-pull-requests) for the description template.
 
@@ -144,33 +205,93 @@ docs(readme): update setup instructions
 
 ## 📝 Pull Requests
 
-**Before Submitting:**
-- [ ] Code works locally
-- [ ] Clear commit messages
-- [ ] No unnecessary changes
+### Before Submitting a PR
 
-**PR Description (Simple):**
-```markdown
-## What changed?
-Brief summary of changes.
-
-## Type
-- [x] New feature / [ ] Bug fix / [ ] Documentation
-
-## Testing
-Tested locally - working as expected
-
-## Additional notes
-Anything else reviewers should know.
-```
+**Checklist:**
+- [ ] Code works locally and is tested
+- [ ] Latest pull from `gssoc_develop` branch (see Step 6 above)
+- [ ] Clear, conventional commit messages
+- [ ] Only required code changes (no extra features or local setup files)
+- [ ] **DO NOT format entire existing code** - Only format changed lines
+  - Formatting makes it hard to identify actual code changes
+  - Reviewers need to see what was modified clearly
+- [ ] Code follows only what's discussed in the assigned issue
+- [ ] No unnecessary refactoring or cleanup outside the issue scope
 
 ### PR Requirements
 
 - **Title** must follow commit conventions
-- **Description** must be clear and detailed
-- **Manual verification**: run backend and frontend locally when your change affects behavior (automated tests are not fully wired yet; `./gradlew test` is currently disabled in `build.gradle`)
+- **Description** must include:
+  - Link to the issue: `Closes #ISSUE_NUMBER` or `Fixes #ISSUE_NUMBER`
+  - **Changes Made**: Detailed list of what was implemented
+  - **Testing**: Test cases performed and results
+  - **UI Changes** (if applicable): Screenshots/images showing the changes
+  - **Functionality Changes** (if applicable): Video demonstration of the feature
+  - **Additional Notes**: Any important information for reviewers
+- **Manual verification**: Run backend and frontend locally when your change affects behavior
 - **No breaking changes** without discussion (or marked as `BREAKING CHANGE`)
-- **Code reviewed** by yourself first (self-review)
+- **Self-review** your code before requesting reviewers
+
+### PR Description Template
+
+```markdown
+## Issue Link
+Closes #ISSUE_NUMBER
+
+## Changes Made
+- Brief description of change 1
+- Brief description of change 2
+- Brief description of change 3
+
+## Type of Change
+- [ ] New feature
+- [ ] Bug fix
+- [ ] Documentation update
+- [ ] Code refactor (for discussed optimization)
+
+## Testing Performed
+
+### Backend Testing (if applicable)
+- [ ] Unit tests passed
+- [ ] API endpoints tested locally with Postman/curl
+- [ ] Database migrations verified
+- **Test Cases**:
+  - Test case 1: Description and result
+  - Test case 2: Description and result
+
+### Frontend Testing (if applicable)
+- [ ] Component renders correctly
+- [ ] Responsive on mobile/tablet/desktop
+- [ ] No console errors
+- **Test Cases**:
+  - Test case 1: Description and result
+  - Test case 2: Description and result
+
+## UI/UX Changes (if applicable)
+### Screenshots/Images
+- **Before**: [Add screenshot if modifying existing UI]
+- **After**: [Add screenshot of new/modified UI]
+
+## Functionality Demo (if applicable)
+- **Video Link**: [Provide link to video showing the feature in action]
+  - Or describe the steps to test the functionality
+
+## Additional Notes
+- Any edge cases handled
+- Known limitations
+- Future improvements (if applicable)
+```
+
+### Important PR Guidelines
+
+1. **Code Changes Only**: Don't include local setup, environment files, or configuration files
+2. **Minimal Formatting**: Only format the lines you changed, not the entire file
+3. **Issue Adherence**: Implement ONLY what's in the assigned issue
+   - No extra features
+   - No additional improvements
+   - No scope creep
+4. **One Issue = One PR**: Don't combine multiple issues in a single PR
+5. **Automated Tests** are not fully wired yet; rely on manual testing
 
 ---
 
