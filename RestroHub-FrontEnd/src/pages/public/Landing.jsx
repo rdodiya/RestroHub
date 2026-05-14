@@ -23,7 +23,6 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   // ============================
   // DATA
   // ============================
@@ -80,7 +79,8 @@ const Landing = () => {
     { num: '04', icon: BarChart3, title: 'Grow Revenue', desc: 'Track analytics and optimize your business.' },
   ];
 
-  const customerSteps = [
+<<<<<<< HEAD
+	const customerSteps = [
     { num: '01', icon: QrCode, title: 'Scan QR', desc: 'Scan the QR code at your table to get started.' },
     { num: '02', icon: UtensilsCrossed, title: 'Select Food', desc: 'Browse the menu and pick your favorite items.' },
     { num: '03', icon: ShoppingCart, title: 'Add to Cart', desc: 'Review your selection and add them to your cart.' },
@@ -115,6 +115,11 @@ const Landing = () => {
       popular: false,
     },
   ];
+
+  const [selectedPlan, setSelectedPlan] = useState(
+    plans.find(plan => plan.popular)?.name || plans[0].name
+  );  
+>>>>>>> upstream/gssoc_develop
 
   const testimonials = [
     {
@@ -483,18 +488,21 @@ const Landing = () => {
               Start free. No credit card required. Upgrade anytime.
             </p>
           </div>
-
+  
           <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
             {plans.map((plan, i) => (
-              <div
-                key={i}
-                className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
-                  plan.popular
-                    ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50'
-                    : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg'
-                }`}
-              >
-                {plan.popular && (
+
+          <button
+          key={i}
+          type="button"
+          onClick={() => setSelectedPlan(plan.name)}
+          className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
+          selectedPlan === plan.name
+          ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50'
+          : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg'
+          }`}
+          >
+          {selectedPlan === plan.name && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="rounded-full bg-blue-600 px-4 py-1 text-xs font-bold text-white shadow-md">
                       MOST POPULAR
@@ -522,7 +530,7 @@ const Landing = () => {
                 <Link
                   to="/admin"
                   className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
-                    plan.popular
+                    selectedPlan === plan.name
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700'
                       : 'border border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600'
                   }`}
@@ -530,7 +538,7 @@ const Landing = () => {
                   Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-              </div>
+              </button>
             ))}
           </div>
         </div>

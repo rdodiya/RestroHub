@@ -19,46 +19,46 @@ export const defaultSiteData = {
 
     // Brand Information
     brand: {
-        name: "RestroHub",
-        fullName: "RestroHub",
-        tagline: "Empowering restaurants to go digital with QR menus and contactless ordering",
-        established: "Est. 2024 • India",
+        name: "ADK",
+        fullName: "Arts District Kitchen",
+        tagline: "Modern American cuisine with a creative twist, served in the heart of LA's vibrant Arts District",
+        established: "Est. 2019 • Los Angeles",
         logo: null
     },
 
     // Navigation Links
     navigation: [
         { label: "About", href: "#about" },
-        { label: "Features", href: "#features" },
-        { label: "Pricing", href: "#pricing" },
+        { label: "Menu", href: "#menu" },
+        { label: "Gallery", href: "#gallery" },
         { label: "Contact", href: "#contact" }
     ],
 
     // Hero Section
     hero: {
-        title: ["RESTRO", "HUB"],
-        backgroundImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=80",
-        ctaPrimary: { label: "Get Started", href: "#features" },
-        ctaSecondary: { label: "Learn More", href: "#about" }
+        title: ["ARTS DISTRICT", "KITCHEN"],
+        backgroundImage: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80",
+        ctaPrimary: { label: "View Menu", href: "#menu" },
+        ctaSecondary: { label: "Book a Table", href: "#reservations" }
     },
 
     // About Section
     about: {
-        subtitle: "Our Mission",
-        title: ["Digital Transformation", "For Restaurants"],
+        subtitle: "Our Story",
+        title: ["Where Art Meets", "Gastronomy"],
         description: [
-            "RestroHub is dedicated to helping Indian restaurants embrace the digital age. We provide simple, powerful tools for QR menus, payments, and order management.",
-            "Our platform is built to handle everything from small dhabas to large restaurant chains, ensuring a seamless experience for both owners and customers."
+            "Nestled in the creative heart of Los Angeles, Arts District Kitchen brings together culinary innovation and artistic expression. Our chefs craft each dish as a masterpiece, using locally-sourced ingredients and time-honored techniques.",
+            "From our open kitchen, witness the passion and precision that goes into every plate. Whether you're here for an intimate dinner or a celebration, expect an experience that engages all your senses."
         ],
-        image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80",
+        image: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80",
         stats: [
-            { value: "500+", label: "Restaurants" },
-            { value: "1.2M+", label: "Orders" },
-            { value: "₹50Cr+", label: "Revenue" }
+            { value: "15+", label: "Awards" },
+            { value: "50k+", label: "Happy Guests" },
+            { value: "5", label: "Years" }
         ],
         hours: { 
-            title: "Support Available", 
-            time: "24/7 Digital Support" 
+            title: "Open Daily", 
+            time: "5:00 PM - 11:00 PM" 
         }
     },
 
@@ -256,30 +256,30 @@ export const defaultSiteData = {
     // Contact Section
     contact: {
         location: { 
-            title: "Support", 
-            lines: ["Surat, Gujarat", "India"],
+            title: "Location", 
+            lines: ["828 Traction Ave", "Los Angeles, CA 90013"],
             mapUrl: "https://maps.google.com"
         },
         hours: { 
-            title: "Support Hours", 
-            lines: ["Monday - Saturday: 9AM - 8PM", "Sunday: Emergency Support Only"] 
+            title: "Hours", 
+            lines: ["Monday - Thursday: 5PM - 10PM", "Friday - Sunday: 5PM - 11PM"] 
         },
         contact: { 
-            title: "Connect", 
-            lines: ["Email: support@restrohub.com", "Web: www.restrohub.com"] 
+            title: "Contact", 
+            lines: ["Phone: (213) 555-0128", "info@artsdistrictkitchen.com"] 
         }
     },
 
     // Social Media Links
     social: [
-        { name: "Twitter", url: "https://twitter.com/restrohub", icon: "twitter" },
-        { name: "Instagram", url: "https://instagram.com/restrohub", icon: "instagram" },
-        { name: "Facebook", url: "https://facebook.com/restrohub", icon: "facebook" }
+        { name: "Twitter", url: "https://twitter.com", icon: "twitter" },
+        { name: "Instagram", url: "https://instagram.com", icon: "instagram" },
+        { name: "Facebook", url: "https://facebook.com", icon: "facebook" }
     ],
 
     // Footer
     footer: {
-        copyright: "© 2024 RestroHub. All rights reserved.",
+        copyright: "© 2024 Arts District Kitchen. All rights reserved.",
         links: [
             { label: "Privacy Policy", href: "/privacy" },
             { label: "Terms of Service", href: "/terms" }
