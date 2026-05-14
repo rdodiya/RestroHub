@@ -37,6 +37,8 @@ public class SecurityConfig {
 			"/h2-console/**",
 			// Auth endpoints
 			"/api/v1/auth/**",
+			// User registration
+			"/api/v1/users/register",
 			// Public api endpoints
 			"/public/api/v1/**"
 	};

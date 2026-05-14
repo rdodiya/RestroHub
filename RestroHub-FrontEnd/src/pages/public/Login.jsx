@@ -152,7 +152,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
-    initialValues: { email: "", password: "" },
+    initialValues: { username: "", password: "" },
     validationSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
@@ -247,10 +247,10 @@ const Login = () => {
                 {/* Email */}
                 <div className="mb-5">
                   <label
-                    htmlFor="email"
+                    htmlFor="username"
                     className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Email
+                    Email or Username
                   </label>
                   <div className="relative">
                    <input
@@ -267,8 +267,8 @@ const Login = () => {
                       <EmailIcon />
                     </span>
                   </div>
-                  {formik.touched.email && formik.errors.email && (
-                    <p className="mt-1.5 text-xs text-red-500">{formik.errors.email}</p>
+                  {formik.touched.username && formik.errors.username && (
+                    <p className="mt-1.5 text-xs text-red-500">{formik.errors.username}</p>
                   )}
                 </div>
 
