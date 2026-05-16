@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '@components/admin/Sidebar';
 import Header from '@components/admin/Header';
-import { AdminThemeProvider, useAdminTheme } from '@context/AdminThemeContext';
+import { useAdminTheme } from '@context/AdminThemeContext';
 
-const AdminLayoutInner = () => {
+const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isDark } = useAdminTheme();
@@ -34,11 +34,5 @@ const AdminLayoutInner = () => {
     </div>
   );
 };
-
-const AdminLayout = () => (
-  <AdminThemeProvider>
-    <AdminLayoutInner />
-  </AdminThemeProvider>
-);
 
 export default AdminLayout;

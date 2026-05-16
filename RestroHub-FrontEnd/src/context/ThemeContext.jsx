@@ -2,21 +2,21 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const ThemeContext = createContext(null);
 
-const STORAGE_KEY = 'public-theme';
+const STORAGE_KEY = 'theme';
 
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored !== null) return stored === 'dark';
-    return false; // default to light mode
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
+    const root = document.documentElement;
+    // Apply both classes: .dark (public pages) and .admin-dark (admin pages)
+    root.classList.toggle('dark', isDark);
+    root.classList.toggle('admin-dark', isDark);
     localStorage.setItem(STORAGE_KEY, isDark ? 'dark' : 'light');
-    // Cleanup: remove the .dark class when this provider unmounts
-    // (e.g. navigating from public routes to admin routes)
-    return () => document.documentElement.classList.remove('dark');
   }, [isDark]);
 
   const toggle = useCallback(() => setIsDark((prev) => !prev), []);
