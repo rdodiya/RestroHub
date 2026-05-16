@@ -33,6 +33,7 @@ const Landing = () => {
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
   ];
+  const [activeLink, setActiveLink] = useState('#');
 
   const features = [
     {
@@ -214,7 +215,10 @@ const plans = [
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-sm font-semibold text-slate-600 transition-colors hover:text-blue-600"
+                  onClick={() => setActiveLink(link.href)}
+                  className={`text-sm font-semibold transition-colors hover:text-blue-600 ${
+                    activeLink === link.href ? 'text-blue-600' : 'text-slate-600'
+                  }`}
                 >
                   {link.label}
                 </a>
