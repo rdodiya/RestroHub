@@ -7,6 +7,7 @@ import OrdersGrid from './orderComponents/OrdersGrid';
 const Orders = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [orders, setOrders] = useState([]);
 
   const filters = [
     { id: 'all', label: 'All' },
@@ -18,27 +19,21 @@ const Orders = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header + Search */}
       <OrdersHeader
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
-
-      {/* Filter Tabs */}
       <OrderFilters
         filters={filters}
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
-        orders={[]}  // Will be managed inside OrdersGrid
+        orders={orders}
       />
-
-      {/* Status Legend */}
       <StatusLegend />
-
-      {/* Orders Grid */}
       <OrdersGrid
         activeFilter={activeFilter}
         searchQuery={searchQuery}
+        onOrdersChange={setOrders}
       />
     </div>
   );
