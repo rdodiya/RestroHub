@@ -20,7 +20,6 @@ const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
   // ------------------------------------
   const handleToggle = async () => {
     try {
-      debugger
       setTogglingAvailability(true);
       await new Promise(resolve => setTimeout(resolve, 300));
       await api.patch(`/secure/api/v1/foods/${item.foodId}/${!item.isAvailable}`);

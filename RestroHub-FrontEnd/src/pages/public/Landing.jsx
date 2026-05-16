@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '@context/ThemeContext';
 import {
   UtensilsCrossed,
   QrCode,
@@ -22,7 +23,7 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const { isDark, toggle } = useTheme();
   // ============================
   // DATA
   // ============================
@@ -32,6 +33,27 @@ const Landing = () => {
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
   ];
+  
+  // active link state
+  const [activeLink, setActiveLink] = useState("#");
+  
+  useEffect(() => {
+    const ids = navLinks.map((link) => link.href.replace("#", ""));
+    const obs = new IntersectionObserver((entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveLink(`#${entry.target.id}`);
+        }
+      });
+    }), { rootMargin: '-50% 0px -50% 0px' });
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+
+    return () => obs.disconnect();
+  }, []);
 
   const features = [
     {
@@ -79,32 +101,55 @@ const Landing = () => {
     { num: '04', icon: BarChart3, title: 'Grow Revenue', desc: 'Track analytics and optimize your business.' },
   ];
 
-  const plans = [
-    {
-      name: 'Starter',
-      price: '₹499',
-      period: '/month',
-      desc: 'Perfect for small restaurants',
-      features: ['2 Branches', '15 Tables', '500 WhatsApp/month', 'Basic Analytics', 'Email Support'],
-      popular: false,
-    },
-    {
-      name: 'Professional',
-      price: '₹999',
-      period: '/month',
-      desc: 'Best for growing businesses',
-      features: ['5 Branches', 'Unlimited Tables', '2000 WhatsApp/month', 'Advanced Analytics', 'Priority Support', 'Custom Domain'],
-      popular: true,
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: '',
-      desc: 'For restaurant chains',
-      features: ['Unlimited Everything', 'Dedicated Manager', 'Custom Integrations', 'SLA Guarantee', '24/7 Phone Support', 'On-site Training'],
-      popular: false,
-    },
-  ];
+const plans = [
+  {
+    name: 'Starter',
+    price: '₹499',
+    period: '/month',
+    desc: 'Perfect for small restaurants',
+    features: [
+      '2 Branches',
+      '15 Tables',
+      '500 WhatsApp/month',
+      'Basic Analytics',
+      'Email Support'
+    ],
+    popular: false,
+  },
+  {
+    name: 'Professional',
+    price: '₹999',
+    period: '/month',
+    desc: 'Best for growing businesses',
+    features: [
+      '5 Branches',
+      'Unlimited Tables',
+      '2000 WhatsApp/month',
+      'Advanced Analytics',
+      'Priority Support',
+      'Custom Domain'
+    ],
+    popular: true,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: '',
+    desc: 'For restaurant chains',
+    features: [
+      'Unlimited Everything',
+      'Dedicated Manager',
+      'Custom Integrations',
+      'SLA Guarantee',
+      '24/7 Phone Support',
+      'On-site Training'
+    ],
+    popular: false,
+  },
+];
+  const [selectedPlan, setSelectedPlan] = useState(
+  plans.find(plan => plan.popular)?.name || plans[0].name
+  );
 
   const testimonials = [
     {
@@ -128,10 +173,31 @@ const Landing = () => {
   ];
 
   const footerColumns = [
-    { title: 'Product', links: ['Features', 'Pricing', 'Integrations', 'Changelog'] },
-    { title: 'Company', links: ['About Us', 'Blog', 'Careers', 'Contact'] },
-    { title: 'Legal', links: ['Privacy Policy', 'Terms of Service', 'Refund Policy'] },
-  ];
+  {
+    title: 'Product',
+    links: [
+      { label: 'Features', href: '#features' },
+      { label: 'How It Works', href: '#how-it-works' },
+      { label: 'Pricing', href: '#pricing' },
+      { label: 'Testimonials', href: '#testimonials' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About Us', href: '#features' },
+      { label: 'Contact', href: '#testimonials' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Privacy Policy', href: '#' },
+      { label: 'Terms of Service', href: '#' },
+      { label: 'Refund Policy', href: '#' },
+    ],
+  },
+];
 
   const stats = [
     { value: '500+', label: 'Restaurants' },
@@ -144,24 +210,24 @@ const Landing = () => {
   // RENDER
   // ============================
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
 
       {/* ================================================ */}
       {/* NAVBAR                                           */}
       {/* ================================================ */}
-      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-lg">
+      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-lg dark:border-slate-700/80 dark:bg-slate-900/80">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between sm:h-20">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5">
+            <a href="#" className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-200 sm:h-10 sm:w-10">
                 <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+              <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Restro<span className="text-blue-600">ly</span>
               </span>
-            </Link>
+            </a>
 
             {/* Desktop Nav Links */}
             <div className="hidden items-center gap-8 md:flex">
@@ -169,7 +235,10 @@ const Landing = () => {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-sm font-semibold text-slate-600 transition-colors hover:text-blue-600"
+                  onClick={() => setActiveLink(link.href)}
+                  className={`text-sm font-semibold transition-colors hover:text-blue-600 ${
+                    activeLink === link.href ? 'text-blue-600' : 'text-slate-600'
+                  }`}
                 >
                   {link.label}
                 </a>
@@ -178,9 +247,25 @@ const Landing = () => {
 
             {/* Desktop CTA */}
             <div className="hidden items-center gap-3 md:flex">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggle}
+                aria-label="Toggle dark mode"
+                className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                {isDark ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                )}
+              </button>
               <Link
                 to="/login"
-                className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+                className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Log In
               </Link>
@@ -195,7 +280,7 @@ const Landing = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 md:hidden"
+              className="inline-flex items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -204,29 +289,29 @@ const Landing = () => {
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="border-t border-slate-100 bg-white px-4 pb-6 pt-2 md:hidden">
+          <div className="border-t border-slate-100 bg-white px-4 pb-6 pt-2 dark:border-slate-700 dark:bg-slate-900 md:hidden">
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  className="rounded-lg px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   {link.label}
                 </a>
               ))}
             </div>
-            <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4">
+            <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4 dark:border-slate-700">
               <Link
                 to="/login"
-                className="rounded-lg border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
+                className="rounded-lg border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 dark:border-slate-600 dark:text-slate-200"
               >
                 Log In
               </Link>
               <Link
                 to="/admin"
-                className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm"
+                className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
               >
                 Get Started Free
               </Link>
@@ -238,7 +323,7 @@ const Landing = () => {
       {/* ================================================ */}
       {/* HERO SECTION                                     */}
       {/* ================================================ */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white pt-28 pb-16 sm:pt-36 sm:pb-24 lg:pt-44 lg:pb-32">
+      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white pt-28 pb-16 dark:from-slate-800 dark:via-slate-900 dark:to-slate-900 sm:pt-36 sm:pb-24 lg:pt-44 lg:pb-32">
 
         {/* Decorative Pattern */}
         <div
@@ -251,13 +336,13 @@ const Landing = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Trust Badge */}
-            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 sm:mb-8">
+            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 sm:mb-8">
               <Star className="h-4 w-4 fill-blue-500 text-blue-500" />
               Trusted by 5+ Restaurants across India
             </div>
 
             {/* Heading */}
-            <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
               Your Restaurant,{' '}
               <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
                 Fully Digital
@@ -265,7 +350,7 @@ const Landing = () => {
             </h1>
 
             {/* Subtitle */}
-            <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-slate-600 sm:mt-8 sm:text-xl">
+            <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-slate-600 dark:text-slate-300 sm:mt-8 sm:text-xl">
               QR code menus, instant UPI payments, WhatsApp order alerts, and
               powerful analytics — all in one beautiful platform.
             </p>
@@ -279,7 +364,7 @@ const Landing = () => {
                 Start Free Trial
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
-              <button className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-8 py-4 text-base font-bold text-slate-700 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 sm:text-lg">
+              <button className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-8 py-4 text-base font-bold text-slate-700 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-400 dark:hover:text-blue-400 sm:text-lg">
                 <Play className="h-5 w-5 fill-blue-600 text-blue-600" />
                 Watch Demo
               </button>
@@ -291,7 +376,7 @@ const Landing = () => {
                 (text) => (
                   <span
                     key={text}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400"
                   >
                     <CheckCircle2 className="h-4 w-4 text-blue-500" />
                     {text}
@@ -322,17 +407,17 @@ const Landing = () => {
       {/* ================================================ */}
       {/* FEATURES                                         */}
       {/* ================================================ */}
-      <section id="features" className="bg-white py-20 sm:py-28">
+      <section id="features" className="bg-white py-20 dark:bg-slate-900 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mx-auto max-w-2xl text-center">
-            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
               Features
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl lg:text-5xl">
               Everything You Need to Go Digital
             </h2>
-            <p className="mt-4 text-lg text-slate-600">
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
               Powerful tools designed specifically for Indian restaurants.
             </p>
           </div>
@@ -342,15 +427,15 @@ const Landing = () => {
             {features.map((feature, i) => (
               <div
                 key={i}
-                className="group rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl"
+                className="group rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500"
               >
                 <div
                   className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl ${feature.color}`}
                 >
                   <feature.icon className="h-7 w-7" />
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-slate-900">{feature.title}</h3>
-                <p className="leading-relaxed text-slate-600">{feature.desc}</p>
+                <h3 className="mb-3 text-xl font-bold text-slate-900 dark:text-white">{feature.title}</h3>
+                <p className="leading-relaxed text-slate-600 dark:text-slate-400">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -360,13 +445,13 @@ const Landing = () => {
       {/* ================================================ */}
       {/* HOW IT WORKS                                     */}
       {/* ================================================ */}
-      <section id="how-it-works" className="bg-slate-50 py-20 sm:py-28">
+      <section id="how-it-works" className="bg-slate-50 py-20 dark:bg-slate-800 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
               How It Works
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Up and Running in Minutes
             </h2>
           </div>
@@ -379,15 +464,15 @@ const Landing = () => {
                   <div className="absolute right-0 top-10 hidden h-0.5 w-full -translate-x-1/2 bg-blue-200 lg:block" />
                 )}
 
-                <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md">
+                <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md dark:border-blue-800 dark:bg-slate-700">
                   <step.icon className="h-8 w-8 text-blue-600" />
                   <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
                     {step.num}
                   </span>
                 </div>
 
-                <h3 className="mb-2 text-lg font-bold text-slate-900">{step.title}</h3>
-                <p className="text-sm text-slate-600">{step.desc}</p>
+                <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -397,31 +482,34 @@ const Landing = () => {
       {/* ================================================ */}
       {/* PRICING                                          */}
       {/* ================================================ */}
-      <section id="pricing" className="bg-white py-20 sm:py-28">
+      <section id="pricing" className="bg-white py-20 dark:bg-slate-900 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
               Pricing
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Simple, Transparent Pricing
             </h2>
-            <p className="mt-4 text-lg text-slate-600">
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
               Start free. No credit card required. Upgrade anytime.
             </p>
           </div>
-
+  
           <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
             {plans.map((plan, i) => (
-              <div
-                key={i}
-                className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
-                  plan.popular
-                    ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50'
-                    : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg'
-                }`}
-              >
-                {plan.popular && (
+
+          <button
+          key={i}
+          type="button"
+          onClick={() => setSelectedPlan(plan.name)}
+          className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
+          selectedPlan === plan.name
+          ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50 dark:bg-slate-800'
+          : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:shadow-slate-700/50'
+          }`}
+          >
+          {selectedPlan === plan.name && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="rounded-full bg-blue-600 px-4 py-1 text-xs font-bold text-white shadow-md">
                       MOST POPULAR
@@ -429,17 +517,17 @@ const Landing = () => {
                   </div>
                 )}
 
-                <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
-                <p className="mt-1 text-sm text-slate-500">{plan.desc}</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">{plan.name}</h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{plan.desc}</p>
 
                 <div className="my-6">
-                  <span className="text-4xl font-extrabold text-slate-900">{plan.price}</span>
-                  <span className="text-slate-500">{plan.period}</span>
+                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white">{plan.price}</span>
+                  <span className="text-slate-500 dark:text-slate-400">{plan.period}</span>
                 </div>
 
                 <ul className="mb-8 flex-1 space-y-3">
                   {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-center gap-2.5 text-sm text-slate-700">
+                    <li key={j} className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300">
                       <Check className="h-4 w-4 shrink-0 text-blue-500" />
                       {f}
                     </li>
@@ -449,15 +537,15 @@ const Landing = () => {
                 <Link
                   to="/admin"
                   className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
-                    plan.popular
+                    selectedPlan === plan.name
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700'
-                      : 'border border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600'
+                      : 'border border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-900/30 dark:hover:text-blue-300'
                   }`}
                 >
                   Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -466,13 +554,13 @@ const Landing = () => {
       {/* ================================================ */}
       {/* TESTIMONIALS                                     */}
       {/* ================================================ */}
-      <section id="testimonials" className="bg-slate-50 py-20 sm:py-28">
+      <section id="testimonials" className="bg-slate-50 py-20 dark:bg-slate-800 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
               Testimonials
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Loved by Restaurant Owners
             </h2>
           </div>
@@ -481,7 +569,7 @@ const Landing = () => {
             {testimonials.map((t, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition-shadow hover:shadow-lg"
+                className="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition-shadow hover:shadow-lg dark:border-slate-700 dark:bg-slate-700"
               >
                 {/* Stars */}
                 <div className="mb-4 flex gap-1">
@@ -492,15 +580,15 @@ const Landing = () => {
                     ))}
                 </div>
 
-                <p className="mb-6 leading-relaxed text-slate-600">"{t.text}"</p>
+                <p className="mb-6 leading-relaxed text-slate-600 dark:text-slate-300">"{t.text}"</p>
 
-                <div className="flex items-center gap-3 border-t border-slate-100 pt-4">
+                <div className="flex items-center gap-3 border-t border-slate-100 pt-4 dark:border-slate-600">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
                     {t.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900">{t.name}</p>
-                    <p className="text-xs text-slate-500">{t.role}</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">{t.name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -512,7 +600,7 @@ const Landing = () => {
       {/* ================================================ */}
       {/* CTA SECTION                                      */}
       {/* ================================================ */}
-      <section className="bg-white py-20 sm:py-28">
+      <section className="bg-white py-20 dark:bg-slate-900 sm:py-28">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 p-10 text-center shadow-2xl shadow-blue-300/30 sm:p-16">
             <Sparkles className="mx-auto mb-6 h-10 w-10 text-blue-200" />
@@ -567,16 +655,16 @@ const Landing = () => {
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link}>
-                      <a
-                        href="#"
-                        className="text-sm text-slate-400 transition-colors hover:text-white"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
+                 {col.links.map((link) => (
+                <li key={link.label}>
+                <a
+                  href={link.href}
+                  className="text-sm text-slate-400 transition-colors hover:text-white"
+                >
+                 {link.label}
+                </a>
+              </li>
+            ))}
                 </ul>
               </div>
             ))}

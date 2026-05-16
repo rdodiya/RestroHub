@@ -27,7 +27,7 @@ const GallerySection = () => {
     };
 
     return (
-        <section id="gallery" className="gallery section">
+        <section id="features" className="gallery section">
             <div className="container">
                 {/* Header */}
                 <div className="gallery-header">
