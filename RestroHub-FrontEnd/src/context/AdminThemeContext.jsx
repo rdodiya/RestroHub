@@ -11,7 +11,7 @@ export const AdminThemeProvider = ({ children }) => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  // Apply / remove the `dark` class on the <html> element
+  // Apply / remove the `admin-dark` class on the <html> element
   useEffect(() => {
     const root = document.documentElement;
     if (isDark) {
@@ -20,6 +20,7 @@ export const AdminThemeProvider = ({ children }) => {
       root.classList.remove('admin-dark');
     }
     localStorage.setItem(STORAGE_KEY, isDark ? 'dark' : 'light');
+    return () => document.documentElement.classList.remove('admin-dark');
   }, [isDark]);
 
   const toggle = useCallback(() => setIsDark((prev) => !prev), []);

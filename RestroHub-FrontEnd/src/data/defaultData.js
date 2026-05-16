@@ -6,6 +6,7 @@
 export const defaultSiteData = {
     // Theme Configuration
     theme: {
+        mode: "dark",
         primary: "#f59e0b",
         primaryHover: "#fbbf24",
         primaryDark: "#d97706",

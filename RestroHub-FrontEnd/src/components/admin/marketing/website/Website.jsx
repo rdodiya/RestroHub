@@ -15,10 +15,10 @@ const Website = () => {
   const saved = loadSaved();
 
   const [selectedTemplate, setSelectedTemplate] = useState(saved.template || 'modern');
-  const [selectedTheme, setSelectedTheme]       = useState(saved.palette  || 'blue');
-  const [websiteMode, setWebsiteMode]           = useState(saved.mode     || 'dark');
-  const [customPrimary, setCustomPrimary]       = useState(saved.customPrimary   || '#3b82f6');
-  const [customSecondary, setCustomSecondary]   = useState(saved.customSecondary || '#2563eb');
+  const [selectedTheme, setSelectedTheme] = useState(saved.palette || 'blue');
+  const [websiteMode, setWebsiteMode] = useState(saved.mode || 'dark');
+  const [customPrimary, setCustomPrimary] = useState(saved.customPrimary || '#3b82f6');
+  const [customSecondary, setCustomSecondary] = useState(saved.customSecondary || '#2563eb');
 
   // Persist config to localStorage — customer template reads this on load via SiteContext
   const handleSave = () => {

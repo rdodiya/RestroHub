@@ -5,10 +5,10 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  // Use .admin-dark class on <html> (set by AdminThemeContext) to activate dark: variants.
-  // This is intentionally scoped to "admin-dark" so it never interferes with the
-  // customer-facing website template which uses CSS variables instead.
-  darkMode: ['selector', '.admin-dark'],
+  // .admin-dark  → toggled by AdminThemeContext (admin panel only)
+  // .dark        → toggled by PublicLayout based on system preference (login / public pages)
+  // Both activate Tailwind's dark: variants; CSS-variable-based customer template is unaffected.
+  darkMode: ['selector', ['.dark', '.admin-dark']],
   theme: {
     extend: {
       colors: {

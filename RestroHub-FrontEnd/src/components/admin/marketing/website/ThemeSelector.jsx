@@ -101,7 +101,7 @@ const ThemeSelector = ({
                 <input
                   type="color"
                   value={customPrimary}
-                  onChange={(e) => onCustomPrimaryChange(e.target.value)}
+                  onChange={(e) => { onCustomPrimaryChange(e.target.value); onThemeChange('custom'); }}
                   className="
                     h-9 w-9 cursor-pointer rounded-lg border border-gray-200
                     bg-transparent sm:h-10 sm:w-10
@@ -110,7 +110,7 @@ const ThemeSelector = ({
                 <input
                   type="text"
                   value={customPrimary}
-                  onChange={(e) => onCustomPrimaryChange(e.target.value)}
+                  onChange={(e) => { onCustomPrimaryChange(e.target.value); onThemeChange('custom'); }}
                   className="
                     w-full rounded-lg border border-gray-200 bg-white
                     px-2.5 py-2 text-xs uppercase text-gray-900
@@ -130,7 +130,7 @@ const ThemeSelector = ({
                 <input
                   type="color"
                   value={customSecondary}
-                  onChange={(e) => onCustomSecondaryChange(e.target.value)}
+                  onChange={(e) => { onCustomSecondaryChange(e.target.value); onThemeChange('custom'); }}
                   className="
                     h-9 w-9 cursor-pointer rounded-lg border border-gray-200
                     bg-transparent sm:h-10 sm:w-10
@@ -139,7 +139,7 @@ const ThemeSelector = ({
                 <input
                   type="text"
                   value={customSecondary}
-                  onChange={(e) => onCustomSecondaryChange(e.target.value)}
+                  onChange={(e) => { onCustomSecondaryChange(e.target.value); onThemeChange('custom'); }}
                   className="
                     w-full rounded-lg border border-gray-200 bg-white
                     px-2.5 py-2 text-xs uppercase text-gray-900

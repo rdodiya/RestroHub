@@ -150,8 +150,6 @@ const StatsSection = () => {
 
     const response = await api.get("/secure/api/v1/dashboard/statistics");
 
-    console.log("Actual response:", response);
-    console.log("Response data:", response.data);
 
     const apiStats = response.data.map(stat => ({
       ...stat,
