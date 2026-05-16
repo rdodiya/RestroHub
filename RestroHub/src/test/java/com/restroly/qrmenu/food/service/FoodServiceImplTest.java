@@ -9,7 +9,6 @@ import com.restroly.qrmenu.config.CloudinaryService;
 import com.restroly.qrmenu.food.dto.FoodMapper;
 import com.restroly.qrmenu.food.dto.FoodRequestDTO;
 import com.restroly.qrmenu.food.dto.FoodResponseDTO;
-import com.restroly.qrmenu.food.dto.FoodUpdateDTO;
 import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.food.repository.FoodRepository;
 import org.junit.jupiter.api.BeforeEach;
