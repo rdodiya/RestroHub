@@ -6,10 +6,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { GoogleLogin } from "@react-oauth/google";
 import api from "@services/common/api";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8181/restroly";
 
 const validationSchema = Yup.object({
     username: Yup.string().required("Email or username is required"),
@@ -152,7 +153,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
-    initialValues: { email: "", password: "" },
+    initialValues: { username: "", password: "" },
     validationSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
@@ -187,9 +188,39 @@ const Login = () => {
     },
   });
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE_URL}/auth/google`;
-  };
+const handleGoogleLogin = async (credentialResponse) => {
+  try {
+    setIsLoading(true);
+
+    const res = await api.post("/public/api/v1/auth/google", {
+      token: credentialResponse.credential,
+    });
+
+    const result = res.data;
+
+    if (result.success) {
+      const { accessToken, refreshToken, roles } = result.data;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("roles", JSON.stringify(roles));
+
+      axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+      toast.success("Google login successful!");
+
+      navigate("/admin/dashboard");
+    } else {
+      toast.error(result.message || "Google login failed");
+    }
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message || "Google authentication failed"
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   /* ── input wrapper helper ── */
   const inputClass = (field) =>
@@ -247,16 +278,17 @@ const Login = () => {
                 {/* Email */}
                 <div className="mb-5">
                   <label
-                    htmlFor="email"
+                    htmlFor="username"
                     className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Email
+                    Email or Username
                   </label>
                   <div className="relative">
                    <input
                       id="username"
                       name="username"
                       type="text"
+                      autoComplete="username"
                       placeholder="Enter email or username"
                       value={formik.values.username}
                       onChange={formik.handleChange}
@@ -267,8 +299,8 @@ const Login = () => {
                       <EmailIcon />
                     </span>
                   </div>
-                  {formik.touched.email && formik.errors.email && (
-                    <p className="mt-1.5 text-xs text-red-500">{formik.errors.email}</p>
+                  {formik.touched.username && formik.errors.username && (
+                    <p className="mt-1.5 text-xs text-red-500">{formik.errors.username}</p>
                   )}
                 </div>
 
@@ -333,26 +365,28 @@ const Login = () => {
                     "Sign In"
                   )}
                 </button>
+{/* Divider */}
+<div className="relative mb-5 flex items-center">
+  <div className="flex-grow border-t border-gray-200 dark:border-gray-600" />
 
-                {/* Divider */}
-                {/* <div className="relative mb-5 flex items-center">
-                  <div className="flex-grow border-t border-gray-200 dark:border-gray-600" />
-                  <span className="mx-4 shrink-0 text-xs uppercase text-gray-400 dark:text-gray-500">
-                    Or continue with
-                  </span>
-                  <div className="flex-grow border-t border-gray-200 dark:border-gray-600" />
-                </div>
+  <span className="mx-4 shrink-0 text-xs uppercase text-gray-400 dark:text-gray-500">
+    Or continue with
+  </span>
 
-                
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={isLoading}
-                  className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-gray-50 px-6 py-4 text-base font-medium text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                >
-                  <GoogleIcon />
-                  Sign in with Google
-                </button> */}
+  <div className="flex-grow border-t border-gray-200 dark:border-gray-600" />
+</div>
+
+<GoogleLogin
+  onSuccess={(credentialResponse) => {
+    handleGoogleLogin(credentialResponse);
+  }}
+  onError={() => {
+    toast.error("Google Login Failed");
+  }}
+/>
+```
+
+
 
                 {/* Sign-up link */}
                 <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
