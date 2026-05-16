@@ -150,10 +150,31 @@ const plans = [
   ];
 
   const footerColumns = [
-    { title: 'Product', links: ['Features', 'Pricing', 'Integrations', 'Changelog'] },
-    { title: 'Company', links: ['About Us', 'Blog', 'Careers', 'Contact'] },
-    { title: 'Legal', links: ['Privacy Policy', 'Terms of Service', 'Refund Policy'] },
-  ];
+  {
+    title: 'Product',
+    links: [
+      { label: 'Features', href: '#features' },
+      { label: 'How It Works', href: '#how-it-works' },
+      { label: 'Pricing', href: '#pricing' },
+      { label: 'Testimonials', href: '#testimonials' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About Us', href: '#features' },
+      { label: 'Contact', href: '#testimonials' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Privacy Policy', href: '#' },
+      { label: 'Terms of Service', href: '#' },
+      { label: 'Refund Policy', href: '#' },
+    ],
+  },
+];
 
   const stats = [
     { value: '500+', label: 'Restaurants' },
@@ -592,16 +613,16 @@ const plans = [
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link}>
-                      <a
-                        href="#"
-                        className="text-sm text-slate-400 transition-colors hover:text-white"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
+                 {col.links.map((link) => (
+                <li key={link.label}>
+                <a
+                  href={link.href}
+                  className="text-sm text-slate-400 transition-colors hover:text-white"
+                >
+                 {link.label}
+                </a>
+              </li>
+            ))}
                 </ul>
               </div>
             ))}
