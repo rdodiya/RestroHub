@@ -28,10 +28,11 @@ export const defaultSiteData = {
 
     // Navigation Links
     navigation: [
-        { label: "About", href: "#about" },
-        { label: "Menu", href: "#menu" },
-        { label: "Gallery", href: "#gallery" },
-        { label: "Contact", href: "#contact" }
+       { label: "Features", href: "#features" },
+    { label: "How It Works", href: "#how-it-works" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "About Us", href: "#about" },
+    { label: "Contact", href: "#contact" }
     ],
 
     // Hero Section
@@ -278,13 +279,17 @@ export const defaultSiteData = {
     ],
 
     // Footer
-    footer: {
-        copyright: "© 2024 Arts District Kitchen. All rights reserved.",
-        links: [
-            { label: "Privacy Policy", href: "/privacy" },
-            { label: "Terms of Service", href: "/terms" }
-        ]
-    }
-};
+   footer: {
+  copyright: "© 2026 Restroly. All rights reserved.",
+  links: [
+    { label: "Features", href: "#features" },
+    { label: "How It Works", href: "#how-it-works" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "Testimonials", href: "#testimonials" },
+    { label: "About Us", href: "#about" },
+    { label: "Contact", href: "#contact" }
+  ]
+},
+    };
 
 export default defaultSiteData;
