@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@context/ThemeContext';
 import {
@@ -33,7 +33,27 @@ const Landing = () => {
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
   ];
-  const [activeLink, setActiveLink] = useState('#');
+  
+  // active link state
+  const [activeLink, setActiveLink] = useState("#");
+  
+  useEffect(() => {
+    const ids = navLinks.map((link) => link.href.replace("#", ""));
+    const obs = new IntersectionObserver((entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveLink(`#${entry.target.id}`);
+        }
+      });
+    }), { rootMargin: '-50% 0px -50% 0px' });
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+
+    return () => obs.disconnect();
+  }, []);
 
   const features = [
     {
@@ -200,14 +220,14 @@ const plans = [
           <div className="flex h-16 items-center justify-between sm:h-20">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5">
+            <a href="#" className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-200 sm:h-10 sm:w-10">
                 <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Restro<span className="text-blue-600">ly</span>
               </span>
-            </Link>
+            </a>
 
             {/* Desktop Nav Links */}
             <div className="hidden items-center gap-8 md:flex">
