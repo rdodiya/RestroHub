@@ -22,6 +22,8 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  
   // ============================
   // DATA
   // ============================
@@ -30,6 +32,7 @@ const Landing = () => {
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
+    { label: 'Contact', href: '#contact' },
   ];
 
   const features = [
@@ -127,7 +130,41 @@ const plans = [
   const [selectedPlan, setSelectedPlan] = useState(
   plans.find(plan => plan.popular)?.name || plans[0].name
   );
+const [contactForm, setContactForm] = useState({
+    name: '', mobile: '', email: '', description: '',
+  });
+  const [contactStatus, setContactStatus] = useState(''); // '', 'sending', 'success', 'error'
 
+  const handleContactChange = (e) =>
+    setContactForm({ ...contactForm, [e.target.name]: e.target.value });
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactStatus('sending');
+    try {
+      const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({
+  service_id: "service_fgj8bx6" ,      // ← your actual Service ID
+  template_id: "template_j3k2n5c",     // ← your actual Template ID
+  user_id: "-Lly6B-CoO6THDld_",         // ← your actual Public Key
+  template_params: {
+    from_name: contactForm.name,
+    mobile: contactForm.mobile,
+    from_email: contactForm.email,
+    message: contactForm.description,
+  },
+}),
+      });
+      if (res.ok) {
+        setContactStatus('success');
+        setContactForm({ name: '', mobile: '', email: '', description: '' });
+      } else setContactStatus('error');
+    } catch {
+      setContactStatus('error');
+    }
+  };
   const testimonials = [
     {
       name: 'Ramesh Patel',
@@ -563,6 +600,115 @@ const plans = [
           </div>
         </div>
       </section>
+      {/* ================================================ */}
+      {/* CONTACT SECTION                                  */}
+      {/* ================================================ */}
+      <section id="contact" className="bg-slate-50 py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+              Contact Us
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Get in Touch
+            </h2>
+            <p className="mt-4 text-lg text-slate-600">
+              Have questions? We'd love to hear from you.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-12 max-w-xl rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
+            <div className="space-y-5">
+              {/* Name */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={contactForm.name}
+                  onChange={handleContactChange}
+                  placeholder="John Doe"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Mobile */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Mobile Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="mobile"
+                  required
+                  value={contactForm.mobile}
+                  onChange={handleContactChange}
+                  placeholder="+91 XXXXX XXXXX"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={contactForm.email}
+                  onChange={handleContactChange}
+                  placeholder="you@example.com"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  required
+                  rows={4}
+                  value={contactForm.description}
+                  onChange={handleContactChange}
+                  placeholder="Tell us how we can help..."
+                  className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                onClick={handleContactSubmit}
+                disabled={contactStatus === 'sending'}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-200 transition-all hover:bg-blue-700 disabled:opacity-60"
+              >
+                {contactStatus === 'sending' ? 'Sending...' : 'Send Message'}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </button>
+
+              {/* Feedback */}
+              {contactStatus === 'success' && (
+                <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                  <CheckCircle2 className="h-5 w-5" />
+                  Message sent! We'll get back to you soon.
+                </div>
+              )}
+              {contactStatus === 'error' && (
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600">
+                  ❌ Something went wrong. Please try again.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ================================================ */}
       {/* FOOTER                                           */}
@@ -595,7 +741,7 @@ const plans = [
                   {col.links.map((link) => (
                     <li key={link}>
                       <a
-                        href="#"
+                          href={link === 'Contact' ? '#contact' : '#'} 
                         className="text-sm text-slate-400 transition-colors hover:text-white"
                       >
                         {link}
