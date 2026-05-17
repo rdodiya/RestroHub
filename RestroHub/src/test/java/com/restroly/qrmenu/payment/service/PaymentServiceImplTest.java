@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +39,7 @@ class PaymentServiceImplTest {
     void newPayment_ShouldSaveAndReturnPaymentId() {
         // Given
         Long orderId = 123L;
-        double amount = 500.00;
+        BigDecimal amount = new BigDecimal("500.00");
 
         // When
         String resultId = paymentService.newPayment(orderId, amount);
@@ -52,7 +53,7 @@ class PaymentServiceImplTest {
     @Test
     void generatePaymentLink_ShouldReturnCorrectlyFormattedUpiString() {
         // Given
-        double amount = 150.50;
+        BigDecimal amount = new BigDecimal("150.50");
         Long orderId = 456L;
         String upiId = "admin@bank";
 
@@ -148,7 +149,7 @@ class PaymentServiceImplTest {
     @Test
     void generateUPIQR_ShouldReturnResource() throws IOException {
         // Given
-        double amount = 100.0;
+        BigDecimal amount = new BigDecimal("100.00");
         String upiId = "test@bank";
         String description = "Test QR";
 

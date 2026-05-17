@@ -10,6 +10,7 @@ import com.restroly.qrmenu.payment.entity.PaymentVerification;
 import com.restroly.qrmenu.payment.repository.PaymentVerificationRepository;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
@@ -33,7 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentVerificationRepository verificationRepository;
 
-    public String newPayment(Long orderId, double amount) {
+    public String newPayment(Long orderId, BigDecimal amount) {
         log.info("Creating new payment record with manual verification flag set to false");
         PaymentVerification entity = PaymentVerification.builder()
                                     .paymentId("PAY" + orderId)
@@ -46,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public String generatePaymentLink(double amount, Long orderId, String upiId) {
+    public String generatePaymentLink(BigDecimal amount, Long orderId, String upiId) {
         log.info("Generating raw UPI payment link for orderId: {}, amount: {}, upiId: {}", orderId, amount, upiId);
 
         String description = (orderId != null && orderId > 0)
@@ -58,7 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Resource generateUPIQR(double amount, String upiId, String description) {
+    public Resource generateUPIQR(BigDecimal amount, String upiId, String description) {
         log.info("Generating raw UPI QR for amount: {}, upiId: {}, description: {}", amount, upiId, description);
 
         String desc = (description != null && !description.isBlank()) ? description : "RestroHub payment";
@@ -83,7 +84,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private String buildUri(
             String baseUrl,
-            double amount,
+            BigDecimal amount,
             Long orderId,
             String upiId,
             String description) {

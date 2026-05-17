@@ -1,5 +1,7 @@
 package com.restroly.qrmenu.payment.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +29,7 @@ public class PaymentVerification {
     private Long orderId;
 
     @Column(name = "amount")
-    private double amount;
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "verified", nullable = false)

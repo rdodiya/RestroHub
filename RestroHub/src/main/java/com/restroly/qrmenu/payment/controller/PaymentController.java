@@ -3,9 +3,10 @@
 //Preferred : only use for testing purpose, as this module is a plug-and-play type and should not have any external dependencies. --- IGNORE ---
 // Written By Contributor who formally made this module --- IGNORE ---
 
+// REMOVE ME IN PRODUCTION: This controller is only for testing the payment module and should not be used in production. The payment module is designed to be plug-and-play without any external dependencies, so this controller is not intended for production use.
 
-
-
+//-------------- THE CONTROLLER IS NOT TO BE USED IN PRODUCTION,
+// IT IS ONLY FOR TESTING PURPOSES. THE MODULE IS DESIGNED TO BE PLUG-AND-PLAY WITHOUT ANY EXTERNAL DEPENDENCIES. ------------------
 package com.restroly.qrmenu.payment.controller;
 
 import com.restroly.qrmenu.payment.service.PaymentService;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.restroly.qrmenu.common.util.ApiConstants.*;
+
+import java.math.BigDecimal;
 @RestController
 @RequestMapping(PUBLIC_API_VERSION+"/payments")
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class PaymentController {
 
     @GetMapping("/link")
     public ResponseEntity<String> generatePaymentLink(
-            @RequestParam double amount,
+            @RequestParam BigDecimal amount,
             @RequestParam(required = false) Long orderId,
             @RequestParam String upiId) {
         String link = paymentService.generatePaymentLink(amount, orderId, upiId);
@@ -35,7 +38,7 @@ public class PaymentController {
 
     @GetMapping("/qr")
     public ResponseEntity<Resource> generateUPIQR(
-            @RequestParam double amount,
+            @RequestParam BigDecimal amount,
             @RequestParam String upiId,
             @RequestParam(required = false, defaultValue = "RestroHub Payment") String description) {
         Resource qrResource = paymentService.generateUPIQR(amount, upiId, description);
