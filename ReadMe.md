@@ -452,7 +452,7 @@ git push origin feature/your-feature-name
 
 | Feature | Difficulty | Impact |
 |---------|-----------|--------|
-| Backend Api Changes as per requiremen of Frontne | Low | High |
+| Backend Api Changes as per requirements of Frontend | Low | High |
 | Frontend Highly Responsive UI | Low | High |
 | Frontend & Backend Integration | Low | High |
 | WhatsApp Integration | Medium | High |
