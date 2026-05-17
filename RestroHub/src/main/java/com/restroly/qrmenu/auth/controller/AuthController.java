@@ -5,8 +5,7 @@ import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
 import com.restroly.qrmenu.auth.service.AuthService;
 import com.restroly.qrmenu.common.dto.ApiResponse;
-import com.restroly.qrmenu.common.exception.ErrorResponse;
-import com.restroly.qrmenu.common.util.ApiConstants;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -69,7 +68,7 @@ public class AuthController {
                     description = "Invalid request - validation failed",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -77,7 +76,7 @@ public class AuthController {
                     description = "Authentication failed - invalid credentials",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
+                            schema = @Schema(implementation = ApiErrorResponse.class),
                             examples = @ExampleObject(value = """
                                     {
                                         "status": 401,
@@ -134,7 +133,7 @@ public class AuthController {
                     description = "Invalid or expired refresh token",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })

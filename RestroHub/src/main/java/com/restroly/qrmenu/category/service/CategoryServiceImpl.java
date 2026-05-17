@@ -2,7 +2,7 @@ package com.restroly.qrmenu.category.service;
 
 import com.restroly.qrmenu.category.dto.CategoryRequestDTO;
 import com.restroly.qrmenu.category.dto.CategoryResponseDTO;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.restroly.qrmenu.category.dto.CategoryDTO;

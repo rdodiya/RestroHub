@@ -1,8 +1,7 @@
 package com.restroly.qrmenu.template.service;
 
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
-import com.restroly.qrmenu.template.dto.*;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.template.dto.*;
 import com.restroly.qrmenu.template.entity.Section;
 import com.restroly.qrmenu.template.entity.SectionTemplate;
@@ -71,8 +70,7 @@ public class SectionServiceImpl implements SectionService {
                 .orElseThrow(() -> new  ResourceNotFoundException("Site config not found with siteId : "+ siteId));
 
         SectionTemplate template = sectionTemplateRepository.findById(sectionTemplateId)
-                .orElseThrow(() -> new RuntimeException("Section template not found: " + sectionTemplateId));
-
+                .orElseThrow(() -> new ResourceNotFoundException("SectionTemplate", "id", sectionTemplateId));
         // Check for duplicate section key
         if (sectionRepository.existsBySiteConfigIdAndSectionKey(siteConfig.getId(), sectionKey)) {
             throw new ResourceAlreadyExistsException("Section", "sectionKey", sectionKey);

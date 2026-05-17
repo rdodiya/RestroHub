@@ -1,7 +1,7 @@
 package com.restroly.qrmenu.restaurant.controller;
 
 
-import com.restroly.qrmenu.common.exception.ErrorResponse;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 import com.restroly.qrmenu.common.util.ApiConstants;
 import com.restroly.qrmenu.restaurant.dto.RestaurantRequestDTO;
 import com.restroly.qrmenu.restaurant.dto.RestaurantResponseDTO;
@@ -54,9 +54,9 @@ public class RestaurantController {
             @ApiResponse(responseCode = "201", description = "Restaurant added successfully",
                     content = @Content(schema = @Schema(implementation = RestaurantResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Restaurant already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions")
     })
@@ -74,7 +74,7 @@ public class RestaurantController {
             @ApiResponse(responseCode = "200", description = "Restaurant found",
                     content = @Content(schema = @Schema(implementation = RestaurantResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "Restaurant not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<RestaurantResponseDTO> getRestaurantById(
             @Parameter(description = "Long Id of the restaurant", required = true)
@@ -98,11 +98,11 @@ public class RestaurantController {
             @ApiResponse(responseCode = "200", description = "Restaurant updated successfully",
                     content = @Content(schema = @Schema(implementation = RestaurantResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Restaurant not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Restaurant name already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<RestaurantResponseDTO> updateRestaurant(
             @Parameter(description = "UUID of the restaurant item", required = true)
