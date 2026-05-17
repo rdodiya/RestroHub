@@ -64,6 +64,8 @@ const HeroSection = () => {
                     justify-content: center;
                     position: relative;
                     padding: var(--spacing-md);
+                    /* Hero is always a photo with dark overlay — force white text regardless of site theme */
+                    color: #ffffff;
                 }
 
                 .hero-content {
