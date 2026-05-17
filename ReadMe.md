@@ -233,7 +233,12 @@ Create a `.env` file in `RestroHub-FrontEnd/` (see `.env.example`):
 ```env
 # Base URL for the Spring context path (no trailing slash). Vite only reads VITE_* variables.
 VITE_API_BASE_URL=http://localhost:8181/restroly
+
+# Google Sign-In (OAuth 2.0 Web client ID) — required for /login
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
 ```
+
+Create OAuth credentials in [Google Cloud Console](https://console.cloud.google.com/apis/credentials) (OAuth 2.0 Client ID, type **Web application**). Add `http://localhost:5173` (or your Vite dev URL) to authorized JavaScript origins.
 
 Optional:
 
