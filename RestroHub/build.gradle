@@ -78,6 +78,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
+    // Google OAuth 2.0 for token verification
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.11.0'
+
     // Logging (JSON format for production)
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'

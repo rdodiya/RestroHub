@@ -123,6 +123,12 @@ Before starting, ensure you have the following installed on your machine:
 - Code Editor: VS Code (recommended)
 ```
 
+**For Google OAuth Integration:**
+```bash
+- Google Cloud Console account (free)
+- OAuth 2.0 Client ID from Google Cloud
+```
+
 ### Verify Installation
 
 ```bash
@@ -180,13 +186,44 @@ export DB_PASSWORD=your_password
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/RestroHub_DB
 ```
 
-The active Spring profile is **`dev`** by default (`spring.profiles.active` in `application.properties`). Database settings are merged from `application.properties` and `application-dev.properties`.
+#### 2. Google OAuth Setup (Required for Login)
 
-#### 2. Backend configuration (optional)
+**Get Google OAuth Client ID:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new project or select existing
+3. Click **"Create Credentials"** → **"OAuth client ID"** → **"Web application"**
+4. Add authorized URIs:
+   - `http://localhost:5173` (Frontend dev)
+   - `http://localhost:3000` (Alternative)
+   - Your production domain
+5. Copy the **Client ID**
+
+**Set Backend Configuration:**
+
+```bash
+export GOOGLE_OAUTH_CLIENT_ID=your_client_id_from_google_cloud
+export JWT_SECRET=your-256-bit-secret-key-change-in-production
+export JWT_EXPIRATION=86400000
+export JWT_REFRESH_EXPIRATION=604800000
+```
+
+To generate a secure JWT_SECRET:
+```bash
+# macOS/Linux
+openssl rand -hex 32
+
+# Or Python
+python3 -c "import os; print(os.urandom(32).hex())"
+
+# Or Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+#### 3. Backend configuration (optional)
 
 Most defaults are already in `RestroHub/src/main/resources/application.properties` and `application-dev.properties`. Prefer environment variables for secrets (for example `DB_PASSWORD`, `JWT_SECRET`) instead of committing passwords.
 
-#### 3. Build and run backend
+#### 4. Build and run backend
 
 ```bash
 # Navigate to backend directory
@@ -226,14 +263,17 @@ cd RestroHub-FrontEnd
 npm install
 ```
 
-#### 2. Environment configuration
+#### 2. Environment configuration - Google OAuth
 
 Create a `.env` file in `RestroHub-FrontEnd/` (see `.env.example`):
 
 ```env
-# Base URL for the Spring context path (no trailing slash). Vite only reads VITE_* variables.
+# Frontend API and Google OAuth
 VITE_API_BASE_URL=http://localhost:8181/restroly
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
 ```
+
+**Important:** Use the **same Google Client ID** from Google Cloud Console as used in backend configuration.
 
 Optional:
 
