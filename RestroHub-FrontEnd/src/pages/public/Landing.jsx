@@ -23,12 +23,11 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-gssoc_develop
+
   
   
 
   const { isDark, toggle } = useTheme();
- gssoc_develop
   // ============================
   // DATA
   // ============================
@@ -804,7 +803,6 @@ const [contactForm, setContactForm] = useState({
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
- gssoc_develop
                   {col.links.map((link) => (
                     <li key={link}>
                       <a
@@ -826,7 +824,6 @@ const [contactForm, setContactForm] = useState({
                 </a>
               </li>
             ))}
- gssoc_develop
                 </ul>
               </div>
             ))}
