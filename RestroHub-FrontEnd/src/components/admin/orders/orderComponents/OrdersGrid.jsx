@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
 import OrderCard from './OrderCard';
+import EmptyState from '../../EmptyState';
 import api from "@services/common/api";
 
 // ============================================
@@ -203,17 +204,17 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
 
   if (filteredOrders.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
-        <ClipboardList className="w-16 h-16 text-blue-200 mx-auto mb-4" />
-        <p className="text-gray-700 font-medium mb-1">No orders found</p>
-        <p className="text-gray-500 text-sm">
-          {searchQuery
+      <EmptyState
+        icon={ClipboardList}
+        title={searchQuery ? 'No orders found' : 'No orders yet'}
+        description={
+          searchQuery
             ? `No results for "${searchQuery}"`
             : activeFilter !== 'all'
               ? `No ${activeFilter} orders right now`
-              : 'No orders yet. They will appear here.'}
-        </p>
-      </div>
+              : 'New orders will appear here once customers place them.'
+        }
+      />
     );
   }
 

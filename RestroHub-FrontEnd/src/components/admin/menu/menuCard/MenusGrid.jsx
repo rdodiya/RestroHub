@@ -32,6 +32,7 @@ import {
   BadgePercent,
 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
+import EmptyState from '../../EmptyState';
 import api from "@services/common/api";
 
 // ============================================
@@ -1143,28 +1144,17 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
           </button>
         </div>
       ) : filteredMenus.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 text-center p-10 sm:p-16 shadow-sm">
-          <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-5">
-            <UtensilsCrossed className="w-10 h-10 text-blue-300" />
-          </div>
-          <p className="text-gray-700 font-bold text-lg mb-1">
-            {searchQuery ? 'No menus found' : 'No menus yet'}
-          </p>
-          <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto">
-            {searchQuery
+        <EmptyState
+          icon={UtensilsCrossed}
+          title={searchQuery ? 'No menus found' : 'No menus yet'}
+          description={
+            searchQuery
               ? `No results for "${searchQuery}"`
-              : 'Create your first menu to organize your food items.'}
-          </p>
-          {!searchQuery && (
-            <button onClick={onCreateMenu}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600
-                               to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700
-                               transition-all font-semibold shadow-lg shadow-blue-600/25">
-              <Plus className="w-5 h-5" />
-              Create Your First Menu
-            </button>
-          )}
-        </div>
+              : 'Create your first menu to organize your food items.'
+          }
+          actionLabel={!searchQuery ? 'Create Your First Menu' : undefined}
+          onAction={!searchQuery ? onCreateMenu : undefined}
+        />
       ) : (
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {filteredMenus.map((menu) => (
