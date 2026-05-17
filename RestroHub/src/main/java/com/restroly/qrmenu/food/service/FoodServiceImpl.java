@@ -170,7 +170,7 @@ public class FoodServiceImpl implements FoodService {
         }
 
         // Safe null check for imageUrl
-        if(Objects.equals(updateDTO.getImageUrl(), existingFood.getImageUrl())) {
+        if(!Objects.equals(updateDTO.getImageUrl(), existingFood.getImageUrl())) {
             String imageUrl = null;
             if (image != null && !image.isEmpty()) {
                 imageUrl = cloudinaryService.uploadImage(image, "qrmenu/foods");
@@ -181,7 +181,7 @@ public class FoodServiceImpl implements FoodService {
         }
 
         // Safe null check for categoryId
-        if(Objects.equals(existingFood.getCategory().getCategoryId(), updateDTO.getCategoryId())) {
+        if(!Objects.equals(existingFood.getCategory().getCategoryId(), updateDTO.getCategoryId())) {
             if (updateDTO.getCategoryId() != null) {
                 Category category = categoryRepository.findById(updateDTO.getCategoryId())
                         .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + updateDTO.getCategoryId()));
