@@ -167,7 +167,7 @@ public class FoodServiceImpl implements FoodService {
             throw new ResourceAlreadyExistsException(
                     String.format(FOOD_EXISTS_MSG, updateDTO.getName()));
         }
-        if(!updateDTO.getImageUrl().equals(existingFood.getImageUrl())){
+        if (!java.util.Objects.equals(updateDTO.getImageUrl(), existingFood.getImageUrl())) {
             String imageUrl = null;
             if (image != null && !image.isEmpty()) {
                 imageUrl = cloudinaryService.uploadImage(image, "qrmenu/foods");
