@@ -1,4 +1,4 @@
-// src/main/java/com/Restroly/qrmenu/food/service/impl/FoodServiceImpl.java
+// src/main/java/com/restroly/qrmenu/food/service/impl/FoodServiceImpl.java
 package com.restroly.qrmenu.food.service;
 
 import com.cloudinary.Cloudinary;
