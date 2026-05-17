@@ -151,7 +151,13 @@ public class AuthController {
     }
     @PostMapping("/forgot-password")
 public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        if(email == null || email.trim().isEmpty()) {
+    return ResponseEntity.badRequest().body("Email cannot be empty");
+}
 
+if(!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+    return ResponseEntity.badRequest().body("Invalid email format");
+}
     authService.forgotPassword(email);
 
     return ResponseEntity.ok("Reset token generated successfully");
@@ -161,7 +167,13 @@ public ResponseEntity<String> forgotPassword(@RequestParam String email) {
 public ResponseEntity<String> resetPassword(
         @RequestParam String token,
         @RequestParam String newPassword) {
+                if(newPassword == null || newPassword.trim().isEmpty()) {
+    return ResponseEntity.badRequest().body("Password cannot be empty");
+}
 
+if(newPassword.length() < 6) {
+    return ResponseEntity.badRequest().body("Password must be at least 6 characters");
+}
     authService.resetPassword(token, newPassword);
 
     return ResponseEntity.ok("Password reset successful");
