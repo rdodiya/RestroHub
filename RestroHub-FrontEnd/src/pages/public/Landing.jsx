@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@context/ThemeContext';
 import {
@@ -33,6 +33,27 @@ const Landing = () => {
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
   ];
+  
+  // active link state
+  const [activeLink, setActiveLink] = useState("#");
+  
+  useEffect(() => {
+    const ids = navLinks.map((link) => link.href.replace("#", ""));
+    const obs = new IntersectionObserver((entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveLink(`#${entry.target.id}`);
+        }
+      });
+    }), { rootMargin: '-50% 0px -50% 0px' });
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+
+    return () => obs.disconnect();
+  }, []);
 
   const features = [
     {
@@ -152,10 +173,31 @@ const plans = [
   ];
 
   const footerColumns = [
-    { title: 'Product', links: ['Features', 'Pricing', 'Integrations', 'Changelog'] },
-    { title: 'Company', links: ['About Us', 'Blog', 'Careers', 'Contact'] },
-    { title: 'Legal', links: ['Privacy Policy', 'Terms of Service', 'Refund Policy'] },
-  ];
+  {
+    title: 'Product',
+    links: [
+      { label: 'Features', href: '#features' },
+      { label: 'How It Works', href: '#how-it-works' },
+      { label: 'Pricing', href: '#pricing' },
+      { label: 'Testimonials', href: '#testimonials' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About Us', href: '#features' },
+      { label: 'Contact', href: '#testimonials' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Privacy Policy', href: '#' },
+      { label: 'Terms of Service', href: '#' },
+      { label: 'Refund Policy', href: '#' },
+    ],
+  },
+];
 
   const stats = [
     { value: '500+', label: 'Restaurants' },
@@ -178,14 +220,14 @@ const plans = [
           <div className="flex h-16 items-center justify-between sm:h-20">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5">
+            <a href="#" className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-200 sm:h-10 sm:w-10">
                 <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Restro<span className="text-blue-600">ly</span>
               </span>
-            </Link>
+            </a>
 
             {/* Desktop Nav Links */}
             <div className="hidden items-center gap-8 md:flex">
@@ -193,7 +235,10 @@ const plans = [
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-sm font-semibold text-slate-600 transition-colors hover:text-blue-600"
+                  onClick={() => setActiveLink(link.href)}
+                  className={`text-sm font-semibold transition-colors hover:text-blue-600 ${
+                    activeLink === link.href ? 'text-blue-600' : 'text-slate-600'
+                  }`}
                 >
                   {link.label}
                 </a>
@@ -610,16 +655,16 @@ const plans = [
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link}>
-                      <a
-                        href="#"
-                        className="text-sm text-slate-400 transition-colors hover:text-white"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
+                 {col.links.map((link) => (
+                <li key={link.label}>
+                <a
+                  href={link.href}
+                  className="text-sm text-slate-400 transition-colors hover:text-white"
+                >
+                 {link.label}
+                </a>
+              </li>
+            ))}
                 </ul>
               </div>
             ))}
