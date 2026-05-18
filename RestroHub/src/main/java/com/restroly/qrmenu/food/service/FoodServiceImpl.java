@@ -52,8 +52,17 @@ public class FoodServiceImpl implements FoodService {
     @CacheEvict(value = "foods", allEntries = true)
     public FoodResponseDTO createFood(FoodRequestDTO requestDTO, MultipartFile image) {
 
-        if (foodRepository.existsByNameIgnoreCase(requestDTO.getName())) {
-            throw new ResourceAlreadyExistsException("Food already exists: " + requestDTO.getName());
+        //This is validating globally not per restaurant, so we will remove this validation
+        // if (foodRepository.existsByNameIgnoreCase(requestDTO.getName())) {
+        //     throw new ResourceAlreadyExistsException("Food already exists: " + requestDTO.getName());
+        // } 
+
+        // New validation to check if a food with the same name exists for the same restaurant
+        if(foodRepository.existsByNameAndRestaurantIdIgnoreCase(requestDTO.getName(), requestDTO.getRestaurantId())) {
+            log.warn("Attempt to create duplicate food with name: {} for restaurant id: {}",
+                    requestDTO.getName(), requestDTO.getRestaurantId());
+            throw new ResourceAlreadyExistsException(
+                "Food with name '" + requestDTO.getName() +"' already exists for this restaurant");
         }
 
         String imageUrl = null;

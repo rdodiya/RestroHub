@@ -47,4 +47,8 @@ public interface FoodService {
     boolean existsById(Long id);
 
     boolean existsByName(String name);
+
+    // New method to check if a food with the same name exists for the same restaurant
+    boolean existsByNameAndRestaurantIdIgnoreCase(String name, Long restaurantId);
+
 }
