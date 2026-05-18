@@ -149,7 +149,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
   // HANDLERS
   // ------------------------------------
   const handleStatusUpdate = (orderId, newStatus) => {
-    if (newStatus === 'complete') {
+    if (newStatus === 'complete' || newStatus === 'cancelled') {
       syncOrders(orders.filter((o) => o.id !== orderId));
     } else {
       syncOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)));

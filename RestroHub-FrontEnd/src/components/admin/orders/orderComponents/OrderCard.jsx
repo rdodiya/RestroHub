@@ -8,6 +8,7 @@ import {
   Phone,
   MoreVertical,
   Loader2,
+  X,
 } from 'lucide-react';
 import api from "@services/common/api";
 
@@ -116,6 +117,26 @@ const OrderCard = ({ order, onStatusUpdate }) => {
     }
   };
 
+  const handleCancel = async () => {
+    const isConfirmed = window.confirm("Are you sure you want to cancel this order?");
+    if (!isConfirmed) return;
+
+    try {
+      setUpdating(true);
+
+      // 🔌 UNCOMMENT WHEN API READY
+      // await api.put(`/api/orders/${order.id}/status`, { status: 'cancelled' });
+      // toast.success(`Order #${order.id} cancelled`);
+
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      onStatusUpdate(order.id, 'cancelled');
+    } catch (err) {
+      console.error('Failed to cancel order:', err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   // ------------------------------------
   // RENDER
   // ------------------------------------
@@ -187,18 +208,30 @@ const OrderCard = ({ order, onStatusUpdate }) => {
 
       {/* Action Button - NO WHITE TEXT */}
       {action && (
-        <button
-          onClick={handleAction}
-          disabled={updating}
-          className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold disabled:opacity-50 ${action.bg} ${action.text} ${action.hoverBg} ${action.border}`}
-        >
-          {updating ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <action.icon className="w-4 h-4" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleAction}
+            disabled={updating}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold disabled:opacity-50 ${action.bg} ${action.text} ${action.hoverBg} ${action.border}`}
+          >
+            {updating ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <action.icon className="w-4 h-4" />
+            )}
+            {action.label}
+          </button>
+          {order.status === 'pending' && (
+            <button
+              onClick={handleCancel}
+              disabled={updating}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 disabled:opacity-50"
+            >
+              <X className="w-4 h-4" />
+              Cancel
+            </button>
           )}
-          {action.label}
-        </button>
+        </div>
       )}
     </div>
   );
