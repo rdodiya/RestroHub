@@ -154,7 +154,7 @@ const plans = [
       name: 'Ramesh Patel',
       role: 'Owner, Rajkot Dhaba',
       text: 'Restroly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
-      text: 'Restorly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
+      text: 'Restroly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
       rating: 5,
     },
     {
@@ -606,7 +606,7 @@ const plans = [
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-lg text-blue-100/90">
               Join 5+ restaurants across India already using Restroly to
-              Join 5+ restaurants across India already using Restorly to
+              Join 5+ restaurants across India already using Restroly to
               serve customers faster.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -672,7 +672,7 @@ const plans = [
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row">
             <p className="text-sm text-slate-500">
               © {new Date().getFullYear()} Restroly. All rights reserved.
-              © {new Date().getFullYear()} Restorly. All rights reserved.
+              © {new Date().getFullYear()} Restroly. All rights reserved.
             </p>
             <p className="text-sm text-slate-500">Made with ❤️ in India</p>
           </div>
@@ -683,3 +683,4 @@ const plans = [
 };
 
 export default Landing;
+
