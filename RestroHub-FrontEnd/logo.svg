@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50">
+  <rect width="42" height="42" rx="8" fill="#E85D26" y="4"/>
+  <rect x="5" y="9" width="12" height="12" rx="2" fill="white"/>
+  <rect x="7" y="11" width="8" height="8" rx="1" fill="#E85D26"/>
+  <rect x="25" y="9" width="12" height="12" rx="2" fill="white"/>
+  <rect x="27" y="11" width="8" height="8" rx="1" fill="#E85D26"/>
+  <rect x="5" y="29" width="12" height="12" rx="2" fill="white"/>
+  <rect x="7" y="31" width="8" height="8" rx="1" fill="#E85D26"/>
+  <rect x="25" y="29" width="5" height="5" rx="1" fill="white"/>
+  <rect x="32" y="29" width="5" height="5" rx="1" fill="white"/>
+  <rect x="25" y="36" width="5" height="5" rx="1" fill="white"/>
+  <rect x="32" y="36" width="5" height="5" rx="1" fill="white"/>
+  <rect x="19" y="9" width="3" height="3" rx="0.5" fill="white"/>
+  <rect x="19" y="13" width="3" height="8" rx="0.5" fill="white"/>
+  <rect x="5" y="22" width="14" height="3" rx="0.5" fill="white"/>
+  <rect x="19" y="22" width="3" height="3" rx="0.5" fill="white"/>
+  <text x="50" y="33" font-family="system-ui,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#E85D26" letter-spacing="-0.5">Restroly</text>
+</svg>
