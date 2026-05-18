@@ -9,7 +9,6 @@ yarn-debug.log
 yarn-error.log
 dist/
 build/
-RestroHub-FrontEnd/package-lock.json
 
 # Java / Spring Boot
 target/
