@@ -10,6 +10,7 @@ import ProtectedRoute from './ProtectedRoute';
 // Public Pages
 import Landing from '../pages/public/Landing';
 import Login from '../pages/public/Login';
+import Register from '../pages/public/Register';
 
 // Customer Pages
 import RestaurantMenu from '../pages/customer/RestaurantMenu';
@@ -32,6 +33,7 @@ const AppRoutes = () => {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Route>
 
       {/* ========== CUSTOMER ROUTES ========== */}

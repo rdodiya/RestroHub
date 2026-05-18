@@ -1,23 +1,24 @@
-// src/pages/public/Login.jsx
+// src/pages/public/Register.jsx
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import toast from "react-hot-toast";
 import api from "@services/common/api";
 import { ArrowLeft } from "lucide-react";
 
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8181/restroly";
-
 const validationSchema = Yup.object({
-    username: Yup.string().required("Email or username is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
 });
 
 /* ──────────────────── SVG Icons (inlined) ──────────────────── */
@@ -56,15 +57,6 @@ const EyeOffIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.68 12.55a11.25 11.25 0 0 1-2.63 3.81l-1.49-1.49a9.75 9.75 0 0 0 2.18-2.87.75.75 0 0 0 0-.59A9.98 9.98 0 0 0 12 5.25c-.96 0-1.9.14-2.77.4L7.62 4.04A11.19 11.19 0 0 1 12 3.25c5.09 0 9.27 3.29 10.68 7.3a.75.75 0 0 1 0 .5ZM15.75 12c0 .18-.01.36-.04.53l-4.24-4.24A3.75 3.75 0 0 1 15.75 12Zm-3.22 3.71-4.24-4.24A3.75 3.75 0 0 0 12.53 15.71ZM6.75 12c0-.18.01-.36.04-.53L4.15 8.83A11.24 11.24 0 0 0 1.32 11.5a.75.75 0 0 0 0 .5C2.73 16.21 6.91 19.5 12 19.5c1.12 0 2.19-.16 3.21-.47l-1.66-1.66a9.98 9.98 0 0 1-10.62-4.81A9.75 9.75 0 0 1 6.75 12Z" />
-  </svg>
-);
-
-const GoogleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 10.22c.01-.69-.06-1.37-.22-2.04H10.2v3.71h5.63a4.8 4.8 0 0 1-2.09 3.15l3.03 2.3C18.89 15.83 20 13.27 20 10.22Z" fill="#4285F4" />
-    <path d="M10.21 20c2.75 0 5.07-.89 6.76-2.42l-3.22-2.45a6.12 6.12 0 0 1-9.35-3.16l-3.27 2.4A10.2 10.2 0 0 0 10.21 20Z" fill="#34A853" />
-    <path d="M4.4 11.98A6.1 6.1 0 0 1 4.06 10c0-.69.12-1.36.33-1.98L1.13 5.63A10.01 10.01 0 0 0 0 10c0 1.56.37 3.1 1.09 4.49l3.31-2.51Z" fill="#FBBC05" />
-    <path d="M10.21 3.87c1.46-.02 2.87.49 3.94 1.43l2.88-2.76A10.2 10.2 0 0 0 10.21 0 10.2 10.2 0 0 0 1.09 5.51l3.3 2.51a6.1 6.1 0 0 1 5.82-4.15Z" fill="#EB4335" />
   </svg>
 );
 
@@ -145,53 +137,47 @@ const Illustration = () => (
 );
 
 /* ═══════════════════════════════════════════════════════
-   LOGIN COMPONENT
+   REGISTER COMPONENT
    ═══════════════════════════════════════════════════════ */
 
-const Login = () => {
+const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
-    initialValues: { email: "", password: "" },
+    initialValues: { email: "", password: "", confirmPassword: "" },
     validationSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
 
       try {
-        const res = await api.post("/public/api/v1/auth/login", values);
+        const registerData = {
+          email: values.email,
+          password: values.password,
+        };
 
+        const res = await api.post("/public/api/v1/auth/register", registerData);
         const result = res.data;
 
         if (result.success) {
-          const { accessToken, refreshToken, roles } = result.data;
-
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
-          localStorage.setItem("roles", JSON.stringify(roles));
-
-          axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-
-          toast.success("Login successful!");
-
-          navigate("/admin/dashboard");
+          toast.success("Registration successful! Redirecting to login...");
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
         } else {
-          toast.error(result.message || "Login failed");
+          toast.error(result.message || "Registration failed");
         }
       } catch (err) {
         toast.error(
-          err.response?.data?.message || "Invalid username or password"
+          err.response?.data?.message || "Registration failed. Please try again."
         );
       } finally {
         setIsLoading(false);
       }
     },
   });
-
-  const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE_URL}/auth/google`;
-  };
 
   /* ── input wrapper helper ── */
   const inputClass = (field) =>
@@ -218,9 +204,9 @@ const Login = () => {
               </Link>
 
               <p className="mx-auto mb-10 max-w-sm text-lg leading-relaxed text-blue-100">
-                Manage your restaurant operations seamlessly.
+                Join our restaurant management platform.
                 <br />
-                Sign in to access your dashboard.
+                Create an account to get started today.
               </p>
 
               <Illustration />
@@ -237,21 +223,19 @@ const Login = () => {
                 </span>
               </div>
 
-            <Link 
-              to="/"
-              className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
+              <Link
+                to="/"
+                className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
               >
-                <ArrowLeft size={15}/>
-                  Back to Home 
+                <ArrowLeft size={15} />
+                Back to Home
               </Link>
 
-              
-
               <p className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-                Welcome back!
+                Get started now!
               </p>
               <h2 className="mb-8 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
-                Sign In to Restroly
+                Create Your Account
               </h2>
 
               {/* ── FORM ── */}
@@ -265,15 +249,15 @@ const Login = () => {
                     Email
                   </label>
                   <div className="relative">
-                   <input
-                      id="username"
-                      name="username"
-                      type="text"
-                      placeholder="Enter email or username"
-                      value={formik.values.username}
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={formik.values.email}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      className={inputClass("username")}
+                      className={inputClass("email")}
                     />
                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
                       <EmailIcon />
@@ -297,7 +281,7 @@ const Login = () => {
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                       placeholder="6+ Characters, 1 Capital letter"
                       disabled={isLoading}
                       value={formik.values.password}
@@ -320,14 +304,40 @@ const Login = () => {
                   )}
                 </div>
 
-                {/* Forgot password */}
-                <div className="mb-6 flex justify-end">
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                {/* Confirm Password */}
+                <div className="mb-5">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Forgot Password?
-                  </Link>
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      placeholder="Confirm your password"
+                      disabled={isLoading}
+                      value={formik.values.confirmPassword}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={inputClass("confirmPassword")}
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowConfirmPassword((p) => !p)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                  </div>
+                  {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                    <p className="mt-1.5 text-xs text-red-500">{formik.errors.confirmPassword}</p>
+                  )}
                 </div>
 
                 {/* Submit */}
@@ -339,41 +349,21 @@ const Login = () => {
                   {isLoading ? (
                     <>
                       <SpinnerIcon />
-                      Signing In…
+                      Creating Account…
                     </>
                   ) : (
-                    "Sign In"
+                    "Sign Up"
                   )}
                 </button>
 
-                {/* Divider */}
-                {/* <div className="relative mb-5 flex items-center">
-                  <div className="flex-grow border-t border-gray-200 dark:border-gray-600" />
-                  <span className="mx-4 shrink-0 text-xs uppercase text-gray-400 dark:text-gray-500">
-                    Or continue with
-                  </span>
-                  <div className="flex-grow border-t border-gray-200 dark:border-gray-600" />
-                </div>
-
-                
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={isLoading}
-                  className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-gray-50 px-6 py-4 text-base font-medium text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                >
-                  <GoogleIcon />
-                  Sign in with Google
-                </button> */}
-
-                {/* Sign-up link */}
+                {/* Sign-in link */}
                 <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                  Don&apos;t have an account?{" "}
+                  Already have an account?{" "}
                   <Link
-                    to="/register"
+                    to="/login"
                     className="font-medium text-blue-600 hover:underline dark:text-blue-400"
                   >
-                    Sign Up
+                    Sign In
                   </Link>
                 </p>
               </form>
@@ -385,4 +375,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
