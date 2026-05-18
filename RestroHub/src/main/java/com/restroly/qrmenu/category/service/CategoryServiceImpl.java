@@ -27,6 +27,13 @@ public class CategoryServiceImpl implements CategoryService {
 	@Transactional
 	public CategoryResponseDTO createCategory(CategoryRequestDTO requestDTO) {
 
+		//Duplicate check
+		if (categoryRepository.existsByNameAndRestaurantId(
+			requestDTO.getName(), requestDTO.getRestaurantId())) {
+				throw new DuplicateResourceException("Category with name '" + requestDTO.getName() + "' already exists for this restaurant.");
+			
+		}
+    
 		Category category = CategoryDTO.toEntity(
 				CategoryDTO.builder()
 						.name(requestDTO.getName())

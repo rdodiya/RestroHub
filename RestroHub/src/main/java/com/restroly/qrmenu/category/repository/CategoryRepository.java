@@ -11,4 +11,7 @@ import com.restroly.qrmenu.category.entity.Category;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
 	List<Category> findByMenu_MenuId(long menuId);
+
+	//New method for duplicate validation
+    boolean existsByNameAndRestaurantId(String name, Long restaurantId)
 }
