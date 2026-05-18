@@ -221,58 +221,58 @@ const AdminSkeleton = ({ variant = 'order' }) => {
   );
 
   case 'table':
-  return (
-    <div className="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white animate-pulse">
-      <div className="px-4 py-5 text-center">
-        <div className="mx-auto mb-2 h-14 w-14 rounded-xl bg-gray-100" />
-        <div className="mx-auto mb-1 h-4 w-14 rounded bg-gray-100" />
-        <div className="mx-auto mb-2 h-3 w-12 rounded bg-gray-100" />
-        <div className="mx-auto h-5 w-16 rounded-full bg-gray-100" />
-      </div>
+    return (
+      <div className="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white animate-pulse">
+        <div className="px-4 py-5 text-center">
+          <div className="mx-auto mb-2 h-14 w-14 rounded-xl bg-gray-100" />
+          <div className="mx-auto mb-1 h-4 w-14 rounded bg-gray-100" />
+          <div className="mx-auto mb-2 h-3 w-12 rounded bg-gray-100" />
+          <div className="mx-auto h-5 w-16 rounded-full bg-gray-100" />
+        </div>
 
-      <div className="flex justify-center gap-2 border-t border-gray-100 px-3 py-3">
-        <div className="h-8 w-8 rounded-lg bg-gray-100" />
-        <div className="h-8 w-8 rounded-lg bg-gray-100" />
-        <div className="h-8 w-8 rounded-lg bg-gray-100" />
+        <div className="flex justify-center gap-2 border-t border-gray-100 px-3 py-3">
+          <div className="h-8 w-8 rounded-lg bg-gray-100" />
+          <div className="h-8 w-8 rounded-lg bg-gray-100" />
+          <div className="h-8 w-8 rounded-lg bg-gray-100" />
+        </div>
       </div>
-    </div>
-  );
+    );
 
   case 'upi':
-  return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white animate-pulse">
-      {/* Header */}
-      <div className="border-b border-gray-100 px-4 py-4 sm:px-6 sm:py-5">
-        <div className="flex items-start gap-3">
-          <div className="h-10 w-10 shrink-0 rounded-xl bg-gray-100 sm:h-12 sm:w-12" />
+    return (
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white animate-pulse">
+        {/* Header */}
+        <div className="border-b border-gray-100 px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-gray-100 sm:h-12 sm:w-12" />
 
-          <div className="flex-1">
-            <div className="mb-2 h-5 w-32 rounded bg-gray-100" />
-            <div className="h-4 w-40 rounded bg-gray-100" />
+            <div className="flex-1">
+              <div className="mb-2 h-5 w-32 rounded bg-gray-100" />
+              <div className="h-4 w-40 rounded bg-gray-100" />
+            </div>
+
+            <div className="h-9 w-9 rounded-lg bg-gray-100" />
           </div>
+        </div>
 
-          <div className="h-9 w-9 rounded-lg bg-gray-100" />
+        {/* Body */}
+        <div className="px-4 py-4 sm:px-6 sm:py-5">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-20 rounded-xl bg-gray-100" />
+            <div className="h-20 rounded-xl bg-gray-100" />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-gray-100 px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex gap-2">
+            <div className="h-10 flex-1 rounded-lg bg-gray-100" />
+            <div className="h-10 flex-1 rounded-lg bg-gray-100" />
+            <div className="h-10 w-10 rounded-lg bg-gray-100" />
+          </div>
         </div>
       </div>
-
-      {/* Body */}
-      <div className="px-4 py-4 sm:px-6 sm:py-5">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="h-20 rounded-xl bg-gray-100" />
-          <div className="h-20 rounded-xl bg-gray-100" />
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="border-t border-gray-100 px-4 py-3 sm:px-6 sm:py-4">
-        <div className="flex gap-2">
-          <div className="h-10 flex-1 rounded-lg bg-gray-100" />
-          <div className="h-10 flex-1 rounded-lg bg-gray-100" />
-          <div className="h-10 w-10 rounded-lg bg-gray-100" />
-        </div>
-      </div>
-    </div>
-  );
+    );
 
     default:
       return null;

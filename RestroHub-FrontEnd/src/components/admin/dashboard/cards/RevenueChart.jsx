@@ -86,9 +86,6 @@ const RevenueChart = () => {
         {loading ? (
           // Skeleton
           <AdminSkeleton variant="chart" />
-          <div className={`w-full h-full rounded-xl animate-pulse flex items-center justify-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <RefreshCw className={`w-8 h-8 animate-spin ${isDark ? 'text-gray-600' : 'text-gray-300'}`} />
-          </div>
         ) : error && data.length === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center">
             <AlertCircle className="w-10 h-10 text-red-300 mb-2" />

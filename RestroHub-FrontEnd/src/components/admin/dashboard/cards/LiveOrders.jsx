@@ -56,35 +56,6 @@ const OrderCard = ({ order }) => {
 };
 
 // ============================================
-// SKELETON (Private to this file)
-// ============================================
-/*const OrderSkeleton = () => (
-  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl animate-pulse">
-    <div className="flex items-center gap-4">
-      <div className="w-12 h-12 bg-gray-200 rounded-xl" />
-      <div>
-        <div className="w-32 h-4 bg-gray-200 rounded mb-2" />
-        <div className="w-48 h-3 bg-gray-200 rounded" />
-const OrderSkeleton = () => {
-  const { isDark } = useAdminTheme();
-  return (
-    <div className={`flex items-center justify-between p-4 rounded-xl animate-pulse ${isDark ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-      <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-        <div>
-          <div className={`w-32 h-4 rounded mb-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-          <div className={`w-48 h-3 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-        </div>
-      </div>
-      <div className={`w-16 h-5 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-    </div>
-    <div className="w-16 h-5 bg-gray-200 rounded" />
-  </div>
-);*/
-  );
-};
-
-// ============================================
 // MAIN COMPONENT (Exported)
 // ============================================
 const LiveOrders = () => {
@@ -173,8 +144,6 @@ const LiveOrders = () => {
           <AdminSkeleton key={i} variant="order" />))
           ) : error && orders.length === 0 ? (
           // Error State
-          [1, 2, 3, 4].map(i => <OrderSkeleton key={i} />)
-        ) : error && orders.length === 0 ? (
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-3" />
             <p className="text-red-500 mb-2">{error}</p>
