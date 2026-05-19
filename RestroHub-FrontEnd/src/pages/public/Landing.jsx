@@ -18,11 +18,29 @@ import {
   CheckCircle2,
   UserPlus,
   ShoppingCart,
-  Sparkles
+  Sparkles,
+  ArrowUp
 } from 'lucide-react';
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // show scroll top 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+
   const { isDark, toggle } = useTheme();
   // ============================
   // DATA
@@ -211,6 +229,20 @@ const plans = [
   // ============================
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
+
+
+      {/* adding scroll-up */}
+      
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          className="fixed bottom-6 right-6 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-300/40 transition-all hover:-translate-y-1 hover:bg-blue-700"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </button>
+      )}
 
       {/* ================================================ */}
       {/* NAVBAR                                           */}
