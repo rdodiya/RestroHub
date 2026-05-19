@@ -167,7 +167,7 @@ const QuickActions = () => {
   // RENDER
   // ------------------------------------
   return (
-    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>Quick Actions</h2>
       <div className="flex flex-wrap gap-3">
         {actions.map((action) => (

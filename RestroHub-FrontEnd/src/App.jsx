@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import AppRoutes from './routes';
 import { ThemeProvider } from '@context/ThemeContext';
 import './index.css';
+import './styles/global.css';
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;

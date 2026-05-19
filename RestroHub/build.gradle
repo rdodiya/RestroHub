@@ -66,7 +66,7 @@ dependencies {
     // Testing
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  //  testImplementation 'org.springframework.boot:spring-boot-starter-test';
+    testImplementation 'org.springframework.boot:spring-boot-starter-test';
     testImplementation 'org.springframework.security:spring-security-test';
 
     //OpenAPI Documentation
@@ -86,10 +86,12 @@ dependencies {
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
 }
 
+// tasks.named('test') {
+//     enabled = false
+// }
 tasks.named('test') {
-    enabled = false
+    useJUnitPlatform()
 }
-
 
 //tasks.withType<Test> {
 //	useJUnitPlatform()
