@@ -72,6 +72,27 @@
 - Multi-branch management
 - Inventory & stock management
 
+### ✅ Feature Checklist
+
+| Area | Status |
+|------|--------|
+| QR menu generation | ✅ Available |
+| Menu & category management | ✅ Available |
+| Order dashboard | ✅ Available |
+| UPI payment links | ✅ Available |
+| Admin authentication | ✅ Available |
+| Multi-branch support | 🚧 In progress |
+| Real-time order updates | 🚧 Planned |
+| Subscription tiers | 🚧 Planned |
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming (`feature/`, `fix/`, `docs/`), commit format, and PR workflow.
+
+### 🗺️ Roadmap
+
+- **Near term:** empty-state UX polish, order realtime updates, README/onboarding improvements
+- **Mid term:** subscription management, role-based access by plan
+- **Long term:** aggregator sync, WhatsApp notifications, AI menu translation
+
 ---
 
 ## 🏗️ Tech Stack
