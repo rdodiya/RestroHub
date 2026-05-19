@@ -299,3 +299,35 @@ select.input option {
     border-color: rgba(0, 0, 0, 0.08);
     border-top-color: var(--color-primary);
 }
+
+/* ============================================
+   PASSWORD INPUT — hide browser native eye icon
+   ============================================ */
+
+/* Edge */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+
+/* ============================================
+   ADMIN DARK MODE — force dark backgrounds & light text
+   Overrides hardcoded bg-white / bg-gray-50 and dark text
+   on all admin panel components when dark mode is active.
+   ============================================ */
+
+.dark .admin-content .bg-white,
+.dark .admin-content .bg-gray-50 {
+    background-color: rgb(31 41 55) !important;
+}
+
+.dark .admin-content .text-gray-900,
+.dark .admin-content .text-gray-800,
+.dark .admin-content .text-gray-700 {
+    color: rgb(243 244 246) !important; /* gray-100 */
+}
+
+.dark .admin-content .text-gray-600,
+.dark .admin-content .text-gray-500 {
+    color: rgb(209 213 219) !important; /* gray-300 */
+}

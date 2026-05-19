@@ -1,4 +1,4 @@
-//com/Restroly/qrmenu/order/service/impl/OrderServiceImpl.java
+//com/restroly/qrmenu/order/service/impl/OrderServiceImpl.java
 package com.restroly.qrmenu.order.service.impl;
 
 import com.restroly.qrmenu.branch.entity.Branch;
@@ -78,6 +78,8 @@ public class OrderServiceImpl implements OrderService {
 		// Send notification to admin
 		notificationService.notifyNewOrder(savedOrder);
 
+		//Storing paymentId in order for better utility
+		savedOrder.setPaymentId(branch.getBranchUpiId());
 		return orderMapper.toResponse(savedOrder);
 	}
 
