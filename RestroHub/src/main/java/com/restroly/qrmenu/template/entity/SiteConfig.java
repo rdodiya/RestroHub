@@ -50,27 +50,27 @@ public class SiteConfig {
     private List<Section> sections = new ArrayList<>();
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "brand_data", columnDefinition = "jsonb")
+    @Column(name = "brand_data")
     private Map<String, Object> brandData; // Brand info: name, logo, tagline, etc.
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "navigation", columnDefinition = "jsonb")
+    @Column(name = "navigation")
     private List<Map<String, Object>> navigation; // Navigation links
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "social_links", columnDefinition = "jsonb")
+    @Column(name = "social_links")
     private List<Map<String, Object>> socialLinks;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "footer_data", columnDefinition = "jsonb")
+    @Column(name = "footer_data")
     private Map<String, Object> footerData;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "meta_data", columnDefinition = "jsonb")
+    @Column(name = "meta_data")
     private Map<String, Object> metaData; // SEO, social meta, etc.
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "global_settings", columnDefinition = "jsonb")
+    @Column(name = "global_settings")
     private Map<String, Object> globalSettings; // Site-wide settings
 
     @Column(name = "is_published")

@@ -7,15 +7,17 @@ import {
   AlertCircle
 } from 'lucide-react';
 import api from "@services/common/api";
+import { useAdminTheme } from '@context/AdminThemeContext';
 
 // ============================================
 // STATUS BADGE (Private to this file)
 // ============================================
 const StatusBadge = ({ status }) => {
+  const { isDark } = useAdminTheme();
   const config = {
-    pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: Clock, label: 'Pending' },
-    cooking: { bg: 'bg-blue-100', text: 'text-blue-700', icon: ChefHat, label: 'Cooking' },
-    ready: { bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle2, label: 'Ready' },
+    pending: { bg: isDark ? 'bg-yellow-900/40' : 'bg-yellow-100', text: isDark ? 'text-yellow-400' : 'text-yellow-700', icon: Clock, label: 'Pending' },
+    cooking: { bg: isDark ? 'bg-blue-900/40'   : 'bg-blue-100',   text: isDark ? 'text-blue-400'   : 'text-blue-700',   icon: ChefHat, label: 'Cooking' },
+    ready:   { bg: isDark ? 'bg-green-900/40'  : 'bg-green-100',  text: isDark ? 'text-green-400'  : 'text-green-700',  icon: CheckCircle2, label: 'Ready' },
   };
 
   const { bg, text, icon: Icon, label } = config[status] || config.pending;
@@ -31,39 +33,45 @@ const StatusBadge = ({ status }) => {
 // ============================================
 // ORDER CARD (Private to this file)
 // ============================================
-const OrderCard = ({ order }) => (
-  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-    <div className="flex items-center gap-4">
-      <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-        <span className="font-bold text-orange-600">#{order.id}</span>
-      </div>
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-800">Table {order.table}</span>
-          <StatusBadge status={order.status} />
+const OrderCard = ({ order }) => {
+  const { isDark } = useAdminTheme();
+  return (
+    <div className={`flex items-center justify-between p-4 rounded-xl transition-colors ${isDark ? 'bg-gray-700/50 hover:bg-gray-700' : 'bg-gray-50 hover:bg-gray-100'}`}>
+      <div className="flex items-center gap-4">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isDark ? 'bg-orange-900/40' : 'bg-orange-100'}`}>
+          <span className={`font-bold ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>#{order.id}</span>
         </div>
-        <p className="text-sm text-gray-500 mt-1">{order.items}</p>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className={`font-semibold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>Table {order.table}</span>
+            <StatusBadge status={order.status} />
+          </div>
+          <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{order.items}</p>
+        </div>
       </div>
+      <p className={`font-bold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>₹{order.amount}</p>
     </div>
-    <p className="font-bold text-gray-800">₹{order.amount}</p>
-  </div>
-);
+  );
+};
 
 // ============================================
 // SKELETON (Private to this file)
 // ============================================
-const OrderSkeleton = () => (
-  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl animate-pulse">
-    <div className="flex items-center gap-4">
-      <div className="w-12 h-12 bg-gray-200 rounded-xl" />
-      <div>
-        <div className="w-32 h-4 bg-gray-200 rounded mb-2" />
-        <div className="w-48 h-3 bg-gray-200 rounded" />
+const OrderSkeleton = () => {
+  const { isDark } = useAdminTheme();
+  return (
+    <div className={`flex items-center justify-between p-4 rounded-xl animate-pulse ${isDark ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
+      <div className="flex items-center gap-4">
+        <div className={`w-12 h-12 rounded-xl ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
+        <div>
+          <div className={`w-32 h-4 rounded mb-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
+          <div className={`w-48 h-3 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
+        </div>
       </div>
+      <div className={`w-16 h-5 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
     </div>
-    <div className="w-16 h-5 bg-gray-200 rounded" />
-  </div>
-);
+  );
+};
 
 // ============================================
 // MAIN COMPONENT (Exported)
@@ -73,6 +81,7 @@ const LiveOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const { isDark } = useAdminTheme();
 
   // ------------------------------------
   // FALLBACK DATA
@@ -122,24 +131,24 @@ const LiveOrders = () => {
   // RENDER
   // ------------------------------------
   return (
-    <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className={`lg:col-span-2 rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-gray-800">Live Orders Feed</h2>
+          <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>Live Orders Feed</h2>
           {refreshing && <RefreshCw className="w-4 h-4 text-gray-400 animate-spin" />}
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={fetchOrders}
             disabled={refreshing}
-            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            className={`text-sm transition-colors ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
           <a
             href="/admin/orders"
-            className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+            className="text-sm text-orange-500 hover:text-orange-400 font-medium"
           >
             View All →
           </a>
@@ -149,25 +158,21 @@ const LiveOrders = () => {
       {/* Content */}
       <div className="space-y-4">
         {loading ? (
-          // Skeleton Loading
           [1, 2, 3, 4].map(i => <OrderSkeleton key={i} />)
         ) : error && orders.length === 0 ? (
-          // Error State
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-3" />
-            <p className="text-red-600 mb-2">{error}</p>
-            <button onClick={fetchOrders} className="text-sm text-red-700 underline">
+            <p className="text-red-500 mb-2">{error}</p>
+            <button onClick={fetchOrders} className="text-sm text-red-400 underline">
               Try Again
             </button>
           </div>
         ) : orders.length === 0 ? (
-          // Empty State
           <div className="text-center py-8">
             <CheckCircle2 className="w-12 h-12 text-green-300 mx-auto mb-3" />
-            <p className="text-gray-500">No active orders right now</p>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No active orders right now</p>
           </div>
         ) : (
-          // Orders List
           orders.map(order => <OrderCard key={order.id} order={order} />)
         )}
       </div>

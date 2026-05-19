@@ -8,6 +8,7 @@ import {
   Loader2
 } from 'lucide-react';
 import api from "@services/common/api";
+import { useAdminTheme } from '@context/AdminThemeContext';
 // import { useNavigate } from 'react-router-dom';  // if using react-router
 
 // ============================================
@@ -33,6 +34,7 @@ const ActionButton = ({ label, icon: Icon, bgColor, hoverColor, onClick, loading
 // ============================================
 const QuickActions = () => {
   const [loadingAction, setLoadingAction] = useState(null);
+  const { isDark } = useAdminTheme();
 
   // ------------------------------------
   // ACTION HANDLERS
@@ -165,8 +167,8 @@ const QuickActions = () => {
   // RENDER
   // ------------------------------------
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>Quick Actions</h2>
       <div className="flex flex-wrap gap-3">
         {actions.map((action) => (
           <ActionButton

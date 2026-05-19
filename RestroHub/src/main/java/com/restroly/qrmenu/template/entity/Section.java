@@ -48,15 +48,15 @@ public class Section {
     private SiteConfig siteConfig;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "content", columnDefinition = "jsonb")
+    @Column(name = "content")
     private Map<String, Object> content; // Section-specific content
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "settings", columnDefinition = "jsonb")
+    @Column(name = "settings")
     private Map<String, Object> settings; // Section-specific settings (layout, animations, etc.)
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "style_overrides", columnDefinition = "jsonb")
+    @Column(name = "style_overrides")
     private Map<String, Object> styleOverrides; // Custom CSS overrides for this section
 
     @Column(name = "background_image", length = 500)
