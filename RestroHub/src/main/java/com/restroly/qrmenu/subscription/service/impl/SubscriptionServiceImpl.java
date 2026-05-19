@@ -214,4 +214,58 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .isAutoRenew(rs.getIsAutoRenew())
                 .build();
     }
+
+    @Override
+    @Transactional
+    public SubscriptionFeatureDto createFeature(SubscriptionFeatureRequest request) {
+        SubscriptionFeature feature = SubscriptionFeature.builder()
+                .featureKey(request.getFeatureKey())
+                .displayName(request.getDisplayName())
+                .description(request.getDescription())
+                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+                .build();
+        feature = featureRepository.save(feature);
+        return mapToFeatureDto(feature);
+    }
+
+    @Override
+    @Transactional
+    public SubscriptionFeatureDto updateFeature(Long id, SubscriptionFeatureRequest request) {
+        SubscriptionFeature feature = featureRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Feature not found with id: " + id));
+        feature.setFeatureKey(request.getFeatureKey());
+        feature.setDisplayName(request.getDisplayName());
+        feature.setDescription(request.getDescription());
+        if (request.getIsActive() != null) {
+            feature.setIsActive(request.getIsActive());
+        }
+        feature = featureRepository.save(feature);
+        return mapToFeatureDto(feature);
+    }
+
+    @Override
+    @Transactional
+    public void deleteFeature(Long id) {
+        if (!featureRepository.existsById(id)) {
+            throw new RuntimeException("Feature not found with id: " + id);
+        }
+        featureRepository.deleteById(id);
+    }
+
+    @Override
+    public List<SubscriptionFeatureDto> getAllFeatures() {
+        return featureRepository.findAll().stream()
+                .map(this::mapToFeatureDto)
+                .collect(Collectors.toList());
+    }
+
+    private SubscriptionFeatureDto mapToFeatureDto(SubscriptionFeature feature) {
+        return SubscriptionFeatureDto.builder()
+                .id(feature.getId())
+                .featureKey(feature.getFeatureKey())
+                .displayName(feature.getDisplayName())
+                .description(feature.getDescription())
+                .isActive(feature.getIsActive())
+                .build();
+    }
 }
