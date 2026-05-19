@@ -50,7 +50,7 @@ const Navigation = () => {
         <nav className={`nav ${scrolled ? 'nav-scrolled' : ''}`}>
             <div className="nav-container">
                 {/* Logo */}
-                <a href="#" className="nav-logo font-heading">
+                <a href="/" className="nav-logo font-heading">
                     {siteData.brand.logo ? (
                         <img src={siteData.brand.logo} alt={siteData.brand.name} />
                     ) : (
