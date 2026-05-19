@@ -204,6 +204,14 @@ Lombok & MapStruct annotation processing enabled
 
 ### Installation & Setup
 
+## 📁 Project Structure
+
+- `RestroHub/` - Spring Boot backend project
+  - `src/main/java/` - Java source code
+  - `src/main/resources/` - Spring configuration and properties
+  - `src/test/java/` - Backend tests
+- `RestroHub-FrontEnd/` - React/Vite frontend project
+
 #### 💻 Frontend Setup (React / Vite)
 ```bash
 # Clone the repository
@@ -231,13 +239,27 @@ createdb RestroHub_DB
 # Or via psql:
 # psql -U postgres -c 'CREATE DATABASE "RestroHub_DB";'
 
-# Set up environment variables
-cp .env.example .env
+# Set up backend configuration
+Backend configuration is now managed through Spring property files in `src/main/resources`.
+Update `application-dev.properties` with your local database values if needed.
+
+The Google OAuth Client ID should be provided via an environment variable rather than committed into a config file.
+Backend Spring Boot reads this value from `GOOGLE_OAUTH_CLIENT_ID`.
+
+Example environment setup:
 ```
-Open `.env` and fill in your actual credentials, specifically:
-- `GOOGLE_OAUTH_CLIENT_ID`: Your Client ID from the Google Cloud Console.
-- `DB_USERNAME` and `DB_PASSWORD`: Your PostgreSQL database credentials.
-- `JWT_SECRET`: A secure 256-bit token (you can generate one using `openssl rand -hex 32` or similar).
+- PowerShell:
+  ```powershell
+  $env:GOOGLE_OAUTH_CLIENT_ID="your-google-client-id"
+  ```
+- CMD:
+  ```cmd
+  set GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+  ```
+- Bash:
+  ```bash
+  export GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+  ```
 
 ---
 
@@ -516,7 +538,7 @@ We love contributions! Here's how you can help build Restroly:
 
 ---
 
-### 🚀 How to Contribu  te
+### 🚀 How to Contribute
 
 ```bash
 # 1. Fork the repository
