@@ -832,26 +832,15 @@ const [contactForm, setContactForm] = useState({
                 </h4>
                 <ul className="space-y-3">
                   {col.links.map((link) => (
-                    <li key={link}>
+                    <li key={link.label}>
                       <a
-                          href={link === 'Contact' ? '#contact' : '#'} 
+                        href={link.href}
                         className="text-sm text-slate-400 transition-colors hover:text-white"
                       >
-                        {link}
+                        {link.label}
                       </a>
                     </li>
                   ))}
-
-                 {col.links.map((link) => (
-                <li key={link.label}>
-                <a
-                  href={link.href}
-                  className="text-sm text-slate-400 transition-colors hover:text-white"
-                >
-                 {link.label}
-                </a>
-              </li>
-            ))}
                 </ul>
               </div>
             ))}
