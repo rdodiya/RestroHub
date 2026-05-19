@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.lang.Long;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -167,7 +168,9 @@ public class FoodServiceImpl implements FoodService {
             throw new ResourceAlreadyExistsException(
                     String.format(FOOD_EXISTS_MSG, updateDTO.getName()));
         }
-        if(!updateDTO.getImageUrl().equals(existingFood.getImageUrl())){
+
+        // Safe null check for imageUrl
+        if(!Objects.equals(updateDTO.getImageUrl(), existingFood.getImageUrl())) {
             String imageUrl = null;
             if (image != null && !image.isEmpty()) {
                 imageUrl = cloudinaryService.uploadImage(image, "qrmenu/foods");
@@ -176,13 +179,16 @@ public class FoodServiceImpl implements FoodService {
                 updateDTO.setImageUrl(imageUrl);
             }
         }
-        if(existingFood.getCategory().getCategoryId() != updateDTO.getCategoryId()){
+
+        // Safe null check for categoryId
+        if(!Objects.equals(existingFood.getCategory().getCategoryId(), updateDTO.getCategoryId())) {
             if (updateDTO.getCategoryId() != null) {
                 Category category = categoryRepository.findById(updateDTO.getCategoryId())
                         .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + updateDTO.getCategoryId()));
                 existingFood.setCategory(category);
             }
         }
+        
         foodMapper.updateEntityFromDTO(updateDTO, existingFood);
         Food updatedFood = foodRepository.save(existingFood);
 
