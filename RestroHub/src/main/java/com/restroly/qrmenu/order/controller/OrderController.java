@@ -30,6 +30,7 @@ import static com.restroly.qrmenu.common.util.ApiConstants.*;
 @RequestMapping(SECURE_API_VERSION+"/orders")
 @CrossOrigin(origins = "*")
 public class OrderController {
+	
     @Autowired
 	private final PaymentService paymentService = null;
 	@Autowired
