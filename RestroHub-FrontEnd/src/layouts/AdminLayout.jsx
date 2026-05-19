@@ -25,7 +25,7 @@ const AdminLayout = () => {
           onCollapseToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
 
-        <main className={`flex-1 overflow-y-auto overflow-x-hidden ${isDark ? 'bg-gray-900' : ''}`}>
+        <main className={`admin-content flex-1 overflow-y-auto overflow-x-hidden ${isDark ? 'bg-gray-900' : ''}`}>
           <div className="mx-auto max-w-screen-2xl p-4 sm:p-5 lg:p-6 2xl:p-8">
             <Outlet />
           </div>

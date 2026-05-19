@@ -113,7 +113,7 @@ const LiveOrders = () => {
   // RENDER
   // ------------------------------------
   return (
-    <div className={`lg:col-span-2 rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+    <div className={`lg:col-span-2 rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
