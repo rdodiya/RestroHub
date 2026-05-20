@@ -26,6 +26,7 @@ public class OrderResponse {
     private String customerPhone;
     private String specialInstructions;
     private BigDecimal totalAmount;
+	private String paymentLink;
     private OrderStatus status;
     private LocalDateTime createdAt;
     private List<OrderItemResponse> items;
@@ -100,6 +101,12 @@ public class OrderResponse {
 	}
 	public void setItems(List<OrderItemResponse> items) {
 		this.items = items;
+	}
+	public String getPaymentLink() {
+		return paymentLink;
+	}
+	public void setPaymentLink(String paymentLink) {
+		this.paymentLink = paymentLink;
 	}
     
 }
