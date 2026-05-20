@@ -35,7 +35,7 @@ public class RestaurantServiceImpl implements  RestaurantService{
     public RestaurantResponseDTO createRestaurant(RestaurantRequestDTO requestDTO) {
         log.info("Creating new restaurant: {}", requestDTO.getName());
         if (restaurantRepository.existsByNameIgnoreCase(requestDTO.getName())) {
-            log.warn("Attempt to create duplicate food: {}", requestDTO.getName());
+            log.warn("Attempt to create duplicate restaurant: {}", requestDTO.getName());
             throw new ResourceAlreadyExistsException(
                     String.format(RESTAURANT_EXISTS_MSG, requestDTO.getName()));
         }
@@ -43,7 +43,7 @@ public class RestaurantServiceImpl implements  RestaurantService{
         Restaurant restaurant = restaurantMapper.toEntity(requestDTO);
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
-        log.info("Successfully created food item with id: {}", savedRestaurant.getRestId());
+        log.info("Successfully created restaurant with id: {}", savedRestaurant.getRestId());
         return restaurantMapper.toResponseDTO(savedRestaurant);
     }
 
@@ -92,7 +92,7 @@ public class RestaurantServiceImpl implements  RestaurantService{
                 !updateDTO.getName().equalsIgnoreCase(existingRestaurant.getName()) &&
                 restaurantRepository.existsByNameIgnoreCase(updateDTO.getName())) {
 
-            log.warn("Attempt to update food with duplicate name: {}", updateDTO.getName());
+            log.warn("Attempt to update restaurant with duplicate name: {}", updateDTO.getName());
             throw new ResourceAlreadyExistsException(
                     String.format(RESTAURANT_EXISTS_MSG, updateDTO.getName()));
         }
@@ -117,7 +117,7 @@ public class RestaurantServiceImpl implements  RestaurantService{
         }
 
         restaurantRepository.deleteById(id);
-        log.info("Successfully deleted food with id: {}", id);
+        log.info("Successfully deleted restaurant with id: {}", id);
     }
 
     private Restaurant findRestaurantByIdOrThrow(Long id) {
