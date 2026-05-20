@@ -78,6 +78,8 @@ public class OrderServiceImpl implements OrderService {
 		// Send notification to admin
 		notificationService.notifyNewOrder(savedOrder);
 
+		//Storing paymentId in order for better utility
+		savedOrder.setPaymentId(branch.getBranchUpiId());
 		return orderMapper.toResponse(savedOrder);
 	}
 
