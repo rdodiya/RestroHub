@@ -56,6 +56,7 @@ public class RestaurantServiceImpl implements  RestaurantService{
         log.debug("Fetching restaurant by id: {}", id);
 
         Restaurant restaurant = findRestaurantByIdOrThrow(id);
+        log.debug("Found restaurant: {}", restaurant.getName());
         return restaurantMapper.toResponseDTO(restaurant);
     }
 
@@ -72,7 +73,7 @@ public class RestaurantServiceImpl implements  RestaurantService{
                     log.warn("Restaurant not found with name: {}", name);
                     return new ResourceNotFoundException("Restaurant not found with name: " + name);
                 });
-
+        log.debug("Found restaurant: {}", restaurant.getName());
         return restaurantMapper.toResponseDTO(restaurant);
     }
 
