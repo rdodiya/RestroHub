@@ -42,12 +42,15 @@ public class BranchServiceImpl implements BranchService {
 
         // Validate restaurant exists
         Restaurant restaurant = restaurantRepository.findById(requestDTO.getRestaurantId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Restaurant not found with ID: " + requestDTO.getRestaurantId()));
+                .orElseThrow(() ->{
+                    log.warn("Restaurant not found with ID: {}", requestDTO.getRestaurantId());
+                    return new ResourceNotFoundException("Restaurant not found with ID: " + requestDTO.getRestaurantId());
+                });
 
         // Check for duplicate branch name
         if (branchRepository.existsByNameAndRestaurant_RestId(
                 requestDTO.getName(), requestDTO.getRestaurantId())) {
+            log.warn("Branch with name '{}' already exists for restaurant ID: {}", requestDTO.getName(), requestDTO.getRestaurantId());
             throw new DuplicateResourceException(
                     "Branch with name '" + requestDTO.getName() + "' already exists for this restaurant");
         }
@@ -56,8 +59,10 @@ public class BranchServiceImpl implements BranchService {
         Menu menu = null;
         if (requestDTO.getMenuId() != null) {
             menu = menuRepository.findById(requestDTO.getMenuId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Menu not found with ID: " + requestDTO.getMenuId()));
+                    .orElseThrow(() -> {
+                        log.warn("Menu not found with ID: {}", requestDTO.getMenuId());
+                        return new ResourceNotFoundException("Menu not found with ID: " + requestDTO.getMenuId());
+                    });
         }
 
         // Convert DTO to Entity
@@ -77,8 +82,10 @@ public class BranchServiceImpl implements BranchService {
         log.debug("Fetching branch with ID: {}", branchId);
 
         Branch branch = branchRepository.findByBranchIdAndIsDeleteFalse(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
+                .orElseThrow(() -> {
+                    log.warn("Branch not found with ID: {}", branchId);
+                    return new ResourceNotFoundException("Branch not found with ID: " + branchId);
+                });
 
         return branchMapper.toResponseDTO(branch);
     }
@@ -112,6 +119,7 @@ public class BranchServiceImpl implements BranchService {
 
         // Validate restaurant exists
         if (!restaurantRepository.existsById(restId)) {
+            log.warn("Restaurant not found with ID: {}", restId);
             throw new ResourceNotFoundException("Restaurant not found with ID: " + restId);
         }
 
@@ -137,14 +145,18 @@ public class BranchServiceImpl implements BranchService {
 
         // Find existing branch
         Branch existingBranch = branchRepository.findByBranchIdAndIsDeleteFalse(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
+                .orElseThrow(() -> {
+                    log.warn("Branch not found with ID: {}", branchId);
+                    return new ResourceNotFoundException("Branch not found with ID: " + branchId);
+                });
 
         // Check for duplicate name (excluding current branch)
         if (branchRepository.existsByNameAndRestaurant_RestIdAndBranchIdNot(
                 requestDTO.getName(),
                 existingBranch.getRestaurant().getRestId(),
                 branchId)) {
+            log.warn("Branch with name '{}' already exists for restaurant ID: {} (excluding branch ID: {})",
+                    requestDTO.getName(), existingBranch.getRestaurant().getRestId(), branchId);
             throw new DuplicateResourceException(
                     "Branch with name '" + requestDTO.getName() + "' already exists for this restaurant");
         }
@@ -153,8 +165,10 @@ public class BranchServiceImpl implements BranchService {
         Menu menu = null;
         if (requestDTO.getMenuId() != null) {
             menu = menuRepository.findById(requestDTO.getMenuId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Menu not found with ID: " + requestDTO.getMenuId()));
+                    .orElseThrow(() -> {
+                        log.warn("Menu not found with ID: {}", requestDTO.getMenuId());
+                        return new ResourceNotFoundException("Menu not found with ID: " + requestDTO.getMenuId());
+                    });
         }
 
         // Update entity from DTO
@@ -173,8 +187,10 @@ public class BranchServiceImpl implements BranchService {
         log.info("Soft deleting branch with ID: {}", branchId);
 
         Branch branch = branchRepository.findByBranchIdAndIsDeleteFalse(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
+                .orElseThrow(() -> {
+                    log.warn("Branch not found with ID: {}", branchId);
+                    return new ResourceNotFoundException("Branch not found with ID: " + branchId);
+                });
 
         branch.setIsDelete(true);
         branchRepository.save(branch);
@@ -188,8 +204,10 @@ public class BranchServiceImpl implements BranchService {
         log.info("Hard deleting branch with ID: {}", branchId);
 
         Branch branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
+                .orElseThrow(() -> {
+                    log.warn("Branch not found with ID: {}", branchId);
+                    return new ResourceNotFoundException("Branch not found with ID: " + branchId);
+                });
 
         branchRepository.delete(branch);
 
@@ -202,8 +220,10 @@ public class BranchServiceImpl implements BranchService {
         log.info("Restoring branch with ID: {}", branchId);
 
         Branch branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
+                .orElseThrow(() -> {
+                    log.warn("Branch not found with ID: {}", branchId);
+                    return new ResourceNotFoundException("Branch not found with ID: " + branchId);
+                });
 
         if (!branch.getIsDelete()) {
             log.warn("Branch with ID: {} is already active", branchId);
@@ -245,6 +265,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     @Transactional(readOnly = true)
     public long countBranchesByRestaurant(Long restId) {
+        log.debug("Counting branches for restaurant ID: {}", restId);
         return branchRepository.countByRestaurant_RestIdAndIsDeleteFalse(restId);
     }
 
@@ -252,6 +273,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String name, Long restId) {
+        log.debug("Checking if branch exists with name: '{}' for restaurant ID: {}", name, restId);
         return branchRepository.existsByNameAndRestaurant_RestId(name, restId);
     }
 }
