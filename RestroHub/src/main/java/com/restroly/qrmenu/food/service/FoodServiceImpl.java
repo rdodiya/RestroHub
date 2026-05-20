@@ -51,8 +51,11 @@ public class FoodServiceImpl implements FoodService {
     @Transactional
     @CacheEvict(value = "foods", allEntries = true)
     public FoodResponseDTO createFood(FoodRequestDTO requestDTO, MultipartFile image) {
+        
+        log.info("Attempting to create food: {}", requestDTO.getName());
 
         if (foodRepository.existsByNameIgnoreCase(requestDTO.getName())) {
+            log.warn("Attempt to create duplicate food: {}", requestDTO.getName());
             throw new ResourceAlreadyExistsException("Food already exists: " + requestDTO.getName());
         }
 
@@ -71,12 +74,16 @@ public class FoodServiceImpl implements FoodService {
         // Set Category - This is the most important part
         if (requestDTO.getCategoryId() != null) {
             Category category = categoryRepository.findById(requestDTO.getCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + requestDTO.getCategoryId()));
+                    .orElseThrow(() -> {
+                        log.warn("Category not found with id: {}", requestDTO.getCategoryId());
+                        return new ResourceNotFoundException("Category not found with id: " + requestDTO.getCategoryId());
+                    });
 
             food.setCategory(category);
         }
 
         Food saved = foodRepository.save(food);
+        log.info("Successfully created food with id: {}", saved.getFoodId());
         return foodMapper.toResponseDTO(saved);
     }
 
@@ -234,11 +241,13 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public boolean existsById(Long id) {
+        log.debug("Checking existence of food by id: {}", id);
         return foodRepository.existsById(id);
     }
 
     @Override
     public boolean existsByName(String name) {
+        log.debug("Checking existence of food by name: {}", name);
         return foodRepository.existsByNameIgnoreCase(name);
     }
 
