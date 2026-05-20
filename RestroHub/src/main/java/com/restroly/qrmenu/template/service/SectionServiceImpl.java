@@ -43,6 +43,7 @@ public class SectionServiceImpl implements SectionService {
 
         // Check for duplicate section key
         if (sectionRepository.existsBySiteConfigIdAndSectionKey(siteConfig.getId(), request.getSectionKey())) {
+            log.warn("Section with key '{}' already exists for siteId: {}", request.getSectionKey(), siteId);
             throw new ResourceAlreadyExistsException("Section", "sectionKey", request.getSectionKey());
         }
 
@@ -68,13 +69,20 @@ public class SectionServiceImpl implements SectionService {
         log.info("Creating section from template {} for siteId: {}", sectionTemplateId, siteId);
 
         SiteConfig siteConfig = siteConfigRepository.findBySiteId(siteId)
-                .orElseThrow(() -> new  ResourceNotFoundException("Site config not found with siteId : "+ siteId));
+                .orElseThrow(() ->{
+                    log.warn("Site config not found for siteId: {}", siteId);
+                    return new  ResourceNotFoundException("Site config not found with siteId : "+ siteId);
+                });
 
         SectionTemplate template = sectionTemplateRepository.findById(sectionTemplateId)
-                .orElseThrow(() -> new RuntimeException("Section template not found: " + sectionTemplateId));
+                .orElseThrow(() -> {
+                    log.warn("Section template not found for id: {}", sectionTemplateId);
+                    return new RuntimeException("Section template not found: " + sectionTemplateId);
+                });
 
         // Check for duplicate section key
         if (sectionRepository.existsBySiteConfigIdAndSectionKey(siteConfig.getId(), sectionKey)) {
+            log.warn("Section with key '{}' already exists for siteId: {}", sectionKey, siteId);
             throw new ResourceAlreadyExistsException("Section", "sectionKey", sectionKey);
         }
 
@@ -92,7 +100,10 @@ public class SectionServiceImpl implements SectionService {
     public SectionDTO getSectionById(Long id) {
         log.debug("Fetching section by id: {}", id);
         Section section = sectionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
+                .orElseThrow(() ->{
+                    log.warn("Section not found with id: {}", id);
+                    return new ResourceNotFoundException("Section not found with id: " + id);
+                });
         return sectionMapper.toDTO(section);
     }
 
@@ -101,7 +112,10 @@ public class SectionServiceImpl implements SectionService {
     public SectionDTO getSectionByKey(String siteId, String sectionKey) {
         log.debug("Fetching section by key: {} for siteId: {}", sectionKey, siteId);
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> {
+                    log.warn("Section not found with sectionKey: {}", sectionKey);
+                    return new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey);
+                });
         return sectionMapper.toDTO(section);
     }
 
@@ -110,6 +124,7 @@ public class SectionServiceImpl implements SectionService {
     public List<SectionDTO> getSectionsBySiteId(String siteId) {
         log.debug("Fetching all sections for siteId: {}", siteId);
         List<Section> sections = sectionRepository.findBySiteConfigSiteIdOrderByDisplayOrderAsc(siteId);
+        log.info("Found {} sections for siteId: {}", sections.size(), siteId);
         return sectionMapper.toDTOList(sections);
     }
 
@@ -118,6 +133,7 @@ public class SectionServiceImpl implements SectionService {
     public List<SectionDTO> getVisibleSectionsBySiteId(String siteId) {
         log.debug("Fetching visible sections for siteId: {}", siteId);
         List<Section> sections = sectionRepository.findBySiteConfigSiteIdAndIsVisibleTrueOrderByDisplayOrderAsc(siteId);
+        log.info("Found {} visible sections for siteId: {}", sections.size(), siteId);
         return sectionMapper.toDTOList(sections);
     }
 
@@ -127,7 +143,10 @@ public class SectionServiceImpl implements SectionService {
         log.info("Updating section with id: {}", sectionId);
 
         Section section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
+                .orElseThrow(() -> {
+                    log.warn("Section not found with id: {}", sectionId);
+                    return new ResourceNotFoundException("Section not found with id: " + sectionId);
+                });
 
         sectionMapper.updateEntity(section, request);
         Section updatedSection = sectionRepository.save(section);
@@ -142,7 +161,10 @@ public class SectionServiceImpl implements SectionService {
         log.info("Updating section '{}' for siteId: {}", sectionKey, siteId);
 
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> {
+                    log.warn("Section not found with sectionKey: {}", sectionKey);
+                    return new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey);
+                });
 
         sectionMapper.updateEntity(section, request);
         Section updatedSection = sectionRepository.save(section);
@@ -157,7 +179,10 @@ public class SectionServiceImpl implements SectionService {
         log.info("Deleting section with id: {}", sectionId);
 
         Section section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
+                .orElseThrow(() -> {
+                    log.warn("Section not found with id: {}", sectionId);
+                    return new ResourceNotFoundException("Section not found with id: " + sectionId);
+                });
 
         Long siteConfigId = section.getSiteConfig().getId();
         Integer deletedOrder = section.getDisplayOrder();
@@ -176,7 +201,10 @@ public class SectionServiceImpl implements SectionService {
         log.info("Deleting section '{}' for siteId: {}", sectionKey, siteId);
 
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> {
+                    log.warn("Section not found with sectionKey: {}", sectionKey);
+                    return new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey);
+                });
 
         Long siteConfigId = section.getSiteConfig().getId();
         Integer deletedOrder = section.getDisplayOrder();
@@ -194,11 +222,14 @@ public class SectionServiceImpl implements SectionService {
 
         for (SectionReorderRequest.SectionOrderItem item : request.getSections()) {
             Section section = sectionRepository.findById(item.getSectionId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + item.getSectionId()));
+                    .orElseThrow(() -> {
+                        log.warn("Section not found with id: {}", item.getSectionId());
+                        return new ResourceNotFoundException("Section not found with id: " + item.getSectionId());
+                    });
             section.setDisplayOrder(item.getDisplayOrder());
             sectionRepository.save(section);
         }
-
+        log.info("Sections reordered successfully for siteId: {}", siteId);
         return getSectionsBySiteId(siteId);
     }
 
@@ -208,11 +239,15 @@ public class SectionServiceImpl implements SectionService {
         log.info("Moving section '{}' to order {} for siteId: {}", sectionKey, newOrder, siteId);
 
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> {
+                    log.warn("Section not found with sectionKey: {}", sectionKey);
+                    return new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey);
+                });
 
         Integer oldOrder = section.getDisplayOrder();
         Long siteConfigId = section.getSiteConfig().getId();
 
+        log.info("Moving section from order {} to {}", oldOrder, newOrder);
         if (newOrder > oldOrder) {
             // Moving down - decrement orders between old and new
             sectionRepository.decrementDisplayOrderFrom(siteConfigId, oldOrder);
@@ -224,7 +259,7 @@ public class SectionServiceImpl implements SectionService {
 
         section.setDisplayOrder(newOrder);
         Section updatedSection = sectionRepository.save(section);
-
+        log.info("Section moved successfully to order {}", newOrder);
         return sectionMapper.toDTO(updatedSection);
     }
 
@@ -249,9 +284,11 @@ public class SectionServiceImpl implements SectionService {
     @Override
     @CacheEvict(value = "siteConfigs", allEntries = true)
     public SectionDTO hideSection(Long sectionId) {
+        log.info("Hiding section with id: {}", sectionId);
         Section section = sectionRepository.findById(sectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
         section.setIsVisible(false);
+        log.info("Section with id: {} is now hidden", sectionId);
         return sectionMapper.toDTO(sectionRepository.save(section));
     }
 
@@ -275,21 +312,26 @@ public class SectionServiceImpl implements SectionService {
 
         SiteConfig siteConfig = siteConfigRepository.findBySiteId(siteId)
                 .orElseThrow(() -> new  ResourceNotFoundException("Site config not found with siteId : "+ siteId));
-
+        
+        log.info("All sections deleted successfully for siteId: {}", siteId);
         sectionRepository.deleteBySiteConfigId(siteConfig.getId());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SectionTemplateDTO> getAvailableSectionTemplates() {
+        log.debug("Fetching all active section templates");
         List<SectionTemplate> templates = sectionTemplateRepository.findByIsActiveTrue();
+        log.info("Found {} active section templates", templates.size());
         return sectionTemplateMapper.toDTOList(templates);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SectionTemplateDTO> getSectionTemplatesByType(String sectionType) {
+        log.debug("Fetching section templates for type: {}", sectionType);
         List<SectionTemplate> templates = sectionTemplateRepository.findBySectionTypeAndIsActiveTrue(sectionType);
+        log.info("Found {} section templates for type: {}", templates.size(), sectionType);
         return sectionTemplateMapper.toDTOList(templates);
     }
 }
