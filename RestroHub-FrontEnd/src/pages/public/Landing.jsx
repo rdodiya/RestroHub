@@ -696,25 +696,25 @@ const [contactForm, setContactForm] = useState({
       {/* ================================================ */}
       {/* CONTACT SECTION                                  */}
       {/* ================================================ */}
-      <section id="contact" className="bg-slate-50 py-20 sm:py-28">
+      <section id="contact" className="bg-slate-50 py-20 dark:bg-slate-800 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
               Contact Us
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Get in Touch
             </h2>
-            <p className="mt-4 text-lg text-slate-600">
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
               Have questions? We'd love to hear from you.
             </p>
           </div>
 
-          <div className="mx-auto mt-12 max-w-xl rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
+          <div className="mx-auto mt-12 max-w-xl rounded-2xl border border-slate-100 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
             <div className="space-y-5">
               {/* Name */}
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -724,13 +724,13 @@ const [contactForm, setContactForm] = useState({
                   value={contactForm.name}
                   onChange={handleContactChange}
                   placeholder="John Doe"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
                 />
               </div>
 
               {/* Mobile */}
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Mobile Number <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -740,13 +740,13 @@ const [contactForm, setContactForm] = useState({
                   value={contactForm.mobile}
                   onChange={handleContactChange}
                   placeholder="+91 XXXXX XXXXX"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -756,13 +756,13 @@ const [contactForm, setContactForm] = useState({
                   value={contactForm.email}
                   onChange={handleContactChange}
                   placeholder="you@example.com"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -772,7 +772,7 @@ const [contactForm, setContactForm] = useState({
                   value={contactForm.description}
                   onChange={handleContactChange}
                   placeholder="Tell us how we can help..."
-                  className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
                 />
               </div>
 
@@ -780,7 +780,7 @@ const [contactForm, setContactForm] = useState({
               <button
                 onClick={handleContactSubmit}
                 disabled={contactStatus === 'sending'}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-200 transition-all hover:bg-blue-700 disabled:opacity-60"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-200 transition-all hover:bg-blue-700 disabled:opacity-60 dark:shadow-blue-900/40"
               >
                 {contactStatus === 'sending' ? 'Sending...' : 'Send Message'}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -788,13 +788,13 @@ const [contactForm, setContactForm] = useState({
 
               {/* Feedback */}
               {contactStatus === 'success' && (
-                <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
                   <CheckCircle2 className="h-5 w-5" />
                   Message sent! We'll get back to you soon.
                 </div>
               )}
               {contactStatus === 'error' && (
-                <p className="rounded-xl bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600">
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600 dark:bg-red-900/30 dark:text-red-400">
                   ❌ Something went wrong. Please try again.
                 </p>
               )}
