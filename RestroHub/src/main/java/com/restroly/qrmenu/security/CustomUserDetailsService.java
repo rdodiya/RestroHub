@@ -34,16 +34,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Check if the user account is active
         if (!user.isActive()) {
             log.warn("User account is inactive: {}", email);
-            throw new UserDisabledException("User account is inactive: " + email);
+            throw new UserDisabledException("User account is inactive");
         }
 
         // Check if the user account is locked
         if (user.isLocked()) {
             log.warn("User account is locked: {}", email);
-            throw new UserLockedException("User account is locked: " + email);
+            throw new UserLockedException("User account is locked");
         }
-
-
 
         List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
