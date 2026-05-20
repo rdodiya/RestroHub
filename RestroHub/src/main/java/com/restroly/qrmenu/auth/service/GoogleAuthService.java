@@ -37,6 +37,9 @@ public class GoogleAuthService {
     @Value("${google.oauth.client-id}")
     private String googleClientId;
 
+    @Value("${google.oauth.enabled:true}")
+    private boolean googleAuthEnabled;
+
     /**
      * Authenticates user via Google OAuth token.
      * 1. Verifies the Google ID token
@@ -51,8 +54,13 @@ public class GoogleAuthService {
      */
     @Transactional
     public AuthResponse authenticateWithGoogle(GoogleAuthRequest googleAuthRequest) {
+        if (!googleAuthEnabled) {
+            log.warn("Google OAuth is disabled via configuration");
+            throw new BusinessException("Google authentication is currently disabled. Please use username/password login.");
+        }
+
         String idToken = googleAuthRequest.getToken();
-        
+
         log.info("Google OAuth authentication initiated");
 
         JsonWebSignature jws = verifyGoogleToken(idToken);
