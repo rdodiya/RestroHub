@@ -51,7 +51,7 @@ public class RoleServiceImpl implements RoleService {
 
         Role role = roleRepository.findByIdWithUsers(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
-
+        log.info("Role found with ID: {}", id);
         return mapToResponseWithUserCount(role);
     }
 
@@ -62,7 +62,7 @@ public class RoleServiceImpl implements RoleService {
 
         Role role = roleRepository.findByName(name)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found with name: " + name));
-
+        log.info("Role found with name: {}", name);
         return mapToResponse(role);
     }
 
@@ -96,6 +96,7 @@ public class RoleServiceImpl implements RoleService {
         // Check name uniqueness (if changed)
         if (request.getName() != null && !request.getName().equals(role.getName())) {
             if (roleRepository.existsByNameAndIdNot(request.getName(), id)) {
+                log.warn("Role name '{}' already exists for another role", request.getName());
                 throw new DuplicateResourceException("Role with name '" + request.getName() + "' already exists");
             }
             role.setName(request.getName());
@@ -125,6 +126,7 @@ public class RoleServiceImpl implements RoleService {
         // Check if role is assigned to any users
         long userCount = roleRepository.countUsersByRoleId(id);
         if (userCount > 0) {
+            log.warn("Cannot delete role with ID: {}. It is assigned to {} user(s)", id, userCount);
             throw new IllegalStateException("Cannot delete role. It is assigned to " + userCount + " user(s)");
         }
 
@@ -149,11 +151,13 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String name) {
+        log.info("Checking existence of role with name: {}", name);
         return roleRepository.existsByName(name);
     }
 
     // Private helper methods
     private RoleResponse mapToResponse(Role role) {
+        log.debug("Mapping role entity to response for ID: {}", role.getId());
         return RoleResponse.builder()
                 .id(role.getId())
                 .name(role.getName())
@@ -163,6 +167,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private RoleResponse mapToResponseWithUserCount(Role role) {
+        log.debug("Mapping role entity to response with user count for ID: {}", role.getId());
+
         long userCount = roleRepository.countUsersByRoleId(role.getId());
 
         return RoleResponse.builder()
