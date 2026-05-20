@@ -45,15 +45,16 @@ public class MenuServiceImpl implements MenuService {
         Branch branch = null;
         if (requestDTO.getBranchId() != null) {
             branch = branchRepository.findById(requestDTO.getBranchId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Branch not found with ID: " + requestDTO.getBranchId()));
+                    .orElseThrow(() -> {
+                        log.warn("Branch not found with ID: {}", requestDTO.getBranchId());
+                        return new ResourceNotFoundException("Branch not found with ID: " + requestDTO.getBranchId());
+                    });
 
             // Check duplicate name within same branch
             if (menuRepository.existsByMenuNameAndBranch_BranchId(
                     requestDTO.getMenuName(), requestDTO.getBranchId())) {
-                throw new DuplicateResourceException(
-                        "Menu with name '" + requestDTO.getMenuName() +
-                                "' already exists for this branch");
+                        log.warn("Attempt to create duplicate menu: {}", requestDTO.getMenuName());
+                        throw new DuplicateResourceException("Menu with name '" + requestDTO.getMenuName() + "' already exists for this branch");
             }
         }
 
@@ -77,8 +78,10 @@ public class MenuServiceImpl implements MenuService {
         log.debug("Fetching menu with ID: {}", menuId);
 
         Menu menu = menuRepository.findByMenuIdAndIsDeletedFalse(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Menu not found with ID: " + menuId));
+                .orElseThrow(() ->{
+                    log.warn("Menu not found with ID: {}", menuId);
+                    return new ResourceNotFoundException("Menu not found with ID: " + menuId);
+                });
 
         return menuMapper.toResponseDTO(menu);
     }
@@ -111,6 +114,7 @@ public class MenuServiceImpl implements MenuService {
         log.debug("Fetching menus for branch ID: {}", branchId);
 
         if (!branchRepository.existsById(branchId)) {
+            log.warn("Branch not found with ID: {}", branchId);
             throw new ResourceNotFoundException("Branch not found with ID: " + branchId);
         }
 
@@ -126,22 +130,25 @@ public class MenuServiceImpl implements MenuService {
 
         // Find existing menu
         Menu existingMenu = menuRepository.findByMenuIdAndIsDeletedFalse(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Menu not found with ID: " + menuId));
+                .orElseThrow(() -> {
+                    log.warn("Menu not found with ID: {}", menuId);
+                    return new ResourceNotFoundException("Menu not found with ID: " + menuId);
+                });
 
         // Validate branch if provided
         Branch branch = null;
         if (requestDTO.getBranchId() != null) {
             branch = branchRepository.findById(requestDTO.getBranchId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Branch not found with ID: " + requestDTO.getBranchId()));
+                    .orElseThrow(() ->{
+                        log.warn("Branch not found with ID: {}", requestDTO.getBranchId());
+                        return new ResourceNotFoundException("Branch not found with ID: " + requestDTO.getBranchId());
+                    });
 
             // Check duplicate name (excluding current menu)
             if (menuRepository.existsByMenuNameAndBranch_BranchIdAndMenuIdNot(
                     requestDTO.getMenuName(), requestDTO.getBranchId(), menuId)) {
-                throw new DuplicateResourceException(
-                        "Menu with name '" + requestDTO.getMenuName() +
-                                "' already exists for this branch");
+                        log.warn("Attempt to update menu to duplicate name: {}", requestDTO.getMenuName());
+                        throw new DuplicateResourceException("Menu with name '" + requestDTO.getMenuName()+"' already exists for this branch");
             }
         }
 
@@ -164,8 +171,10 @@ public class MenuServiceImpl implements MenuService {
         log.info("Soft deleting menu with ID: {}", menuId);
 
         Menu menu = menuRepository.findByMenuIdAndIsDeletedFalse(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Menu not found with ID: " + menuId));
+                .orElseThrow(() -> {
+                    log.warn("Menu not found with ID: {}", menuId);
+                    return new ResourceNotFoundException("Menu not found with ID: " + menuId);
+                });
 
         menu.setDeleted(true);
         menuRepository.save(menu);
@@ -179,8 +188,10 @@ public class MenuServiceImpl implements MenuService {
         log.info("Hard deleting menu with ID: {}", menuId);
 
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Menu not found with ID: " + menuId));
+                .orElseThrow(() ->{
+                    log.warn("Menu not found with ID: {}", menuId);
+                    return new ResourceNotFoundException("Menu not found with ID: " + menuId);
+                });
 
         menuRepository.delete(menu);
 
@@ -193,8 +204,10 @@ public class MenuServiceImpl implements MenuService {
         log.info("Restoring menu with ID: {}", menuId);
 
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Menu not found with ID: " + menuId));
+                .orElseThrow(() ->{
+                    log.warn("Menu not found with ID: {}", menuId);
+                    return new ResourceNotFoundException("Menu not found with ID: " + menuId);
+                });
 
         if (!menu.isDeleted()) {
             log.warn("Menu with ID: {} is already active", menuId);
@@ -241,12 +254,14 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(readOnly = true)
     public long countMenus() {
+        log.debug("Counting all active menus");
         return menuRepository.countByIsDeletedFalse();
     }
 
     @Override
     @Transactional(readOnly = true)
     public long countMenusByBranch(Long branchId) {
+        log.debug("Counting menus for branch ID: {}", branchId);
         return menuRepository.countByBranch_BranchIdAndIsDeletedFalse(branchId);
     }
 
@@ -254,12 +269,14 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String menuName, Long branchId) {
+        log.debug("Checking existence of menu - name: {}, branchId: {}", menuName, branchId);
         return menuRepository.existsByMenuNameAndBranch_BranchId(menuName, branchId);
     }
 
     // ========== PRIVATE HELPERS ==========
 
     private List<Category> resolveCategories(List<Long> categoryIds) {
+        log.debug("Resolving categories for IDs: {}", categoryIds);
         if (categoryIds == null || categoryIds.isEmpty()) {
             return new ArrayList<>();
         }
@@ -274,6 +291,7 @@ public class MenuServiceImpl implements MenuService {
             List<Long> missingIds = categoryIds.stream()
                     .filter(id -> !foundIds.contains(id))
                     .toList();
+            log.warn("Categories not found with IDs: {}", missingIds);
             throw new ResourceNotFoundException(
                     "Categories not found with IDs: " + missingIds);
         }
