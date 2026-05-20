@@ -49,15 +49,21 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderResponse createOrder(CreateOrderRequest request) {
-//		log.info("Creating order for branch: {}, table: {}", request.getBranchId(), request.getTableId());
+		log.info("Creating order for branch: {}, table: {}", request.getBranchId(), request.getTableId());
 
 		// Fetch branch
 		Branch branch = branchRepository.findByBranchIdAndIsDeleteFalse(request.getBranchId())
-				.orElseThrow(() -> new ResourceNotFoundException("Branch not found with id: " + request.getBranchId()));
+				.orElseThrow(() ->{
+					log.warn("Branch not found with id: {}", request.getBranchId());
+					return new ResourceNotFoundException("Branch not found with id: " + request.getBranchId());
+				});
 
 		// Fetch table
 		Tables table = tableRepository.findByTableIdAndIsActiveTrue(request.getTableId())
-				.orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + request.getTableId()));
+				.orElseThrow(() -> {
+					log.warn("Table not found with id: {}", request.getTableId());
+					return new ResourceNotFoundException("Table not found with id: " + request.getTableId());
+				});
 
 		// Fetch all food items
 		List<Long> foodIds = request.getItems().stream().map(OrderItemRequest::getFoodId).collect(Collectors.toList());
@@ -65,6 +71,7 @@ public class OrderServiceImpl implements OrderService {
 		List<Food> foods = foodRepository.findByFoodIdInAndIsDeleteFalse(foodIds);
 
 		if (foods.size() != foodIds.size()) {
+			log.warn("One or more food items not found for IDs: {}", foodIds);
 			throw new ResourceNotFoundException("One or more food items not found");
 		}
 
@@ -73,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
 
 		// Save order
 		Order savedOrder = orderRepository.save(order);
-//     log.info("Order created successfully with id: {}", savedOrder.getOrderId());
+        log.info("Order created successfully with id: {}", savedOrder.getOrderId());
 
 		// Send notification to admin
 		notificationService.notifyNewOrder(savedOrder);
@@ -84,6 +91,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	@Transactional(readOnly = true)
 	public OrderResponse getOrderById(Long orderId) {
+		log.debug("Fetching order with id: {}", orderId);
 		Order order = findOrderById(orderId);
 		return orderMapper.toResponse(order);
 	}
@@ -91,6 +99,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getOrdersByBranch(Long branchId) {
+		log.debug("Fetching orders for branch with id: {}", branchId);
 		List<Order> orders = orderRepository.findByBranchBranchIdOrderByCreatedAtDesc(branchId);
 		return orders.stream().map(orderMapper::toResponse).collect(Collectors.toList());
 	}
@@ -98,6 +107,8 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getActiveOrdersByBranch(Long branchId) {
+		log.debug("Fetching active orders for branch with id: {}", branchId);
+
 		List<OrderStatus> activeStatuses = Arrays.asList(OrderStatus.PENDING, OrderStatus.CONFIRMED,
 				OrderStatus.PREPARING, OrderStatus.READY);
 
@@ -107,28 +118,35 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderResponse updateOrderStatus(Long orderId, OrderStatus status) {
+		log.debug("Updating order status for id: {}, new status: {}", orderId, status);
+		
 		Order order = findOrderById(orderId);
 		order.setStatus(status);
 		Order updatedOrder = orderRepository.save(order);
 
-//     log.info("Order {} status updated to {}", orderId, status);
-
 		// Notify about status change
 		notificationService.notifyOrderStatusChange(updatedOrder);
-
+		log.info("Order {} status updated to {}", orderId, status);
 		return orderMapper.toResponse(updatedOrder);
 	}
 
 	@Override
 	public void cancelOrder(Long orderId) {
+		log.debug("Cancelling order with id: {}", orderId);
+
 		Order order = findOrderById(orderId);
 		order.setStatus(OrderStatus.CANCELLED);
 		orderRepository.save(order);
-//     log.info("Order {} cancelled", orderId);
+        log.info("Order {} cancelled", orderId);
 	}
 
 	private Order findOrderById(Long orderId) {
+		log.debug("Finding order with id: {}", orderId);
+
 		return orderRepository.findById(orderId)
-				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+				.orElseThrow(() ->{
+					log.warn("Order not found with id: {}", orderId);
+					return new ResourceNotFoundException("Order not found with id: " + orderId);
+				});
 	}
 }
