@@ -18,11 +18,29 @@ import {
   CheckCircle2,
   UserPlus,
   ShoppingCart,
-  Sparkles
+  Sparkles,
+  ArrowUp
 } from 'lucide-react';
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // show scroll top 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+
   const { isDark, toggle } = useTheme();
   // =====================  // DATA
   // =====================  const navLinks = [
@@ -30,6 +48,7 @@ const Landing = () => {
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
+    { label: 'Contact', href: '#contact' },
   ];
   
   // active link state
@@ -148,12 +167,45 @@ const plans = [
   const [selectedPlan, setSelectedPlan] = useState(
   plans.find(plan => plan.popular)?.name || plans[0].name
   );
+const [contactForm, setContactForm] = useState({
+    name: '', mobile: '', email: '', description: '',
+  });
+  const [contactStatus, setContactStatus] = useState(''); // '', 'sending', 'success', 'error'
 
+  const handleContactChange = (e) =>
+    setContactForm({ ...contactForm, [e.target.name]: e.target.value });
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactStatus('sending');
+    try {
+      const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({
+  service_id: "service_fgj8bx6" ,      // ← your actual Service ID
+  template_id: "template_j3k2n5c",     // ← your actual Template ID
+  user_id: "-Lly6B-CoO6THDld_",         // ← your actual Public Key
+  template_params: {
+    from_name: contactForm.name,
+    mobile: contactForm.mobile,
+    from_email: contactForm.email,
+    message: contactForm.description,
+  },
+}),
+      });
+      if (res.ok) {
+        setContactStatus('success');
+        setContactForm({ name: '', mobile: '', email: '', description: '' });
+      } else setContactStatus('error');
+    } catch {
+      setContactStatus('error');
+    }
+  };
   const testimonials = [
     {
       name: 'Ramesh Patel',
       role: 'Owner, Rajkot Dhaba',
-      text: 'Restroly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
       text: 'Restroly doubled our order efficiency. Customers love the QR menu and we love the zero-error billing!',
       rating: 5,
     },
@@ -208,6 +260,20 @@ const plans = [
   // =====================  // RENDER
   // =====================  return (
     <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
+
+
+      {/* adding scroll-up */}
+      
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          className="fixed bottom-6 right-6 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-300/40 transition-all hover:-translate-y-1 hover:bg-blue-700"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </button>
+      )}
 
       {/* ================================================ */}
       {/* NAVBAR                                           */}
@@ -606,7 +672,6 @@ const plans = [
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-lg text-blue-100/90">
               Join 5+ restaurants across India already using Restroly to
-              Join 5+ restaurants across India already using Restroly to
               serve customers faster.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -621,6 +686,115 @@ const plans = [
             <p className="mt-4 text-sm text-blue-200/80">
               No credit card needed · Free forever plan available
             </p>
+          </div>
+        </div>
+      </section>
+      {/* ================================================ */}
+      {/* CONTACT SECTION                                  */}
+      {/* ================================================ */}
+      <section id="contact" className="bg-slate-50 py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+              Contact Us
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Get in Touch
+            </h2>
+            <p className="mt-4 text-lg text-slate-600">
+              Have questions? We'd love to hear from you.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-12 max-w-xl rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
+            <div className="space-y-5">
+              {/* Name */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={contactForm.name}
+                  onChange={handleContactChange}
+                  placeholder="John Doe"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Mobile */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Mobile Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="mobile"
+                  required
+                  value={contactForm.mobile}
+                  onChange={handleContactChange}
+                  placeholder="+91 XXXXX XXXXX"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={contactForm.email}
+                  onChange={handleContactChange}
+                  placeholder="you@example.com"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  required
+                  rows={4}
+                  value={contactForm.description}
+                  onChange={handleContactChange}
+                  placeholder="Tell us how we can help..."
+                  className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                onClick={handleContactSubmit}
+                disabled={contactStatus === 'sending'}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-200 transition-all hover:bg-blue-700 disabled:opacity-60"
+              >
+                {contactStatus === 'sending' ? 'Sending...' : 'Send Message'}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </button>
+
+              {/* Feedback */}
+              {contactStatus === 'success' && (
+                <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                  <CheckCircle2 className="h-5 w-5" />
+                  Message sent! We'll get back to you soon.
+                </div>
+              )}
+              {contactStatus === 'error' && (
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600">
+                  ❌ Something went wrong. Please try again.
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -653,16 +827,16 @@ const plans = [
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
-                 {col.links.map((link) => (
-                <li key={link.label}>
-                <a
-                  href={link.href}
-                  className="text-sm text-slate-400 transition-colors hover:text-white"
-                >
-                 {link.label}
-                </a>
-              </li>
-            ))}
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        className="text-sm text-slate-400 transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}
@@ -671,7 +845,6 @@ const plans = [
           {/* Bottom Bar */}
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row">
             <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} Restroly. All rights reserved.
               © {new Date().getFullYear()} Restroly. All rights reserved.
             </p>
             <p className="text-sm text-slate-500">Made with ❤️ in India</p>
@@ -683,6 +856,3 @@ const plans = [
 };
 
 export default Landing;
-
-
-

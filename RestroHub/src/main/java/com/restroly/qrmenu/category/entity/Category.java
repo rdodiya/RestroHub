@@ -37,11 +37,11 @@ public class Category {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    // ✅ CHANGE START: One-to-Many Relationship
+    // CHANGE START: One-to-Many Relationship
     // mappedBy points to the 'category' field name in the Food class (singular)
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private Set<Food> foods = new HashSet<>();
-    // ✅ CHANGE END
+    private Set<Food> foods = new HashSet<Food>();
+    // CHANGE END
 
     @Builder.Default
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
