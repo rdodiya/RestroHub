@@ -2,10 +2,14 @@ package com.restroly.qrmenu.admin.dashboard.service;
 
 
 import com.restroly.qrmenu.admin.dashboard.dto.DashboardStatDTO;
+import com.restroly.qrmenu.branch.repository.BranchRepository;
 import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.order.repository.OrderRepository;
+import com.restroly.qrmenu.order.service.OrderNotificationService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -19,6 +23,8 @@ import java.util.Locale;
 public class DashboardServiceImpl implements DashboardService {
 
     private final OrderRepository orderRepository;
+    private final BranchRepository branchRepository;
+    private final OrderNotificationService notificationService;
 
     @Override
     public List<DashboardStatDTO> getDashboardStats() {
@@ -67,6 +73,14 @@ public class DashboardServiceImpl implements DashboardService {
                         null
                 )
         );
+    }
+
+    @Override
+    public SseEmitter switchOnNotificationsForBranch(Long branchId) {
+        if(branchRepository.existsById(branchId)){
+            return notificationService.subscribe(branchId);
+        }
+        throw new IllegalArgumentException("Branch not found with ID: " + branchId);
     }
 
 }
