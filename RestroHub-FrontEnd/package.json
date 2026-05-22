@@ -47,10 +47,6 @@
     "tailwindcss": "^3.4.19",
     "vite": "^7.3.1"
   },
-  "overrides": {
-    "three-mesh-bvh": "^0.9.10",
-    "meshoptimizer": "^1.1.1"
-  },
   "keywords": [
     "restaurant",
     "react",
