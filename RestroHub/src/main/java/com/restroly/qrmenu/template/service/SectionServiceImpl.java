@@ -275,6 +275,7 @@ public class SectionServiceImpl implements SectionService {
                 .orElseThrow(() -> new  ResourceNotFoundException("Site config not found with siteId : "+ siteId));
 
         sectionRepository.deleteBySiteConfigId(siteConfig.getId());
+        log.info("All sections deleted successfully for siteId: {}", siteId);
     }
 
     @Override

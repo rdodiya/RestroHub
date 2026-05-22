@@ -1,4 +1,4 @@
-// src/main/java/com/Restroly/qrmenu/food/service/impl/FoodServiceImpl.java
+// src/main/java/com/restroly/qrmenu/food/service/impl/FoodServiceImpl.java
 package com.restroly.qrmenu.food.service;
 
 import com.restroly.qrmenu.category.entity.Category;
@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.List;
 import java.lang.Long;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -162,7 +164,9 @@ public class FoodServiceImpl implements FoodService {
             throw new ResourceAlreadyExistsException(
                     String.format(FOOD_EXISTS_MSG, updateDTO.getName()));
         }
-        if(!updateDTO.getImageUrl().equals(existingFood.getImageUrl())){
+
+        // Safe null check for imageUrl
+        if(!Objects.equals(updateDTO.getImageUrl(), existingFood.getImageUrl())) {
             String imageUrl = null;
             if (image != null && !image.isEmpty()) {
                 imageUrl = cloudinaryService.uploadImage(image, "qrmenu/foods");
@@ -171,13 +175,16 @@ public class FoodServiceImpl implements FoodService {
                 updateDTO.setImageUrl(imageUrl);
             }
         }
-        if(existingFood.getCategory().getCategoryId() != updateDTO.getCategoryId()){
+
+        // Safe null check for categoryId
+        if(!Objects.equals(existingFood.getCategory().getCategoryId(), updateDTO.getCategoryId())) {
             if (updateDTO.getCategoryId() != null) {
                 Category category = categoryRepository.findById(updateDTO.getCategoryId())
                         .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + updateDTO.getCategoryId()));
                 existingFood.setCategory(category);
             }
         }
+        
         foodMapper.updateEntityFromDTO(updateDTO, existingFood);
         Food updatedFood = foodRepository.save(existingFood);
 
@@ -223,15 +230,18 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public boolean existsById(Long id) {
+        log.debug("Checking existence of food by id: {}", id);
         return foodRepository.existsById(id);
     }
 
     @Override
     public boolean existsByName(String name) {
+        log.debug("Checking existence of food by name: {}", name);
         return foodRepository.existsByNameIgnoreCase(name);
     }
 
     private Food findFoodByIdOrThrow(Long id) {
+        log.debug("Finding food by id: {}", id);
         return foodRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Food not found with id: {}", id);

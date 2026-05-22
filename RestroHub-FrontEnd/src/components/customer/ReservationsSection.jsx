@@ -73,7 +73,7 @@ const ReservationsSection = () => {
     };
 
     return (
-        <section id="reservations" className="reservations section">
+        <section id="pricing" className="reservations section">
             {/* Background Image */}
             <div 
                 className="reservations-bg"

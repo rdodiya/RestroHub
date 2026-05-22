@@ -50,6 +50,7 @@ public class MenuServiceImpl implements MenuService {
             // Check duplicate name within same branch
             if (menuRepository.existsByMenuNameAndBranch_BranchId(
                     requestDTO.getMenuName(), requestDTO.getBranchId())) {
+                log.warn("Attempt to create duplicate menu: {}",requestDTO.getMenuName());
                 throw new DuplicateResourceException(
                         "Menu with name '" + requestDTO.getMenuName() +
                                 "' already exists for this branch");
@@ -138,9 +139,8 @@ public class MenuServiceImpl implements MenuService {
             // Check duplicate name (excluding current menu)
             if (menuRepository.existsByMenuNameAndBranch_BranchIdAndMenuIdNot(
                     requestDTO.getMenuName(), requestDTO.getBranchId(), menuId)) {
-                throw new DuplicateResourceException(
-                        "Menu with name '" + requestDTO.getMenuName() +
-                                "' already exists for this branch");
+                        log.warn("Attempt to update menu to duplicate name: {}", requestDTO.getMenuName());
+                        throw new DuplicateResourceException("Menu with name '" + requestDTO.getMenuName()+"' already exists for this branch");
             }
         }
 
@@ -253,12 +253,14 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String menuName, Long branchId) {
+        log.debug("Checking existence of menu - name: {}, branchId: {}", menuName, branchId);
         return menuRepository.existsByMenuNameAndBranch_BranchId(menuName, branchId);
     }
 
     // ========== PRIVATE HELPERS ==========
 
     private List<Category> resolveCategories(List<Long> categoryIds) {
+        log.debug("Resolving categories for IDs: {}", categoryIds);
         if (categoryIds == null || categoryIds.isEmpty()) {
             return new ArrayList<>();
         }
