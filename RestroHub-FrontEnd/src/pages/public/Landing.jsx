@@ -186,34 +186,7 @@ const Landing = () => {
     },
   ];
 
-  // Scroll animation: update connecting line height and toggle in-view classes
-  useEffect(() => {
-    const items = Array.from(document.querySelectorAll('.scroll-animate'));
-    const line = document.getElementById('customer-connect-line');
-    if (!items.length || !line) return;
-
-    const updateLine = () => {
-      const inView = items.filter(it => it.classList.contains('in-view'));
-      const maxIdx = inView.length ? Math.max(...inView.map(it => Number(it.getAttribute('data-index')))) : -1;
-      const percent = maxIdx >= 0 ? ((maxIdx + 1) / items.length) * 100 : 0;
-      line.style.height = percent + '%';
-    };
-
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const el = entry.target;
-        if (entry.isIntersecting) el.classList.add('in-view');
-        else el.classList.remove('in-view');
-      });
-      updateLine();
-    }, { root: null, rootMargin: '-30% 0px -30% 0px', threshold: 0.3 });
-
-    items.forEach(it => obs.observe(it));
-    // initialise
-    updateLine();
-
-    return () => obs.disconnect();
-  }, []);
+  
 
 const plans = [
   {
@@ -361,17 +334,19 @@ const [contactForm, setContactForm] = useState({
     <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
 
       {/* Custom Styles for Animation */}
-      <style>{`
-        .scroll-animate {
-          opacity: 0;
-          transform: translateY(50px);
-          transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .scroll-animate.animate-in {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .scroll-animate {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          .scroll-animate.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        `
+      }} />
 
 
       {/* adding scroll-up */}
