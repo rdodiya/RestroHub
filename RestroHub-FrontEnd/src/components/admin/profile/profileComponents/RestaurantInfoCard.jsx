@@ -79,6 +79,25 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleToggleServiceRequest = async () => {
+    const newValue = !formData.serviceRequestEnabled;
+    setFormData((prev) => ({ ...prev, serviceRequestEnabled: newValue }));
+
+    try {
+      await api.put('/secure/api/v1/restaurants/1', {
+        name: formData.restaurantName,
+        description: formData.tagline,
+        phoneNumber: '+91-9876543210',
+        isActive: true,
+        serviceRequestEnabled: newValue,
+      });
+      onSave?.({ ...formData, serviceRequestEnabled: newValue });
+    } catch (err) {
+      console.warn('Backend restaurant update failed. Syncing locally.', err);
+    }
+  };
+
+
   const inputClass = `
     w-full rounded-lg border border-gray-200 bg-white
     px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400
@@ -334,19 +353,36 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
               <InfoRow label="Facebook" value={formData.facebook} icon={Facebook} />
             </div>
             
-            <div className="flex items-start gap-3 mt-5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-              <div className="flex h-5 w-5 items-center justify-center mt-0.5">
-                <span className="text-blue-500 text-lg">🛎️</span>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500">Service Requests (FAB)</p>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <span className={`inline-flex h-2.5 w-2.5 rounded-full ${formData.serviceRequestEnabled ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                  <span className="text-sm font-medium text-gray-900">
-                    {formData.serviceRequestEnabled ? 'Enabled (Customers can Call Waiter / Request Bill)' : 'Disabled'}
-                  </span>
+            <div className="flex items-center justify-between gap-3 mt-5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+              <div className="flex items-start gap-3">
+                <div className="flex h-5 w-5 items-center justify-center mt-0.5">
+                  <span className="text-blue-500 text-lg">🛎️</span>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500">Service Requests (FAB)</p>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span className={`inline-flex h-2.5 w-2.5 rounded-full ${formData.serviceRequestEnabled ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                    <span className="text-sm font-medium text-gray-900">
+                      {formData.serviceRequestEnabled ? 'Enabled (Customers can Call Waiter / Request Bill)' : 'Disabled'}
+                    </span>
+                  </div>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={handleToggleServiceRequest}
+                className={`
+                  relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none
+                  ${formData.serviceRequestEnabled ? 'bg-blue-600' : 'bg-gray-200'}
+                `}
+              >
+                <span
+                  className={`
+                    pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out
+                    ${formData.serviceRequestEnabled ? 'translate-x-5' : 'translate-x-0'}
+                  `}
+                />
+              </button>
             </div>
           </div>
         </div>

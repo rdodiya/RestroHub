@@ -24,7 +24,7 @@ const ServiceFAB = () => {
     useEffect(() => {
         const checkServiceStatus = async () => {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/v1/restaurants`);
+                const res = await fetch(`${API_BASE_URL}/public/api/v1/restaurants/1`);
                 if (res.ok) {
                     const data = await res.json();
                     // Find the restaurant that has this branch
