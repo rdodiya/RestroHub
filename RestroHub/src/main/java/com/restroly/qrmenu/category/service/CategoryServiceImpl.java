@@ -3,6 +3,7 @@ package com.restroly.qrmenu.category.service;
 import com.restroly.qrmenu.category.dto.CategoryRequestDTO;
 import com.restroly.qrmenu.category.dto.CategoryResponseDTO;
 import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.restroly.qrmenu.category.dto.CategoryDTO;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
 	private final CategoryRepository categoryRepository;
@@ -37,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 		);
 
 		Category savedCategory = categoryRepository.save(category);
-		log.info("Category created with ID: {}", savedCategory.getId());
+		log.info("Category created with ID: {}", savedCategory.getCategoryId());
 		return CategoryResponseDTO.fromEntity(savedCategory);
 	}
 
@@ -87,7 +89,7 @@ public class CategoryServiceImpl implements CategoryService {
 		existingCategory.setUpdatedDate(LocalDateTime.now());
 
 		Category updatedCategory = categoryRepository.save(existingCategory);
-		log.info("Category updated with ID: {}", updatedCategory.getId());
+		log.info("Category updated with ID: {}", updatedCategory.getCategoryId());
 		return CategoryResponseDTO.fromEntity(updatedCategory);
 	}
 
