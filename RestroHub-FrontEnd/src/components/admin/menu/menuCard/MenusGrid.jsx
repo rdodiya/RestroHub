@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 
 // ============================================
 // CONSTANTS
@@ -62,39 +63,6 @@ const categoryStyleSets = [
 ];
 
 const getCategoryStyle = (index) => categoryStyleSets[index % categoryStyleSets.length];
-
-// ============================================
-// SKELETON
-// ============================================
-const MenuCardSkeleton = () => (
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
-    <div className="h-2 bg-gray-100" />
-    <div className="p-6">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gray-100 rounded-2xl" />
-          <div>
-            <div className="w-40 h-5 bg-gray-100 rounded-lg mb-2" />
-            <div className="w-28 h-4 bg-gray-100 rounded-lg" />
-          </div>
-        </div>
-        <div className="w-20 h-7 bg-gray-100 rounded-full" />
-      </div>
-      <div className="w-full h-4 bg-gray-100 rounded mb-2" />
-      <div className="w-2/3 h-4 bg-gray-100 rounded mb-5" />
-      <div className="flex gap-2 mb-5">
-        <div className="w-20 h-7 bg-gray-100 rounded-full" />
-        <div className="w-24 h-7 bg-gray-100 rounded-full" />
-        <div className="w-16 h-7 bg-gray-100 rounded-full" />
-      </div>
-      <div className="flex gap-2 pt-4 border-t border-gray-100">
-        <div className="flex-1 h-10 bg-gray-100 rounded-xl" />
-        <div className="flex-1 h-10 bg-gray-100 rounded-xl" />
-        <div className="w-10 h-10 bg-gray-100 rounded-xl" />
-      </div>
-    </div>
-  </div>
-);
 
 // ============================================
 // VEG / NON-VEG INDICATOR
@@ -1129,7 +1097,7 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
       {/* Content */}
       {loading ? (
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => <MenuCardSkeleton key={i} />)}
+          {[1, 2, 3, 4, 5, 6].map((i) => <AdminSkeleton key={i} variant="menu-card" />)}
         </div>
       ) : error && menus.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 text-center p-8 sm:p-12 shadow-sm">

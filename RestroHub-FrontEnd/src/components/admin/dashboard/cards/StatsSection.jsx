@@ -8,6 +8,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 
 // ============================================
@@ -181,7 +182,7 @@ const StatsSection = () => {
     return (
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {[1, 2, 3, 4].map(i => (
-          <StatCardSkeleton key={i} />
+           <AdminSkeleton key={i} variant="stats" />
         ))}
       </div>
     );
