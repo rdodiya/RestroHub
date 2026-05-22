@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
      ======================= */
 	@Transactional
 	public CategoryResponseDTO createCategory(CategoryRequestDTO requestDTO) {
-
+		log.debug("Creating category with name: {}", requestDTO.getName());
 		Category category = CategoryDTO.toEntity(
 				CategoryDTO.builder()
 						.name(requestDTO.getName())
@@ -37,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
 		);
 
 		Category savedCategory = categoryRepository.save(category);
+		log.info("Category created with ID: {}", savedCategory.getId());
 		return CategoryResponseDTO.fromEntity(savedCategory);
 	}
 
@@ -46,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	@Transactional(readOnly = true)
 	public CategoryResponseDTO getCategoryById(Long id) {
-
+		log.debug("Fetching category with ID: {}", id);
 		Category category = categoryRepository.findById(id)
 				.orElseThrow(() ->
 						new ResourceNotFoundException("Category", "id", id));
@@ -60,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<CategoryResponseDTO> getAllCategories(Pageable pageable) {
-
+		log.debug("Fetching all categories with pagination: {}", pageable);
 		return categoryRepository.findAll(pageable)
 				.map(CategoryResponseDTO::fromEntity);
 	}
@@ -70,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
      ======================= */
 	@Transactional
 	public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO requestDTO) {
-
+		log.debug("Updating category with ID: {}", id);
 		Category existingCategory = categoryRepository.findById(id)
 				.orElseThrow(() ->
 						new ResourceNotFoundException("Category", "id", id));
@@ -86,6 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
 		existingCategory.setUpdatedDate(LocalDateTime.now());
 
 		Category updatedCategory = categoryRepository.save(existingCategory);
+		log.info("Category updated with ID: {}", updatedCategory.getId());
 		return CategoryResponseDTO.fromEntity(updatedCategory);
 	}
 
@@ -95,14 +97,14 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	@Transactional
 	public void deleteCategory(Long id) {
-
+		log.debug("Soft deleting category with ID: {}", id);
 		Category existingCategory = categoryRepository.findById(id)
 				.orElseThrow(() ->
 						new ResourceNotFoundException("Category", "id", id));
 
 		existingCategory.setIsDelete(true);
 		existingCategory.setUpdatedDate(LocalDateTime.now());
-
+		log.info("Category with ID: {} marked as deleted", id);
 		categoryRepository.save(existingCategory);
 	}
 }

@@ -15,10 +15,13 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8181/restroly";
 
 const validationSchema = Yup.object({
-    username: Yup.string().required("Email or username is required"),
+  username: Yup.string().required("Email or username is required"),
   password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .required("Password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?`~]).{8,}$/,
+      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
+    ),
 });
 
 /* ──────────────────── SVG Icons (inlined) ──────────────────── */
@@ -349,7 +352,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       name="password"
                       type={showPassword ? "text" : "password"}
                       autoComplete="new-password"
-                      placeholder="6+ Characters, 1 Capital letter"
+                      placeholder="Minimum 8 characters; include uppercase, lowercase, number, special character"
                       disabled={isLoading}
                       value={formik.values.password}
                       onChange={formik.handleChange}
