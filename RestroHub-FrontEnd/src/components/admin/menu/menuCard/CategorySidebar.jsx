@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight, RefreshCw, FolderPlus } from 'lucide-react';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 
 // ============================================
@@ -83,7 +84,7 @@ const CategorySidebar = ({ selectedCategory, onCategoryChange, onAddCategory, se
 
         {/* Categories List */}
         {loading ? (
-          <CategorySkeleton />
+          <AdminSkeleton variant="category" />
         ) : (
           <div className="space-y-2">
             {categories.map((cat) => (

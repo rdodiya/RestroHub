@@ -1,23 +1,7 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, LayoutGrid } from 'lucide-react';
 import TableCard from './TableCard';
-
-// Skeleton
-const TableSkeleton = () => (
-  <div className="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white animate-pulse">
-    <div className="px-4 py-5 text-center">
-      <div className="mx-auto mb-2 h-14 w-14 rounded-xl bg-gray-100" />
-      <div className="mx-auto mb-1 h-4 w-14 rounded bg-gray-100" />
-      <div className="mx-auto mb-2 h-3 w-12 rounded bg-gray-100" />
-      <div className="mx-auto h-5 w-16 rounded-full bg-gray-100" />
-    </div>
-    <div className="flex justify-center gap-2 border-t border-gray-100 px-3 py-3">
-      <div className="h-8 w-8 rounded-lg bg-gray-100" />
-      <div className="h-8 w-8 rounded-lg bg-gray-100" />
-      <div className="h-8 w-8 rounded-lg bg-gray-100" />
-    </div>
-  </div>
-);
+import AdminSkeleton from '../../AdminSkeleton';
 
 const TablesGrid = ({ branchId, onShowQR, onTablesLoaded }) => {
   const [tables, setTables] = useState([]);
@@ -63,7 +47,7 @@ const TablesGrid = ({ branchId, onShowQR, onTablesLoaded }) => {
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <TableSkeleton key={i} />)}
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <AdminSkeleton key={i} variant="table" />)}
       </div>
     );
   }

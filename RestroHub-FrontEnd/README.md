@@ -57,39 +57,48 @@ Restroly-FrontEnd/
 
 ## 🔧 Setup & Installation
 
-### 📌 Clone Repository
+### 📌 Prerequisites
 
+Ensure you have installed:
+- **Node.js** 18.0 or higher
+- **npm** 9.0 or higher (comes with Node.js)
+- **Git**
+- **Code Editor** (VS Code recommended)
+
+---
+
+### 📌 Getting Started
+
+#### 1. Navigate to Frontend Directory
+From the root of the cloned `RestroHub` repository, enter the frontend directory:
 ```bash
-git clone https://github.com/rdodiya/Restroly-FrontEnd.git
-cd Restroly-FrontEnd
-````
+cd RestroHub-FrontEnd
+```
 
-### 📌 Install Dependencies
-
+#### 2. Install Dependencies
 ```bash
 npm install
 ```
 
-or with Yarn:
-
+#### 3. Environment Configuration
+Create a `.env` file in the frontend root directory:
 ```bash
-yarn install
+cp .env.example .env
 ```
+Open `.env` and enter your actual config values:
+- `VITE_API_BASE_URL=http://localhost:8181/restroly` (Should point to your Spring Boot backend)
+- `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth client ID (Must match the one configured on the backend)
+
+---
 
 ### 📌 Run Locally
 
+To launch the Vite development server:
 ```bash
-npm start
+npm run dev
 ```
 
-or
-
-```bash
-yarn start
-```
-
-Open your browser at:
-
+By default, Vite will start the frontend on port **3000**:
 ```
 http://localhost:3000
 ```
@@ -98,19 +107,9 @@ http://localhost:3000
 
 ## 🌐 Backend Integration
 
-This frontend app connects to the **Restroly backend** to fetch menus, categories, and handle orders.
+The frontend app automatically integrates with the **Restroly backend API** to load menus, categories, handle orders, and perform authentication.
 
-Ensure your backend is running and update the API base URL in:
-
-```
-src/services/api.js
-```
-
-Example:
-
-```js
-export const API_BASE_URL = "http://localhost:8080/api";
-```
+The API client configuration can be found at `src/services/common/api.js`. It is set up to automatically look at `VITE_API_BASE_URL` from your `.env` file, falling back to `http://localhost:8181/restroly` when not specified.
 
 ---
 
@@ -155,12 +154,23 @@ npm run deploy
 
 ## 🧩 Environment Variables
 
-Create a `.env` file in the root:
+Create a `.env` file in the root (Vite only exposes variables prefixed with `VITE_`):
 
 ```env
-REACT_APP_API_BASE_URL=http://localhost:8080/api
-# any other keys you need
+VITE_API_BASE_URL=http://localhost:8181/restroly
+# Google OAuth: create credentials in Google Cloud Console and set your client id here
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
 ```
+
+How to obtain a Google Client ID:
+
+1. Go to https://console.cloud.google.com/apis/credentials
+2. Create or select a project
+3. Click "Create Credentials" → "OAuth client ID" and choose "Web application"
+4. Add `http://localhost:5173` (or your Vite dev URL) to Authorized JavaScript origins
+5. Copy the `Client ID` and add it to your `.env` as `VITE_GOOGLE_CLIENT_ID`
+
+After updating `.env`, restart the dev server.
 
 ---
 

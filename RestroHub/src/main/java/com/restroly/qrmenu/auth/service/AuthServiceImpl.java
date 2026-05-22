@@ -78,10 +78,12 @@ public class AuthServiceImpl implements AuthService {
         log.debug("Refresh token request received");
 
         if (!jwtTokenProvider.validateToken(refreshToken)) {
+            log.warn("Invalid or expired refresh token");
             throw new BusinessException("Invalid or expired refresh token");
         }
 
         if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
+            log.warn("Provided token is not a refresh token");
             throw new BusinessException("Token is not a refresh token");
         }
 

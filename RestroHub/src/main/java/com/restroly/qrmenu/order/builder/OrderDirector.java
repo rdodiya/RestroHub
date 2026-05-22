@@ -24,7 +24,7 @@ public class OrderDirector {
 //
 //    private final OrderBuilder orderBuilder;
 //    private final OrderItemBuilder orderItemBuilder;
-    private final OrderBuilder orderBuilder = null;
+    private final OrderBuilder orderBuilder = new OrderBuilderImpl();
     private final OrderItemBuilder orderItemBuilder = new OrderItemBuilder();
 
     /**

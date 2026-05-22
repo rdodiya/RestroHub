@@ -8,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.restroly.qrmenu.security.exception.UserDisabledException;
+import com.restroly.qrmenu.security.exception.UserLockedException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +31,16 @@ public class CustomUserDetailsService implements UserDetailsService {
                     log.warn("User not found with email: {}", email);
                     return new UsernameNotFoundException("User not found with email: " + email);
                 });
-
+        // Check if the user account is active
         if (!user.isActive()) {
             log.warn("User account is inactive: {}", email);
-            throw new UsernameNotFoundException("User account is inactive: " + email);
+            throw new UserDisabledException("User account is inactive");
+        }
+
+        // Check if the user account is locked
+        if (user.isLocked()) {
+            log.warn("User account is locked: {}", email);
+            throw new UserLockedException("User account is locked");
         }
 
         List<SimpleGrantedAuthority> authorities = user.getRoles().stream()

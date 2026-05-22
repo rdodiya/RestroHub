@@ -202,14 +202,21 @@ Lombok & MapStruct annotation processing enabled
 
 ```
 
-### Installation
+### Installation & Setup
 
+## 📁 Project Structure
+
+- `RestroHub/` - Spring Boot backend project
+  - `src/main/java/` - Java source code
+  - `src/main/resources/` - Spring configuration and properties
+  - `src/test/java/` - Backend tests
+- `RestroHub-FrontEnd/` - React/Vite frontend project
+
+#### 💻 Frontend Setup (React / Vite)
 ```bash
 # Clone the repository
-git clone https://github.com/rdodiya/Restroly.git
-
-# Navigate to project directory
-cd Restroly
+git clone https://github.com/rdodiya/RestroHub.git
+cd RestroHub/RestroHub-FrontEnd
 
 # Install dependencies
 npm install
@@ -220,6 +227,60 @@ cp .env.example .env
 # Start development server
 npm run dev
 ```
+
+#### ☕ Backend Setup (Java / Spring Boot)
+```bash
+# Clone the repository (if not already done)
+git clone https://github.com/rdodiya/RestroHub.git
+cd RestroHub/RestroHub
+
+# Create a PostgreSQL database named RestroHub_DB
+createdb RestroHub_DB
+# Or via psql:
+# psql -U postgres -c 'CREATE DATABASE "RestroHub_DB";'
+
+# Set up backend configuration
+Backend configuration is now managed through Spring property files in `src/main/resources`.
+Update `application-dev.properties` with your local database values if needed.
+
+The Google OAuth Client ID should be provided via an environment variable rather than committed into a config file.
+Backend Spring Boot reads this value from `GOOGLE_OAUTH_CLIENT_ID`.
+
+Example environment setup:
+```
+- PowerShell:
+  ```powershell
+  $env:GOOGLE_OAUTH_CLIENT_ID="your-google-client-id"
+  ```
+- CMD:
+  ```cmd
+  set GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+  ```
+- Bash:
+  ```bash
+  export GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+  ```
+
+---
+
+#### 🚀 Running the Application
+
+To build and run the Spring Boot server:
+
+```bash
+# On Linux/macOS
+./gradlew bootRun --args='--spring.profiles.active=dev'
+
+# On Windows (PowerShell)
+.\gradlew.bat bootRun --args='--spring.profiles.active=dev'
+```
+
+The server will start up on port **8181** with context path `/restroly`.
+Verify it is running by visiting:
+* **Health endpoint**: `http://localhost:8181/restroly/actuator/health`
+* **Swagger API docs**: `http://localhost:8181/restroly/swagger-ui.html`
+
+---
 
 ### Environment Variables
 
@@ -422,10 +483,10 @@ class AggregatorSyncService {
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              DEVELOPMENT ROADMAP                             │
+│                              DEVELOPMENT ROADMAP                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│   ✅ COMPLETED              🚧 IN PROGRESS           📋 PLANNED              │
+│                                                                             │
+│   ✅ COMPLETED              🚧 IN PROGRESS           📋 PLANNED            │
 │                                                                              │
 │   Phase 1 (Q1)              Phase 2 (Q2)             Phase 3 (Q3)            │
 │   ──────────                ──────────               ──────────              │
@@ -477,7 +538,7 @@ We love contributions! Here's how you can help build Restroly:
 
 ---
 
-### 🚀 How to Contribu  te
+### 🚀 How to Contribute
 
 ```bash
 # 1. Fork the repository

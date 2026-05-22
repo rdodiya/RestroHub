@@ -7,6 +7,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 
 // ============================================
@@ -50,25 +51,6 @@ const OrderCard = ({ order }) => {
         </div>
       </div>
       <p className={`font-bold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>₹{order.amount}</p>
-    </div>
-  );
-};
-
-// ============================================
-// SKELETON (Private to this file)
-// ============================================
-const OrderSkeleton = () => {
-  const { isDark } = useAdminTheme();
-  return (
-    <div className={`flex items-center justify-between p-4 rounded-xl animate-pulse ${isDark ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-      <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-        <div>
-          <div className={`w-32 h-4 rounded mb-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-          <div className={`w-48 h-3 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
-        </div>
-      </div>
-      <div className={`w-16 h-5 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
     </div>
   );
 };
@@ -158,8 +140,10 @@ const LiveOrders = () => {
       {/* Content */}
       <div className="space-y-4">
         {loading ? (
-          [1, 2, 3, 4].map(i => <OrderSkeleton key={i} />)
-        ) : error && orders.length === 0 ? (
+          [1, 2, 3, 4].map(i => (
+          <AdminSkeleton key={i} variant="order" />))
+          ) : error && orders.length === 0 ? (
+          // Error State
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-3" />
             <p className="text-red-500 mb-2">{error}</p>
