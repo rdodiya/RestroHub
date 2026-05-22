@@ -38,6 +38,16 @@ public class User {
     @Column(name = "is_locked")
     private boolean isLocked;
 
+    // OAuth2 fields for Google login integration
+    @Column(name = "google_sub", unique = true)
+    private String googleSub;  // Google's unique user identifier
+
+    @Column(name = "auth_provider")
+    private String authProvider;  // e.g., "GOOGLE", "LOCAL", "FACEBOOK" (future)
+
+    @Column(name = "picture_url")
+    private String pictureUrl;  // User profile picture from OAuth provider
+
     @ManyToMany
     @JoinTable(
         name = "t_rel_usr_role",

@@ -308,7 +308,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       id="username"
                       name="username"
                       type="text"
-                      autoComplete="username"
+                      autoComplete="off"
                       placeholder="Enter email or username"
                       value={formik.values.username}
                       onChange={formik.handleChange}
@@ -337,7 +337,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                       placeholder="6+ Characters, 1 Capital letter"
                       disabled={isLoading}
                       value={formik.values.password}
@@ -403,8 +403,7 @@ const handleGoogleLogin = async (credentialResponse) => {
   onError={() => {
     toast.error("Google Login Failed");
   }}
-/>
-```
+/> 
 
 
 
