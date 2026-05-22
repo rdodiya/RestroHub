@@ -13,11 +13,8 @@ import org.springframework.stereotype.Service;
 //@Slf4j
 public class OrderNotificationService {
 
-//	private final SimpMessagingTemplate messagingTemplate;
-//	private final OrderMapper orderMapper;
-
-	private final SimpMessagingTemplate messagingTemplate = null;
-	private final OrderMapper orderMapper = new OrderMapper();
+	private final SimpMessagingTemplate messagingTemplate;
+	private final OrderMapper orderMapper;
 	
 	public void notifyNewOrder(Order order) {
 		OrderResponse response = orderMapper.toResponse(order);

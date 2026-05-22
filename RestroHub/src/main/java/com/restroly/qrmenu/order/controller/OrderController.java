@@ -28,12 +28,10 @@ import static com.restroly.qrmenu.common.util.ApiConstants.*;
 @RestController
 @RequestMapping(SECURE_API_VERSION+"/orders")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class OrderController {
 
-	@Autowired
-	private final OrderService orderService = null;
-
-//private final OrderService orderService;
+	private final OrderService orderService;
 	@PostMapping
 	public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
 		OrderResponse response = orderService.createOrder(request);

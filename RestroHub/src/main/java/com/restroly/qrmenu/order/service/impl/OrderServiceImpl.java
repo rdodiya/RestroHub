@@ -43,9 +43,12 @@ public class OrderServiceImpl implements OrderService {
 	@Autowired
 	private FoodRepository foodRepository;
 
-	private final OrderDirector orderDirector = new OrderDirector();
-	private final OrderMapper orderMapper = new OrderMapper();
-	private final OrderNotificationService notificationService = new OrderNotificationService();
+	@Autowired
+	private OrderDirector orderDirector;
+	@Autowired
+	private OrderMapper orderMapper;
+	@Autowired
+	private OrderNotificationService notificationService;
 
 	@Override
 	public OrderResponse createOrder(CreateOrderRequest request) {

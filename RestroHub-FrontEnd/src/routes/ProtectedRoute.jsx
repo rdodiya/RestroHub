@@ -1,10 +1,43 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
+  const location = useLocation();
   const accessToken = localStorage.getItem("accessToken");
-
+  
   if (!accessToken) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Role-based access control
+  let roles = [];
+  try {
+    const rolesStr = localStorage.getItem("roles");
+    if (rolesStr) roles = JSON.parse(rolesStr);
+  } catch (e) {
+    console.error("Failed to parse roles");
+  }
+
+  const hasRole = (roleToCheck) => {
+    if (!Array.isArray(roles)) return false;
+    return roles.some(r => {
+      const roleName = typeof r === 'string' ? r : r.authority || r.name;
+      return roleName === roleToCheck || roleName === `ROLE_${roleToCheck}`;
+    });
+  };
+
+  const isAdmin = hasRole("ADMIN");
+  const isManager = hasRole("MANAGER");
+  const isStaff = hasRole("STAFF");
+
+  // If user is Manager or Staff but NOT Admin, restrict access to KDS and Orders
+  if (!isAdmin && (isManager || isStaff)) {
+    const allowedPaths = ["/admin/kds", "/admin/orders", "/admin/profile"];
+    const isAllowed = allowedPaths.some(p => location.pathname.startsWith(p));
+    
+    // Redirect away from dashboard or unauthorized routes to KDS
+    if (!isAllowed || location.pathname === "/admin" || location.pathname === "/admin/dashboard") {
+      return <Navigate to="/admin/kds" replace />;
+    }
   }
 
   return children;

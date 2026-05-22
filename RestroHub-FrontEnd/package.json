@@ -17,6 +17,7 @@
     "@react-oauth/google": "^0.13.5",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
+    "@stomp/stompjs": "^7.3.0",
     "axios": "^1.13.4",
     "formik": "^2.4.9",
     "framer-motion": "^12.33.0",
@@ -29,6 +30,7 @@
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^6.30.1",
     "recharts": "^3.7.0",
+    "sockjs-client": "^1.6.1",
     "three": "^0.182.0",
     "yup": "^1.7.1"
   },
