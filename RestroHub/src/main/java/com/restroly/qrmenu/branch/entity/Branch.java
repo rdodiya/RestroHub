@@ -75,6 +75,9 @@ public class Branch {
 	@Builder.Default
 	private List<Tables> tables = new ArrayList<>();
 
+	@Column(name = "branch_upi_id")
+	private String branchUpiId;
+
 	@PrePersist
 	protected void onCreate() {
 		createdDate = LocalDateTime.now();

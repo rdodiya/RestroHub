@@ -19,6 +19,7 @@ import com.restroly.qrmenu.order.dto.CreateOrderRequest;
 import com.restroly.qrmenu.order.dto.OrderResponse;
 import com.restroly.qrmenu.order.dto.UpdateOrderStatusRequest;
 import com.restroly.qrmenu.order.service.OrderService;
+import com.restroly.qrmenu.payment.service.PaymentService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,11 @@ public class OrderController {
 	@PostMapping
 	public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
 		OrderResponse response = orderService.createOrder(request);
+		//Order tacking improvement needed
+		//Response is used to carry the UPI Id out of instead of calling it from database again hence reducing the number of calls to database and improving the performance of the application
+		String paymentUrl = paymentService.generatePaymentLink(response.getTotalAmount(), response.getOrderId(), response.getPaymentLink());
+		//Genarated payment link is stored in response object to send it to client and use it for payment
+		response.setPaymentLink(paymentUrl);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 

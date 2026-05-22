@@ -149,6 +149,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String name) {
+        log.debug("Checking existence of role with name: {}", name);
         return roleRepository.existsByName(name);
     }
 
