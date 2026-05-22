@@ -74,6 +74,32 @@ const Landing = () => {
     return () => obs.disconnect();
   }, []);
 
+  // Scroll Animation for Customer Flow (user requested insertion near top useEffects)
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+
+          // Animate the connecting line
+          const line = document.getElementById('customer-connect-line');
+          if (line) {
+            setTimeout(() => {
+              line.style.height = '100%';
+            }, 300);
+          }
+        }
+      });
+    }, { threshold: 0.2 });
+
+    // Observe all scroll-animate elements
+    document.querySelectorAll('.scroll-animate').forEach((el) => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const features = [
     {
       icon: QrCode,
@@ -119,6 +145,75 @@ const Landing = () => {
     { num: '03', icon: ShoppingCart, title: 'Receive Orders', desc: 'Customers scan, order, and pay from their phone.' },
     { num: '04', icon: BarChart3, title: 'Grow Revenue', desc: 'Track analytics and optimize your business.' },
   ];
+
+  // Customer Flow Steps (for the scroll-animated column)
+  const customerSteps = [
+    { 
+      num: '01', 
+      icon: QrCode, 
+      title: 'Scan QR Code', 
+      desc: 'Scan the QR code placed on your table to open the digital menu.' 
+    },
+    { 
+      num: '02', 
+      icon: Menu, 
+      title: 'Browse Menu', 
+      desc: 'Explore categories and select your favourite food items.' 
+    },
+    { 
+      num: '03', 
+      icon: ShoppingCart, 
+      title: 'Add to Cart', 
+      desc: 'Add desired items to cart and adjust quantity as needed.' 
+    },
+    { 
+      num: '04', 
+      icon: UserPlus, 
+      title: 'Place Order', 
+      desc: 'Confirm your order and enter your table number.' 
+    },
+    { 
+      num: '05', 
+      icon: MessageSquare, 
+      title: 'Live Updates', 
+      desc: 'Track your order status in real-time (Preparing → Ready → Served).' 
+    },
+    { 
+      num: '06', 
+      icon: CreditCard, 
+      title: 'UPI Payment', 
+      desc: 'Make secure payment directly via UPI - no cash required.' 
+    },
+  ];
+
+  // Scroll animation: update connecting line height and toggle in-view classes
+  useEffect(() => {
+    const items = Array.from(document.querySelectorAll('.scroll-animate'));
+    const line = document.getElementById('customer-connect-line');
+    if (!items.length || !line) return;
+
+    const updateLine = () => {
+      const inView = items.filter(it => it.classList.contains('in-view'));
+      const maxIdx = inView.length ? Math.max(...inView.map(it => Number(it.getAttribute('data-index')))) : -1;
+      const percent = maxIdx >= 0 ? ((maxIdx + 1) / items.length) * 100 : 0;
+      line.style.height = percent + '%';
+    };
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const el = entry.target;
+        if (entry.isIntersecting) el.classList.add('in-view');
+        else el.classList.remove('in-view');
+      });
+      updateLine();
+    }, { root: null, rootMargin: '-30% 0px -30% 0px', threshold: 0.3 });
+
+    items.forEach(it => obs.observe(it));
+    // initialise
+    updateLine();
+
+    return () => obs.disconnect();
+  }, []);
 
 const plans = [
   {
@@ -264,6 +359,19 @@ const [contactForm, setContactForm] = useState({
   // ============================
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
+
+      {/* Custom Styles for Animation */}
+      <style>{`
+        .scroll-animate {
+          opacity: 0;
+          transform: translateY(50px);
+          transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .scroll-animate.animate-in {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `}</style>
 
 
       {/* adding scroll-up */}
@@ -510,38 +618,91 @@ const [contactForm, setContactForm] = useState({
       </section>
 
       {/* ================================================ */}
-      {/* HOW IT WORKS                                     */}
+      {/* HOW IT WORKS - DUAL FLOW WITH SCROLL ANIMATION */}
       {/* ================================================ */}
       <section id="how-it-works" className="bg-slate-50 py-20 dark:bg-slate-800 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
+          <div className="mx-auto max-w-2xl text-center mb-16">
             <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
               How It Works
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-              Up and Running in Minutes
+              Simple for Everyone
             </h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
+              Seamless experience for both restaurant owners and customers
+            </p>
           </div>
 
-          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {steps.map((step, i) => (
-              <div key={i} className="relative text-center">
-                {/* Connector */}
-                {i < steps.length - 1 && (
-                  <div className="absolute right-0 top-10 hidden h-0.5 w-full -translate-x-1/2 bg-blue-200 lg:block" />
-                )}
-
-                <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md dark:border-blue-800 dark:bg-slate-700">
-                  <step.icon className="h-8 w-8 text-blue-600" />
-                  <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
-                    {step.num}
-                  </span>
+          {/* Restaurant Owners Flow */}
+          <div className="mb-20">
+            <h3 className="text-2xl font-semibold text-center mb-10 text-emerald-600">
+              For Restaurant Owners
+            </h3>
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {steps.map((step, i) => (
+                <div key={i} className="relative text-center">
+                  {i < steps.length - 1 && (
+                    <div className="absolute right-0 top-10 hidden h-0.5 w-full -translate-x-1/2 bg-emerald-200 lg:block" />
+                  )}
+                  <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-emerald-100 bg-white shadow-md dark:border-emerald-800 dark:bg-slate-700">
+                    <step.icon className="h-8 w-8 text-emerald-600" />
+                    <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-sm">
+                      {step.num}
+                    </span>
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{step.desc}</p>
                 </div>
+              ))}
+            </div>
+          </div>
 
-                <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{step.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{step.desc}</p>
+          {/* Customer Flow with Scroll Animation */}
+          <div>
+            <h3 className="text-2xl font-semibold text-center mb-12 text-violet-600">
+              For Customers
+            </h3>
+
+            <div className="relative max-w-5xl mx-auto">
+              {/* Vertical Connecting Line */}
+              <div 
+                id="customer-connect-line"
+                className="absolute left-1/2 top-12 hidden h-0 w-1 bg-gradient-to-b from-violet-400 via-purple-500 to-blue-500 lg:block -translate-x-1/2 rounded-full transition-all duration-1000"
+              />
+
+              <div className="space-y-20 relative">
+                {customerSteps.map((step, index) => (
+                  <div 
+                    key={index} 
+                    className="scroll-animate group flex flex-col lg:flex-row items-center gap-8 lg:gap-16"
+                    data-index={index}
+                  >
+                    {/* Icon Side */}
+                    <div className="lg:w-1/2 flex justify-center lg:justify-end">
+                      <div className="relative">
+                        <div className="w-28 h-28 rounded-3xl bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center border-4 border-violet-100 dark:border-violet-900 group-hover:scale-110 transition-transform duration-500">
+                          <step.icon className="w-14 h-14 text-violet-600" />
+                        </div>
+                        <div className="absolute -top-4 -right-4 w-10 h-10 rounded-2xl bg-violet-600 text-white flex items-center justify-center text-xl font-bold shadow-lg">
+                          {step.num}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content Side */}
+                    <div className="lg:w-1/2 text-center lg:text-left">
+                      <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+                        {step.title}
+                      </h4>
+                      <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                        {step.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
