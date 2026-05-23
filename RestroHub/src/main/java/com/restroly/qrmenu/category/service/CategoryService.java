@@ -17,4 +17,7 @@ public interface CategoryService {
 	public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO requestDTO);
 
 	public void deleteCategory(Long id);
+
+	Page<CategoryResponseDTO> getActiveCategories(Pageable pageable);
+
 }
