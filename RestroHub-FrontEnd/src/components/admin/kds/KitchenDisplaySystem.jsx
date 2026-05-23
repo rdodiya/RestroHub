@@ -64,7 +64,7 @@ const KitchenDisplaySystem = () => {
   const fetchActiveOrders = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/v1/secure/orders/branch/${branchId}/active`);
+      const response = await api.get(`/secure/api/v1/orders/branch/${branchId}/active`);
       setOrders(response.data || []);
     } catch (error) {
       console.error("Error fetching orders:", error);
