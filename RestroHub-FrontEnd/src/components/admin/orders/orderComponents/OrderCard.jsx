@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Clock,
   ChefHat,
@@ -9,8 +9,7 @@ import {
   MoreVertical,
   Loader2,
   X,
-} from 'lucide-react';
-import api from "@services/common/api";
+} from "lucide-react";
 
 const OrderCard = ({ order, onStatusUpdate }) => {
   const [updating, setUpdating] = useState(false);
@@ -20,32 +19,39 @@ const OrderCard = ({ order, onStatusUpdate }) => {
   // ------------------------------------
   const statusConfig = {
     pending: {
-      bg: 'bg-yellow-50',
-      text: 'text-yellow-700',
-      border: 'border-yellow-200',
+      bg: "bg-yellow-50",
+      text: "text-yellow-700",
+      border: "border-yellow-200",
       icon: Clock,
-      label: 'Pending',
+      label: "Pending",
     },
     cooking: {
-      bg: 'bg-blue-50',
-      text: 'text-blue-700',
-      border: 'border-blue-200',
+      bg: "bg-blue-50",
+      text: "text-blue-700",
+      border: "border-blue-200",
       icon: ChefHat,
-      label: 'Cooking',
+      label: "Cooking",
     },
     ready: {
-      bg: 'bg-green-50',
-      text: 'text-green-700',
-      border: 'border-green-200',
+      bg: "bg-green-50",
+      text: "text-green-700",
+      border: "border-green-200",
       icon: CheckCircle2,
-      label: 'Ready',
+      label: "Ready",
     },
     billed: {
-      bg: 'bg-purple-50',
-      text: 'text-purple-700',
-      border: 'border-purple-200',
+      bg: "bg-purple-50",
+      text: "text-purple-700",
+      border: "border-purple-200",
       icon: Receipt,
-      label: 'Billed',
+      label: "Billed",
+    },
+    cancelled: {
+      bg: "bg-red-50",
+      text: "text-red-700",
+      border: "border-red-200",
+      icon: X,
+      label: "Cancelled",
     },
   };
 
@@ -54,40 +60,49 @@ const OrderCard = ({ order, onStatusUpdate }) => {
   // ------------------------------------
   const actionConfig = {
     pending: {
-      label: 'Start Cooking',
-      next: 'cooking',
+      label: "Start Cooking",
+      next: "cooking",
       icon: ChefHat,
-      bg: 'bg-blue-50',
-      text: 'text-blue-700',
-      hoverBg: 'hover:bg-blue-100',
-      border: 'border border-blue-200',
+      bg: "bg-blue-50",
+      text: "text-blue-700",
+      hoverBg: "hover:bg-blue-100",
+      border: "border border-blue-200",
     },
     cooking: {
-      label: 'Mark Ready',
-      next: 'ready',
+      label: "Mark Ready",
+      next: "ready",
       icon: CheckCircle2,
-      bg: 'bg-green-50',
-      text: 'text-green-700',
-      hoverBg: 'hover:bg-green-100',
-      border: 'border border-green-200',
+      bg: "bg-green-50",
+      text: "text-green-700",
+      hoverBg: "hover:bg-green-100",
+      border: "border border-green-200",
     },
     ready: {
-      label: 'Generate Bill',
-      next: 'billed',
+      label: "Generate Bill",
+      next: "billed",
       icon: Receipt,
-      bg: 'bg-purple-50',
-      text: 'text-purple-700',
-      hoverBg: 'hover:bg-purple-100',
-      border: 'border border-purple-200',
+      bg: "bg-purple-50",
+      text: "text-purple-700",
+      hoverBg: "hover:bg-purple-100",
+      border: "border border-purple-200",
     },
     billed: {
-      label: 'Complete Payment',
-      next: 'complete',
+      label: "Complete Payment",
+      next: "complete",
       icon: CreditCard,
-      bg: 'bg-gray-50',
-      text: 'text-gray-700',
-      hoverBg: 'hover:bg-gray-100',
-      border: 'border border-gray-200',
+      bg: "bg-gray-50",
+      text: "text-gray-700",
+      hoverBg: "hover:bg-gray-100",
+      border: "border border-gray-200",
+    },
+    cancelled: {
+      label: "Cancelled",
+      next: null,
+      icon: X,
+      bg: "bg-red-50",
+      text: "text-red-700",
+      hoverBg: "hover:bg-red-100",
+      border: "border border-red-200",
     },
   };
 
@@ -111,14 +126,16 @@ const OrderCard = ({ order, onStatusUpdate }) => {
       await new Promise((resolve) => setTimeout(resolve, 400));
       onStatusUpdate(order.id, action.next);
     } catch (err) {
-      console.error('Failed to update order:', err);
+      console.error("Failed to update order:", err);
     } finally {
       setUpdating(false);
     }
   };
 
   const handleCancel = async () => {
-    const isConfirmed = window.confirm("Are you sure you want to cancel this order?");
+    const isConfirmed = window.confirm(
+      "Are you sure you want to cancel this order?",
+    );
     if (!isConfirmed) return;
 
     try {
@@ -129,9 +146,9 @@ const OrderCard = ({ order, onStatusUpdate }) => {
       // toast.success(`Order #${order.id} cancelled`);
 
       await new Promise((resolve) => setTimeout(resolve, 400));
-      onStatusUpdate(order.id, 'cancelled');
+      onStatusUpdate(order.id, "cancelled");
     } catch (err) {
-      console.error('Failed to cancel order:', err);
+      console.error("Failed to cancel order:", err);
     } finally {
       setUpdating(false);
     }
@@ -152,7 +169,9 @@ const OrderCard = ({ order, onStatusUpdate }) => {
 
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-gray-900">Table {order.table}</span>
+              <span className="font-semibold text-gray-900">
+                Table {order.table}
+              </span>
               {/* Status Badge */}
               <span
                 className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.bg} ${status.text} border ${status.border}`}
@@ -202,7 +221,9 @@ const OrderCard = ({ order, onStatusUpdate }) => {
         {/* Total */}
         <div className="flex justify-between pt-2 border-t border-gray-100">
           <span className="font-semibold text-gray-900">Total</span>
-          <span className="font-bold text-lg text-gray-900">₹{order.amount}</span>
+          <span className="font-bold text-lg text-gray-900">
+            ₹{order.amount}
+          </span>
         </div>
       </div>
 
@@ -221,7 +242,7 @@ const OrderCard = ({ order, onStatusUpdate }) => {
             )}
             {action.label}
           </button>
-          {order.status === 'pending' && (
+          {order.status === "pending" && (
             <button
               onClick={handleCancel}
               disabled={updating}
