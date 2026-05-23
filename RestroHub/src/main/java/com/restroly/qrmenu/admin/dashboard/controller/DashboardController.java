@@ -22,7 +22,7 @@ public class DashboardController {
         return dashboardService.getDashboardStats();
     }
 
-    @GetMapping("/notifications/stream/{branchId}")
+    @GetMapping("/notifications/stream/{branchId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE))
     public SseEmitter streamNotifications(@PathVariable Long branchId) {
         return dashboardService.switchOnNotificationsForBranch(branchId);
     }
