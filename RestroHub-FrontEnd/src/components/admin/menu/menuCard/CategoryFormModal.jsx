@@ -20,7 +20,6 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-debugger
     try {
       setSubmitting(true);
 

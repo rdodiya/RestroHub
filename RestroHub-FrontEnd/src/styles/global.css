@@ -47,6 +47,13 @@ body {
     padding-bottom: 1rem !important;
 }
 
+/* Light mode override: transparent nav on scroll */
+[data-site-theme="light"] .nav-scrolled {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.08);
+}
+
 /* Text Stroke Effect */
 .text-stroke {
     -webkit-text-stroke: 1px var(--color-text-primary);
@@ -281,4 +288,46 @@ select.input option {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--color-primary);
+}
+
+/* ============================================
+   LIGHT MODE OVERRIDES (customer website)
+   Applied when data-site-theme="light" on <html>
+   ============================================ */
+
+[data-site-theme="light"] .loader {
+    border-color: rgba(0, 0, 0, 0.08);
+    border-top-color: var(--color-primary);
+}
+
+/* ============================================
+   PASSWORD INPUT — hide browser native eye icon
+   ============================================ */
+
+/* Edge */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+
+/* ============================================
+   ADMIN DARK MODE — force dark backgrounds & light text
+   Overrides hardcoded bg-white / bg-gray-50 and dark text
+   on all admin panel components when dark mode is active.
+   ============================================ */
+
+.dark .admin-content .bg-white,
+.dark .admin-content .bg-gray-50 {
+    background-color: rgb(31 41 55) !important;
+}
+
+.dark .admin-content .text-gray-900,
+.dark .admin-content .text-gray-800,
+.dark .admin-content .text-gray-700 {
+    color: rgb(243 244 246) !important; /* gray-100 */
+}
+
+.dark .admin-content .text-gray-600,
+.dark .admin-content .text-gray-500 {
+    color: rgb(209 213 219) !important; /* gray-300 */
 }

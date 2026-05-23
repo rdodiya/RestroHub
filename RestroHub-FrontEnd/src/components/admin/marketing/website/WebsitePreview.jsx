@@ -1,7 +1,7 @@
 import { Eye, ExternalLink, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { useState } from 'react';
 
-const WebsitePreview = ({ selectedTemplate, selectedTheme }) => {
+const WebsitePreview = ({ selectedTemplate, selectedTheme, websiteMode = 'dark' }) => {
   const [device, setDevice] = useState('desktop');
 
   const devices = [
@@ -83,6 +83,9 @@ const WebsitePreview = ({ selectedTemplate, selectedTheme }) => {
           </span>
           <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
             Device: {device}
+          </span>
+          <span className={`rounded px-2 py-0.5 text-xs font-medium ${websiteMode === 'dark' ? 'bg-gray-800 text-white' : 'bg-yellow-50 text-yellow-700'}`}>
+            {websiteMode === 'dark' ? '🌙 Dark' : '☀️ Light'}
           </span>
         </div>
 
