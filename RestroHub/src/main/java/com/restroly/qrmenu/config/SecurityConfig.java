@@ -46,7 +46,8 @@ public class SecurityConfig {
 	private static final String[] PUBLIC_GET_URLS = {
 			"/api/v1/foods/**",
 			"/api/v1/categories/**",
-			"/api/v1/restaurants/**"
+			"/api/v1/restaurants/**",
+			"/api/v1/roles/**"
 	};
 
 

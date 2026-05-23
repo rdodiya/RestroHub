@@ -45,4 +45,13 @@ public class UserRequest {
     private Boolean isActive;
 
     private Set<Long> roleIds;
+
+    @Size(max = 255, message = "Restaurant name must not exceed 255 characters")
+    private String restaurantName;
+
+    @Size(max = 255, message = "Restaurant description must not exceed 255 characters")
+    private String restaurantDescription;
+
+    @Pattern(regexp = "^[0-9+\\-\\s]{10,15}$", message = "Restaurant phone number must be 10 to 15 digits")
+    private String restaurantPhoneNumber;
 }
