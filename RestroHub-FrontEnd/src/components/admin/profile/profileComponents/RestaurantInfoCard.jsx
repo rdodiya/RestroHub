@@ -13,6 +13,19 @@ import api from '../../../../services/common/api';
 const RestaurantInfoCard = ({ profile, onSave }) => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [backupFormData, setBackupFormData] = useState(null);
+
+  const handleStartEdit = () => {
+    setBackupFormData({ ...formData });
+    setEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    if (backupFormData) {
+      setFormData(backupFormData);
+    }
+    setEditing(false);
+  };
 
   const [formData, setFormData] = useState({
     restaurantName: profile.restaurantName || 'Rajkot Dhaba',
@@ -141,7 +154,7 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
 
         {!editing && (
           <button
-            onClick={() => setEditing(true)}
+            onClick={handleStartEdit}
             className="
               inline-flex items-center gap-1.5 rounded-lg
               bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700
@@ -321,7 +334,7 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-3 border-t border-gray-100 px-4 py-4 sm:px-6">
-            <button type="button" onClick={() => setEditing(false)} disabled={saving}
+            <button type="button" onClick={handleCancelEdit} disabled={saving}
               className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
               <X className="h-4 w-4" /> Cancel
@@ -370,11 +383,12 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
               </div>
               <button
                 type="button"
-                onClick={handleToggleServiceRequest}
+                disabled={true}
                 className={`
-                  relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none
+                  relative inline-flex h-6 w-11 shrink-0 cursor-not-allowed opacity-60 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none
                   ${formData.serviceRequestEnabled ? 'bg-blue-600' : 'bg-gray-200'}
                 `}
+                title="Please click 'Edit' above to enable/disable service requests"
               >
                 <span
                   className={`
