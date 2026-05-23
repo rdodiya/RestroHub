@@ -11,7 +11,7 @@ const API_BASE_URL = 'http://localhost:8181/restroly';
 const ServiceFAB = () => {
     const { branchId } = useParams();
     const [searchParams] = useSearchParams();
-    const tableNumber = parseInt(searchParams.get('table') || '0', 10);
+    const tableNumber = parseInt(searchParams.get('table') || searchParams.get('tableId') || '0', 10);
 
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
