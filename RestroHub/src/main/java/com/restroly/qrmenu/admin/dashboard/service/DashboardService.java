@@ -10,5 +10,4 @@ public interface DashboardService {
 
     List<DashboardStatDTO> getDashboardStats();
 
-    SseEmitter switchOnNotificationsForBranch(Long branchId);
 }

@@ -23,8 +23,6 @@ import java.util.Locale;
 public class DashboardServiceImpl implements DashboardService {
 
     private final OrderRepository orderRepository;
-    private final BranchRepository branchRepository;
-    private final OrderNotificationService notificationService;
 
     @Override
     public List<DashboardStatDTO> getDashboardStats() {
@@ -75,12 +73,12 @@ public class DashboardServiceImpl implements DashboardService {
         );
     }
 
-    @Override
-    public SseEmitter switchOnNotificationsForBranch(Long branchId) {
-        if(branchRepository.existsById(branchId)){
-            return notificationService.subscribe(branchId);
-        }
-        throw new IllegalArgumentException("Branch not found with ID: " + branchId);
-    }
+    // @Override
+    // public SseEmitter switchOnNotificationsForBranch(Long branchId) {
+    //     if(branchRepository.existsById(branchId)){
+    //         return notificationService.subscribe(branchId);
+    //     }
+    //     throw new IllegalArgumentException("Branch not found with ID: " + branchId);
+    // }
 
 }
