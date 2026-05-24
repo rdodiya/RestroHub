@@ -2,7 +2,6 @@ package com.restroly.qrmenu.admin.dashboard.controller;
 
 import com.restroly.qrmenu.admin.dashboard.dto.DashboardStatDTO;
 import com.restroly.qrmenu.admin.dashboard.service.DashboardService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
