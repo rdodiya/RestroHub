@@ -19,11 +19,25 @@ const apiRequest = async (endpoint, options = {}) => {
 
     const response = await fetch(url, { ...defaultOptions, ...options });
     
-    if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+   if (!response.ok) {
+    let errorMessage = `API Error: ${response.status}`;
+
+    try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+    } catch (err) {
+        console.error("Failed to parse error response:", err);
     }
+
+    throw new Error(errorMessage);
+}
     
-    return response.json();
+    try {
+    return await response.json();
+} catch (err) {
+    console.error("Failed to parse response JSON:", err);
+    throw new Error("Invalid server response");
+}
 };
 
 const ApiService = {
