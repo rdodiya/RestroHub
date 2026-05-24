@@ -1,6 +1,10 @@
 package com.restroly.qrmenu.user.service;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.restroly.qrmenu.user.dto.RoleResponse;
+import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
+import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
 import com.restroly.qrmenu.user.entity.Role;
@@ -262,5 +266,57 @@ public class UserServiceImpl implements UserService {
                 .isActive(user.isActive())
                 .roles(roles)
                 .build();
+    }
+
+@Override
+public UserProfileResponseDTO getCurrentUserProfile() {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new UserNotFoundException(
+                            "User not found with email: " + email));
+
+    return UserProfileResponseDTO.builder()
+            .userId(user.getUserId())
+            .name(user.getName())
+            .email(user.getEmail())
+            .phoneNumber(user.getPhoneNumber())
+            .pictureUrl(user.getPictureUrl())
+            .build();
+}
+
+@Override
+public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request) {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new UserNotFoundException(
+                            "User not found with email: " + email));
+
+    user.setName(request.getName());
+
+    if (request.getPhoneNumber() != null) {
+        user.setPhoneNumber(request.getPhoneNumber());
+    }
+
+    User updatedUser = userRepository.save(user);
+
+    return UserProfileResponseDTO.builder()
+            .userId(updatedUser.getUserId())
+            .name(updatedUser.getName())
+            .email(updatedUser.getEmail())
+            .phoneNumber(updatedUser.getPhoneNumber())
+            .pictureUrl(updatedUser.getPictureUrl())
+            .build();
     }
 }
