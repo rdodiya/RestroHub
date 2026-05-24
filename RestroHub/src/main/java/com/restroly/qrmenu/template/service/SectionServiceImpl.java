@@ -38,7 +38,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Creating section '{}' for siteId: {}", request.getSectionKey(), siteId);
 
         SiteConfig siteConfig = siteConfigRepository.findBySiteId(siteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Site config not found with siteId : "+ siteId));
+                .orElseThrow(() -> new ResourceNotFoundException("SiteConfig", "siteId", siteId));
 
         // Check for duplicate section key
         if (sectionRepository.existsBySiteConfigIdAndSectionKey(siteConfig.getId(), request.getSectionKey())) {
@@ -67,7 +67,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Creating section from template {} for siteId: {}", sectionTemplateId, siteId);
 
         SiteConfig siteConfig = siteConfigRepository.findBySiteId(siteId)
-                .orElseThrow(() -> new  ResourceNotFoundException("Site config not found with siteId : "+ siteId));
+                .orElseThrow(() -> new ResourceNotFoundException("SiteConfig", "siteId", siteId));
 
         SectionTemplate template = sectionTemplateRepository.findById(sectionTemplateId)
                 .orElseThrow(() -> new ResourceNotFoundException("SectionTemplate", "id", sectionTemplateId));
@@ -90,7 +90,7 @@ public class SectionServiceImpl implements SectionService {
     public SectionDTO getSectionById(Long id) {
         log.debug("Fetching section by id: {}", id);
         Section section = sectionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "id", id));
         return sectionMapper.toDTO(section);
     }
 
@@ -99,7 +99,7 @@ public class SectionServiceImpl implements SectionService {
     public SectionDTO getSectionByKey(String siteId, String sectionKey) {
         log.debug("Fetching section by key: {} for siteId: {}", sectionKey, siteId);
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "sectionKey", sectionKey));
         return sectionMapper.toDTO(section);
     }
 
@@ -125,7 +125,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Updating section with id: {}", sectionId);
 
         Section section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "id", sectionId));
 
         sectionMapper.updateEntity(section, request);
         Section updatedSection = sectionRepository.save(section);
@@ -140,7 +140,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Updating section '{}' for siteId: {}", sectionKey, siteId);
 
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "sectionKey", sectionKey));
 
         sectionMapper.updateEntity(section, request);
         Section updatedSection = sectionRepository.save(section);
@@ -155,7 +155,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Deleting section with id: {}", sectionId);
 
         Section section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "id", sectionId));
 
         Long siteConfigId = section.getSiteConfig().getId();
         Integer deletedOrder = section.getDisplayOrder();
@@ -174,7 +174,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Deleting section '{}' for siteId: {}", sectionKey, siteId);
 
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "sectionKey", sectionKey));
 
         Long siteConfigId = section.getSiteConfig().getId();
         Integer deletedOrder = section.getDisplayOrder();
@@ -192,7 +192,7 @@ public class SectionServiceImpl implements SectionService {
 
         for (SectionReorderRequest.SectionOrderItem item : request.getSections()) {
             Section section = sectionRepository.findById(item.getSectionId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + item.getSectionId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Section", "id", item.getSectionId()));
             section.setDisplayOrder(item.getDisplayOrder());
             sectionRepository.save(section);
         }
@@ -206,7 +206,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Moving section '{}' to order {} for siteId: {}", sectionKey, newOrder, siteId);
 
         Section section = sectionRepository.findBySiteConfigSiteIdAndSectionKey(siteId, sectionKey)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with sectionKey : " + sectionKey));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "sectionKey", sectionKey));
 
         Integer oldOrder = section.getDisplayOrder();
         Long siteConfigId = section.getSiteConfig().getId();
@@ -230,7 +230,7 @@ public class SectionServiceImpl implements SectionService {
     @CacheEvict(value = "siteConfigs", allEntries = true)
     public SectionDTO toggleVisibility(Long sectionId) {
         Section section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "id", sectionId));
         section.setIsVisible(!section.getIsVisible());
         return sectionMapper.toDTO(sectionRepository.save(section));
     }
@@ -239,7 +239,7 @@ public class SectionServiceImpl implements SectionService {
     @CacheEvict(value = "siteConfigs", allEntries = true)
     public SectionDTO showSection(Long sectionId) {
         Section section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "id", sectionId));
         section.setIsVisible(true);
         return sectionMapper.toDTO(sectionRepository.save(section));
     }
@@ -248,7 +248,7 @@ public class SectionServiceImpl implements SectionService {
     @CacheEvict(value = "siteConfigs", allEntries = true)
     public SectionDTO hideSection(Long sectionId) {
         Section section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + sectionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Section", "id", sectionId));
         section.setIsVisible(false);
         return sectionMapper.toDTO(sectionRepository.save(section));
     }
@@ -272,7 +272,7 @@ public class SectionServiceImpl implements SectionService {
         log.info("Deleting all sections for siteId: {}", siteId);
 
         SiteConfig siteConfig = siteConfigRepository.findBySiteId(siteId)
-                .orElseThrow(() -> new  ResourceNotFoundException("Site config not found with siteId : "+ siteId));
+                .orElseThrow(() -> new ResourceNotFoundException("SiteConfig", "siteId", siteId));
 
         sectionRepository.deleteBySiteConfigId(siteConfig.getId());
     }
