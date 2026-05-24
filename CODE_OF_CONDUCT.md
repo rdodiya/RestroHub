@@ -87,18 +87,6 @@ RestroHub aims to build an open, beginner-friendly, and scalable restaurant mana
 
 Happy Contributing 🚀
 
-# Code of Conduct
-
-## 🌟 Our Promise
-
-We’re building RestroHub as a welcoming, inclusive, and collaborative open-source project for everyone interested in restaurant technology, web development, and open-source contribution.
-
-Whether you're a beginner making your first pull request or an experienced developer, every contributor deserves respect and support.
-
-This repository is part of GSSoC 2026, where contributors learn, collaborate, and grow through meaningful open-source contributions.
-
----
-
 ## 🤝 Expected Behavior
 
 We expect contributors to:
