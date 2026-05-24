@@ -17,6 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import com.restroly.qrmenu.auth.dto.RegisterRequest;
+import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.user.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +30,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
@@ -117,5 +123,28 @@ public class AuthServiceImpl implements AuthService {
         // For now, we just clear the security context
         SecurityContextHolder.clearContext();
         log.info("User logged out successfully");
+    }
+
+    @Override
+    public AuthResponse register(RegisterRequest registerRequest) {
+
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new RuntimeException("User already exists with this email");
+        }
+
+        User user = User.builder()
+                .name(registerRequest.getFirstName() + " " + registerRequest.getLastName())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .isActive(true)
+                .isLocked(false)
+                .authProvider("LOCAL")
+                .build();
+
+        userRepository.save(user);
+
+        return AuthResponse.builder()
+        .username(user.getEmail())
+        .build();
     }
 }

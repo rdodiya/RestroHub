@@ -10,8 +10,8 @@ api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
     // Add token only for secure APIs
-    if (accessToken && config.url.includes("/secure/")) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    if (accessToken) {
+  config.headers.Authorization = `Bearer ${accessToken}`;
     }
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
