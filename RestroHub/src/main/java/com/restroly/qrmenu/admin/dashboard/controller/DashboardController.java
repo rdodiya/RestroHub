@@ -20,5 +20,4 @@ public class DashboardController {
     public List<DashboardStatDTO> getStatistics() {
         return dashboardService.getDashboardStats();
     }
-
 }
