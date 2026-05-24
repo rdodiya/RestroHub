@@ -80,7 +80,7 @@ public class MenuServiceImpl implements MenuService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Menu not found with ID: " + menuId));
 
-        return menuMapper.toResponseDTO(menu);
+        return menuMapper.buildMenuResponse(menu);
     }
 
     // ========== GET ALL (Paginated) ==========

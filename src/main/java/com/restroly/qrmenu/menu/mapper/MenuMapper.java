@@ -168,7 +168,7 @@ public class MenuMapper {
 
     // Inside your service/mapper where you build MenuResponseDTO
 
-    private MenuResponseDTO buildMenuResponse(Menu menu) {
+    public MenuResponseDTO buildMenuResponse(Menu menu) {
 
         // Map branch
         MenuResponseDTO.BranchDTO branchDTO = null;
