@@ -156,4 +156,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
             @Param("id") Long id,
             @Param("available") Boolean available
     );
+
+    //Duplicate check scoped by category
+    boolean existsByNameIgnoreCaseAndCategory_CategoryId(String name, Long categoryId);
 }
