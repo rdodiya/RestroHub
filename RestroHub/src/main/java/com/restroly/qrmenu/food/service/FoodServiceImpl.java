@@ -234,15 +234,18 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public boolean existsById(Long id) {
+        log.debug("Checking existence of food by id: {}", id);
         return foodRepository.existsById(id);
     }
 
     @Override
     public boolean existsByName(String name) {
+        log.debug("Checking existence of food by name: {}", name);
         return foodRepository.existsByNameIgnoreCase(name);
     }
 
     private Food findFoodByIdOrThrow(Long id) {
+        log.debug("Finding food by id: {}", id);
         return foodRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Food not found with id: {}", id);
