@@ -60,6 +60,12 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
     fetchUser();
   }, []);
 
+  // Handle user logout
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  };
+
   const notifications = [
     { id: 1, title: 'New order #127', desc: 'Table 4 - 2 items', time: '2m ago', unread: true },
     { id: 2, title: 'Payment received', desc: '₹450 via UPI', time: '15m ago', unread: true },
@@ -304,6 +310,7 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
 
                 <div className={`border-t py-1 ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
                   <button
+                    onClick={handleLogout}
                     className="
                       flex w-full items-center gap-2.5 px-4 py-2.5
                       text-sm text-red-500 hover:bg-red-500/10 transition-colors
