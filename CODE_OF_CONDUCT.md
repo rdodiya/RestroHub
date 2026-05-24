@@ -152,9 +152,9 @@ Maintainers may remove comments, reject pull requests, or restrict participation
 
 ## 📣 Reporting Issues
 
-If you experience or witness unacceptable behavior, please report it to the project maintainers through GitHub discussions, issues, or direct communication.
+If you experience or witness unacceptable behavior, please report it privately to the project maintainers through direct communication or email where possible.
 
-All reports will be handled respectfully and reviewed carefully.
+Please avoid sharing sensitive incidents publicly through GitHub issues or discussions.
 
 ---
 
@@ -163,3 +163,12 @@ All reports will be handled respectfully and reviewed carefully.
 RestroHub aims to build an open, beginner-friendly, and scalable restaurant management platform while fostering a positive and collaborative open-source community.
 
 Happy Contributing 🚀
+
+---
+
+## 📖 Attribution
+
+This Code of Conduct is inspired by the Contributor Covenant, version 2.1.
+
+For more information, visit:
+https://www.contributor-covenant.org/version/2/1/code_of_conduct/
