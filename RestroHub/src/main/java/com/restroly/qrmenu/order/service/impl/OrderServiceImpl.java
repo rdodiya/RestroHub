@@ -101,7 +101,7 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional(readOnly = true)
 	public List<OrderResponse> getActiveOrdersByBranch(Long branchId) {
 		List<OrderStatus> activeStatuses = Arrays.asList(OrderStatus.PENDING, OrderStatus.CONFIRMED,
-				OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.BILLED);
+				OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.SERVED, OrderStatus.BILLED);
 
 		List<Order> orders = orderRepository.findActiveOrdersByBranch(branchId, activeStatuses);
 		return orders.stream().map(orderMapper::toResponse).collect(Collectors.toList());
