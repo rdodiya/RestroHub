@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import profileService from '../../services/user/profileService';
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -23,6 +24,11 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const notifRef = useRef(null);
   const navigate = useNavigate();
   const { isDark, toggle: toggleAdminTheme } = useAdminTheme();
+
+  const [userProfile, setUserProfile] = useState({
+    name: 'Admin User',
+    email: 'admin@restrohub.com'
+  });
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -36,6 +42,22 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  // Fetch authenticated user for navbar
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await profileService.getCurrentUserProfile();
+        setUserProfile({
+          name: data.name || 'Admin User',
+          email: data.email || 'admin@restrohub.com'
+        });
+      } catch (error) {
+        console.error('Failed to fetch user for header:', error);
+      }
+    };
+    fetchUser();
   }, []);
 
   const notifications = [
@@ -234,8 +256,8 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
               </div>
 
               <div className="hidden text-left sm:block">
-                <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Admin User</p>
-                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>admin@restrohub.com</p>
+                <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{userProfile.name}</p>
+                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{userProfile.email}</p>
               </div>
 
               <ChevronDown
@@ -252,8 +274,8 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
               <div className={`${dropdownBase} w-56`}>
                 {/* Mobile user info */}
                 <div className={`border-b px-4 py-3 sm:hidden ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-                  <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Admin User</p>
-                  <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>admin@restrohub.com</p>
+                  <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{userProfile.name}</p>
+                  <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{userProfile.email}</p>
                 </div>
 
                 <div className="py-1">
