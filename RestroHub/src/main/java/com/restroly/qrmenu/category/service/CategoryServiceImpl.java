@@ -3,6 +3,8 @@ package com.restroly.qrmenu.category.service;
 import com.restroly.qrmenu.category.dto.CategoryRequestDTO;
 import com.restroly.qrmenu.category.dto.CategoryResponseDTO;
 import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.menu.entity.Menu;
+import com.restroly.qrmenu.menu.repository.MenuRepository;
 import com.restroly.qrmenu.user.exception.DuplicateResourceException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 public class CategoryServiceImpl implements CategoryService {
 
 	private final CategoryRepository categoryRepository;
+	private final MenuRepository menuRepository;
 
 	/* =======================
        CREATE CATEGORY
@@ -38,6 +41,14 @@ public class CategoryServiceImpl implements CategoryService {
 			log.warn("Category with name '{}' already exists in menu '{}'", requestDTO.getName(), requestDTO.getMenuId());
 			throw new DuplicateResourceException("Category with name '" + requestDTO.getName() + "' already exists");
 		}
+
+		// Validate menu existence
+		Menu menu = menuRepository.findById(requestDTO.getMenuId())
+				.orElseThrow(() ->{
+					log.warn("Menu with ID '{}' not found for category creation", requestDTO.getMenuId());
+					return new ResourceNotFoundException("Menu with ID '" + requestDTO.getMenuId() + "' not found");
+				});
+
 		Category category = CategoryDTO.toEntity(
 				CategoryDTO.builder()
 						.name(requestDTO.getName())
@@ -46,6 +57,10 @@ public class CategoryServiceImpl implements CategoryService {
 						.updatedDate(LocalDateTime.now())
 						.build()
 		);
+
+		// Attach both sides of the relationship
+		category.getMenu().add(menu);
+		menu.getCategories().add(category);
 
 		Category savedCategory = categoryRepository.save(category);
 		log.info("Category created with ID: {}", savedCategory.getCategoryId());
