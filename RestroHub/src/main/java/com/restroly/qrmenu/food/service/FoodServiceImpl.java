@@ -165,15 +165,19 @@ public class FoodServiceImpl implements FoodService {
 
         Food existingFood = findFoodByIdOrThrow(id);
 
-        // Check for duplicate name within the same category if name is being updated
-        if (updateDTO.getName() != null &&
-            !updateDTO.getName().equalsIgnoreCase(existingFood.getName()) &&
-            foodRepository.existsByNameIgnoreCaseAndCategory_CategoryId(
-                updateDTO.getName(), existingFood.getCategory().getCategoryId())) {
+        // Check for duplicate name if name is being updated
+        if(updateDTO.getName() != null && !updateDTO.getName().equalsIgnoreCase(existingFood.getName())) {
+            // Determine the category ID to check
+            Long categoryIdToCheck = updateDTO.getCategoryId() != null ? updateDTO.getCategoryId() : existingFood.getCategory().getCategoryId();
 
-            log.warn("Attempt to update food with duplicate name '{}' in category '{}'",
-                    updateDTO.getName(), existingFood.getCategory().getCategoryId());
-            throw new ResourceAlreadyExistsException(String.format(FOOD_EXISTS_MSG, updateDTO.getName()));
+            // check for duplicate name in the target category, excluding the current food item
+            if(foodRepository.existsByNameIgnoreCaseAndCategory_CategoryIdAndFoodIdNot(
+                    updateDTO.getName(), categoryIdToCheck, id)) {
+                log.warn("Attempt to update food to duplicate name: {} in category id: {}",
+                        updateDTO.getName(), categoryIdToCheck);
+                throw new ResourceAlreadyExistsException("Food already exists with name: " + updateDTO.getName() +
+                        " in category id: " + categoryIdToCheck);
+            }
         }
 
         // Safe null check for imageUrl
