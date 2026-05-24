@@ -3,6 +3,7 @@ package com.restroly.qrmenu.category.dto; // Changed package to fit category DTO
 import com.restroly.qrmenu.category.entity.Category;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,10 @@ public class CategoryRequestDTO {
 
     @Schema(description = "Whether the category is marked for deletion (soft delete)")
     private Boolean isDelete; // Mirrors the field from the Category entity
+
+    @NotNull(message = "Menu ID is required")
+    private Long menuId;
+
 
     public static CategoryRequestDTO fromEntity(Category category) {
         if (category == null) return null;

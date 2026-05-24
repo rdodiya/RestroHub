@@ -3,6 +3,8 @@ package com.restroly.qrmenu.category.service;
 import com.restroly.qrmenu.category.dto.CategoryRequestDTO;
 import com.restroly.qrmenu.category.dto.CategoryResponseDTO;
 import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.user.exception.DuplicateResourceException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,13 @@ public class CategoryServiceImpl implements CategoryService {
 	@Transactional
 	public CategoryResponseDTO createCategory(CategoryRequestDTO requestDTO) {
 		log.debug("Creating category with name: {}", requestDTO.getName());
+
+		// Check for duplicate category name within the same menu
+		if(categoryRepository.existsByNameIgnoreCaseAndMenu_MenuId(
+				requestDTO.getName(), requestDTO.getMenuId())) {
+			log.warn("Category with name '{}' already exists in menu '{}'", requestDTO.getName(), requestDTO.getMenuId());
+			throw new DuplicateResourceException("Category with name '" + requestDTO.getName() + "' already exists");
+		}
 		Category category = CategoryDTO.toEntity(
 				CategoryDTO.builder()
 						.name(requestDTO.getName())
