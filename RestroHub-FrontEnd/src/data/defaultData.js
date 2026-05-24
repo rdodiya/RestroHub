@@ -6,15 +6,22 @@
 export const defaultSiteData = {
     // Theme Configuration
     theme: {
+        mode: "dark",
         primary: "#f59e0b",
         primaryHover: "#fbbf24",
         primaryDark: "#d97706",
         bgPrimary: "#000000",
         bgSecondary: "#0a0a0a",
         bgTertiary: "#171717",
+        bgCard: "#1a1a1a",
         textPrimary: "#ffffff",
         textSecondary: "#9ca3af",
-        textMuted: "#6b7280"
+        textMuted: "#6b7280",
+        borderPrimary: "#374151",
+        borderSecondary: "#1f2937",
+        overlayDark: "rgba(0,0,0,0.5)",
+        overlayDarker: "rgba(0,0,0,0.6)",
+        overlayLight: "rgba(0,0,0,0.2)"
     },
 
     // Brand Information
@@ -28,10 +35,11 @@ export const defaultSiteData = {
 
     // Navigation Links
     navigation: [
-        { label: "About", href: "#about" },
-        { label: "Menu", href: "#menu" },
-        { label: "Gallery", href: "#gallery" },
-        { label: "Contact", href: "#contact" }
+       { label: "Features", href: "#features" },
+    { label: "How It Works", href: "#how-it-works" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "About Us", href: "#about" },
+    { label: "Contact", href: "#contact" }
     ],
 
     // Hero Section
@@ -278,13 +286,17 @@ export const defaultSiteData = {
     ],
 
     // Footer
-    footer: {
-        copyright: "© 2024 Arts District Kitchen. All rights reserved.",
-        links: [
-            { label: "Privacy Policy", href: "/privacy" },
-            { label: "Terms of Service", href: "/terms" }
-        ]
-    }
-};
+   footer: {
+  copyright: "© 2026 Restroly. All rights reserved.",
+  links: [
+    { label: "Features", href: "#features" },
+    { label: "How It Works", href: "#how-it-works" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "Testimonials", href: "#testimonials" },
+    { label: "About Us", href: "#about" },
+    { label: "Contact", href: "#contact" }
+  ]
+},
+    };
 
 export default defaultSiteData;

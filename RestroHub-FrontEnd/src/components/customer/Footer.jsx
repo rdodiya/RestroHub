@@ -49,7 +49,7 @@ const Footer = () => {
                 <div className="footer-main">
                     {/* Brand */}
                     <div className="footer-brand">
-                        <a href="#" className="footer-logo font-heading">
+                        <a href="/" className="footer-logo font-heading">
                             {brand.name}
                         </a>
                         <p className="footer-tagline">{brand.fullName}</p>
@@ -58,14 +58,14 @@ const Footer = () => {
                     {/* Navigation */}
                     <div className="footer-nav">
                         {navigation.map((item, index) => (
-                            <a 
-                                key={index} 
-                                href={item.href}
-                                className="footer-nav-link"
-                            >
-                                {item.label}
-                            </a>
-                        ))}
+                    <a
+                        key={index}
+                        href={item.href}
+                        className="footer-nav-link"
+                    >
+                        {item.label}
+                    </a>
+                ))}
                     </div>
 
                     {/* Social Links */}
@@ -91,15 +91,15 @@ const Footer = () => {
                         © {currentYear} {brand.fullName}. All rights reserved.
                     </p>
                     
-                    {footer?.links && (
-                        <div className="footer-legal">
-                            {footer.links.map((link, index) => (
-                                <a key={index} href={link.href} className="footer-legal-link">
-                                    {link.label}
-                                </a>
-                            ))}
-                        </div>
-                    )}
+                   {footer?.links && (
+                            <div className="footer-legal">
+                        {footer.links.map((link, index) => (
+                        <a key={index} href={link.href} className="footer-legal-link">
+                            {link.label}
+                        </a>
+                    ))}
+                </div>
+                )}
                 </div>
             </div>
 
