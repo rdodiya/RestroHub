@@ -7,6 +7,8 @@ import com.restroly.qrmenu.common.exception.ErrorResponse;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
 import com.restroly.qrmenu.common.util.ApiConstants;
 
+import com.restroly.qrmenu.subscription.enums.FeatureType;
+import com.restroly.qrmenu.subscription.service.SubscriptionValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,6 +47,8 @@ public class BranchController {
 
     private final BranchService branchService;
 
+    private final SubscriptionValidationService subscriptionValidationService;
+
     // ========== CREATE ==========
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -68,6 +72,16 @@ public class BranchController {
             @Valid @RequestBody BranchRequestDTO requestDTO) {
 
         log.info("REST request to create branch: {}", requestDTO.getName());
+        Long restaurantId = requestDTO.getRestaurantId();
+
+        // 1. Check if their subscription plan allows the ADD_BRANCH feature at all
+        subscriptionValidationService.validateFeatureAccess(restaurantId, FeatureType.ADD_BRANCH);
+
+        // 2. Count how many branches they currently have
+        long currentBranchCount = branchService.countBranchesByRestaurant(restaurantId);
+
+        // 3. Check if adding one more branch exceeds their plan's maximum branch limit
+        subscriptionValidationService.validateBranchLimit(restaurantId, (int) currentBranchCount);
         BranchResponseDTO response = branchService.createBranch(requestDTO);
 
         URI location = URI.create("/" + ApiConstants.APP_NAME + SECURE_API_VERSION +

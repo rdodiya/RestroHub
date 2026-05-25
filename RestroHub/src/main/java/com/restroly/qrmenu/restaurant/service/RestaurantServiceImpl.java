@@ -1,5 +1,6 @@
 package com.restroly.qrmenu.restaurant.service;
 
+import com.restroly.qrmenu.common.exception.BusinessException;
 import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
 import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.restaurant.dto.RestaurantRequestDTO;
@@ -10,10 +11,19 @@ import com.restroly.qrmenu.restaurant.mapper.RestaurantMapper;
 import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 
 
+import com.restroly.qrmenu.subscription.entity.RestaurantSubscription;
+import com.restroly.qrmenu.subscription.entity.SubscriptionPlan;
+import com.restroly.qrmenu.subscription.enums.SubscriptionType;
+import com.restroly.qrmenu.subscription.repository.RestaurantSubscriptionRepository;
+import com.restroly.qrmenu.subscription.repository.SubscriptionPlanRepository;
 import lombok.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 
 @Service
@@ -23,8 +33,8 @@ public class RestaurantServiceImpl implements  RestaurantService{
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantMapper restaurantMapper;
-
-    private static final String RESTAURANT_NOT_FOUND_MSG = "RESTAURANT not found with id: %s";
+    private final SubscriptionPlanRepository planRepository;
+    private final RestaurantSubscriptionRepository restaurantSubscriptionRepository;    private static final String RESTAURANT_NOT_FOUND_MSG = "RESTAURANT not found with id: %s";
     private static final String RESTAURANT_EXISTS_MSG = "RESTAURANT already exists with name: %s";
 
     /**
@@ -32,6 +42,7 @@ public class RestaurantServiceImpl implements  RestaurantService{
      * @return
      */
     @Override
+    @Transactional
     public RestaurantResponseDTO createRestaurant(RestaurantRequestDTO requestDTO) {
         log.info("Creating new restaurant: {}", requestDTO.getName());
         if (restaurantRepository.existsByNameIgnoreCase(requestDTO.getName())) {
@@ -42,6 +53,18 @@ public class RestaurantServiceImpl implements  RestaurantService{
 
         Restaurant restaurant = restaurantMapper.toEntity(requestDTO);
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        SubscriptionPlan freePlan = planRepository
+                .findByTypeAndActiveTrue(SubscriptionType.FREE)
+                .orElseThrow(() -> new BusinessException("FREE plan not found in database.", HttpStatus.INTERNAL_SERVER_ERROR));
+        RestaurantSubscription newSubscription = RestaurantSubscription.builder()
+                .restId(savedRestaurant.getRestId())
+                .plan(freePlan)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusYears(10)) // Free plan lasts 10 years
+                .active(true)
+                .build();
+
+        restaurantSubscriptionRepository.save(newSubscription);
 
         log.info("Successfully created food item with id: {}", savedRestaurant.getRestId());
         return restaurantMapper.toResponseDTO(savedRestaurant);

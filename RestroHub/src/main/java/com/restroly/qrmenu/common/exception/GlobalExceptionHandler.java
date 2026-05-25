@@ -1,6 +1,7 @@
 // src/main/java/com/Restroly/qrmenu/common/exception/GlobalExceptionHandler.java
 package com.restroly.qrmenu.common.exception;
 
+import com.restroly.qrmenu.subscription.exception.FeatureAccessException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -22,13 +23,22 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    @ExceptionHandler(FeatureAccessException.class)
+    public ResponseEntity<Map<String, String>> handleFeatureAccess(FeatureAccessException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Your current subscription does not support this feature");
+        response.put("feature", ex.getFeature().name());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
@@ -320,4 +330,9 @@ public class GlobalExceptionHandler {
     private String generateTraceId() {
         return UUID.randomUUID().toString().substring(0, 8);
     }
+
+
+
+
+
 }

@@ -13,6 +13,8 @@ import com.restroly.qrmenu.menu.repository.MenuRepository;
 import com.restroly.qrmenu.restaurant.entity.Restaurant;
 import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 
+import com.restroly.qrmenu.subscription.enums.FeatureType;
+import com.restroly.qrmenu.subscription.service.FeatureAccessService;
 import com.restroly.qrmenu.user.exception.DuplicateResourceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class BranchServiceImpl implements BranchService {
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
     private final BranchMapper branchMapper;
+    private final FeatureAccessService featureAccessService;
 
     // ========== CREATE ==========
     @Override
@@ -44,6 +47,10 @@ public class BranchServiceImpl implements BranchService {
         Restaurant restaurant = restaurantRepository.findById(requestDTO.getRestaurantId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Restaurant not found with ID: " + requestDTO.getRestaurantId()));
+
+        featureAccessService.assertFeatureAccess(requestDTO.getRestaurantId(), FeatureType.ADD_BRANCH);
+        long currentCount = countBranchesByRestaurant(requestDTO.getRestaurantId());
+        featureAccessService.validateBranchLimit(requestDTO.getRestaurantId(), (int) currentCount);
 
         // Check for duplicate branch name
         if (branchRepository.existsByNameAndRestaurant_RestId(

@@ -76,6 +76,8 @@ public class RestaurantController {
             @ApiResponse(responseCode = "404", description = "Restaurant not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @GetMapping(value = "/{restaurantId}")
+    @Operation(summary = "Get restaurant by ID", description = "Retrieves a restaurant by ID")
     public ResponseEntity<RestaurantResponseDTO> getRestaurantById(
             @Parameter(description = "Long Id of the restaurant", required = true)
             @PathVariable Long restaurantId) {
