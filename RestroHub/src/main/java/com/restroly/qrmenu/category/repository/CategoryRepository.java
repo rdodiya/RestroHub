@@ -16,6 +16,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
 	Page<Category> findByIsDeleteFalse(Pageable pageable);
 
-	boolean existsByNameIgnoreCaseAndBranch_BranchId(String name, Long branchId);
-
 }
