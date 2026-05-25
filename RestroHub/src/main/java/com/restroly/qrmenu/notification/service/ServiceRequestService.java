@@ -11,6 +11,7 @@ import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,9 @@ public class ServiceRequestService {
     private final LiveNotificationService liveNotificationService;
     private final RestaurantRepository restaurantRepository;
 
+    @Value("${service.request.types:CALL_WAITER,REQUEST_BILL}")
+    private List<String> allowedTypes;
+
     /**
      * Create a new service request from a customer.
      * Validates feature flag and table number before saving.
@@ -35,6 +39,12 @@ public class ServiceRequestService {
     public ServiceRequestResponseDTO createServiceRequest(ServiceRequestDTO dto) {
         log.info("Creating service request: type={}, restaurant={}, branch={}, table={}",
                 dto.getRequestType(), dto.getRestaurantId(), dto.getBranchId(), dto.getTableNumber());
+
+        // Validate: Check if request type is allowed per properties configuration
+        if (dto.getRequestType() == null || !allowedTypes.contains(dto.getRequestType())) {
+            throw new IllegalArgumentException("Invalid service request type: " + dto.getRequestType() +
+                    ". Allowed types are: " + allowedTypes);
+        }
 
         // Validate: Table 0 is the counter — no service requests allowed
         if (dto.getTableNumber() == null || dto.getTableNumber() <= 0) {

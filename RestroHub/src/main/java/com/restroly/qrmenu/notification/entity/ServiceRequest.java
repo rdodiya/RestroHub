@@ -28,9 +28,8 @@ public class ServiceRequest {
     @Column(name = "table_number", nullable = false)
     private Integer tableNumber;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "request_type", nullable = false)
-    private ServiceRequestType requestType;
+    private String requestType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

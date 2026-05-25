@@ -1,6 +1,6 @@
 package com.restroly.qrmenu.notification.dto;
 
-import com.restroly.qrmenu.notification.entity.ServiceRequestType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -28,5 +28,5 @@ public class ServiceRequestDTO {
 
     @NotNull(message = "Request type is required")
     @Schema(description = "Type of service request", example = "CALL_WAITER", requiredMode = Schema.RequiredMode.REQUIRED)
-    private ServiceRequestType requestType;
+    private String requestType;
 }

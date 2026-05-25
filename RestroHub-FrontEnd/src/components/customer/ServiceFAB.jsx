@@ -15,7 +15,6 @@ const ServiceFAB = () => {
 
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [cooldown, setCooldown] = useState(false);
     const [toast, setToast] = useState(null);
     const [serviceEnabled, setServiceEnabled] = useState(false);
     const [restaurantId, setRestaurantId] = useState(null);
@@ -68,7 +67,7 @@ const ServiceFAB = () => {
     };
 
     const handleRequest = async (requestType) => {
-        if (cooldown || isLoading) return;
+        if (isLoading) return;
 
         setIsLoading(true);
         try {
@@ -86,9 +85,7 @@ const ServiceFAB = () => {
             if (res.ok) {
                 const label = requestType === 'CALL_WAITER' ? 'Waiter called' : 'Bill requested';
                 showToast(`✅ ${label}! Staff will be with you shortly.`);
-                setCooldown(true);
                 setIsOpen(false);
-                setTimeout(() => setCooldown(false), 30000);
             } else {
                 const err = await res.json().catch(() => null);
                 showToast(err?.message || 'Unable to send request. Please try again.', 'error');
@@ -140,16 +137,12 @@ const ServiceFAB = () => {
                 <button
                     style={{
                         ...styles.fab,
-                        ...(cooldown ? styles.fabCooldown : {}),
                         ...(isOpen ? styles.fabOpen : {}),
                     }}
-                    onClick={() => !cooldown && setIsOpen(!isOpen)}
-                    disabled={cooldown}
+                    onClick={() => setIsOpen(!isOpen)}
                     aria-label="Service menu"
                 >
-                    {cooldown ? (
-                        <span style={styles.fabIconText}>✓</span>
-                    ) : isOpen ? (
+                    {isOpen ? (
                         <span style={styles.fabIconText}>✕</span>
                     ) : (
                         <span style={styles.fabIconText}>🛎️</span>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
+import toast from 'react-hot-toast';
 
 // ============================================
 // useWebSocketNotifications Hook
@@ -8,8 +9,8 @@ import SockJS from 'sockjs-client/dist/sockjs';
 // live service request notifications for admin
 // ============================================
 
-const WS_URL = 'http://localhost:8181/restroly/ws';
-const API_BASE_URL = 'http://localhost:8181/restroly';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8181/restroly';
+const WS_URL = `${API_BASE_URL}/ws`;
 
 /**
  * Helper to compute relative time (e.g., "2m ago")
@@ -89,6 +90,13 @@ const useWebSocketNotifications = (branchId) => {
                         const request = JSON.parse(message.body);
                         const notif = mapToNotification(request);
                         setNotifications((prev) => [notif, ...prev]);
+
+                        // Display a beautiful real-time toast alert to the admin!
+                        const label = request.requestType === 'CALL_WAITER' ? '🔔 Call Waiter' : '💳 Request Bill';
+                        toast(`${label} — Table ${request.tableNumber}`, {
+                            icon: request.requestType === 'CALL_WAITER' ? '🔔' : '💳',
+                            duration: 5000,
+                        });
                     }
                 );
             },
