@@ -48,11 +48,6 @@ public class Category {
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     private Set<Menu> menu = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id", nullable = false)
-    private Branch branch;
-
-
     @PreUpdate
     protected void onUpdate() {
         updatedDate = LocalDateTime.now();
