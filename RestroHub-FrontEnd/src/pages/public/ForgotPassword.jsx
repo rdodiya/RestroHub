@@ -35,6 +35,10 @@ const getApiMessage = (payload, fallback) => {
   return payload?.message || payload?.data?.message || fallback;
 };
 
+const PASSWORD_RESET_SUCCESS_MESSAGE = "Password reset successful";
+const DEFAULT_COMPLETION_MESSAGE =
+  "You can now sign in with your new password.";
+
 const EmailIcon = () => (
   <svg
     className="fill-current text-gray-400"
@@ -163,6 +167,7 @@ const ForgotPassword = () => {
 
         setRequestedEmail(normalizedEmail);
         setSuccessMessage(message);
+        setSubmitError("");
         setStep("reset");
         toast.success(message);
       } catch (err) {
@@ -171,6 +176,7 @@ const ForgotPassword = () => {
           err.message ||
           "Unable to send reset instructions. Please try again.";
 
+        setSuccessMessage("");
         setSubmitError(message);
         toast.error(message);
       } finally {
@@ -189,6 +195,7 @@ const ForgotPassword = () => {
     onSubmit: async ({ token, newPassword }) => {
       setIsResetLoading(true);
       setSubmitError("");
+      setSuccessMessage("");
 
       try {
         const resetPasswordData = new URLSearchParams({
@@ -216,7 +223,12 @@ const ForgotPassword = () => {
           "Password reset successful. Please sign in with your new password."
         );
 
-        setSuccessMessage(message);
+        setSuccessMessage(
+          message === PASSWORD_RESET_SUCCESS_MESSAGE
+            ? DEFAULT_COMPLETION_MESSAGE
+            : message
+        );
+        setSubmitError("");
         setStep("complete");
         toast.success(message);
       } catch (err) {
@@ -225,6 +237,7 @@ const ForgotPassword = () => {
           err.message ||
           "Password reset failed.";
 
+        setSuccessMessage("");
         setSubmitError(message);
         toast.error(message);
       } finally {
@@ -252,6 +265,16 @@ const ForgotPassword = () => {
     setSuccessMessage("");
     setSubmitError("");
     resetPasswordFormik.resetForm();
+  };
+
+  const handleResetFieldChange = (event) => {
+    if (successMessage) {
+      setSuccessMessage("");
+    }
+    if (submitError) {
+      setSubmitError("");
+    }
+    resetPasswordFormik.handleChange(event);
   };
 
   return (
@@ -413,7 +436,7 @@ const ForgotPassword = () => {
                         placeholder="Enter code from email"
                         disabled={isResetLoading}
                         value={resetPasswordFormik.values.token}
-                        onChange={resetPasswordFormik.handleChange}
+                        onChange={handleResetFieldChange}
                         onBlur={resetPasswordFormik.handleBlur}
                         className={inputClass(resetPasswordFormik, "token")}
                       />
@@ -440,7 +463,7 @@ const ForgotPassword = () => {
                         placeholder="Enter new password"
                         disabled={isResetLoading}
                         value={resetPasswordFormik.values.newPassword}
-                        onChange={resetPasswordFormik.handleChange}
+                        onChange={handleResetFieldChange}
                         onBlur={resetPasswordFormik.handleBlur}
                         className={inputClass(
                           resetPasswordFormik,
@@ -470,7 +493,7 @@ const ForgotPassword = () => {
                         placeholder="Confirm new password"
                         disabled={isResetLoading}
                         value={resetPasswordFormik.values.confirmPassword}
-                        onChange={resetPasswordFormik.handleChange}
+                        onChange={handleResetFieldChange}
                         onBlur={resetPasswordFormik.handleBlur}
                         className={inputClass(
                           resetPasswordFormik,
