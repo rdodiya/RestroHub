@@ -29,8 +29,8 @@ public class CategoryRequestDTO {
     @Schema(description = "Whether the category is marked for deletion (soft delete)")
     private Boolean isDelete; // Mirrors the field from the Category entity
 
-    @NotNull(message = "Menu ID is required")
-    private Long menuId;
+    @NotNull(message = "Branch ID is required")
+    private Long branchId; // Added branchId to link category to a branch
 
 
     public static CategoryRequestDTO fromEntity(Category category) {
