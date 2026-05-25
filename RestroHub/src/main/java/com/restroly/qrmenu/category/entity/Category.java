@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.menu.entity.Menu;
 import jakarta.persistence.*;
@@ -46,6 +47,11 @@ public class Category {
     @Builder.Default
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     private Set<Menu> menu = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
+
 
     @PreUpdate
     protected void onUpdate() {
