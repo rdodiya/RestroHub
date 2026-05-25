@@ -6,6 +6,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
 import api from "@services/common/api";
+import { ArrowLeft } from "lucide-react";
 
 /* ──────────────────── SVG Icons ──────────────────── */
 
@@ -138,6 +139,13 @@ const Register = () => {
               <div className="mb-8 flex items-center justify-center xl:hidden">
                 <span className="text-2xl font-bold text-blue-600">🍽️ Restroly</span>
               </div>
+              <Link
+                to="/"
+                className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
+              >
+                <ArrowLeft size={15} />
+                Back to Home
+              </Link>
               <h2 className="mb-8 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Create Account</h2>
 
               <form onSubmit={formik.handleSubmit} noValidate>
