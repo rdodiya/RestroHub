@@ -40,7 +40,9 @@ public class SecurityConfig {
 			// User registration
 			"/api/v1/users/register",
 			// Public api endpoints
-			"/public/api/v1/**"
+			"/public/api/v1/**",
+			// WebSocket endpoint
+			"/ws/**"
 	};
 
 	private static final String[] PUBLIC_GET_URLS = {
