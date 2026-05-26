@@ -33,6 +33,7 @@ import static com.restroly.qrmenu.common.util.ApiConstants.*;
 public class OrderController {
 
 	private final OrderService orderService;
+	private final PaymentService paymentService;
 	@PostMapping
 	public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
 		OrderResponse response = orderService.createOrder(request);
