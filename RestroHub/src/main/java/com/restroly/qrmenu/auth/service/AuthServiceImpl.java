@@ -19,10 +19,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import com.restroly.qrmenu.auth.dto.RegisterRequest;
 import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.repository.UserRepository;
+import com.restroly.qrmenu.user.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +35,7 @@ import java.util.stream.Collectors;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -140,6 +145,11 @@ public class AuthServiceImpl implements AuthService {
                 .isLocked(false)
                 .authProvider("LOCAL")
                 .build();
+
+        Role customerRole = roleRepository.findByName("CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Default CUSTOMER role not found"));
+
+        user.setRoles(new ArrayList<>(Collections.singletonList(customerRole)));
 
         userRepository.save(user);
 

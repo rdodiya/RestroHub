@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Upload, Loader2, Camera, Trash2 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
+import profileService from '../../../../services/user/profileService';
 
 const ProfileImageModal = ({ isOpen, onClose, currentImage, onSave }) => {
   const [preview, setPreview] = useState(null);
@@ -18,9 +19,15 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage, onSave }) => {
   const handleSave = async () => {
     try {
       setUploading(true);
-      // 🔌 Upload file
-      await new Promise((r) => setTimeout(r, 1000));
-      onSave?.(preview);
+      // If preview is a data URL, extract base64 payload
+      const base64 = preview?.includes(',') ? preview.split(',')[1] : preview;
+
+      // Persist image to backend
+      const resp = await profileService.updateUserProfile({ profileImageBytes: base64 });
+
+      // server returns profileImage as base64 string; update parent with data URL
+      const returnedBase64 = resp.profileImage || base64;
+      onSave?.(`data:image/jpeg;base64,${returnedBase64}`);
       onClose();
       setPreview(null);
     } catch (err) {

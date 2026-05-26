@@ -61,7 +61,7 @@ const Profile = () => {
           email: data.email || '',
           phoneNumber: data.phoneNumber || '',
 
-          avatar: data.pictureUrl || null,
+          avatar: data.profileImage ? `data:image/jpeg;base64,${data.profileImage}` : null,
         }));
 
       } catch (error) {

@@ -12,8 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserProfileRequestDTO {
 
-    @NotBlank(message = "Name cannot be empty")
+    // Name is optional for partial updates (e.g., only updating profile image)
     private String name;
 
     private String phoneNumber;
+
+    // Transient field to carry file data from Controller to Service layer
+    private byte[] profileImageBytes;
 }

@@ -27,8 +27,17 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
 
   const [userProfile, setUserProfile] = useState({
     name: 'Admin User',
-    email: 'admin@restrohub.com'
+    email: 'admin@restrohub.com',
+    profileImage: null
   });
+
+  // Fix: Add missing logout handler to prevent React crashes
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    // If you store user data, remove it here: localStorage.removeItem('user');
+    navigate('/login', { replace: true });
+  };
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -51,7 +60,8 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
         const data = await profileService.getCurrentUserProfile();
         setUserProfile({
           name: data.name || 'Admin User',
-          email: data.email || 'admin@restrohub.com'
+          email: data.email || 'admin@restrohub.com',
+          profileImage: data.profileImage || null
         });
       } catch (error) {
         console.error('Failed to fetch user for header:', error);
@@ -252,8 +262,12 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                 isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
               }`}
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 sm:h-9 sm:w-9">
-                <User className="h-4 w-4 text-white" />
+              <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-blue-600 sm:h-9 sm:w-9">
+                {userProfile.profileImage ? (
+                  <img src={`data:image/jpeg;base64,${userProfile.profileImage}`} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <User className="h-4 w-4 text-white" />
+                )}
               </div>
 
               <div className="hidden text-left sm:block">

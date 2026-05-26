@@ -14,7 +14,6 @@ public class UserProfileResponseDTO {
     private String name;
     private String email;
     private String phoneNumber;
-    private String pictureUrl;
+    private String profileImage; // Base64 encoded raw string without data URI prefix
     // We can add resuruant specific fields later if user entry holds item
 }
-
