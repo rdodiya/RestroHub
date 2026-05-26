@@ -92,7 +92,7 @@ const useWebSocketNotifications = (branchId) => {
                         setNotifications((prev) => [notif, ...prev]);
 
                         // Display a beautiful real-time toast alert to the admin!
-                        const label = request.requestType === 'CALL_WAITER' ? '🔔 Call Waiter' : '💳 Request Bill';
+                        const label = request.requestType === 'CALL_WAITER' ? 'Call Waiter' : 'Request Bill';
                         toast(`${label} — Table ${request.tableNumber}`, {
                             icon: request.requestType === 'CALL_WAITER' ? '🔔' : '💳',
                             duration: 5000,
