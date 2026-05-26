@@ -106,6 +106,10 @@ public class BranchResponseDTO {
 
         private Integer tableNumber;
 
+        private Integer capacity;
+
+        private String status;
+
         private String qrCodeUrl;
 
         private Boolean isActive;
