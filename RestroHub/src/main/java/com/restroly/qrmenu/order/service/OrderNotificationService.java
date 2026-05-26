@@ -1,12 +1,7 @@
-//com/Restroly/qrmenu/order/service/OrderNotificationService.java
 package com.restroly.qrmenu.order.service;
 
-import com.restroly.qrmenu.order.dto.OrderResponse;
+import com.restroly.qrmenu.notifications.service.SseGenericNotificationService;
 import com.restroly.qrmenu.order.entity.Order;
-import com.restroly.qrmenu.order.mapper.OrderMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
