@@ -38,6 +38,10 @@ public class Restaurant {
 	@Builder.Default
 	private Boolean isActive = true;
 
+	@Column(name = "service_request_enabled")
+	@Builder.Default
+	private Boolean serviceRequestEnabled = false;
+
 	@Column(name = "created_at", updatable = false)
 	private LocalDateTime createdAt;
 
