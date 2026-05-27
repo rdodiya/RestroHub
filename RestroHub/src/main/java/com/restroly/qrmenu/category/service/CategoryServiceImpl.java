@@ -27,6 +27,8 @@ public class CategoryServiceImpl implements CategoryService {
 	@Transactional
 	public CategoryResponseDTO createCategory(CategoryRequestDTO requestDTO) {
 		log.debug("Creating category with name: {}", requestDTO.getName());
+
+		// Check for duplicate category name within the same branch //add mapping before logic
 		Category category = CategoryDTO.toEntity(
 				CategoryDTO.builder()
 						.name(requestDTO.getName())
@@ -106,5 +108,13 @@ public class CategoryServiceImpl implements CategoryService {
 		existingCategory.setUpdatedDate(LocalDateTime.now());
 		log.info("Category with ID: {} marked as deleted", id);
 		categoryRepository.save(existingCategory);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<CategoryResponseDTO> getActiveCategories(Pageable pageable) {
+		log.debug("Fetching active categories with pagination: {}", pageable);
+		return categoryRepository.findByIsDeleteFalse(pageable)
+				.map(CategoryResponseDTO::fromEntity);
 	}
 }

@@ -200,6 +200,14 @@ public class MenuServiceImpl implements MenuService {
             return menuMapper.toResponseDTO(menu);
         }
 
+        if (menu.getBranch() != null
+                && menuRepository.existsByMenuNameAndBranch_BranchId(
+                        menu.getMenuName(), menu.getBranch().getBranchId())) {
+            throw new DuplicateResourceException(
+                    "Menu with name '" + menu.getMenuName()
+                            + "' already exists for this branch");
+        }
+
         menu.setDeleted(false);
         Menu restoredMenu = menuRepository.save(menu);
 

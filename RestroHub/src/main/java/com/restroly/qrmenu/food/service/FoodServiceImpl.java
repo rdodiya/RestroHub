@@ -47,9 +47,15 @@ public class FoodServiceImpl implements FoodService {
     @Transactional
     @CacheEvict(value = "foods", allEntries = true)
     public FoodResponseDTO createFood(FoodRequestDTO requestDTO, MultipartFile image) {
-
-        if (foodRepository.existsByNameIgnoreCase(requestDTO.getName())) {
-            throw new ResourceAlreadyExistsException("Food already exists: " + requestDTO.getName());
+        log.debug("Creating new food with name: {}", requestDTO.getName());
+        
+        // duplicate name check scoped by category
+        if(foodRepository.existsByNameIgnoreCaseAndCategory_CategoryId(
+            requestDTO.getName(), requestDTO.getCategoryId())) {
+            log.warn("Attempt to create duplicate food with name: {} in category: {}",
+                    requestDTO.getName(), requestDTO.getCategoryId());
+            throw new ResourceAlreadyExistsException("Food already exists with name: " + requestDTO.getName() +
+                    " in category id: " + requestDTO.getCategoryId());
         }
 
         String imageUrl = null;
@@ -156,13 +162,18 @@ public class FoodServiceImpl implements FoodService {
         Food existingFood = findFoodByIdOrThrow(id);
 
         // Check for duplicate name if name is being updated
-        if (updateDTO.getName() != null &&
-                !updateDTO.getName().equalsIgnoreCase(existingFood.getName()) &&
-                foodRepository.existsByNameIgnoreCase(updateDTO.getName())) {
+        if(updateDTO.getName() != null && !updateDTO.getName().equalsIgnoreCase(existingFood.getName())) {
+            // Determine the category ID to check
+            Long categoryIdToCheck = updateDTO.getCategoryId() != null ? updateDTO.getCategoryId() : existingFood.getCategory().getCategoryId();
 
-            log.warn("Attempt to update food with duplicate name: {}", updateDTO.getName());
-            throw new ResourceAlreadyExistsException(
-                    String.format(FOOD_EXISTS_MSG, updateDTO.getName()));
+            // check for duplicate name in the target category, excluding the current food item
+            if(foodRepository.existsByNameIgnoreCaseAndCategory_CategoryIdAndFoodIdNot(
+                    updateDTO.getName(), categoryIdToCheck, id)) {
+                log.warn("Attempt to update food to duplicate name: {} in category id: {}",
+                        updateDTO.getName(), categoryIdToCheck);
+                throw new ResourceAlreadyExistsException("Food already exists with name: " + updateDTO.getName() +
+                        " in category id: " + categoryIdToCheck);
+            }
         }
 
         // Safe null check for imageUrl

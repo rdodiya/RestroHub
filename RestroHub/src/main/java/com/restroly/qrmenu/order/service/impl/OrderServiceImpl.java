@@ -40,10 +40,11 @@ public class OrderServiceImpl implements OrderService {
 	private TablesRepository tableRepository;
 	@Autowired
 	private FoodRepository foodRepository;
-
+	@Autowired
+	private OrderNotificationService notificationService;
+	
 	private final OrderDirector orderDirector = new OrderDirector();
 	private final OrderMapper orderMapper = new OrderMapper();
-	private final OrderNotificationService notificationService = new OrderNotificationService();
 
 	@Override
 	public OrderResponse createOrder(CreateOrderRequest request) {
