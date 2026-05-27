@@ -125,12 +125,13 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public void cancelOrder(Long orderId) {
+	public OrderResponse cancelOrder(Long orderId) {
 		log.debug("Cancelling order with id: {}", orderId);
 		Order order = findOrderById(orderId);
 		order.setStatus(OrderStatus.CANCELLED);
-		orderRepository.save(order);
+		Order canceledOrder = orderRepository.save(order);
     	log.info("Order {} cancelled", orderId);
+		return orderMapper.toResponse(canceledOrder);
 	}
 
 	private Order findOrderById(Long orderId) {
