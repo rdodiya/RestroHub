@@ -73,3 +73,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Local Logs
+**/logs/
+
