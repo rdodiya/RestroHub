@@ -40,7 +40,9 @@ public class SecurityConfig {
 			// User registration
 			"/api/v1/users/register",
 			// Public api endpoints
-			"/public/api/v1/**"
+			"/public/api/v1/**",
+			// WebSocket endpoint
+			"/ws/**"
 	};
 
 	private static final String[] PUBLIC_GET_URLS = {
@@ -61,9 +63,9 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(PUBLIC_URLS).permitAll()
 						.requestMatchers(HttpMethod.GET, PUBLIC_GET_URLS).permitAll()
-						.requestMatchers(HttpMethod.POST, "/secure/api/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
-						.requestMatchers(HttpMethod.PUT, "/secure/api/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
-						.requestMatchers(HttpMethod.DELETE, "/secure/api/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
+						.requestMatchers(HttpMethod.POST, "/secure/api/**").hasAnyRole("ADMIN", "RESTAURANT_OWNER")
+						.requestMatchers(HttpMethod.PUT, "/secure/api/**").hasAnyRole("ADMIN", "RESTAURANT_OWNER")
+						.requestMatchers(HttpMethod.DELETE, "/secure/api/**").hasAnyRole("ADMIN", "RESTAURANT_OWNER")
 						// All other requests require authentication
 						.anyRequest().authenticated()
 				)

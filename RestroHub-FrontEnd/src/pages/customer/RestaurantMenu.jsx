@@ -11,6 +11,7 @@ import GallerySection from '@components/customer/GallerySection.jsx';
 import ReservationsSection from '@components/customer/ReservationsSection.jsx';
 import ContactSection from '@components/customer/ContactSection.jsx';
 import Footer from '@components/customer/Footer.jsx';
+import ServiceFAB from '@components/customer/ServiceFAB.jsx';
 
 // ============================================
 // MAIN APP COMPONENT
@@ -41,6 +42,7 @@ const AppContent = () => {
                 <ContactSection />
             </main>
             <Footer />
+            <ServiceFAB />
         </div>
     );
 };

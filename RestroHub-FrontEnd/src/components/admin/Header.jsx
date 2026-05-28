@@ -11,9 +11,11 @@ import {
   X,
   Sun,
   Moon,
+  Check,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import useWebSocketNotifications from '@hooks/useWebSocketNotifications';
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -38,13 +40,9 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const notifications = [
-    { id: 1, title: 'New order #127', desc: 'Table 4 - 2 items', time: '2m ago', unread: true },
-    { id: 2, title: 'Payment received', desc: '₹450 via UPI', time: '15m ago', unread: true },
-    { id: 3, title: 'Low stock alert', desc: 'Paneer Tikka - 3 left', time: '1h ago', unread: false },
-  ];
-
-  const unreadCount = notifications.filter((n) => n.unread).length;
+  // Live service request notifications via WebSocket
+  // TODO: Replace hardcoded branchId with actual branch from auth context
+  const { notifications, unreadCount, completeRequest } = useWebSocketNotifications(1);
 
   // Shared class helpers
   const iconBtn = `inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
@@ -180,36 +178,54 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                 </div>
 
                 <div className="max-h-72 overflow-y-auto">
-                  {notifications.map((notif) => (
-                    <div
-                      key={notif.id}
-                      className={`
-                        flex items-start gap-3 border-b px-4 py-3
-                        transition-colors cursor-pointer
-                        ${isDark
-                          ? `border-gray-700 hover:bg-gray-700 ${notif.unread ? 'bg-blue-900/20' : ''}`
-                          : `border-gray-50 hover:bg-gray-50 ${notif.unread ? 'bg-blue-50/30' : ''}`
-                        }
-                      `}
-                    >
-                      <div
-                        className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                          notif.unread ? 'bg-blue-500' : 'bg-transparent'
-                        }`}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className={`truncate text-sm font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{notif.title}</p>
-                        <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{notif.desc}</p>
-                        <p className={`mt-0.5 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>{notif.time}</p>
-                      </div>
+                  {notifications.length === 0 ? (
+                    <div className={`px-4 py-8 text-center text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                      No active service requests
                     </div>
-                  ))}
+                  ) : (
+                    notifications.map((notif) => (
+                      <div
+                        key={notif.id}
+                        className={`
+                          flex items-start gap-3 border-b px-4 py-3
+                          transition-colors
+                          ${isDark
+                            ? `border-gray-700 ${notif.unread ? 'bg-blue-900/20' : ''}`
+                            : `border-gray-50 ${notif.unread ? 'bg-blue-50/30' : ''}`
+                          }
+                        `}
+                      >
+                        <div
+                          className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                            notif.unread ? 'bg-blue-500' : 'bg-transparent'
+                          }`}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className={`truncate text-sm font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{notif.title}</p>
+                          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{notif.desc}</p>
+                          <p className={`mt-0.5 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>{notif.time}</p>
+                        </div>
+                        <button
+                          onClick={() => completeRequest(notif.id)}
+                          className={`mt-1 shrink-0 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+                            isDark
+                              ? 'bg-green-900/40 text-green-400 hover:bg-green-900/60'
+                              : 'bg-green-50 text-green-700 hover:bg-green-100'
+                          }`}
+                          title="Mark as done"
+                        >
+                          <Check className="inline h-3 w-3 mr-0.5" />
+                          Done
+                        </button>
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 <div className={`border-t px-4 py-2.5 text-center ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-                  <button className={`text-xs font-medium ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-700 hover:text-blue-800'}`}>
-                    View All Notifications
-                  </button>
+                  <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Live service requests
+                  </span>
                 </div>
               </div>
             )}
