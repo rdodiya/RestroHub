@@ -3,18 +3,7 @@ import { RefreshCw, AlertCircle, LayoutGrid } from 'lucide-react';
 import api from '@services/common/api';
 import TableCard from './TableCard';
 import AdminSkeleton from '../../AdminSkeleton';
-
-const normalizeTable = (table) => ({
-  id: table.tableId,
-  tableId: table.tableId,
-  branchId: table.branchId,
-  number: table.tableNumber,
-  tableNumber: table.tableNumber,
-  capacity: table.capacity || 4,
-  status: table.status || 'available',
-  qrCodeUrl: table.qrCodeUrl,
-  isActive: table.isActive !== false,
-});
+import { normalizeTable } from './tableMapper';
 
 const TablesGrid = ({ branchId, onShowQR, onEdit, onTablesLoaded, refreshKey }) => {
   const [tables, setTables] = useState([]);
@@ -29,6 +18,7 @@ const TablesGrid = ({ branchId, onShowQR, onEdit, onTablesLoaded, refreshKey }) 
     if (!branchId) {
       setTables([]);
       onTablesLoaded?.([]);
+      setError(null);
       setLoading(false);
       return;
     }

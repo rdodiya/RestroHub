@@ -56,10 +56,10 @@ public class TableController {
     @PostMapping(value = "/branches/{branchId}/tables",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Create a table",
-            description = "Creates a new table for a branch. Requires ADMIN or MANAGER role.",
+            description = "Creates a new table for a branch. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
@@ -87,10 +87,10 @@ public class TableController {
     @PutMapping(value = "/tables/{tableId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Update a table",
-            description = "Updates table details and status. Requires ADMIN or MANAGER role.",
+            description = "Updates table details and status. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<TableResponseDTO> updateTable(
@@ -103,11 +103,11 @@ public class TableController {
     }
 
     @DeleteMapping("/tables/{tableId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete a table",
-            description = "Soft deletes a table. Requires ADMIN role.",
+            description = "Soft deletes a table. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<Void> deleteTable(
@@ -120,10 +120,10 @@ public class TableController {
     }
 
     @PatchMapping(value = "/tables/{tableId}/restore", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Restore a table",
-            description = "Restores a soft-deleted table. Requires ADMIN role.",
+            description = "Restores a soft-deleted table. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<TableResponseDTO> restoreTable(

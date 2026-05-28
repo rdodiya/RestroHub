@@ -23,7 +23,7 @@ public class TableRequestDTO {
     @Min(value = 1, message = "Capacity must be greater than 0")
     private Integer capacity;
 
-    @Pattern(regexp = "available|occupied|reserved",
+    @Pattern(regexp = "(?i)available|occupied|reserved",
             message = "Status must be available, occupied, or reserved")
     private String status;
 

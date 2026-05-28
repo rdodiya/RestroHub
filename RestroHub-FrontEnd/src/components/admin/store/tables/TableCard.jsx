@@ -1,18 +1,7 @@
 import { useState } from 'react';
 import { QrCode, Edit2, Trash2, Users, Loader2, RotateCcw } from 'lucide-react';
 import api from '@services/common/api';
-
-const normalizeTable = (table) => ({
-  id: table.tableId,
-  tableId: table.tableId,
-  branchId: table.branchId,
-  number: table.tableNumber,
-  tableNumber: table.tableNumber,
-  capacity: table.capacity || 4,
-  status: table.status || 'available',
-  qrCodeUrl: table.qrCodeUrl,
-  isActive: table.isActive !== false,
-});
+import { normalizeTable } from './tableMapper';
 
 const TableCard = ({ table, onShowQR, onEdit, onDelete, onRestore }) => {
   const [saving, setSaving] = useState(false);

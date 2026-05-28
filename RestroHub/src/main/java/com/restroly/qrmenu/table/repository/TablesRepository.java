@@ -17,11 +17,12 @@ public interface TablesRepository extends JpaRepository<Tables, Long> {
 
 	List<Tables> findByBranch_BranchId(Long branchId);
 
-	Optional<Tables> findByBranch_BranchIdAndTableNumber(Long branchId, Integer tableNumber);
-
 	boolean existsByBranch_BranchIdAndTableNumber(Long branchId, Integer tableNumber);
 
 	boolean existsByBranch_BranchIdAndTableNumberAndTableIdNot(Long branchId, Integer tableNumber, Long tableId);
+
+	boolean existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(
+			Long branchId, Integer tableNumber, Long tableId);
 
 	Tables findByTableNumber(Integer tableNumber);
 }

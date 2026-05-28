@@ -73,7 +73,7 @@ public class TableServiceImpl implements TableService {
 
         table.setTableNumber(requestDTO.getTableNumber());
         table.setCapacity(requestDTO.getCapacity() != null ? requestDTO.getCapacity() : table.getCapacity());
-        table.setStatus(normalizeStatus(requestDTO.getStatus()));
+        table.setStatus(hasText(requestDTO.getStatus()) ? normalizeStatus(requestDTO.getStatus()) : table.getStatus());
         table.setQrCodeUrl(requestDTO.getQrCodeUrl());
 
         return toResponseDTO(tablesRepository.save(table));
@@ -95,11 +95,10 @@ public class TableServiceImpl implements TableService {
         Tables table = findTableOrThrow(tableId);
         Long branchId = table.getBranch().getBranchId();
 
-        tablesRepository.findByBranch_BranchIdAndTableNumber(branchId, table.getTableNumber())
-                .filter(existing -> !existing.getTableId().equals(tableId) && Boolean.TRUE.equals(existing.getIsActive()))
-                .ifPresent(existing -> {
-                    throw duplicateTableNumber(branchId, table.getTableNumber());
-                });
+        if (tablesRepository.existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(
+                branchId, table.getTableNumber(), tableId)) {
+            throw duplicateTableNumber(branchId, table.getTableNumber());
+        }
 
         table.setIsActive(true);
         return toResponseDTO(tablesRepository.save(table));
@@ -123,6 +122,10 @@ public class TableServiceImpl implements TableService {
 
     private String normalizeStatus(String status) {
         return status == null || status.isBlank() ? "available" : status.toLowerCase();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     private TableResponseDTO toResponseDTO(Tables table) {

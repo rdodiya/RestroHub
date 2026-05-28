@@ -167,6 +167,32 @@ class TableServiceImplTest {
     }
 
     @Test
+    void updateTableShouldKeepExistingStatusWhenMissing() {
+        Branch branch = Branch.builder().branchId(1L).build();
+        Tables table = Tables.builder()
+                .tableId(10L)
+                .branch(branch)
+                .tableNumber(5)
+                .capacity(6)
+                .status("reserved")
+                .isActive(true)
+                .build();
+        TableRequestDTO request = TableRequestDTO.builder()
+                .tableNumber(5)
+                .capacity(8)
+                .build();
+
+        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
+        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 5, 10L)).thenReturn(false);
+        when(tablesRepository.save(table)).thenReturn(table);
+
+        TableResponseDTO response = tableService.updateTable(10L, request);
+
+        assertEquals(8, response.getCapacity());
+        assertEquals("reserved", response.getStatus());
+    }
+
+    @Test
     void updateTableShouldRejectDuplicateTableNumberInBranch() {
         Branch branch = Branch.builder().branchId(1L).build();
         Tables table = Tables.builder()
@@ -203,7 +229,8 @@ class TableServiceImplTest {
                 .build();
 
         when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
-        when(tablesRepository.findByBranch_BranchIdAndTableNumber(1L, 5)).thenReturn(Optional.of(table));
+        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(1L, 5, 10L))
+                .thenReturn(false);
         when(tablesRepository.save(table)).thenReturn(table);
 
         TableResponseDTO response = tableService.restoreTable(10L);
@@ -229,15 +256,9 @@ class TableServiceImplTest {
                 .tableNumber(5)
                 .isActive(false)
                 .build();
-        Tables activeDuplicate = Tables.builder()
-                .tableId(11L)
-                .branch(branch)
-                .tableNumber(5)
-                .isActive(true)
-                .build();
-
         when(tablesRepository.findById(10L)).thenReturn(Optional.of(inactiveTable));
-        when(tablesRepository.findByBranch_BranchIdAndTableNumber(1L, 5)).thenReturn(Optional.of(activeDuplicate));
+        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(1L, 5, 10L))
+                .thenReturn(true);
 
         assertThrows(ResourceAlreadyExistsException.class, () -> tableService.restoreTable(10L));
         verify(tablesRepository, never()).save(any(Tables.class));
