@@ -70,13 +70,15 @@ public abstract class WhatsappServiceImpl implements WhatsappService {
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
 
-            ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("WhatsApp template '{}' sent successfully to {}", templateName, toPhoneNumber);
-            } else {
-                log.warn("Failed to send WhatsApp template. Status: {}, Response: {}",
-                        response.getStatusCode(), response.getBody());
+            for (int i = 1; i <= 3; i++) {
+                ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
+                if (response.getStatusCode().is2xxSuccessful()) {
+                    log.info("WhatsApp template '{}' sent successfully to {}", templateName, toPhoneNumber);
+                    break;
+                } else {
+                    log.warn("Failed to send WhatsApp template. Status: {}, Response: {} for try {}",
+                            response.getStatusCode(), response.getBody(),i);
+                }
             }
 
         } catch (Exception e) {
