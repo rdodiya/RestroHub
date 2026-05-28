@@ -3,8 +3,11 @@ package com.restroly.qrmenu.user.service;
 import com.restroly.qrmenu.user.dto.RoleResponse;
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
+import com.restroly.qrmenu.restaurant.entity.Restaurant;
+import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
 import com.restroly.qrmenu.user.exception.DuplicateResourceException;
 import com.restroly.qrmenu.user.exception.UserNotFoundException;
 import com.restroly.qrmenu.user.repository.RoleRepository;
@@ -29,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final RestaurantRepository restaurantRepository;
     private final PasswordEncoder passwordEncoder;
 
     // =============================
@@ -71,7 +75,40 @@ public class UserServiceImpl implements UserService {
                     .ifPresent(role -> user.setRoles(List.of(role)));
         }
 
-        return mapToResponse(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+        createRestaurantIfRequested(request);
+
+        return mapToResponse(savedUser);
+    }
+
+    private void createRestaurantIfRequested(UserRequest request) {
+        if (request.getRestaurantName() == null || request.getRestaurantName().isBlank()) {
+            return;
+        }
+
+        String restaurantName = request.getRestaurantName().trim();
+        if (restaurantRepository.existsByNameIgnoreCase(restaurantName)) {
+            throw new ResourceAlreadyExistsException(
+                    "Restaurant already exists with name: " + restaurantName);
+        }
+
+        Restaurant restaurant = Restaurant.builder()
+                .name(restaurantName)
+                .description(normalizeRestaurantDescription(request, restaurantName))
+                .phoneNumber(normalizeOptionalText(request.getRestaurantPhoneNumber()))
+                .isActive(true)
+                .build();
+
+        restaurantRepository.save(restaurant);
+    }
+
+    private String normalizeRestaurantDescription(UserRequest request, String restaurantName) {
+        String description = normalizeOptionalText(request.getRestaurantDescription());
+        return description != null ? description : restaurantName;
+    }
+
+    private String normalizeOptionalText(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     // =============================
