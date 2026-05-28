@@ -3,7 +3,9 @@ package com.restroly.qrmenu.whatsapp.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class WhatsappOrderNotificationServiceImpl extends WhatsappServiceImpl implements WhatsappOrderNotificationService{
+    @Autowired
+    public WhatsappOrderNotificationServiceImpl(RestTemplateBuilder builder) {
+        super(builder);
+    }
     @Value("${whatsapp.message.template.order-confirmation}")
     public  String orderConfirmation;
     @Value("${whatsapp.message.template.status-update}")

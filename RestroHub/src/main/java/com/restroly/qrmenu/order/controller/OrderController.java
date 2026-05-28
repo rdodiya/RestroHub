@@ -50,7 +50,8 @@ public class OrderController {
 		//Genarated payment link is stored in response object to send it to client and use it for payment
 		response.setPaymentLink(paymentUrl);
 		//Sending whatsapp notification
-		whatsapp.sendOrderConfirmation(response);
+		if(response.getCustomerName() == null) response.setCustomerName("Customer");
+		if(response.getCustomerPhone() != null) whatsapp.sendOrderConfirmation(response);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
@@ -74,7 +75,8 @@ public class OrderController {
 			@Valid @RequestBody UpdateOrderStatusRequest request) {
 				OrderResponse response = orderService.updateOrderStatus(orderId, request.getStatus());
 				//Sending whatsapp notification
-	            whatsapp.sendOrderStatusUpdate(response);
+				if(response.getCustomerName() == null) response.setCustomerName("Customer");
+		        if(response.getCustomerPhone() != null) whatsapp.sendOrderStatusUpdate(response);
 		return ResponseEntity.ok(response);
 	}
 
@@ -82,7 +84,8 @@ public class OrderController {
 	public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
 		OrderResponse response=orderService.cancelOrder(orderId);
 		//sending cancel message
-		whatsapp.sendOrderStatusUpdate(response);
+		if(response.getCustomerName() == null) response.setCustomerName("Customer");
+		if(response.getCustomerPhone() != null) whatsapp.sendOrderStatusUpdate(response);
 		return ResponseEntity.noContent().build();
 	}
 }

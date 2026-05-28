@@ -2,7 +2,9 @@ package com.restroly.qrmenu.whatsapp.service.impl;
 
 import com.restroly.qrmenu.whatsapp.service.WhatsappService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public abstract class WhatsappServiceImpl implements WhatsappService {
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${whatsapp.api.url:https://graph.facebook.com/v25.0/}")
     private String apiUrl;
@@ -31,10 +34,19 @@ public abstract class WhatsappServiceImpl implements WhatsappService {
     @Value("${whatsapp.api.token}")
     private String accessToken;
 
+    @Autowired
+    public WhatsappServiceImpl(RestTemplateBuilder builder) {
+        this.restTemplate = builder
+                .setConnectTimeout(Duration.ofMillis(5000)) // Time to establish connection
+                .setReadTimeout(Duration.ofMillis(5000)) // Time to wait for data
+                .build();
+    }
+
     /**
      * Core method to execute the HTTP POST request to Meta's Cloud API.
      */
-    public void sendTemplateMessage(String toPhoneNumber, String templateName, List<Map<String, String>> bodyParameters) {
+    public void sendTemplateMessage(String toPhoneNumber, String templateName,
+            List<Map<String, String>> bodyParameters) {
         try {
             String url = apiUrl + phoneNumberId + "/messages";
 
@@ -54,11 +66,7 @@ public abstract class WhatsappServiceImpl implements WhatsappService {
                             "components", List.of(
                                     Map.of(
                                             "type", "body",
-                                            "parameters", bodyParameters
-                                    )
-                            )
-                    )
-            );
+                                            "parameters", bodyParameters))));
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
 
@@ -67,7 +75,7 @@ public abstract class WhatsappServiceImpl implements WhatsappService {
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("WhatsApp template '{}' sent successfully to {}", templateName, toPhoneNumber);
             } else {
-                log.warn("Failed to send WhatsApp template. Status: {}, Response: {}", 
+                log.warn("Failed to send WhatsApp template. Status: {}, Response: {}",
                         response.getStatusCode(), response.getBody());
             }
 
@@ -77,11 +85,12 @@ public abstract class WhatsappServiceImpl implements WhatsappService {
     }
 
     /**
-     * Utility to ensure the phone number doesn't have '+' or spaces, 
+     * Utility to ensure the phone number doesn't have '+' or spaces,
      * as required by the WhatsApp API.
      */
     private String formatPhoneNumber(String phone) {
-        if (phone == null) return "";
+        if (phone == null)
+            return "";
         return phone.replaceAll("[^0-9]", "");
     }
 }
