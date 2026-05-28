@@ -54,9 +54,9 @@ public class AuthController {
 
         AuthResponse response = authService.register(registerRequest);
 
-        return ResponseEntity.ok(
-        ApiResponse.success(response, "Registration successful")
-        );      
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response, "Registration successful")  //updated message to be more specific
+                );      
         }
         //end point for login
     @PostMapping("/login")
