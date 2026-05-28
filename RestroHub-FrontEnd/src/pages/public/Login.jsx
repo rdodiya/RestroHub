@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { GoogleLogin } from "@react-oauth/google";
+import { ArrowLeft } from "lucide-react";
 import api from "@services/common/api";
 import { useTheme } from "@context/ThemeContext";
 
@@ -288,6 +289,16 @@ const handleGoogleLogin = async (credentialResponse) => {
                   🍽️ Restroly
                 </span>
               </div>
+
+            <Link 
+              to="/"
+              className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
+              >
+                <ArrowLeft size={15}/>
+                  Back to Home 
+              </Link>
+
+              
 
               <p className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                 Welcome back!

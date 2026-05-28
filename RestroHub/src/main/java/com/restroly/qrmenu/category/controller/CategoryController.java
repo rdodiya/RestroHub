@@ -16,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.restroly.qrmenu.category.dto.CategoryDTO;
-import com.restroly.qrmenu.category.service.CategoryService;
 
 @RestController
 @RequestMapping("/secure/api/v1/categories")
@@ -59,5 +57,13 @@ public class CategoryController {
 	public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id) {
 		categoryService.deleteCategory(id);
 		return ResponseEntity.ok(ApiResponse.success(null, "Category deleted (soft-deleted) successfully"));
+	}
+
+	@GetMapping("/activecategories")
+	public ResponseEntity<ApiResponse<PagedResponse<CategoryResponseDTO>>> getActiveCategories(
+			@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable) {
+		Page<CategoryResponseDTO> categoryPage = categoryService.getActiveCategories(pageable);
+		PagedResponse<CategoryResponseDTO> pagedResponse = PagedResponse.from(categoryPage);
+		return ResponseEntity.ok(ApiResponse.success(pagedResponse, "Active categories retrieved successfully"));
 	}
 }
