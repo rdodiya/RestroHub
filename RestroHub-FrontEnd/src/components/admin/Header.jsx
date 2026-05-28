@@ -16,7 +16,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import useWebSocketNotifications from '@hooks/useWebSocketNotifications';
-import api from '../../services/common/api';
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -40,23 +39,6 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await api.post('/public/api/v1/auth/logout');  //handles logout on backend and invalidates refresh token
-    } catch (error) {
-      console.error('Logout API failed:', error);  //catches errors if API call breaks
-    } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('roles');
-
-      if (api?.defaults?.headers?.common?.Authorization) {  //cleans up axios default auth header if it exists
-        delete api.defaults.headers.common.Authorization;
-      }
-      navigate('/login', { replace: true });
-    }
-  };
 
   // Live service request notifications via WebSocket
   // TODO: Replace hardcoded branchId with actual branch from auth context
@@ -316,7 +298,6 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
 
                 <div className={`border-t py-1 ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
                   <button
-                    onClick={handleLogout}
                     className="
                       flex w-full items-center gap-2.5 px-4 py-2.5
                       text-sm text-red-500 hover:bg-red-500/10 transition-colors
