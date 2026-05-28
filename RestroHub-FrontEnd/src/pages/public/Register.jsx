@@ -6,7 +6,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
 import api from "@services/common/api";
-import { ArrowLeft, Building2, Phone, Users } from "lucide-react";
+import { ArrowLeft, Building2, Moon, Phone, Sun, Users } from "lucide-react";
+import { useTheme } from "@context/ThemeContext";
 
 /* ──────────────────── SVG Icons ──────────────────── */
 
@@ -83,6 +84,7 @@ const validationSchema = Yup.object({
 
 const Register = () => {
   const navigate = useNavigate();
+  const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [roles, setRoles] = useState([]);
@@ -174,6 +176,17 @@ const Register = () => {
           {/* RIGHT PANEL */}
           <div className="w-full xl:w-1/2">
             <div className="w-full px-6 py-12 sm:px-14 lg:px-20 xl:py-16">
+              <div className="mb-4 flex justify-end">
+                <button
+                  type="button"
+                  onClick={toggle}
+                  aria-label="Toggle dark mode"
+                  title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                  className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-gray-700"
+                >
+                  {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                </button>
+              </div>
               <div className="mb-8 flex items-center justify-center xl:hidden">
                 <span className="text-2xl font-bold text-blue-600">🍽️ Restroly</span>
               </div>
@@ -221,21 +234,21 @@ const Register = () => {
                     {rolesLoading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading roles...</p>}
                     {rolesError && <p className="text-sm text-red-500">{rolesError}</p>}
                     {!rolesLoading && !rolesError && (
-                      <div className="grid gap-2 sm:grid-cols-2">
+                      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
                         {roles.map((role) => (
                           <label
                             key={role.id}
-                            className="flex cursor-pointer items-center gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-blue-400 dark:border-gray-700 dark:text-gray-200"
+                            className="flex min-w-0 cursor-pointer items-start gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-blue-400 dark:border-gray-700 dark:text-gray-200"
                           >
                             <input
                               type="checkbox"
                               checked={formik.values.roleIds.includes(role.id)}
                               onChange={() => toggleRole(role.id)}
                               onBlur={() => formik.setFieldTouched("roleIds", true)}
-                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             />
-                            <Users size={16} className="text-blue-500" />
-                            <span>{role.name}</span>
+                            <Users size={16} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
+                            <span className="min-w-0 break-words leading-snug">{role.name}</span>
                           </label>
                         ))}
                       </div>
