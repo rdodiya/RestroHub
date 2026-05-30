@@ -4,7 +4,7 @@ import com.google.auth.oauth2.TokenVerifier;
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.GoogleAuthRequest;
-import com.restroly.qrmenu.common.exception.BusinessException;
+import com.restroly.qrmenu.exception.BusinessException;
 import com.restroly.qrmenu.security.JwtTokenProvider;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.entity.User;

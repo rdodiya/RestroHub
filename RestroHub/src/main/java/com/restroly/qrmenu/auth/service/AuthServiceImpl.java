@@ -3,7 +3,7 @@ package com.restroly.qrmenu.auth.service;
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
-import com.restroly.qrmenu.common.exception.BusinessException;
+import com.restroly.qrmenu.exception.BusinessException;
 import com.restroly.qrmenu.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -25,8 +25,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/login";
+      if (!error.config?.url?.includes("/public/")) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("roles");
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(error);

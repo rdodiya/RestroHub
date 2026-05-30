@@ -1,5 +1,5 @@
 // src/main/java/com/Restroly/qrmenu/common/exception/ResourceAlreadyExistsException.java
-package com.restroly.qrmenu.common.exception;
+package com.restroly.qrmenu.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
