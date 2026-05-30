@@ -1,5 +1,5 @@
 // src/main/java/com/Restroly/qrmenu/common/exception/BusinessException.java
-package com.restroly.qrmenu.common.exception;
+package com.restroly.qrmenu.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

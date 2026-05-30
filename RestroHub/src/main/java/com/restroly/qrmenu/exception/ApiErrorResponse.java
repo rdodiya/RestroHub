@@ -1,5 +1,5 @@
 // src/main/java/com/Restroly/qrmenu/common/exception/ErrorResponse.java
-package com.restroly.qrmenu.common.exception;
+package com.restroly.qrmenu.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Standard error response structure")
-public class ErrorResponse {
+public class ApiErrorResponse {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Schema(description = "Timestamp of when the error occurred")

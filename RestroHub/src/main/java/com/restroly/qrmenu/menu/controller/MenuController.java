@@ -1,6 +1,6 @@
 package com.restroly.qrmenu.menu.controller;
 
-import com.restroly.qrmenu.common.exception.ErrorResponse;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
 import com.restroly.qrmenu.common.util.ApiConstants;
 import com.restroly.qrmenu.menu.dto.MenuRequestDTO;
@@ -58,9 +58,9 @@ public class MenuController {
             @ApiResponse(responseCode = "201", description = "Menu created successfully",
                     content = @Content(schema = @Schema(implementation = MenuResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Menu name already exists for this branch",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions")
     })
@@ -85,7 +85,7 @@ public class MenuController {
             @ApiResponse(responseCode = "200", description = "Menu found",
                     content = @Content(schema = @Schema(implementation = MenuResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "Menu not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<MenuResponseDTO> getMenuById(
             @Parameter(description = "ID of the menu", required = true)
@@ -139,7 +139,7 @@ public class MenuController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successfully retrieved menus"),
             @ApiResponse(responseCode = "404", description = "Branch not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<MenuResponseDTO>> getMenusByBranch(
             @Parameter(description = "ID of the branch", required = true)
@@ -196,11 +196,11 @@ public class MenuController {
             @ApiResponse(responseCode = "200", description = "Menu updated successfully",
                     content = @Content(schema = @Schema(implementation = MenuResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Menu not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Menu name already exists for this branch",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<MenuResponseDTO> updateMenu(
             @Parameter(description = "ID of the menu", required = true)
