@@ -70,6 +70,7 @@ public class RestaurantController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @GetMapping("/{restaurantId}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Restaurant found",
                     content = @Content(schema = @Schema(implementation = RestaurantResponseDTO.class))),
