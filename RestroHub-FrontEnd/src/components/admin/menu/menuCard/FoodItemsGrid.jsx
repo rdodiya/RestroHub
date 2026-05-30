@@ -1,6 +1,7 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Search, RefreshCw, AlertCircle, UtensilsCrossed } from 'lucide-react';
 import MenuItemCard from './FoodItemCard';
+import EmptyState from '../../EmptyState';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 
@@ -205,40 +206,15 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
         </div>
 
       ) : filteredItems.length === 0 ? (
-        // ------------------------------------
-        // EMPTY STATE - Responsive
-        // ------------------------------------
-        <div
-          className="
-            bg-white rounded-2xl border border-gray-100 text-center
-
-            /* MOBILE */
-            p-8
-
-            /* TABLET+ */
-            sm:p-12
-          "
-        >
-          <UtensilsCrossed
-            className="
-              text-blue-200 mx-auto mb-3
-
-              /* MOBILE */
-              w-12 h-12
-
-              /* TABLET+ */
-              sm:w-16 sm:h-16 sm:mb-4
-            "
-          />
-          <p className="text-gray-700 font-medium mb-1 text-sm sm:text-base">
-            No items found
-          </p>
-          <p className="text-gray-500 text-xs sm:text-sm">
-            {searchQuery
+        <EmptyState
+          icon={UtensilsCrossed}
+          title={searchQuery ? 'No items found' : 'No menu items yet'}
+          description={
+            searchQuery
               ? `No results for "${searchQuery}"`
-              : 'Add your first menu item to get started'}
-          </p>
-        </div>
+              : 'Add your first menu item to get started.'
+          }
+        />
 
       ) : (
         // ------------------------------------
