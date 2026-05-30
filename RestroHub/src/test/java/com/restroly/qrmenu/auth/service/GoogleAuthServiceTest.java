@@ -2,7 +2,6 @@ package com.restroly.qrmenu.auth.service;
 
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.GoogleAuthRequest;
-import com.restroly.qrmenu.common.exception.BusinessException;
 import com.restroly.qrmenu.security.JwtTokenProvider;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.entity.User;

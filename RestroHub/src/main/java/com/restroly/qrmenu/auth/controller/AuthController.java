@@ -153,7 +153,7 @@ public class AuthController {
                     description = "Invalid request - token missing or invalid",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -161,7 +161,7 @@ public class AuthController {
                     description = "Google token verification failed",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })

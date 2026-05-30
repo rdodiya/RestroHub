@@ -1,5 +1,6 @@
 package com.restroly.qrmenu.user.service;
 
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
 import com.restroly.qrmenu.user.dto.RoleResponse;
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
