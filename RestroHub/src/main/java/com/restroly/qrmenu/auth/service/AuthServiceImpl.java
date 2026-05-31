@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import com.restroly.qrmenu.auth.dto.RegisterRequest;
 import com.restroly.qrmenu.user.entity.User;
-import com.restroly.qrmenu.user.exception.DuplicateResourceException;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.repository.UserRepository;
 import com.restroly.qrmenu.user.repository.RoleRepository;
