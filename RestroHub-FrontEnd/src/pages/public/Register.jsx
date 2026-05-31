@@ -100,6 +100,12 @@ const hasRestaurantOwnerRole = (roleIds, roles) => {
   });
 };
 
+const formatRoleName = (name) =>
+  name
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
 const EXCLUDED_ROLES = ["ADMIN"];
 
 const Register = () => {
@@ -256,25 +262,25 @@ const Register = () => {
                     {rolesLoading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading roles...</p>}
                     {rolesError && <p className="text-sm text-red-500">{rolesError}</p>}
                     {!rolesLoading && !rolesError && (
-                      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
+                      <select
+                        value={formik.values.roleIds[0] || ""}
+                        onChange={(e) =>
+                          formik.setFieldValue(
+                            "roleIds",
+                            e.target.value ? [Number(e.target.value)] : []
+                          )
+                        }
+                        onBlur={() => formik.setFieldTouched("roleIds", true)}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                      >
+                        <option value="">Select Role</option>
+
                         {roles.map((role) => (
-                          <label
-                            key={role.id}
-                            className="flex min-w-0 cursor-pointer items-start gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-blue-400 dark:border-gray-700 dark:text-gray-200"
-                          >
-                            <input
-                              type="radio"
-                              name="roleIds"
-                              checked={formik.values.roleIds.includes(role.id)}
-                              onChange={() => toggleRole(role.id)}
-                              onBlur={() => formik.setFieldTouched("roleIds", true)}
-                              className="mt-0.5 h-4 w-4 shrink-0 rounded-full border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <Users size={16} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
-                            <span className="min-w-0 break-words leading-snug">{role.name}</span>
-                          </label>
+                          <option key={role.id} value={role.id}>
+                            {formatRoleName(role.name)}
+                          </option>
                         ))}
-                      </div>
+                      </select>
                     )}
                   </div>
                   {formik.touched.roleIds && formik.errors.roleIds && <p className="mt-1.5 text-xs text-red-500">{formik.errors.roleIds}</p>}
