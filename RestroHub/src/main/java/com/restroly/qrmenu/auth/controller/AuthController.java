@@ -20,7 +20,7 @@ import com.restroly.qrmenu.auth.dto.RegisterRequest;
 import com.restroly.qrmenu.auth.service.AuthService;
 import com.restroly.qrmenu.auth.service.GoogleAuthService;
 import com.restroly.qrmenu.common.dto.ApiResponse;
-import com.restroly.qrmenu.common.exception.ErrorResponse;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 
 import com.restroly.qrmenu.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;

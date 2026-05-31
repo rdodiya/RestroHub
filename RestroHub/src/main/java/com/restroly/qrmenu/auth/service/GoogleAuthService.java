@@ -56,8 +56,8 @@ public class GoogleAuthService {
         String idToken = googleAuthRequest.getToken();
 
         if (idToken == null || idToken.isBlank()) {
-        throw new BusinessException("Google token is missing");
-}
+            throw new BusinessException("Google token is missing");
+        }
         
         log.info("Google OAuth authentication initiated");
 

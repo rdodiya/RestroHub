@@ -46,7 +46,7 @@ public class User {
     private String authProvider;  // e.g., "GOOGLE", "LOCAL", "FACEBOOK" (future)
 
     
-    @Column(name = "user_profile", columnDefinition = "bytea")
+    @Column(name = "user_profile")
     private byte[] userProfile; // BLOB for storing profile image bytes
 
     @ManyToMany
