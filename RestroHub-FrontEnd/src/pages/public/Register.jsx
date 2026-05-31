@@ -125,7 +125,7 @@ const Register = () => {
       setIsLoading(true);
       try {
         const { confirmPassword, ...registerData } = values;
-        const res = await api.post("/api/v1/users/register", registerData);
+        const res = await api.post("/public/api/v1/auth/register", registerData);
 
         if (res.data.success) {
           toast.success("Registration successful! Please login.");

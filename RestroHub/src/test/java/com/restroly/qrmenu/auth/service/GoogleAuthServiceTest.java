@@ -14,13 +14,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -72,7 +72,7 @@ class GoogleAuthServiceTest {
                 .name("Test User")
                 .googleSub("123456789")
                 .authProvider("GOOGLE")
-                .pictureUrl("https://example.com/picture.jpg")
+                .userProfile(new byte[]{1})
                 .isActive(true)
                 .isLocked(false)
                 .password("")
@@ -80,8 +80,8 @@ class GoogleAuthServiceTest {
                 .build();
 
         when(userRepository.save(any(User.class))).thenReturn(newUser);
-        when(jwtTokenProvider.generateAccessToken(any())).thenReturn("access_token_123");
-        when(jwtTokenProvider.generateRefreshToken(any())).thenReturn("refresh_token_123");
+        when(jwtTokenProvider.generateAccessToken(any(UserDetails.class))).thenReturn("access_token_123");
+        when(jwtTokenProvider.generateRefreshToken(any(UserDetails.class))).thenReturn("refresh_token_123");
         when(jwtTokenProvider.getExpirationInSeconds()).thenReturn(86400L);
 
         GoogleAuthRequest validRequest = new GoogleAuthRequest(googleToken);

@@ -17,8 +17,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import com.restroly.qrmenu.auth.dto.RegisterRequest;
+import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.user.exception.DuplicateResourceException;
+import com.restroly.qrmenu.user.entity.Role;
+import com.restroly.qrmenu.user.repository.UserRepository;
+import com.restroly.qrmenu.user.repository.RoleRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +35,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
@@ -117,5 +129,33 @@ public class AuthServiceImpl implements AuthService {
         // For now, we just clear the security context
         SecurityContextHolder.clearContext();
         log.info("User logged out successfully");
+    }
+
+    @Override
+    public AuthResponse register(RegisterRequest registerRequest) {
+
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new DuplicateResourceException("User already exists with this email");
+        }
+
+        User user = User.builder()
+                .name(registerRequest.getFirstName() + " " + registerRequest.getLastName())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .isActive(true)
+                .isLocked(false)
+                .authProvider("LOCAL")
+                .build();
+
+        Role customerRole = roleRepository.findByName("CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Default CUSTOMER role not found"));
+
+        user.setRoles(new ArrayList<>(Collections.singletonList(customerRole)));
+
+        userRepository.save(user);
+
+        return AuthResponse.builder()
+        .username(user.getEmail())
+        .build();
     }
 }

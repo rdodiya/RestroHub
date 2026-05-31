@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import profileService from '../../services/user/profileService';
 import useWebSocketNotifications from '@hooks/useWebSocketNotifications';
 import api from '../../services/common/api';
 
@@ -26,6 +27,31 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const notifRef = useRef(null);
   const navigate = useNavigate();
   const { isDark, toggle: toggleAdminTheme } = useAdminTheme();
+
+  const [userProfile, setUserProfile] = useState({
+    name: 'Admin User',
+    email: 'admin@restrohub.com',
+    profileImage: null
+  });
+
+  // Fix: Add missing logout handler to prevent React crashes
+  const handleLogout = async () => {
+  try {
+    await api.post('/public/api/v1/auth/logout');  //handles logout on backend and invalidates refresh token
+  } catch (error) {
+    console.error('Logout API failed:', error);  //catches errors if API call breaks
+  } finally {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('roles');
+
+    if (api?.defaults?.headers?.common?.Authorization) {  //cleans up axios default auth header if it exists
+      delete api.defaults.headers.common.Authorization;
+    }
+
+    navigate('/login', { replace: true });
+  }
+};
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -41,22 +67,22 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/public/api/v1/auth/logout');  //handles logout on backend and invalidates refresh token
-    } catch (error) {
-      console.error('Logout API failed:', error);  //catches errors if API call breaks
-    } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('roles');
-
-      if (api?.defaults?.headers?.common?.Authorization) {  //cleans up axios default auth header if it exists
-        delete api.defaults.headers.common.Authorization;
+  // Fetch authenticated user for navbar
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await profileService.getCurrentUserProfile();
+        setUserProfile({
+          name: data.name || 'Admin User',
+          email: data.email || 'admin@restrohub.com',
+          profileImage: data.profileImage || null
+        });
+      } catch (error) {
+        console.error('Failed to fetch user for header:', error);
       }
-      navigate('/login', { replace: true });
-    }
-  };
+    };
+    fetchUser();
+  }, []);
 
   // Live service request notifications via WebSocket
   // TODO: Replace hardcoded branchId with actual branch from auth context
@@ -263,13 +289,17 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                 isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
               }`}
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 sm:h-9 sm:w-9">
-                <User className="h-4 w-4 text-white" />
+              <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-blue-600 sm:h-9 sm:w-9">
+                {userProfile.profileImage ? (
+                  <img src={`data:image/jpeg;base64,${userProfile.profileImage}`} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <User className="h-4 w-4 text-white" />
+                )}
               </div>
 
               <div className="hidden text-left sm:block">
-                <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Admin User</p>
-                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>admin@restrohub.com</p>
+                <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{userProfile.name}</p>
+                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{userProfile.email}</p>
               </div>
 
               <ChevronDown
@@ -286,8 +316,8 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
               <div className={`${dropdownBase} w-56`}>
                 {/* Mobile user info */}
                 <div className={`border-b px-4 py-3 sm:hidden ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-                  <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Admin User</p>
-                  <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>admin@restrohub.com</p>
+                  <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{userProfile.name}</p>
+                  <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{userProfile.email}</p>
                 </div>
 
                 <div className="py-1">
