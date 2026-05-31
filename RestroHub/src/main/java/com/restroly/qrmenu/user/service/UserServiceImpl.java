@@ -1,15 +1,19 @@
 package com.restroly.qrmenu.user.service;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
 import com.restroly.qrmenu.user.dto.RoleResponse;
+import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
+import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
 import com.restroly.qrmenu.restaurant.entity.Restaurant;
 import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.entity.User;
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.user.exception.DuplicateResourceException;
-import com.restroly.qrmenu.user.exception.UserNotFoundException;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
+import com.restroly.qrmenu.exception.UserNotFoundException;
 import com.restroly.qrmenu.user.repository.RoleRepository;
 import com.restroly.qrmenu.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -71,8 +78,13 @@ public class UserServiceImpl implements UserService {
             user.setRoles(roles);
 
         } else {
-            roleRepository.findByName("ROLE_USER")
-                    .ifPresent(role -> user.setRoles(List.of(role)));
+            // Default to the CUSTOMER role which is used across auth flows
+            Role customerRole = roleRepository.findByName("CUSTOMER")
+        .orElseThrow(() ->
+                new IllegalStateException("Default CUSTOMER role not found"));
+
+        user.setRoles(
+                new ArrayList<>(Collections.singletonList(customerRole)));
         }
 
         User savedUser = userRepository.save(user);
@@ -300,4 +312,92 @@ public class UserServiceImpl implements UserService {
                 .roles(roles)
                 .build();
     }
+
+@Override
+public UserProfileResponseDTO getCurrentUserProfile() {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+        User user = userRepository.findByEmailWithRoles(email)
+            .orElseThrow(() ->
+                new UserNotFoundException(
+                    "User not found with email: " + email));
+
+    return UserProfileResponseDTO.builder()
+            .userId(user.getUserId())
+            .name(user.getName())
+            .email(user.getEmail())
+            .phoneNumber(user.getPhoneNumber())
+            .profileImage(encodeProfileImage(user.getUserProfile()))
+            .build();
+}
+
+private String encodeProfileImage(byte[] imageBytes) {
+    if (imageBytes == null || imageBytes.length == 0) {
+        return null;
+    }
+    return Base64.getEncoder().encodeToString(imageBytes);
+}
+
+@Override
+public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request) {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    User user = userRepository.findByEmailWithRoles(email)
+            .orElseThrow(() ->
+                    new UserNotFoundException(
+                            "User not found with email: " + email));
+        // System.out.println("BEFORE UPDATE ROLES: " + user.getRoles()); line added fo debugging
+
+    log.info("Updating profile for user: {}", email);
+    log.info("Incoming request: {}", request);
+
+    // Update only non-null fields
+    if (request.getName() != null && !request.getName().isBlank()) {
+        user.setName(request.getName());
+    }
+
+    if (request.getPhoneNumber() != null &&
+            !request.getPhoneNumber().isBlank()) {
+        user.setPhoneNumber(request.getPhoneNumber());
+    }
+
+    // Handle profile image safely
+    if (request.getProfileImageBytes() != null &&
+            request.getProfileImageBytes().length > 0) {
+
+        log.info("Updating profile image for user: {}", email);
+
+        user.setUserProfile(request.getProfileImageBytes());
+    }
+
+    // Prevent accidental auth corruption
+    if (user.getEmail() == null || user.getEmail().isBlank()) {
+        throw new IllegalStateException("User email became null during profile update");
+    }
+
+    if (user.getRoles() == null || user.getRoles().isEmpty()) {
+        throw new IllegalStateException("User roles became empty during profile update");
+    }
+
+    User updatedUser = userRepository.save(user);
+
+    log.info("Profile updated successfully for user: {}", email);
+
+    return UserProfileResponseDTO.builder()
+            .userId(updatedUser.getUserId())
+            .name(updatedUser.getName())
+            .email(updatedUser.getEmail())
+            .phoneNumber(updatedUser.getPhoneNumber())
+            .profileImage(encodeProfileImage(updatedUser.getUserProfile()))
+            .build();
+
+        }
 }

@@ -3,7 +3,7 @@ package com.restroly.qrmenu.branch.controller;
 import com.restroly.qrmenu.branch.dto.BranchRequestDTO;
 import com.restroly.qrmenu.branch.dto.BranchResponseDTO;
 import com.restroly.qrmenu.branch.service.BranchService;
-import com.restroly.qrmenu.common.exception.ErrorResponse;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
 import com.restroly.qrmenu.common.util.ApiConstants;
 
@@ -31,7 +31,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 import static com.restroly.qrmenu.common.util.ApiConstants.SECURE_API_VERSION;
 
@@ -58,9 +57,9 @@ public class BranchController {
             @ApiResponse(responseCode = "201", description = "Branch created successfully",
                     content = @Content(schema = @Schema(implementation = BranchResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Branch name already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions")
     })
@@ -85,7 +84,7 @@ public class BranchController {
             @ApiResponse(responseCode = "200", description = "Branch found",
                     content = @Content(schema = @Schema(implementation = BranchResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "Branch not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<BranchResponseDTO> getBranchById(
             @Parameter(description = "ID of the branch", required = true)
@@ -139,7 +138,7 @@ public class BranchController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successfully retrieved branches"),
             @ApiResponse(responseCode = "404", description = "Restaurant not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<PageResponseDTO<BranchResponseDTO>> getBranchesByRestaurant(
             @Parameter(description = "ID of the restaurant", required = true)
@@ -214,11 +213,11 @@ public class BranchController {
             @ApiResponse(responseCode = "200", description = "Branch updated successfully",
                     content = @Content(schema = @Schema(implementation = BranchResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Branch not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Branch name already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<BranchResponseDTO> updateBranch(
             @Parameter(description = "ID of the branch", required = true)

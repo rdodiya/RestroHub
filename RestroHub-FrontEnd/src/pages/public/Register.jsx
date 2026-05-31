@@ -155,7 +155,7 @@ const Register = () => {
       setIsLoading(true);
       try {
         const { confirmPassword, ...registerData } = values;
-        const res = await api.post("/api/v1/users/register", registerData);
+        const res = await api.post("/public/api/v1/auth/register", registerData);
 
         if (res.data.success) {
           toast.success("Registration successful! Please login.");
@@ -227,7 +227,7 @@ const Register = () => {
               </Link>
               <h2 className="mb-8 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Create Account</h2>
 
-              <form onSubmit={formik.handleSubmit} noValidate>
+              <form onSubmit={(e) => { e.preventDefault(); formik.handleSubmit(e); }} noValidate>
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <div className="w-full">
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>

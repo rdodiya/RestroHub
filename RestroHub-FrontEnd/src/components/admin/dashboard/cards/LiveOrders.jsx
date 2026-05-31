@@ -3,6 +3,8 @@ import {
   Clock,
   ChefHat,
   CheckCircle2,
+  Receipt,
+  XCircle,
   RefreshCw,
   AlertCircle
 } from 'lucide-react';
@@ -15,13 +17,17 @@ import { useAdminTheme } from '@context/AdminThemeContext';
 // ============================================
 const StatusBadge = ({ status }) => {
   const { isDark } = useAdminTheme();
+  // Keys match backend OrderStatus enum values (uppercase)
   const config = {
-    pending: { bg: isDark ? 'bg-yellow-900/40' : 'bg-yellow-100', text: isDark ? 'text-yellow-400' : 'text-yellow-700', icon: Clock, label: 'Pending' },
-    cooking: { bg: isDark ? 'bg-blue-900/40'   : 'bg-blue-100',   text: isDark ? 'text-blue-400'   : 'text-blue-700',   icon: ChefHat, label: 'Cooking' },
-    ready:   { bg: isDark ? 'bg-green-900/40'  : 'bg-green-100',  text: isDark ? 'text-green-400'  : 'text-green-700',  icon: CheckCircle2, label: 'Ready' },
+    PENDING:   { bg: isDark ? 'bg-yellow-900/40' : 'bg-yellow-100', text: isDark ? 'text-yellow-400' : 'text-yellow-700', icon: Clock, label: 'Pending' },
+    CONFIRMED: { bg: isDark ? 'bg-indigo-900/40' : 'bg-indigo-100', text: isDark ? 'text-indigo-400' : 'text-indigo-700', icon: CheckCircle2, label: 'Confirmed' },
+    PREPARING: { bg: isDark ? 'bg-blue-900/40'   : 'bg-blue-100',   text: isDark ? 'text-blue-400'   : 'text-blue-700',   icon: ChefHat, label: 'Preparing' },
+    READY:     { bg: isDark ? 'bg-green-900/40'  : 'bg-green-100',  text: isDark ? 'text-green-400'  : 'text-green-700',  icon: CheckCircle2, label: 'Ready' },
+    BILLED:    { bg: isDark ? 'bg-purple-900/40' : 'bg-purple-100', text: isDark ? 'text-purple-400' : 'text-purple-700', icon: Receipt, label: 'Billed' },
+    CANCELLED: { bg: isDark ? 'bg-red-900/40'    : 'bg-red-100',    text: isDark ? 'text-red-400'    : 'text-red-700',    icon: XCircle, label: 'Cancelled' },
   };
 
-  const { bg, text, icon: Icon, label } = config[status] || config.pending;
+  const { bg, text, icon: Icon, label } = config[status] || config.PENDING;
 
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${bg} ${text}`}>
@@ -69,10 +75,10 @@ const LiveOrders = () => {
   // FALLBACK DATA
   // ------------------------------------
   const fallbackOrders = [
-    { id: 123, table: 4, amount: 450, status: 'cooking', items: '2x Paneer, 1x Lassi' },
-    { id: 124, table: 7, amount: 320, status: 'ready', items: '1x Biryani, 2x Roti' },
-    { id: 125, table: 2, amount: 780, status: 'cooking', items: '3x Thali' },
-    { id: 126, table: 9, amount: 190, status: 'pending', items: '2x Lassi' },
+    { id: 123, table: 4, amount: 450, status: 'PREPARING', items: '2x Paneer, 1x Lassi' },
+    { id: 124, table: 7, amount: 320, status: 'READY', items: '1x Biryani, 2x Roti' },
+    { id: 125, table: 2, amount: 780, status: 'PREPARING', items: '3x Thali' },
+    { id: 126, table: 9, amount: 190, status: 'PENDING', items: '2x Lassi' },
   ];
 
   // ------------------------------------
@@ -91,8 +97,8 @@ const LiveOrders = () => {
       if (!loading) setRefreshing(true);
       setError(null);
 
-      // 🔌 UNCOMMENT WHEN API READY
-      // const response = await api.get('/api/orders?status=active&limit=5');
+      // 🔌 UNCOMMENT WHEN API READY (replace {branchId} with actual branch ID)
+      // const response = await api.get('/secure/api/v1/orders/branch/{branchId}/active');
       // setOrders(response.data);
 
       // 🎭 MOCK
