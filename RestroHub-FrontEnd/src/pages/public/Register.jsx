@@ -63,7 +63,7 @@ const Illustration = () => (
    REGISTER COMPONENT
    ═══════════════════════════════════════════════════════ */
 
-const validationSchema = Yup.object({
+const getValidationSchema = (roles) => Yup.object({
   firstName: Yup.string().min(2, "Minimum 2 characters").required("First name is required"),
   lastName: Yup.string().min(2, "Minimum 2 characters").required("Last name is required"),
   email: Yup.string().email("Invalid email format").required("Email is required"),
@@ -75,12 +75,32 @@ const validationSchema = Yup.object({
     .oneOf([Yup.ref('password'), null], 'Passwords must match')
     .required('Confirm password is required'),
   roleIds: Yup.array().min(1, "Select at least one role"),
-  restaurantName: Yup.string().min(2, "Minimum 2 characters").required("Restaurant name is required"),
-  restaurantDescription: Yup.string().min(5, "Minimum 5 characters").required("Restaurant description is required"),
-  restaurantPhoneNumber: Yup.string()
-    .matches(/^[0-9+\s-]{10,15}$/, "Enter a valid phone number")
-    .required("Restaurant phone number is required"),
+  restaurantName: Yup.string().when('roleIds', {
+    is: (roleIds) => hasRestaurantOwnerRole(roleIds, roles),
+    then: (schema) => schema.min(2, "Minimum 2 characters").required("Restaurant name is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  restaurantDescription: Yup.string().when('roleIds', {
+    is: (roleIds) => hasRestaurantOwnerRole(roleIds, roles),
+    then: (schema) => schema.min(5, "Minimum 5 characters").required("Restaurant description is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  restaurantPhoneNumber: Yup.string().when('roleIds', {
+    is: (roleIds) => hasRestaurantOwnerRole(roleIds, roles),
+    then: (schema) => schema.matches(/^[0-9+\s-]{10,15}$/, "Enter a valid phone number").required("Restaurant phone number is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
+
+const hasRestaurantOwnerRole = (roleIds, roles) => {
+  if (!roleIds || !roles) return false;
+  return roleIds.some((id) => {
+    const role = roles.find((r) => r.id === id);
+    return role && role.name === "RESTAURANT_OWNER";
+  });
+};
+
+const EXCLUDED_ROLES = ["ADMIN"];
 
 const Register = () => {
   const navigate = useNavigate();
@@ -97,7 +117,11 @@ const Register = () => {
       setRolesError("");
       try {
         const res = await api.get("/api/v1/roles/active");
-        setRoles(res.data?.data || []);
+        const activeRoles = res.data?.data || [];
+        const signupRoles = activeRoles.filter(
+          (role) => role.name && !EXCLUDED_ROLES.includes(role.name.toUpperCase())
+        );
+        setRoles(signupRoles);
       } catch {
         setRolesError("Unable to load roles. Please try again.");
       } finally {
@@ -120,7 +144,7 @@ const Register = () => {
       restaurantDescription: "",
       restaurantPhoneNumber: "",
     },
-    validationSchema,
+    validationSchema: getValidationSchema(roles),
     onSubmit: async (values) => {
       setIsLoading(true);
       try {
@@ -141,6 +165,8 @@ const Register = () => {
     },
   });
 
+  const isRestaurantOwner = hasRestaurantOwnerRole(formik.values.roleIds, roles);
+
   const inputClass = (field) =>
     `w-full rounded-lg border ${
       formik.touched[field] && formik.errors[field]
@@ -149,11 +175,7 @@ const Register = () => {
     } bg-transparent py-4 pl-6 pr-12 text-gray-800 placeholder-gray-400 outline-none transition focus:border-transparent focus:ring-2 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`;
 
   const toggleRole = (roleId) => {
-    const nextRoleIds = formik.values.roleIds.includes(roleId)
-      ? formik.values.roleIds.filter((id) => id !== roleId)
-      : [...formik.values.roleIds, roleId];
-
-    formik.setFieldValue("roleIds", nextRoleIds);
+    formik.setFieldValue("roleIds", [roleId]);
   };
 
   return (
@@ -241,11 +263,12 @@ const Register = () => {
                             className="flex min-w-0 cursor-pointer items-start gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-blue-400 dark:border-gray-700 dark:text-gray-200"
                           >
                             <input
-                              type="checkbox"
+                              type="radio"
+                              name="roleIds"
                               checked={formik.values.roleIds.includes(role.id)}
                               onChange={() => toggleRole(role.id)}
                               onBlur={() => formik.setFieldTouched("roleIds", true)}
-                              className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="mt-0.5 h-4 w-4 shrink-0 rounded-full border-gray-300 text-blue-600 focus:ring-blue-500"
                             />
                             <Users size={16} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
                             <span className="min-w-0 break-words leading-snug">{role.name}</span>
@@ -276,6 +299,7 @@ const Register = () => {
                   {formik.touched.confirmPassword && formik.errors.confirmPassword && <p className="mt-1.5 text-xs text-red-500">{formik.errors.confirmPassword}</p>}
                 </div>
 
+                {isRestaurantOwner && (
                 <div className="mb-5 border-t border-gray-200 pt-5 dark:border-gray-700">
                   <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Restaurant Details</h3>
                   <div>
@@ -308,6 +332,7 @@ const Register = () => {
                     {formik.touched.restaurantPhoneNumber && formik.errors.restaurantPhoneNumber && <p className="mt-1.5 text-xs text-red-500">{formik.errors.restaurantPhoneNumber}</p>}
                   </div>
                 </div>
+                )}
 
                 <button type="submit" disabled={isLoading} className="mb-5 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-base font-medium text-white transition hover:bg-blue-700 focus:outline-none disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-600">
                   {isLoading ? <><SpinnerIcon /> Registering…</> : "Sign Up"}
