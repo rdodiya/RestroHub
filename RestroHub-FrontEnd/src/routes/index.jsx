@@ -12,6 +12,7 @@ import Landing from '../pages/public/Landing';
 import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
+import PrivacyPolicy from '../pages/public/PrivacyPolicy';
 
 // Customer Pages
 import RestaurantMenu from '../pages/customer/RestaurantMenu';
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Route>
 
       {/* ========== CUSTOMER ROUTES ========== */}
@@ -47,7 +49,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* ========== ADMIN ROUTES ========== */}
-      <Route path="/admin" 
+      <Route path="/admin"
             element={
                   <ProtectedRoute>
                     <AdminLayout />
