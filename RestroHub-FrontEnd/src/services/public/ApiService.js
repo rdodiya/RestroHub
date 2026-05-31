@@ -19,11 +19,20 @@ const apiRequest = async (endpoint, options = {}) => {
 
     const response = await fetch(url, { ...defaultOptions, ...options });
    if (!response.ok) {
-    let errorMessage = `API Error: ${response.status}`;
+    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
 
     try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
+        const contentType = response.headers.get("content-type");
+        const responseText = await response.text();
+
+        if (
+            contentType &&
+            contentType.includes("application/json") &&
+            responseText
+        ) {
+            const errorData = JSON.parse(responseText);
+            errorMessage = errorData.message || errorMessage;
+        }
     } catch (err) {
         console.error("Failed to parse error response:", err);
     }
@@ -32,12 +41,25 @@ const apiRequest = async (endpoint, options = {}) => {
 }
 
 try {
-    return await response.json();
+    const contentType = response.headers.get("content-type");
+    const responseText = await response.text();
+
+    if (!responseText) {
+        return null;
+    }
+
+    if (
+        contentType &&
+        contentType.includes("application/json")
+    ) {
+        return JSON.parse(responseText);
+    }
+
+    return responseText;
 } catch (err) {
-    console.error("Failed to parse response JSON:", err);
+    console.error("Failed to parse response:", err);
     throw new Error("Invalid server response");
 }
-};
 
 const ApiService = {
     // ============================================
