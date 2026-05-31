@@ -180,10 +180,6 @@ const Register = () => {
         : "border-gray-300 focus:ring-blue-500 dark:border-gray-600"
     } bg-transparent py-4 pl-6 pr-12 text-gray-800 placeholder-gray-400 outline-none transition focus:border-transparent focus:ring-2 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`;
 
-  const toggleRole = (roleId) => {
-    formik.setFieldValue("roleIds", [roleId]);
-  };
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10 dark:bg-gray-900 sm:px-6 lg:px-8">
       <div className="w-full max-w-[1200px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
