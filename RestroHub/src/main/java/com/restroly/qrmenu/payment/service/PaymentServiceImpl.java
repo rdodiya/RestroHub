@@ -110,7 +110,7 @@ public class PaymentServiceImpl implements PaymentService {
         
         PaymentVerification entity = verificationRepository.findByPaymentId(paymentId)
                 .orElseThrow(() ->{
-                    log.warn("PaymentId: {} not found in database",paymentId);
+                    log.warn("PaymentId: {} not found in database", paymentId);
                     return new PaymentNotFoundException("Payment record not found for paymentId: " + paymentId);
                 });
 
@@ -126,7 +126,7 @@ public class PaymentServiceImpl implements PaymentService {
         
         PaymentVerification entity = verificationRepository.findByPaymentId(paymentId)
                 .orElseThrow(() -> {
-                    log.warn("PaymentId: {} not found in database",paymentId);
+                    log.warn("PaymentId: {} not found in database", paymentId);
                     return new PaymentNotFoundException("Payment record not found for paymentId: " + paymentId);
                 });
 
