@@ -21,8 +21,5 @@ public interface TablesRepository extends JpaRepository<Tables, Long> {
 
 	boolean existsByBranch_BranchIdAndTableNumberAndTableIdNot(Long branchId, Integer tableNumber, Long tableId);
 
-	boolean existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(
-			Long branchId, Integer tableNumber, Long tableId);
-
 	Tables findByTableNumber(Integer tableNumber);
 }

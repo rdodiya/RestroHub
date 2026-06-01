@@ -14,6 +14,4 @@ public interface TableService {
     TableResponseDTO updateTable(Long tableId, TableRequestDTO requestDTO);
 
     void deleteTable(Long tableId);
-
-    TableResponseDTO restoreTable(Long tableId);
 }

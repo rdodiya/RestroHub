@@ -8,6 +8,7 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
     number: '',
     capacity: '',
     status: 'available',
+    isActive: true,
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -18,9 +19,10 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
         number: editingTable.number || '',
         capacity: editingTable.capacity || '',
         status: editingTable.status || 'available',
+        isActive: editingTable.isActive !== false,
       });
     } else {
-      setFormData({ number: '', capacity: '', status: 'available' });
+      setFormData({ number: '', capacity: '', status: 'available', isActive: true });
     }
     setError(null);
   }, [editingTable, isOpen]);
@@ -35,6 +37,7 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
         tableNumber: Number(formData.number),
         capacity: Number(formData.capacity),
         status: formData.status,
+        isActive: formData.isActive,
       };
 
       if (editingTable) {
@@ -144,6 +147,21 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
                   <option value="reserved">Reserved</option>
                 </select>
               </div>
+              {editingTable && (
+                <label className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <span className="text-sm font-medium text-gray-800">Active table</span>
+                  <span className="relative inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={(e) => updateField('isActive', e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <span className="h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-blue-600" />
+                    <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                  </span>
+                </label>
+              )}
             </div>
 
             <div className="flex items-center gap-3 border-t border-gray-100 px-5 py-4">

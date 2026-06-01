@@ -1,15 +1,12 @@
 // src/main/java/com/restroly/qrmenu/food/service/impl/FoodServiceImpl.java
 package com.restroly.qrmenu.food.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.restroly.qrmenu.category.entity.Category;
 import com.restroly.qrmenu.category.repository.CategoryRepository;
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
 import com.restroly.qrmenu.config.CloudinaryService;
-import com.restroly.qrmenu.food.dto.*;
 import com.restroly.qrmenu.food.dto.FoodMapper;
 import com.restroly.qrmenu.food.dto.FoodRequestDTO;
 import com.restroly.qrmenu.food.dto.FoodResponseDTO;
@@ -18,7 +15,6 @@ import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.food.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;

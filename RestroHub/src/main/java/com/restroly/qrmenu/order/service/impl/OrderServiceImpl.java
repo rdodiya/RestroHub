@@ -4,11 +4,10 @@ package com.restroly.qrmenu.order.service.impl;
 import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
 import com.restroly.qrmenu.common.enums.OrderStatus;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.food.repository.FoodRepository;
 import com.restroly.qrmenu.order.builder.OrderDirector;
-import com.restroly.qrmenu.order.dto.*;
 import com.restroly.qrmenu.order.dto.CreateOrderRequest;
 import com.restroly.qrmenu.order.dto.OrderItemRequest;
 import com.restroly.qrmenu.order.dto.OrderResponse;
@@ -19,7 +18,6 @@ import com.restroly.qrmenu.order.service.OrderService;
 import com.restroly.qrmenu.order.service.OrderNotificationService;
 import com.restroly.qrmenu.table.entity.Tables;
 import com.restroly.qrmenu.table.repository.TablesRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
 	public List<OrderResponse> getActiveOrdersByBranch(Long branchId) {
 		log.debug("Fetching active orders for branchId: {}", branchId);
 		List<OrderStatus> activeStatuses = Arrays.asList(OrderStatus.PENDING, OrderStatus.CONFIRMED,
-				OrderStatus.PREPARING, OrderStatus.READY);
+				OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.SERVED, OrderStatus.BILLED);
 
 		List<Order> orders = orderRepository.findActiveOrdersByBranch(branchId, activeStatuses);
 		return orders.stream().map(orderMapper::toResponse).collect(Collectors.toList());

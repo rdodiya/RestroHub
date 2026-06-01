@@ -308,7 +308,7 @@ const handleGoogleLogin = async (credentialResponse) => {
               </h2>
 
               {/* ── FORM ── */}
-              <form onSubmit={formik.handleSubmit} noValidate>
+              <form onSubmit={(e) => { e.preventDefault(); formik.handleSubmit(e); }} noValidate>
                 {/* Email */}
                 <div className="mb-5">
                   <label

@@ -2,8 +2,8 @@ package com.restroly.qrmenu.table.service;
 
 import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.table.dto.TableRequestDTO;
 import com.restroly.qrmenu.table.dto.TableResponseDTO;
 import com.restroly.qrmenu.table.entity.Tables;
@@ -112,7 +112,7 @@ class TableServiceImplTest {
     }
 
     @Test
-    void deleteTableShouldDeactivateTable() {
+    void deleteTableShouldHardDeleteTable() {
         Tables table = Tables.builder()
                 .tableId(10L)
                 .branch(Branch.builder().branchId(1L).build())
@@ -121,12 +121,10 @@ class TableServiceImplTest {
                 .build();
 
         when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
-        when(tablesRepository.save(table)).thenReturn(table);
 
         tableService.deleteTable(10L);
 
-        assertFalse(table.getIsActive());
-        verify(tablesRepository).save(table);
+        verify(tablesRepository).delete(table);
     }
 
     @Test
@@ -134,7 +132,7 @@ class TableServiceImplTest {
         when(tablesRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> tableService.deleteTable(99L));
-        verify(tablesRepository, never()).save(any(Tables.class));
+        verify(tablesRepository, never()).delete(any(Tables.class));
     }
 
     @Test
@@ -193,6 +191,33 @@ class TableServiceImplTest {
     }
 
     @Test
+    void updateTableShouldPersistActiveStateToggle() {
+        Branch branch = Branch.builder().branchId(1L).build();
+        Tables table = Tables.builder()
+                .tableId(10L)
+                .branch(branch)
+                .tableNumber(5)
+                .capacity(6)
+                .status("available")
+                .isActive(true)
+                .build();
+        TableRequestDTO request = TableRequestDTO.builder()
+                .tableNumber(5)
+                .capacity(6)
+                .status("available")
+                .isActive(false)
+                .build();
+
+        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
+        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 5, 10L)).thenReturn(false);
+        when(tablesRepository.save(table)).thenReturn(table);
+
+        TableResponseDTO response = tableService.updateTable(10L, request);
+
+        assertFalse(response.getIsActive());
+    }
+
+    @Test
     void updateTableShouldRejectDuplicateTableNumberInBranch() {
         Branch branch = Branch.builder().branchId(1L).build();
         Tables table = Tables.builder()
@@ -217,51 +242,6 @@ class TableServiceImplTest {
         when(tablesRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> tableService.updateTable(99L, request));
-    }
-
-    @Test
-    void restoreTableShouldReactivateTable() {
-        Tables table = Tables.builder()
-                .tableId(10L)
-                .branch(Branch.builder().branchId(1L).build())
-                .tableNumber(5)
-                .isActive(false)
-                .build();
-
-        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(1L, 5, 10L))
-                .thenReturn(false);
-        when(tablesRepository.save(table)).thenReturn(table);
-
-        TableResponseDTO response = tableService.restoreTable(10L);
-
-        assertTrue(response.getIsActive());
-        verify(tablesRepository).save(table);
-    }
-
-    @Test
-    void restoreTableShouldRejectMissingTable() {
-        when(tablesRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> tableService.restoreTable(99L));
-        verify(tablesRepository, never()).save(any(Tables.class));
-    }
-
-    @Test
-    void restoreTableShouldRejectActiveDuplicateTableNumber() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        Tables inactiveTable = Tables.builder()
-                .tableId(10L)
-                .branch(branch)
-                .tableNumber(5)
-                .isActive(false)
-                .build();
-        when(tablesRepository.findById(10L)).thenReturn(Optional.of(inactiveTable));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(1L, 5, 10L))
-                .thenReturn(true);
-
-        assertThrows(ResourceAlreadyExistsException.class, () -> tableService.restoreTable(10L));
-        verify(tablesRepository, never()).save(any(Tables.class));
     }
 
     @Test

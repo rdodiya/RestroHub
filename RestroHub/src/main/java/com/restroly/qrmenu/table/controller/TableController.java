@@ -1,7 +1,7 @@
 package com.restroly.qrmenu.table.controller;
 
-import com.restroly.qrmenu.common.exception.ErrorResponse;
 import com.restroly.qrmenu.common.util.ApiConstants;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 import com.restroly.qrmenu.table.dto.TableRequestDTO;
 import com.restroly.qrmenu.table.dto.TableResponseDTO;
 import com.restroly.qrmenu.table.service.TableService;
@@ -43,7 +43,7 @@ public class TableController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tables"),
             @ApiResponse(responseCode = "404", description = "Branch not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<TableResponseDTO>> getTablesByBranch(
             @Parameter(description = "ID of the branch", required = true)
@@ -56,21 +56,21 @@ public class TableController {
     @PostMapping(value = "/branches/{branchId}/tables",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Create a table",
-            description = "Creates a new table for a branch. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
+            description = "Creates a new table for a branch. Requires ADMIN or RESTAURANT_OWNER authority.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Table created successfully",
                     content = @Content(schema = @Schema(implementation = TableResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Branch not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Duplicate table number",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<TableResponseDTO> createTable(
             @Parameter(description = "ID of the branch", required = true)
@@ -87,10 +87,10 @@ public class TableController {
     @PutMapping(value = "/tables/{tableId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Update a table",
-            description = "Updates table details and status. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
+            description = "Updates table details, status, and active state. Requires ADMIN or RESTAURANT_OWNER authority.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<TableResponseDTO> updateTable(
@@ -103,11 +103,11 @@ public class TableController {
     }
 
     @DeleteMapping("/tables/{tableId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'RESTAURANT_OWNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete a table",
-            description = "Soft deletes a table. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
+            description = "Permanently deletes a table. Requires ADMIN or RESTAURANT_OWNER authority.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<Void> deleteTable(
@@ -119,18 +119,4 @@ public class TableController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping(value = "/tables/{tableId}/restore", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
-    @Operation(
-            summary = "Restore a table",
-            description = "Restores a soft-deleted table. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
-    public ResponseEntity<TableResponseDTO> restoreTable(
-            @Parameter(description = "ID of the table", required = true)
-            @PathVariable Long tableId) {
-
-        log.info("REST request to restore table {}", tableId);
-        return ResponseEntity.ok(tableService.restoreTable(tableId));
-    }
 }

@@ -28,4 +28,6 @@ public class TableRequestDTO {
     private String status;
 
     private String qrCodeUrl;
+
+    private Boolean isActive;
 }

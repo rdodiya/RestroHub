@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.restroly.qrmenu.branch.dto.BranchResponseDTO;
 import com.restroly.qrmenu.branch.service.BranchService;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.order.service.OrderNotificationService;
 
 import lombok.RequiredArgsConstructor;

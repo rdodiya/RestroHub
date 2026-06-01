@@ -2,8 +2,8 @@ package com.restroly.qrmenu.table.service;
 
 import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.table.dto.TableRequestDTO;
 import com.restroly.qrmenu.table.dto.TableResponseDTO;
 import com.restroly.qrmenu.table.entity.Tables;
@@ -75,33 +75,19 @@ public class TableServiceImpl implements TableService {
         table.setCapacity(requestDTO.getCapacity() != null ? requestDTO.getCapacity() : table.getCapacity());
         table.setStatus(hasText(requestDTO.getStatus()) ? normalizeStatus(requestDTO.getStatus()) : table.getStatus());
         table.setQrCodeUrl(requestDTO.getQrCodeUrl());
+        if (requestDTO.getIsActive() != null) {
+            table.setIsActive(requestDTO.getIsActive());
+        }
 
         return toResponseDTO(tablesRepository.save(table));
     }
 
     @Override
     public void deleteTable(Long tableId) {
-        log.info("Soft deleting table {}", tableId);
+        log.info("Deleting table {}", tableId);
 
         Tables table = findTableOrThrow(tableId);
-        table.setIsActive(false);
-        tablesRepository.save(table);
-    }
-
-    @Override
-    public TableResponseDTO restoreTable(Long tableId) {
-        log.info("Restoring table {}", tableId);
-
-        Tables table = findTableOrThrow(tableId);
-        Long branchId = table.getBranch().getBranchId();
-
-        if (tablesRepository.existsByBranch_BranchIdAndTableNumberAndIsActiveTrueAndTableIdNot(
-                branchId, table.getTableNumber(), tableId)) {
-            throw duplicateTableNumber(branchId, table.getTableNumber());
-        }
-
-        table.setIsActive(true);
-        return toResponseDTO(tablesRepository.save(table));
+        tablesRepository.delete(table);
     }
 
     private void validateBranchExists(Long branchId) {

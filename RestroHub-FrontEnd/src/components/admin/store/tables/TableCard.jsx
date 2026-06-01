@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { QrCode, Edit2, Trash2, Users, Loader2, RotateCcw } from 'lucide-react';
+import { QrCode, Edit2, Trash2, Users, Loader2 } from 'lucide-react';
 import api from '@services/common/api';
-import { normalizeTable } from './tableMapper';
 
-const TableCard = ({ table, onShowQR, onEdit, onDelete, onRestore }) => {
+const TableCard = ({ table, onShowQR, onEdit, onDelete }) => {
   const [saving, setSaving] = useState(false);
 
   const statusStyles = {
@@ -43,25 +42,10 @@ const TableCard = ({ table, onShowQR, onEdit, onDelete, onRestore }) => {
     try {
       setSaving(true);
       await api.delete(`/secure/api/v1/tables/${table.id}`);
-      onDelete({ ...table, isActive: false });
+      onDelete(table.id);
     } catch (err) {
       console.error('Delete failed:', err);
       alert(err.response?.data?.message || 'Failed to delete table');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleRestore = async (e) => {
-    e.stopPropagation();
-
-    try {
-      setSaving(true);
-      const response = await api.patch(`/secure/api/v1/tables/${table.id}/restore`);
-      onRestore(normalizeTable(response.data));
-    } catch (err) {
-      console.error('Restore failed:', err);
-      alert(err.response?.data?.message || 'Failed to restore table');
     } finally {
       setSaving(false);
     }
@@ -114,50 +98,34 @@ const TableCard = ({ table, onShowQR, onEdit, onDelete, onRestore }) => {
       </div>
 
       <div className="flex items-center justify-center gap-1 border-t border-gray-100 px-2 py-2 sm:gap-2 sm:px-3 sm:py-3">
-        {table.isActive ? (
-          <>
-            <button
-              onClick={(e) => { e.stopPropagation(); onShowQR(table); }}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
-              title="View QR"
-            >
-              <QrCode className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); onEdit?.(table); }}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 text-gray-600 transition-colors hover:bg-gray-100"
-              title="Edit"
-            >
-              <Edit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={saving}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50"
-              title="Delete"
-            >
-              {saving ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              )}
-            </button>
-          </>
-        ) : (
+        {table.isActive && (
           <button
-            onClick={handleRestore}
-            disabled={saving}
-            className="inline-flex h-8 items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-50"
-            title="Restore"
+            onClick={(e) => { e.stopPropagation(); onShowQR(table); }}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
+            title="View QR"
           >
-            {saving ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RotateCcw className="h-3.5 w-3.5" />
-            )}
-            Restore
+            <QrCode className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
         )}
+        <button
+          onClick={(e) => { e.stopPropagation(); onEdit?.(table); }}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 text-gray-600 transition-colors hover:bg-gray-100"
+          title="Edit"
+        >
+          <Edit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        </button>
+        <button
+          onClick={handleDelete}
+          disabled={saving}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50"
+          title="Delete"
+        >
+          {saving ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          )}
+        </button>
       </div>
     </div>
   );

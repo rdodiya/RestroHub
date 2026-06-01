@@ -40,11 +40,9 @@ const TablesGrid = ({ branchId, onShowQR, onEdit, onTablesLoaded, refreshKey }) 
     }
   };
 
-  const updateTableState = (updatedTable) => {
+  const removeTableState = (tableId) => {
     setTables((prev) => {
-      const next = prev.map((table) => (
-        table.id === updatedTable.id ? updatedTable : table
-      ));
+      const next = prev.filter((table) => table.id !== tableId);
       onTablesLoaded?.(next);
       return next;
     });
@@ -93,8 +91,7 @@ const TablesGrid = ({ branchId, onShowQR, onEdit, onTablesLoaded, refreshKey }) 
             table={table}
             onShowQR={onShowQR}
             onEdit={onEdit}
-            onDelete={updateTableState}
-            onRestore={updateTableState}
+            onDelete={removeTableState}
           />
         ))}
       </div>

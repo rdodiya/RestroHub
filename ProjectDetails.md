@@ -93,13 +93,15 @@ rest1.restroly.in/{branchId}?tableId=1#menuId
 - The admin can accept the order and update its status through the lifecycle:
 
 ```text
-Pending -> Cooking -> Ready/Completed -> Billed
+Pending -> Confirmed -> Preparing -> Ready -> Served -> Billed -> Completed
 ```
+
+At any point before completion, an order can also be moved to **Cancelled**.
 
 ### Status updates and payment flow
 
 - Every order status update is automatically sent to the customer through WhatsApp.
-- When an order is marked **Completed**, the customer receives:
+- When an order is marked **Billed**, the customer receives:
   - the updated order status
   - the bill amount
   - a UPI payment link for the total amount
