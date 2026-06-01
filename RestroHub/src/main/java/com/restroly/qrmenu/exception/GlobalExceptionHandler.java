@@ -1,5 +1,5 @@
 // src/main/java/com/Restroly/qrmenu/common/exception/GlobalExceptionHandler.java
-package com.restroly.qrmenu.common.exception;
+package com.restroly.qrmenu.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -30,55 +31,69 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(
+            BadCredentialsException ex, HttpServletRequest request) {
+
+        log.warn("Bad credentials for request: {}", request.getRequestURI());
+
+        ApiErrorResponse response = buildErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid username or password",
+                request);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFoundException(
             ResourceNotFoundException ex, HttpServletRequest request) {
 
         log.warn("Resource not found: {}", ex.getMessage());
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.NOT_FOUND, ex.getMessage(), request);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleResourceAlreadyExistsException(
+    public ResponseEntity<ApiErrorResponse> handleResourceAlreadyExistsException(
             ResourceAlreadyExistsException ex, HttpServletRequest request) {
 
         log.warn("Resource already exists: {}", ex.getMessage());
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.CONFLICT, ex.getMessage(), request);
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(
+    public ResponseEntity<ApiErrorResponse> handleBusinessException(
             BusinessException ex, HttpServletRequest request) {
 
         log.warn("Business exception: {}", ex.getMessage());
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 ex.getStatus(), ex.getMessage(), request);
 
         return ResponseEntity.status(ex.getStatus()).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
+    public ResponseEntity<ApiErrorResponse> handleValidationException(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
 
         log.warn("Validation failed for request: {}", request.getRequestURI());
 
-        List<ErrorResponse.ValidationError> validationErrors = ex.getBindingResult()
+        List<ApiErrorResponse.ValidationError> validationErrors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(this::mapFieldError)
                 .collect(Collectors.toList());
 
-        ErrorResponse response = ErrorResponse.builder()
+        ApiErrorResponse response = ApiErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
@@ -92,17 +107,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+    public ResponseEntity<ApiErrorResponse> handleConstraintViolationException(
             ConstraintViolationException ex, HttpServletRequest request) {
 
         log.warn("Constraint violation: {}", ex.getMessage());
 
-        List<ErrorResponse.ValidationError> validationErrors = ex.getConstraintViolations()
+        List<ApiErrorResponse.ValidationError> validationErrors = ex.getConstraintViolations()
                 .stream()
                 .map(this::mapConstraintViolation)
                 .collect(Collectors.toList());
 
-        ErrorResponse response = ErrorResponse.builder()
+        ApiErrorResponse response = ApiErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
@@ -116,12 +131,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleCustomValidationException(
+    public ResponseEntity<ApiErrorResponse> handleCustomValidationException(
             ValidationException ex, HttpServletRequest request) {
 
         log.warn("Custom validation exception: {}", ex.getMessage());
 
-        ErrorResponse response = ErrorResponse.builder()
+        ApiErrorResponse response = ApiErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
@@ -135,12 +150,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+    public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex, HttpServletRequest request) {
 
         log.warn("Malformed JSON request: {}", ex.getMessage());
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 "Malformed JSON request. Please check the request body.",
                 request);
@@ -149,7 +164,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+    public ResponseEntity<ApiErrorResponse> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
 
         String message = String.format("Parameter '%s' should be of type '%s'",
@@ -158,28 +173,28 @@ public class GlobalExceptionHandler {
 
         log.warn("Type mismatch: {}", message);
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.BAD_REQUEST, message, request);
 
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
+    public ResponseEntity<ApiErrorResponse> handleMissingServletRequestParameterException(
             MissingServletRequestParameterException ex, HttpServletRequest request) {
 
         String message = String.format("Required parameter '%s' is missing", ex.getParameterName());
 
         log.warn("Missing parameter: {}", message);
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.BAD_REQUEST, message, request);
 
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
+    public ResponseEntity<ApiErrorResponse> handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
 
         String message = String.format("HTTP method '%s' is not supported for this endpoint",
@@ -187,28 +202,28 @@ public class GlobalExceptionHandler {
 
         log.warn("Method not supported: {}", message);
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.METHOD_NOT_ALLOWED, message, request);
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(
+    public ResponseEntity<ApiErrorResponse> handleHttpMediaTypeNotSupportedException(
             HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
 
         String message = String.format("Media type '%s' is not supported", ex.getContentType());
 
         log.warn("Media type not supported: {}", message);
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE, message, request);
 
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(response);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(
+    public ResponseEntity<ApiErrorResponse> handleNoHandlerFoundException(
             NoHandlerFoundException ex, HttpServletRequest request) {
 
         String message = String.format("No handler found for %s %s",
@@ -216,19 +231,19 @@ public class GlobalExceptionHandler {
 
         log.warn("No handler found: {}", message);
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.NOT_FOUND, message, request);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex, HttpServletRequest request) {
 
         log.error("Data integrity violation: {}", ex.getMessage());
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.CONFLICT,
                 "Data integrity violation. The operation could not be completed.",
                 request);
@@ -237,12 +252,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+    public ResponseEntity<ApiErrorResponse> handleAccessDeniedException(
             AccessDeniedException ex, HttpServletRequest request) {
 
         log.warn("Access denied: {} for path: {}", ex.getMessage(), request.getRequestURI());
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.FORBIDDEN,
                 "Access denied. You don't have permission to perform this action.",
                 request);
@@ -251,12 +266,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(
             AuthenticationException ex, HttpServletRequest request) {
 
         log.warn("Authentication failed: {}", ex.getMessage());
 
-        ErrorResponse response = buildErrorResponse(
+        ApiErrorResponse response = buildErrorResponse(
                 HttpStatus.UNAUTHORIZED,
                 "Authentication required. Please provide valid credentials.",
                 request);
@@ -265,13 +280,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
+    public ResponseEntity<ApiErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {
 
         String traceId = generateTraceId();
         log.error("Unexpected error occurred [traceId={}]: ", traceId, ex);
 
-        ErrorResponse response = ErrorResponse.builder()
+        ApiErrorResponse response = ApiErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
@@ -283,9 +298,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    private ErrorResponse buildErrorResponse(HttpStatus status, String message,
-                                             HttpServletRequest request) {
-        return ErrorResponse.builder()
+    private ApiErrorResponse buildErrorResponse(HttpStatus status, String message,
+                                                HttpServletRequest request) {
+        return ApiErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
@@ -295,22 +310,22 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    private ErrorResponse.ValidationError mapFieldError(FieldError fieldError) {
-        return ErrorResponse.ValidationError.builder()
+    private ApiErrorResponse.ValidationError mapFieldError(FieldError fieldError) {
+        return ApiErrorResponse.ValidationError.builder()
                 .field(fieldError.getField())
                 .rejectedValue(fieldError.getRejectedValue())
                 .message(fieldError.getDefaultMessage())
                 .build();
     }
 
-    private ErrorResponse.ValidationError mapConstraintViolation(ConstraintViolation<?> violation) {
+    private ApiErrorResponse.ValidationError mapConstraintViolation(ConstraintViolation<?> violation) {
         String field = violation.getPropertyPath().toString();
         // Extract just the field name from the path
         if (field.contains(".")) {
             field = field.substring(field.lastIndexOf('.') + 1);
         }
 
-        return ErrorResponse.ValidationError.builder()
+        return ApiErrorResponse.ValidationError.builder()
                 .field(field)
                 .rejectedValue(violation.getInvalidValue())
                 .message(violation.getMessage())

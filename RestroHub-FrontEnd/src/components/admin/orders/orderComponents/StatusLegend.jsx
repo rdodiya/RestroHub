@@ -1,11 +1,13 @@
-import { Clock, ChefHat, CheckCircle2, Receipt } from 'lucide-react';
+import { Clock, ChefHat, CheckCircle2, Receipt, CreditCard, XCircle } from 'lucide-react';
 
 const StatusLegend = () => {
   const statuses = [
     { icon: Clock, label: 'Pending', color: 'text-yellow-600' },
-    { icon: ChefHat, label: 'Cooking', color: 'text-blue-600' },
+    { icon: ChefHat, label: 'Preparing', color: 'text-blue-600' },
     { icon: CheckCircle2, label: 'Ready', color: 'text-green-600' },
     { icon: Receipt, label: 'Billed', color: 'text-purple-600' },
+    { icon: CreditCard, label: 'Completed', color: 'text-gray-600' },
+    { icon: XCircle, label: 'Cancelled', color: 'text-red-600' },
   ];
 
   return (
