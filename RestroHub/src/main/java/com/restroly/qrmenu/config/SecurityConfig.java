@@ -65,6 +65,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, PUBLIC_GET_URLS).permitAll()
 						.requestMatchers(HttpMethod.POST, "/secure/api/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
 						.requestMatchers(HttpMethod.PUT, "/secure/api/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
+						.requestMatchers(HttpMethod.PATCH, "/secure/api/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
 						.requestMatchers(HttpMethod.DELETE, "/secure/api/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
 						// All other requests require authentication
 						.anyRequest().authenticated()

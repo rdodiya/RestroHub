@@ -234,7 +234,7 @@ public class FoodController {
 
     @PutMapping(value = "/{foodId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Update a food item",
             description = "Updates an existing food item. Requires ADMIN or MANAGER role.",
@@ -261,7 +261,7 @@ public class FoodController {
     }
 
     @PatchMapping(value = "/{foodId}/{available}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Update food availability",
             description = "Updates the availability status of a food item",
@@ -283,7 +283,7 @@ public class FoodController {
     }
 
     @DeleteMapping("/{foodId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'RESTAURANT_OWNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete a food item",

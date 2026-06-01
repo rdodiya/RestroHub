@@ -1,36 +1,46 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Search, RefreshCw, AlertCircle, UtensilsCrossed } from 'lucide-react';
+import { Search, RefreshCw, AlertCircle, UtensilsCrossed, ChevronLeft, ChevronRight } from 'lucide-react';
 import MenuItemCard from './FoodItemCard';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 
-// ============================================
-// MAIN COMPONENT
-// ============================================
+const PAGE_SIZE = 9;
+
+const getPageContent = (data) => {
+  if (Array.isArray(data)) return data;
+  return data?.content || data?.data?.content || [];
+};
+
 const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
   const [menuItems, setMenuItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const [pageInfo, setPageInfo] = useState({
+    totalElements: 0,
+    totalPages: 0,
+    first: true,
+    last: true,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ------------------------------------
-  // FALLBACK DATA
-  // ------------------------------------
-  const fallbackItems = [
-    { id: 1, name: 'Paneer Tikka', price: 250, categoryId: 'starters', stock: 25, available: true },
-    { id: 2, name: 'Butter Naan', price: 45, categoryId: 'main-course', stock: 100, available: true },
-    { id: 3, name: 'Biryani', price: 320, categoryId: 'main-course', stock: 15, available: true },
-    { id: 4, name: 'Mango Lassi', price: 90, categoryId: 'drinks', stock: 50, available: true },
-    { id: 5, name: 'Undhiyu', price: 280, categoryId: 'main-course', stock: 0, available: false },
-    { id: 6, name: 'Gujarati Thali', price: 350, categoryId: 'main-course', stock: 20, available: true },
-  ];
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setPage(0);
+      setDebouncedSearch(searchQuery.trim());
+    }, 350);
 
-  // ------------------------------------
-  // FETCH DATA
-  // ------------------------------------
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [selectedCategory]);
+
   useEffect(() => {
     fetchMenuItems();
-  }, [selectedCategory]);
+  }, [selectedCategory, debouncedSearch, page]);
 
   useImperativeHandle(ref, () => ({
     refreshFoods() {
@@ -42,67 +52,79 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
     try {
       setLoading(true);
       setError(null);
-      var response = null;
-      if (selectedCategory === 'all') {
-        response = await api.get(`/secure/api/v1/foods?page=0&size=10&sortBy=name&sortDirection=asc`);
-        setMenuItems(response.data.content);
+
+      const params = {
+        page,
+        size: PAGE_SIZE,
+        sortBy: 'name',
+        sortDirection: 'asc',
+      };
+
+      let response;
+      if (selectedCategory !== 'all') {
+        response = await api.get(`/secure/api/v1/foods/category/${selectedCategory}`, { params });
+      } else if (debouncedSearch) {
+        response = await api.get('/secure/api/v1/foods/search', {
+          params: { ...params, name: debouncedSearch },
+        });
       } else {
-        response = await api.get(`/secure/api/v1/foods/category/${selectedCategory}?page=0&size=10`);
-        setMenuItems(response.data.content);
+        response = await api.get('/secure/api/v1/foods', { params });
       }
 
-      // MOCK
-      await new Promise(resolve => setTimeout(resolve, 600));
+      const data = response.data || {};
+      const content = getPageContent(data);
+      const filteredContent = selectedCategory !== 'all' && debouncedSearch
+        ? content.filter((item) =>
+            item.name?.toLowerCase().includes(debouncedSearch.toLowerCase())
+          )
+        : content;
 
+      setMenuItems(filteredContent);
+      setPageInfo({
+        totalElements: data.totalElements ?? filteredContent.length,
+        totalPages: data.totalPages ?? 1,
+        first: data.first ?? page === 0,
+        last: data.last ?? true,
+      });
     } catch (err) {
-      console.error('Failed to fetch menu:', err);
-      setError('Failed to load menu items');
-      // setMenuItems(fallbackItems);
+      console.error('Failed to fetch menu:', err.response?.data || err);
+      setError(err.response?.data?.message || 'Failed to load menu items');
+      setMenuItems([]);
+      setPageInfo({ totalElements: 0, totalPages: 0, first: true, last: true });
     } finally {
       setLoading(false);
     }
   };
 
-  // ------------------------------------
-  // HANDLERS
-  // ------------------------------------
-  const handleToggle = (id) => {
+  const handleToggle = (updatedItem) => {
     setMenuItems(prev =>
-      prev.map(item => (item.foodId === id ? { ...item, isAvailable: !item.isAvailable } : item))
+      prev.map(item => (item.foodId === updatedItem.foodId ? updatedItem : item))
     );
   };
 
   const handleDelete = (id) => {
     setMenuItems(prev => prev.filter(item => item.foodId !== id));
+    setPageInfo(prev => ({
+      ...prev,
+      totalElements: Math.max(prev.totalElements - 1, 0),
+    }));
   };
 
-  // ------------------------------------
-  // FILTER LOGIC
-  // ------------------------------------
-  const filteredItems = menuItems
-    .filter(item => selectedCategory === 'all' || item.categoryId === selectedCategory)
-    .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const goToPreviousPage = () => {
+    setPage((currentPage) => Math.max(currentPage - 1, 0));
+  };
 
-  // ------------------------------------
-  // RENDER
-  // ------------------------------------
+  const goToNextPage = () => {
+    setPage((currentPage) => currentPage + 1);
+  };
+
   return (
     <div className="flex-1 min-w-0">
-
-      {/* ================================= */}
-      {/* SEARCH BAR - Responsive           */}
-      {/* ================================= */}
       <div
         className="
           flex items-center gap-2 bg-white rounded-xl border border-gray-200 shadow-sm
           focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100
-          transition-all mb-4
-
-          /* MOBILE */
-          px-3 py-2.5
-
-          /* TABLET+ */
-          sm:px-4 sm:py-3 sm:mb-6
+          transition-all mb-4 px-3 py-2.5 sm:px-4 sm:py-3 sm:mb-6
         "
       >
         <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
@@ -113,13 +135,7 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
           placeholder="Search menu items..."
           className="
             bg-transparent outline-none flex-1 min-w-0
-            text-gray-800 placeholder-gray-400
-
-            /* MOBILE */
-            text-sm
-
-            /* TABLET+ */
-            sm:text-base
+            text-gray-800 placeholder-gray-400 text-sm sm:text-base
           "
         />
         {searchQuery && (
@@ -132,62 +148,15 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
         )}
       </div>
 
-      {/* ================================= */}
-      {/* CONTENT STATES                    */}
-      {/* ================================= */}
-
       {loading ? (
-        // ------------------------------------
-        // SKELETON GRID - Responsive
-        // ------------------------------------
-        <div
-          className="
-            grid gap-4
-
-            /* MOBILE: 1 column */
-            grid-cols-1
-
-            /* TABLET: 1 column (horizontal cards) */
-            sm:grid-cols-1
-
-            /* MEDIUM DESKTOP: 2 columns */
-            lg:grid-cols-2
-
-            /* LARGE DESKTOP: 3 columns */
-            xl:grid-cols-3
-          "
-        >
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map(i => (
-           <AdminSkeleton key={i} variant="food-card" />
+            <AdminSkeleton key={i} variant="food-card" />
           ))}
         </div>
-
-      ) : error && menuItems.length === 0 ? (
-        // ------------------------------------
-        // ERROR STATE - Responsive
-        // ------------------------------------
-        <div
-          className="
-            bg-white rounded-2xl border border-gray-100 text-center
-
-            /* MOBILE */
-            p-8
-
-            /* TABLET+ */
-            sm:p-12
-          "
-        >
-          <AlertCircle
-            className="
-              text-red-300 mx-auto mb-3
-
-              /* MOBILE */
-              w-12 h-12
-
-              /* TABLET+ */
-              sm:w-16 sm:h-16 sm:mb-4
-            "
-          />
+      ) : error ? (
+        <div className="bg-white rounded-2xl border border-gray-100 text-center p-8 sm:p-12">
+          <AlertCircle className="text-red-300 mx-auto mb-3 w-12 h-12 sm:w-16 sm:h-16 sm:mb-4" />
           <p className="text-red-600 font-medium mb-2 text-sm sm:text-base">
             {error}
           </p>
@@ -203,33 +172,9 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
             Try Again
           </button>
         </div>
-
-      ) : filteredItems.length === 0 ? (
-        // ------------------------------------
-        // EMPTY STATE - Responsive
-        // ------------------------------------
-        <div
-          className="
-            bg-white rounded-2xl border border-gray-100 text-center
-
-            /* MOBILE */
-            p-8
-
-            /* TABLET+ */
-            sm:p-12
-          "
-        >
-          <UtensilsCrossed
-            className="
-              text-blue-200 mx-auto mb-3
-
-              /* MOBILE */
-              w-12 h-12
-
-              /* TABLET+ */
-              sm:w-16 sm:h-16 sm:mb-4
-            "
-          />
+      ) : menuItems.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-100 text-center p-8 sm:p-12">
+          <UtensilsCrossed className="text-blue-200 mx-auto mb-3 w-12 h-12 sm:w-16 sm:h-16 sm:mb-4" />
           <p className="text-gray-700 font-medium mb-1 text-sm sm:text-base">
             No items found
           </p>
@@ -239,28 +184,8 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
               : 'Add your first menu item to get started'}
           </p>
         </div>
-
       ) : (
-        // ------------------------------------
-        // ITEMS GRID - Responsive
-        // ------------------------------------
-        <div
-          className="
-            grid gap-4
-
-            /* MOBILE: 1 column vertical cards */
-            grid-cols-1
-
-            /* TABLET: 1 column horizontal cards */
-            sm:grid-cols-1
-
-            /* MEDIUM DESKTOP: 2 columns */
-            lg:grid-cols-2
-
-            /* LARGE DESKTOP: 3 columns */
-            xl:grid-cols-3
-          "
-        >
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {menuItems.map(item => (
             <MenuItemCard
               key={item.foodId}
@@ -273,14 +198,36 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
         </div>
       )}
 
-      {/* ================================= */}
-      {/* RESULTS COUNT - Responsive        */}
-      {/* ================================= */}
-      {!loading && filteredItems.length > 0 && (
-        <div className="mt-4 text-center">
+      {!loading && !error && menuItems.length > 0 && (
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs sm:text-sm text-gray-500">
-            Showing {filteredItems.length} of {menuItems.length} items
+            Showing {menuItems.length} of {pageInfo.totalElements} items
           </p>
+          {pageInfo.totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={goToPreviousPage}
+                disabled={pageInfo.first}
+                className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-xs font-medium text-gray-500 min-w-[80px] text-center">
+                Page {page + 1} of {pageInfo.totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={goToNextPage}
+                disabled={pageInfo.last}
+                className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label="Next page"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
