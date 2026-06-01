@@ -1,5 +1,6 @@
 // Menus.jsx
 import { useRef, useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import MenuHeader from './menuCard/Header';
 import BulkActions from './menuCard/BulkActions';
 import CategorySidebar from './menuCard/CategorySidebar';
@@ -16,6 +17,7 @@ const Menus = () => {
   const [allCategories, setAllCategories] = useState([]);
   const menuGridRef = useRef(null);
   const menusGridRef = useRef(null);
+  const categorySidebarRef = useRef(null);
 
   // FOOD ITEM MODAL STATE
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,6 +25,7 @@ const Menus = () => {
 
   // CATEGORY MODAL STATE
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
   // MENU CREATION MODAL STATE
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
@@ -65,11 +68,26 @@ const Menus = () => {
 
   // CATEGORY MODAL HANDLERS
   const openCategoryModal = () => {
+    setEditingCategory(null);
     setIsCategoryModalOpen(true);
+  };
+
+  const openEditCategoryModal = async (category) => {
+    try {
+      const response = await api.get(`/secure/api/v1/categories/${category.categoryId}`);
+      setEditingCategory(response.data?.data || response.data);
+      setIsCategoryModalOpen(true);
+    } catch (err) {
+      console.error('Failed to fetch category:', err.response?.data || err);
+      toast.error(err.response?.data?.message || 'Failed to load category details');
+    }
   };
 
   const closeCategoryModal = () => {
     setIsCategoryModalOpen(false);
+    setEditingCategory(null);
+    categorySidebarRef.current?.refreshCategories();
+    menuGridRef.current?.refreshFoods();
   };
 
   // MENU CREATION MODAL HANDLERS
@@ -141,9 +159,11 @@ const Menus = () => {
           <BulkActions />
           <div className="flex flex-col lg:flex-row gap-6 mt-6">
             <CategorySidebar
+              ref={categorySidebarRef}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
               onAddCategory={openCategoryModal}
+              onEditCategory={openEditCategoryModal}
               setAllCategories={setAllCategories}
             />
             <MenuItemsGrid
@@ -178,6 +198,7 @@ const Menus = () => {
       <CategoryFormModal
         isOpen={isCategoryModalOpen}
         onClose={closeCategoryModal}
+        editingCategory={editingCategory}
       />
 
       {/* Menu Creation Modal */}
