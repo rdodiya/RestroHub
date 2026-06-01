@@ -10,17 +10,18 @@ import {
   Loader2
 } from 'lucide-react';
 import api from "@services/common/api";
+import { useAdminTheme } from '@context/AdminThemeContext';
 
 const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
   const [togglingAvailability, setTogglingAvailability] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { isDark } = useAdminTheme();
 
   // ------------------------------------
   // HANDLERS
   // ------------------------------------
   const handleToggle = async () => {
     try {
-      debugger
       setTogglingAvailability(true);
       await new Promise(resolve => setTimeout(resolve, 300));
       await api.patch(`/secure/api/v1/foods/${item.foodId}/${!item.isAvailable}`);
@@ -63,8 +64,8 @@ const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
   return (
     <div
       className={`
-        bg-white rounded-2xl shadow-sm border border-gray-100
-        hover:shadow-md hover:border-blue-100 transition-all
+        rounded-2xl shadow-sm border transition-all
+        ${isDark ? 'bg-gray-800 border-gray-700 hover:border-gray-600 hover:shadow-md' : 'bg-white border-gray-200 hover:shadow-md hover:border-blue-100'}
         ${!item.isAvailable ? 'opacity-70' : ''}
 
         /* MOBILE: vertical stack with padding */
@@ -82,7 +83,8 @@ const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
       {/* ================================= */}
       <div
         className={`
-          relative bg-blue-50 rounded-xl flex items-center justify-center overflow-hidden border border-blue-100/50
+          relative rounded-xl flex items-center justify-center overflow-hidden border
+          ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-blue-50 border-blue-100/50'}
 
           /* MOBILE: full width, shorter */
           w-full h-36 mb-3
@@ -124,7 +126,7 @@ const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
         {/* Header: Name + Price + More button */}
         <div className="flex items-start justify-between mb-2 sm:mb-1.5 lg:mb-3">
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-gray-900 text-base sm:text-sm lg:text-base truncate">
+            <h3 className={`font-semibold text-base sm:text-sm lg:text-base truncate ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
               {item.name}
             </h3>
             <p className="text-lg sm:text-base lg:text-lg font-bold text-blue-600">
@@ -138,7 +140,7 @@ const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
 
         {/* Stock Info */}
         <div className="flex items-center justify-between mb-3 sm:mb-2 lg:mb-4">
-          <span className="text-sm sm:text-xs lg:text-sm text-gray-600">
+          <span className={`text-sm sm:text-xs lg:text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             Avalilablity :
           </span>
           <span

@@ -2,7 +2,9 @@ package com.restroly.qrmenu.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.restroly.qrmenu.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,12 +46,22 @@ public class CloudinaryService {
             } catch (Exception e) {
                 log.warn("Attempt {} failed: {}", attempt, e.getMessage());
                 if (attempt == maxRetries) {
-                    throw new RuntimeException("Image upload failed", e);
+                    // FIXED: was RuntimeException — now BusinessException (503 SERVICE_UNAVAILABLE)
+                    throw new BusinessException(
+                            "Image upload failed after " + maxRetries + " attempts: " + e.getMessage(),
+                            HttpStatus.SERVICE_UNAVAILABLE,
+                            "IMAGE_UPLOAD_FAILED"
+                    );
                 }
                 sleep(2000L * attempt);
             }
         }
-        throw new RuntimeException("Unreachable");
+        //FIXED: removed unreachable RuntimeException — loop above always returns or throws
+        throw new BusinessException(
+                "Image upload failed: all retries exhausted",
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "IMAGE_UPLOAD_FAILED"
+        );
     }
 
     private byte[] compressIfNeeded(MultipartFile file) throws Exception {

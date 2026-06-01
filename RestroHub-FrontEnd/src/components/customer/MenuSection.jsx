@@ -15,7 +15,7 @@ const MenuSection = () => {
     const { menu } = siteData;
 
     return (
-        <section id="menu" className="menu section">
+        <section id="how-it-works" className="menu section">
             <div className="container">
                 {/* Header */}
                 <div className="menu-header">

@@ -4,6 +4,8 @@ import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
+import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -21,5 +23,7 @@ public interface UserService {
     public UserResponse toggleUserStatus(Long userId);
     public UserResponse removeRolesFromUser(Long userId, Set<Long> roleIds);
     public boolean existsByEmail(String email);
+    public UserProfileResponseDTO getCurrentUserProfile();
+    public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request);
 
 }

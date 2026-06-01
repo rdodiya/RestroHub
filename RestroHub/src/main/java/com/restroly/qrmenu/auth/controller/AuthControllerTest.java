@@ -5,7 +5,7 @@ package com.restroly.qrmenu.auth.controller;
 //import com.restroly.qrmenu.auth.dto.LoginRequest;
 //import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
 //import com.restroly.qrmenu.auth.service.AuthService;
-//import com.restroly.qrmenu.common.exception.BusinessException;
+//import com.restroly.qrmenu.exception.BusinessException;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;

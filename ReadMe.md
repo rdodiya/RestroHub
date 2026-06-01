@@ -72,6 +72,27 @@
 - Multi-branch management
 - Inventory & stock management
 
+### ✅ Feature Checklist
+
+| Area | Status |
+|------|--------|
+| QR menu generation | ✅ Available |
+| Menu & category management | ✅ Available |
+| Order dashboard | ✅ Available |
+| UPI payment links | ✅ Available |
+| Admin authentication | ✅ Available |
+| Multi-branch support | 🚧 In progress |
+| Real-time order updates | 🚧 Planned |
+| Subscription tiers | 🚧 Planned |
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming (`feature/`, `fix/`, `docs/`), commit format, and PR workflow.
+
+### 🗺️ Roadmap
+
+- **Near term:** empty-state UX polish, order realtime updates, README/onboarding improvements
+- **Mid term:** subscription management, role-based access by plan
+- **Long term:** aggregator sync, WhatsApp notifications, AI menu translation
+
 ---
 
 ## 🏗️ Tech Stack
@@ -81,7 +102,7 @@
 - **Framework**: Spring Boot
 - **Build Tool**: Gradle
 - **Database**: PostgreSQL
-- **Cache**: Redis
+- **Cache**: Redis (planned for some features; not required for local development)
 - **API Documentation**: Swagger/OpenAPI
 
 ### Frontend
@@ -123,6 +144,12 @@ Before starting, ensure you have the following installed on your machine:
 - Code Editor: VS Code (recommended)
 ```
 
+**For Google OAuth Integration:**
+```bash
+- Google Cloud Console account (free)
+- OAuth 2.0 Client ID from Google Cloud
+```
+
 ### Verify Installation
 
 ```bash
@@ -154,59 +181,79 @@ git clone https://github.com/rdodiya/RestroHub.git
 
 # Navigate to project directory
 cd RestroHub
+
+# For GSSoC contributions, work from this branch
+git checkout gssoc_develop
+git pull origin gssoc_develop
 ```
 
 ### Backend Setup
 
-#### 1. Database Configuration
+#### 1. Database configuration
+
+Create a PostgreSQL database named **`RestroHub_DB`** (must match the default JDBC URL; use quotes in SQL if you need mixed case):
 
 ```bash
-# Create PostgreSQL database
-createdb restrohub_db
-
-# Create database user (optional but recommended)
-# In PostgreSQL terminal:
-# CREATE USER restrohub_user WITH PASSWORD 'password';
-# GRANT ALL PRIVILEGES ON DATABASE restrohub_db TO restrohub_user;
+createdb RestroHub_DB
+# or: psql -U postgres -c 'CREATE DATABASE "RestroHub_DB";'
 ```
 
-#### 2. Environment Variables
+Ensure the PostgreSQL user you use can connect to that database. By default the app expects username **`postgres`** with password **`postgres`**. Override with environment variables if your setup differs:
 
-Navigate to `RestroHub/src/main/resources/` and configure:
-
-**application.properties** (or create `application-dev.properties`):
-```properties
-# Server Configuration
-server.port=8181
-server.servlet.context-path=/restroly
-spring.application.name=Restroly
-
-# Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/restrohub_db
-spring.datasource.username=postgres
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# JPA Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.properties.hibernate.format_sql=true
-
-# Redis Configuration (optional for caching)
-spring.redis.host=localhost
-spring.redis.port=6379
-
-# Logging
-logging.level.root=INFO
-logging.level.com.restroly=DEBUG
+```bash
+export DB_USERNAME=postgres
+export DB_PASSWORD=your_password
+# Optional: full JDBC URL
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/RestroHub_DB
 ```
 
-#### 3. Build and Run Backend
+#### 2. Google OAuth Setup (Required for Login)
+
+**Get Google OAuth Client ID:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new project or select existing
+3. Click **"Create Credentials"** → **"OAuth client ID"** → **"Web application"**
+4. Add authorized URIs:
+   - `http://localhost:5173` (Frontend dev)
+   - `http://localhost:3000` (Alternative)
+   - Your production domain
+5. Copy the **Client ID**
+
+**Set Backend Configuration:**
+
+```bash
+export GOOGLE_OAUTH_CLIENT_ID=your_client_id_from_google_cloud
+export JWT_SECRET=your-256-bit-secret-key-change-in-production
+export JWT_EXPIRATION=86400000
+export JWT_REFRESH_EXPIRATION=604800000
+```
+
+To generate a secure JWT_SECRET:
+```bash
+# macOS/Linux
+openssl rand -hex 32
+
+# Or Python
+python3 -c "import os; print(os.urandom(32).hex())"
+
+# Or Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+#### 3. Backend configuration (optional)
+
+Most defaults are already in `RestroHub/src/main/resources/application.properties` and `application-dev.properties`. Prefer environment variables for secrets (for example `DB_PASSWORD`, `JWT_SECRET`) instead of committing passwords.
+
+#### 4. Build and run backend
 
 ```bash
 # Navigate to backend directory
 cd RestroHub
+
+# If ./gradlew is not executable: chmod +x gradlew
+
+# Ensure the Gradle wrapper JAR is present (commit includes RestroHub/gradle/wrapper/gradle-wrapper.jar).
+# If it is missing, regenerate with: gradle wrapper --gradle-version 8.7
 
 # Build the project
 ./gradlew clean build
@@ -237,18 +284,22 @@ cd RestroHub-FrontEnd
 npm install
 ```
 
-#### 2. Environment Configuration
+#### 2. Environment configuration - Google OAuth
 
-Create a `.env` file in `RestroHub-FrontEnd/` root:
+Create a `.env` file in `RestroHub-FrontEnd/` (see `.env.example`):
 
 ```env
-# API Configuration
-VITE_API_BASE_URL=http://localhost:8181/restroly/api/v1
+# Frontend API and Google OAuth
+VITE_API_BASE_URL=http://localhost:8181/restroly
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
+```
 
-# Application Environment
+**Important:** Use the **same Google Client ID** from Google Cloud Console as used in backend configuration.
+
+Optional:
+
+```env
 VITE_NODE_ENV=development
-
-# Feature Flags (optional)
 VITE_ENABLE_ANALYTICS=false
 ```
 
@@ -259,19 +310,21 @@ VITE_ENABLE_ANALYTICS=false
 npm run dev
 ```
 
-The frontend will be available at:
+The frontend dev server uses port **3000** by default (see `RestroHub-FrontEnd/vite.config.js`). If that port is busy, Vite picks the next free port (for example **3001**).
+
 ```
-http://localhost:5173
+http://localhost:3000
 ```
 
 ### Verify Both Services Are Running
 
-1. **Backend Health Check:**
+1. **Backend health (Spring Boot Actuator):**
    ```bash
-   curl http://localhost:8181/restroly/api/v1/health
+   curl http://localhost:8181/restroly/actuator/health
    ```
+   Expect `{"status":"UP"}`. API routes live under `/restroly/api/v1` (and related paths); there is no `/api/v1/health` endpoint.
 
-2. **Frontend:** Open browser and navigate to `http://localhost:5173`
+2. **Frontend:** Open the URL printed by Vite (usually `http://localhost:3000`).
 
 ---
 
@@ -325,7 +378,8 @@ RestroHub/
 │   ├── package.json
 │   ├── vite.config.js
 │   ├── tailwind.config.js
-│   ├── .env                            # Environment variables (create this)
+│   ├── .env.example                    # Template for Vite env (copy to .env)
+│   ├── .env                            # Local env (create from .env.example; not committed)
 │   └── README.md
 │
 ├── ReadMe.md                           # Main project README (this file)
@@ -414,7 +468,7 @@ cd RestroHub
 cd RestroHub-FrontEnd
 npm install
 npm run dev
-# Test at: http://localhost:5173
+# Test at: http://localhost:3000 (or the URL Vite prints)
 ```
 
 **6. Commit with Conventional Commits**
@@ -451,7 +505,7 @@ git push origin feature/your-feature-name
 
 - **Code Style**: Follow existing code patterns
 - **Testing**: Test your changes locally before submitting
-- **Documentation**: Update README if adding new features
+- **Documentation**: Update ReadMe.md if adding new features
 - **Commit Messages**: Use clear, descriptive messages
 - **PR Descriptions**: Explain what and why, not just what
 
@@ -459,7 +513,7 @@ git push origin feature/your-feature-name
 
 | Feature | Difficulty | Impact |
 |---------|-----------|--------|
-| Backend Api Changes as per requiremen of Frontne | Low | High |
+| Backend Api Changes as per requirements of Frontend | Low | High |
 | Frontend Highly Responsive UI | Low | High |
 | Frontend & Backend Integration | Low | High |
 | WhatsApp Integration | Medium | High |
@@ -523,9 +577,9 @@ netlify deploy --prod --dir=dist
 
 ### Backend Deployment
 
-#### Option 0: Embedded tomcat
+#### Option 0: Embedded Tomcat
 
-For Local,use embaedded tomcat server of Spring Boot
+For local development, use the embedded Tomcat server from Spring Boot (`./gradlew bootRun`).
 
 #### Option 1: Docker to Cloud (AWS, GCP, Azure)
 
@@ -545,7 +599,7 @@ docker push your-registry/restrohub:latest
 # Build JAR
 ./gradlew build
 
-# Copy WAT to server
+# Copy WAR to server
 build/libs/restroly-0.0.1-SNAPSHOT-plain.war user@server:/opt/tomcat/webapps/restroly
 
 # Restart web server
@@ -595,17 +649,17 @@ npm install
 
 **Issue: API Calls Returning 404**
 ```bash
-# Verify backend is running at:
-curl http://localhost:8181/restroly/api/v1/health
+# Verify backend is running:
+curl http://localhost:8181/restroly/actuator/health
 
-# Check .env file has correct API URL
-cat .env | grep VITE_API_BASE_URL
+# Check .env: base URL should be the server + context path (not .../api/v1)
+grep VITE_API_BASE_URL .env
 ```
 
-**Issue: Port 5173 Already in Use**
+**Issue: Port 3000 Already in Use**
 ```bash
-# Run on different port
-npm run dev -- --port 3000
+# Run on a different port (ensure CORS_ALLOWED_ORIGINS on the backend includes that origin)
+npm run dev -- --port 5173
 ```
 
 ### General Issues

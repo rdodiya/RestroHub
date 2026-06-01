@@ -122,7 +122,7 @@ const Navigation = () => {
                     left: 0;
                     right: 0;
                     z-index: var(--z-fixed);
-                    padding: var(--spacing-lg) var(--spacing-md);
+                    padding: 12px 16px;
                     transition: all var(--transition-normal);
                 }
 
@@ -138,10 +138,12 @@ const Navigation = () => {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+                    gap:12px;
+                    flex-wrap:nowrap;
                 }
 
                 .nav-logo {
-                    font-size: var(--text-xl);
+                    font-size: var(--text-lg);
                     font-weight: 700;
                     letter-spacing: 0.1em;
                     color: var(--color-text-primary);
@@ -217,11 +219,11 @@ const Navigation = () => {
 
                 .nav-mobile-menu {
                     position: fixed;
-                    top: 70px;
+                    top: 64px;
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: rgba(0, 0, 0, 0.98);
+                    background: var(--color-bg-primary);
                     display: flex;
                     flex-direction: column;
                     align-items: center;
