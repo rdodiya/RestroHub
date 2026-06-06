@@ -3,6 +3,7 @@ import { RefreshCw, AlertCircle, Building2 } from 'lucide-react';
 import api from '@services/common/api';
 import BranchCard from './BranchCard';
 import AdminSkeleton from '../../AdminSkeleton';
+import toast from 'react-hot-toast';
 
 // ============================================
 // MAIN
@@ -61,7 +62,9 @@ const BranchesGrid = forwardRef(({ onEdit, onCountChange, restaurantId }, ref) =
       onCountChange?.((prev) => prev - 1);
     } catch (err) {
       console.error('Delete failed:', err);
-      alert('Failed to delete branch');
+      toast.error(
+        err.response?.data?.message || 'Failed to delete branch'  // Fallback message
+      )
     }
   };
 
@@ -72,7 +75,9 @@ const BranchesGrid = forwardRef(({ onEdit, onCountChange, restaurantId }, ref) =
       fetchBranches();
     } catch (err) {
       console.error('Restore failed:', err);
-      alert('Failed to restore branch');
+      toast.error(
+        err.response?.data?.message || 'Failed to restore branch'  // Fallback message
+      );
     }
   };
 
