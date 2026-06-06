@@ -118,6 +118,8 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
     setPage((currentPage) => currentPage + 1);
   };
 
+  const showPaginationFooter = menuItems.length > 0 || pageInfo.totalPages > 1;
+
   return (
     <div className="flex-1 min-w-0">
       <div
@@ -198,7 +200,7 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
         </div>
       )}
 
-      {!loading && !error && menuItems.length > 0 && (
+      {!loading && !error && showPaginationFooter && (
         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs sm:text-sm text-gray-500">
             Showing {menuItems.length} of {pageInfo.totalElements} items

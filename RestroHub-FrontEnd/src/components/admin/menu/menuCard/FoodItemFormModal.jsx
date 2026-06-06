@@ -61,6 +61,12 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
     setSubmitError('');
   }, [editingItem, isOpen, allCategories]);
 
+  useEffect(() => {
+    if (!formData.imageUrl?.startsWith('blob:')) return undefined;
+
+    return () => URL.revokeObjectURL(formData.imageUrl);
+  }, [formData.imageUrl]);
+
   // ------------------------------------
   // Handle image selection for preview
   // ------------------------------------
