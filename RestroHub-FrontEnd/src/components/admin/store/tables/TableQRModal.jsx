@@ -8,7 +8,7 @@ const TableQRModal = ({ isOpen, onClose, table, branchId }) => {
 
   if (!table) return null;
 
-  const qrUrl = `${window.location.origin}/Restrohub/RajkotDhaba/${branchId}?table=${table.number}`;
+  const qrUrl = `${window.location.origin}/Restrohub/RajkotDhaba/${branchId}?tableId=${table.id}&table=${table.number}`;
 
   const handleDownload = async () => {
     try {
@@ -35,7 +35,7 @@ const TableQRModal = ({ isOpen, onClose, table, branchId }) => {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <Dialog.Title className="text-lg font-bold text-gray-900">
-              Table {table.number} — QR Code
+              Table {table.number} - QR Code
             </Dialog.Title>
             <button
               onClick={onClose}
