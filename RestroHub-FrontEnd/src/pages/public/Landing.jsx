@@ -360,14 +360,18 @@ const [contactForm, setContactForm] = useState({
           <div className="flex h-16 items-center justify-between sm:h-20">
 
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2.5">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2.5"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-200 sm:h-10 sm:w-10">
                 <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Restro<span className="text-blue-600">ly</span>
               </span>
-            </a>
+            </Link>
 
             {/* Desktop Nav Links */}
             <div className="hidden items-center gap-8 md:flex">
