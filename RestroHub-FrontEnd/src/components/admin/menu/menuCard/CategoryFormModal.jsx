@@ -12,7 +12,7 @@ const initialFormData = {
   description: ""
 };
 
-const CategoryFormModal = ({ isOpen, onClose, editingCategory }) => {
+const CategoryFormModal = ({ isOpen, onClose, editingCategory, onSaved }) => {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -53,6 +53,11 @@ const CategoryFormModal = ({ isOpen, onClose, editingCategory }) => {
     return Object.keys(nextErrors).length === 0;
   };
 
+  const handleClose = () => {
+    if (submitting) return;
+    onClose();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
@@ -77,7 +82,7 @@ const CategoryFormModal = ({ isOpen, onClose, editingCategory }) => {
       }
 
       setFormData(initialFormData);
-      onClose();
+      onSaved();
     } catch (err) {
       console.error("Category save failed:", err.response?.data || err);
       const message = getErrorMessage(err, "Failed to save category");
@@ -89,7 +94,7 @@ const CategoryFormModal = ({ isOpen, onClose, editingCategory }) => {
   };
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+    <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
       <div className="fixed inset-0 bg-gradient-to-br from-black/40 to-black/60 backdrop-blur-sm"
            aria-hidden="true" />
 
@@ -114,8 +119,10 @@ const CategoryFormModal = ({ isOpen, onClose, editingCategory }) => {
             </div>
             <button
               type="button"
-              onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-xl transition-colors"
+              onClick={handleClose}
+              disabled={submitting}
+              className="p-2 hover:bg-white/20 rounded-xl transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Close category form"
             >
               <X className="w-5 h-5 text-white" />
             </button>
@@ -181,7 +188,7 @@ const CategoryFormModal = ({ isOpen, onClose, editingCategory }) => {
             <div className="flex gap-3 pt-4">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={submitting}
                 className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl
                            hover:bg-gray-50 transition-colors font-medium text-gray-600

@@ -29,7 +29,8 @@ const CategorySidebar = forwardRef(({
   onCategoryChange,
   onAddCategory,
   onEditCategory,
-  setAllCategories
+  setAllCategories,
+  onCategoryDeleted
 }, ref) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,6 +91,8 @@ const CategorySidebar = forwardRef(({
       if (selectedCategory === category.categoryId) {
         onCategoryChange('all');
       }
+
+      onCategoryDeleted();
     } catch (err) {
       console.error('Failed to delete category:', err.response?.data || err);
       toast.error(getErrorMessage(err, 'Failed to delete category'));

@@ -1,6 +1,5 @@
 // Menus.jsx
 import { useRef, useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
 import MenuHeader from './menuCard/Header';
 import BulkActions from './menuCard/BulkActions';
 import CategorySidebar from './menuCard/CategorySidebar';
@@ -72,21 +71,23 @@ const Menus = () => {
     setIsCategoryModalOpen(true);
   };
 
-  const openEditCategoryModal = async (category) => {
-    try {
-      const response = await api.get(`/secure/api/v1/categories/${category.categoryId}`);
-      setEditingCategory(response.data?.data || response.data);
-      setIsCategoryModalOpen(true);
-    } catch (err) {
-      console.error('Failed to fetch category:', err.response?.data || err);
-      toast.error(err.response?.data?.message || 'Failed to load category details');
-    }
+  const openEditCategoryModal = (category) => {
+    setEditingCategory(category);
+    setIsCategoryModalOpen(true);
   };
 
   const closeCategoryModal = () => {
     setIsCategoryModalOpen(false);
     setEditingCategory(null);
+  };
+
+  const handleCategorySaved = () => {
+    closeCategoryModal();
     categorySidebarRef.current?.refreshCategories();
+    menuGridRef.current?.refreshFoods();
+  };
+
+  const handleCategoryDeleted = () => {
     menuGridRef.current?.refreshFoods();
   };
 
@@ -165,6 +166,7 @@ const Menus = () => {
               onAddCategory={openCategoryModal}
               onEditCategory={openEditCategoryModal}
               setAllCategories={setAllCategories}
+              onCategoryDeleted={handleCategoryDeleted}
             />
             <MenuItemsGrid
               ref={menuGridRef}
@@ -199,6 +201,7 @@ const Menus = () => {
         isOpen={isCategoryModalOpen}
         onClose={closeCategoryModal}
         editingCategory={editingCategory}
+        onSaved={handleCategorySaved}
       />
 
       {/* Menu Creation Modal */}
