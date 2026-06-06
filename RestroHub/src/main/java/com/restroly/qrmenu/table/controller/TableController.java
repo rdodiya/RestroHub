@@ -56,10 +56,10 @@ public class TableController {
     @PostMapping(value = "/branches/{branchId}/tables",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'RESTAURANT_OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Create a table",
-            description = "Creates a new table for a branch. Requires ADMIN or RESTAURANT_OWNER authority.",
+            description = "Creates a new table for a branch. Requires ADMIN or RESTAURANT_OWNER Role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
@@ -87,10 +87,10 @@ public class TableController {
     @PutMapping(value = "/tables/{tableId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'RESTAURANT_OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Update a table",
-            description = "Updates table details, status, and active state. Requires ADMIN or RESTAURANT_OWNER authority.",
+            description = "Updates table details, status, and active state. Requires ADMIN or RESTAURANT_OWNER Role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<TableResponseDTO> updateTable(
@@ -103,11 +103,11 @@ public class TableController {
     }
 
     @DeleteMapping("/tables/{tableId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'RESTAURANT_OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESTAURANT_OWNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete a table",
-            description = "Permanently deletes a table. Requires ADMIN or RESTAURANT_OWNER authority.",
+            description = "Permanently deletes a table. Requires ADMIN or RESTAURANT_OWNER Role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<Void> deleteTable(
