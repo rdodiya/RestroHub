@@ -34,6 +34,7 @@ import {
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
+import toast from 'react-hot-toast';
 
 // ============================================
 // CONSTANTS
@@ -1004,7 +1005,9 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
       setMenus((prev) => prev.filter((m) => m.menuId !== menuId));
     } catch (err) {
       console.error('Failed to delete menu:', err.response?.data || err);
-      alert(err.response?.data?.message || 'Failed to delete menu');
+      toast.error(
+        err.response?.data?.message || 'Failed to delete menu'  // Fallback message
+      );
     } finally {
       setDeletingId(null);
     }
