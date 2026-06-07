@@ -1,8 +1,9 @@
 const TablesStatusLegend = ({ tables = [] }) => {
+  const activeTables = tables.filter((table) => table.isActive !== false);
   const counts = {
-    available: tables.filter((t) => t.status === 'available').length,
-    occupied: tables.filter((t) => t.status === 'occupied').length,
-    reserved: tables.filter((t) => t.status === 'reserved').length,
+    available: activeTables.filter((t) => t.status === 'available').length,
+    occupied: activeTables.filter((t) => t.status === 'occupied').length,
+    reserved: activeTables.filter((t) => t.status === 'reserved').length,
   };
 
   const statuses = [

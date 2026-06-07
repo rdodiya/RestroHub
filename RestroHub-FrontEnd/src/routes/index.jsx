@@ -25,6 +25,7 @@ import Tables from '@components/admin/store/tables/Tables';
 import Website from '@components/admin/marketing/website/Website';
 import QRDisplay from '@components/admin/marketing/qr/QRDisplay';
 import UPILinks from '@components/admin/upi/UPILinks';
+import KitchenDisplaySystem from '@components/admin/kds/KitchenDisplaySystem';
 import Profile from '@components/admin/profile/Profile';
 
 const AppRoutes = () => {
@@ -61,6 +62,7 @@ const AppRoutes = () => {
         <Route path="marketing/website" element={<Website />} />
         <Route path="marketing/qr-display" element={<QRDisplay />} />
         <Route path="upi-links" element={<UPILinks />} />
+        <Route path="kds" element={<KitchenDisplaySystem />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 

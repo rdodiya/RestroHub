@@ -10,6 +10,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 
 // ============================================
@@ -67,7 +68,7 @@ const RevenueChart = () => {
   // RENDER
   // ------------------------------------
   return (
-    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>Revenue (30 Days)</h2>
@@ -83,9 +84,8 @@ const RevenueChart = () => {
       {/* Chart */}
       <div className="h-64">
         {loading ? (
-          <div className={`w-full h-full rounded-xl animate-pulse flex items-center justify-center ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <RefreshCw className={`w-8 h-8 animate-spin ${isDark ? 'text-gray-600' : 'text-gray-300'}`} />
-          </div>
+          // Skeleton
+          <AdminSkeleton variant="chart" />
         ) : error && data.length === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center">
             <AlertCircle className="w-10 h-10 text-red-300 mb-2" />

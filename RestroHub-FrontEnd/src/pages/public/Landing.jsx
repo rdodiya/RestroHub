@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@context/ThemeContext';
 import {
@@ -18,12 +18,65 @@ import {
   CheckCircle2,
   UserPlus,
   ShoppingCart,
-  Sparkles
+  Sparkles,
+  ArrowUp
 } from 'lucide-react';
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // show scroll top 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const { isDark, toggle } = useTheme();
+
+  // ============================
+  // SCROLL ANIMATION REFS
+  // ============================
+  const ownerStepRefs = useRef([]);
+  const customerStepRefs = useRef([]);
+  const ownerLineRef = useRef(null);
+  const customerLineRef = useRef(null);
+
+  useEffect(() => {
+    const allRefs = [
+      ...ownerStepRefs.current,
+      ...customerStepRefs.current,
+      ownerLineRef.current,
+      customerLineRef.current,
+    ].filter(Boolean);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+            entry.target.classList.remove('animate-out');
+          } else {
+            entry.target.classList.add('animate-out');
+            entry.target.classList.remove('animate-in');
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    allRefs.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   // ============================
   // DATA
   // ============================
@@ -32,6 +85,7 @@ const Landing = () => {
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
+    { label: 'Contact', href: '#contact' },
   ];
   
   // active link state
@@ -94,11 +148,22 @@ const Landing = () => {
     },
   ];
 
+  // Restaurant Owner Steps
   const steps = [
     { num: '01', icon: UserPlus, title: 'Sign Up', desc: 'Create your free account in under 2 minutes.' },
     { num: '02', icon: QrCode, title: 'Add Your Menu', desc: 'Upload items, set prices, and generate QR codes.' },
     { num: '03', icon: ShoppingCart, title: 'Receive Orders', desc: 'Customers scan, order, and pay from their phone.' },
     { num: '04', icon: BarChart3, title: 'Grow Revenue', desc: 'Track analytics and optimize your business.' },
+  ];
+
+  // Customer Steps
+  const customerSteps = [
+    { num: '01', icon: QrCode, title: 'Scan QR Code', desc: 'Customer scans the unique QR code placed at their table.' },
+    { num: '02', icon: Smartphone, title: 'Browse Menu', desc: 'Explore the full digital menu with photos and prices.' },
+    { num: '03', icon: ShoppingCart, title: 'Add to Cart', desc: 'Select items and add them to cart with one tap.' },
+    { num: '04', icon: CheckCircle2, title: 'Place Order', desc: 'Confirm and place the order directly from their phone.' },
+    { num: '05', icon: MessageSquare, title: 'Live Updates', desc: 'Get real-time order status updates via WhatsApp.' },
+    { num: '06', icon: CreditCard, title: 'Pay via UPI', desc: 'Pay instantly using any UPI app. Zero hassle.' },
   ];
 
 const plans = [
@@ -150,7 +215,41 @@ const plans = [
   const [selectedPlan, setSelectedPlan] = useState(
   plans.find(plan => plan.popular)?.name || plans[0].name
   );
+const [contactForm, setContactForm] = useState({
+    name: '', mobile: '', email: '', description: '',
+  });
+  const [contactStatus, setContactStatus] = useState(''); // '', 'sending', 'success', 'error'
 
+  const handleContactChange = (e) =>
+    setContactForm({ ...contactForm, [e.target.name]: e.target.value });
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactStatus('sending');
+    try {
+      const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({
+  service_id: "service_fgj8bx6" ,      // ← your actual Service ID
+  template_id: "template_j3k2n5c",     // ← your actual Template ID
+  user_id: "-Lly6B-CoO6THDld_",         // ← your actual Public Key
+  template_params: {
+    from_name: contactForm.name,
+    mobile: contactForm.mobile,
+    from_email: contactForm.email,
+    message: contactForm.description,
+  },
+}),
+      });
+      if (res.ok) {
+        setContactStatus('success');
+        setContactForm({ name: '', mobile: '', email: '', description: '' });
+      } else setContactStatus('error');
+    } catch {
+      setContactStatus('error');
+    }
+  };
   const testimonials = [
     {
       name: 'Ramesh Patel',
@@ -212,6 +311,47 @@ const plans = [
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
 
+      {/* ---- Scroll Animation Styles ---- */}
+      <style>{`
+        .step-item {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .step-item.animate-in {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .step-item.animate-out {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        .flow-line {
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.9s ease;
+        }
+        .flow-line.animate-in {
+          transform: scaleX(1);
+        }
+        .flow-line.animate-out {
+          transform: scaleX(0);
+        }
+      `}</style>
+
+      {/* adding scroll-up */}
+      
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          className="fixed bottom-6 right-6 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-300/40 transition-all hover:-translate-y-1 hover:bg-blue-700"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </button>
+      )}
+
       {/* ================================================ */}
       {/* NAVBAR                                           */}
       {/* ================================================ */}
@@ -220,14 +360,18 @@ const plans = [
           <div className="flex h-16 items-center justify-between sm:h-20">
 
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2.5">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2.5"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-md shadow-blue-200 sm:h-10 sm:w-10">
                 <UtensilsCrossed className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Restro<span className="text-blue-600">ly</span>
               </span>
-            </a>
+            </Link>
 
             {/* Desktop Nav Links */}
             <div className="hidden items-center gap-8 md:flex">
@@ -447,35 +591,87 @@ const plans = [
       {/* ================================================ */}
       <section id="how-it-works" className="bg-slate-50 py-20 dark:bg-slate-800 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+          {/* ---- Restaurant Owner Flow ---- */}
           <div className="mx-auto max-w-2xl text-center">
             <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-              How It Works
+              For Restaurant Owners
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Up and Running in Minutes
             </h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
+              Get your restaurant digital in just 4 simple steps.
+            </p>
           </div>
 
-          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {steps.map((step, i) => (
-              <div key={i} className="relative text-center">
-                {/* Connector */}
-                {i < steps.length - 1 && (
-                  <div className="absolute right-0 top-10 hidden h-0.5 w-full -translate-x-1/2 bg-blue-200 lg:block" />
-                )}
-
-                <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md dark:border-blue-800 dark:bg-slate-700">
-                  <step.icon className="h-8 w-8 text-blue-600" />
-                  <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
-                    {step.num}
-                  </span>
+          <div className="relative mt-16">
+            {/* Animated connector line for owner flow */}
+            <div
+              ref={ownerLineRef}
+              className="flow-line absolute top-10 left-[12%] right-[12%] hidden h-0.5 bg-blue-300 dark:bg-blue-600 lg:block"
+            />
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {steps.map((step, i) => (
+                <div
+                  key={i}
+                  ref={(el) => (ownerStepRefs.current[i] = el)}
+                  className="step-item relative text-center"
+                  style={{ transitionDelay: `${i * 120}ms` }}
+                >
+                  <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md dark:border-blue-800 dark:bg-slate-700">
+                    <step.icon className="h-8 w-8 text-blue-600" />
+                    <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
+                      {step.num}
+                    </span>
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{step.desc}</p>
                 </div>
-
-                <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{step.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{step.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* ---- Customer Flow ---- */}
+          <div className="mx-auto mt-24 max-w-2xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+              For Customers
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              Order in Seconds
+            </h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
+              A seamless experience from scan to payment.
+            </p>
+          </div>
+
+          <div className="relative mt-16">
+            {/* Animated connector line for customer flow */}
+            <div
+              ref={customerLineRef}
+              className="flow-line absolute top-8 left-[5%] right-[5%] hidden h-0.5 bg-blue-300 dark:bg-blue-600 lg:block"
+            />
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-6">
+              {customerSteps.map((step, i) => (
+                <div
+                  key={i}
+                  ref={(el) => (customerStepRefs.current[i] = el)}
+                  className="step-item relative text-center"
+                  style={{ transitionDelay: `${i * 100}ms` }}
+                >
+                  <div className="relative mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border-4 border-blue-100 bg-white shadow-md dark:border-blue-800 dark:bg-slate-700">
+                    <step.icon className="h-7 w-7 text-blue-600" />
+                    <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm">
+                      {step.num}
+                    </span>
+                  </div>
+                  <h3 className="mb-2 text-base font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -626,6 +822,115 @@ const plans = [
           </div>
         </div>
       </section>
+      {/* ================================================ */}
+      {/* CONTACT SECTION                                  */}
+      {/* ================================================ */}
+      <section id="contact" className="bg-slate-50 py-20 dark:bg-slate-800 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+              Contact Us
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              Get in Touch
+            </h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
+              Have questions? We'd love to hear from you.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-12 max-w-xl rounded-2xl border border-slate-100 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <div className="space-y-5">
+              {/* Name */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={contactForm.name}
+                  onChange={handleContactChange}
+                  placeholder="John Doe"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
+                />
+              </div>
+
+              {/* Mobile */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Mobile Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="mobile"
+                  required
+                  value={contactForm.mobile}
+                  onChange={handleContactChange}
+                  placeholder="+91 XXXXX XXXXX"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={contactForm.email}
+                  onChange={handleContactChange}
+                  placeholder="you@example.com"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  required
+                  rows={4}
+                  value={contactForm.description}
+                  onChange={handleContactChange}
+                  placeholder="Tell us how we can help..."
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                onClick={handleContactSubmit}
+                disabled={contactStatus === 'sending'}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-200 transition-all hover:bg-blue-700 disabled:opacity-60 dark:shadow-blue-900/40"
+              >
+                {contactStatus === 'sending' ? 'Sending...' : 'Send Message'}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </button>
+
+              {/* Feedback */}
+              {contactStatus === 'success' && (
+                <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                  <CheckCircle2 className="h-5 w-5" />
+                  Message sent! We'll get back to you soon.
+                </div>
+              )}
+              {contactStatus === 'error' && (
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                  ❌ Something went wrong. Please try again.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ================================================ */}
       {/* FOOTER                                           */}
@@ -655,16 +960,16 @@ const plans = [
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
-                 {col.links.map((link) => (
-                <li key={link.label}>
-                <a
-                  href={link.href}
-                  className="text-sm text-slate-400 transition-colors hover:text-white"
-                >
-                 {link.label}
-                </a>
-              </li>
-            ))}
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        className="text-sm text-slate-400 transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}

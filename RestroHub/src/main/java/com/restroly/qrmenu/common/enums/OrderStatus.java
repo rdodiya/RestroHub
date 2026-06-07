@@ -7,6 +7,7 @@ public enum OrderStatus {
     READY("Ready"),
     SERVED("Served"),
     COMPLETED("Completed"),
+    BILLED("Billed"),
     CANCELLED("Cancelled");
 
     private final String displayName;
