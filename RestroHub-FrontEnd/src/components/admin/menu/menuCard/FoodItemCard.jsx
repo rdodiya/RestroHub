@@ -3,244 +3,175 @@ import {
   Edit2,
   EyeOff,
   Eye,
-  MoreVertical,
-  Globe,
   Image as ImageIcon,
   Trash2,
-  Loader2
+  Loader2,
+  Leaf,
+  Drumstick,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from "@services/common/api";
 import { useAdminTheme } from '@context/AdminThemeContext';
+
+const getErrorMessage = (err, fallback) =>
+  err.response?.data?.message || err.response?.data?.error || fallback;
 
 const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
   const [togglingAvailability, setTogglingAvailability] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const { isDark } = useAdminTheme();
 
-  // ------------------------------------
-  // HANDLERS
-  // ------------------------------------
+  const isAvailable = item.isAvailable ?? true;
+  const isVeg = item.isVeg ?? item.isVegetarian ?? true;
+
   const handleToggle = async () => {
     try {
       setTogglingAvailability(true);
-      await new Promise(resolve => setTimeout(resolve, 300));
-      await api.patch(`/secure/api/v1/foods/${item.foodId}/${!item.isAvailable}`);
-      onToggle(item.foodId);
+      const response = await api.patch(`/secure/api/v1/foods/${item.foodId}/${!isAvailable}`);
+      onToggle(response.data);
+      toast.success(`Food item ${!isAvailable ? 'shown' : 'hidden'} successfully`);
     } catch (err) {
-      console.error('Failed to toggle:', err);
+      console.error('Failed to toggle:', err.response?.data || err);
+      toast.error(getErrorMessage(err, 'Failed to update availability'));
     } finally {
       setTogglingAvailability(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`Delete "${item.name}"?`)) return;
+    if (!window.confirm(`Delete "${item.name}"? This action cannot be undone.`)) return;
+
     try {
       setDeleting(true);
-      await new Promise(resolve => setTimeout(resolve, 300));
       await api.delete(`/secure/api/v1/foods/${item.foodId}`);
       onDelete(item.foodId);
+      toast.success('Food item deleted successfully');
     } catch (err) {
-      console.error('Failed to delete:', err);
+      console.error('Failed to delete:', err.response?.data || err);
+      toast.error(getErrorMessage(err, 'Failed to delete food item'));
     } finally {
       setDeleting(false);
     }
   };
 
-  // ------------------------------------
-  // STOCK STATUS
-  // ------------------------------------
-  const getStockBadge = () => {
-    if (item.isAvailable) return { text: 'In Stock', className: 'bg-green-50 text-green-700' };
-    //if (item.stock > 0) return { text: 'Low Stock', className: 'bg-yellow-50 text-yellow-700' };
-    else return { text: 'Out of Stock', className: 'bg-red-50 text-red-700' };
-  };
+  const stockBadge = isAvailable
+    ? { text: 'Available', className: 'bg-green-50 text-green-700' }
+    : { text: 'Unavailable', className: 'bg-red-50 text-red-700' };
 
-  const stockBadge = getStockBadge();
-
-  // ------------------------------------
-  // RENDER
-  // ------------------------------------
   return (
     <div
       className={`
         rounded-2xl shadow-sm border transition-all
         ${isDark ? 'bg-gray-800 border-gray-700 hover:border-gray-600 hover:shadow-md' : 'bg-white border-gray-200 hover:shadow-md hover:border-blue-100'}
-        ${!item.isAvailable ? 'opacity-70' : ''}
-
-        /* MOBILE: vertical stack with padding */
-        p-4
-
-        /* TABLET: horizontal layout */
-        sm:flex sm:gap-4 sm:p-4
-
-        /* DESKTOP: back to vertical card */
-        lg:flex-col lg:p-5
+        ${!isAvailable ? 'opacity-75' : ''}
+        p-4 sm:flex sm:gap-4 sm:p-4 lg:flex-col lg:p-5
       `}
     >
-      {/* ================================= */}
-      {/* IMAGE SECTION                     */}
-      {/* ================================= */}
       <div
         className={`
           relative rounded-xl flex items-center justify-center overflow-hidden border
           ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-blue-50 border-blue-100/50'}
-
-          /* MOBILE: full width, shorter */
-          w-full h-36 mb-3
-
-          /* TABLET: fixed width square, no margin bottom */
-          sm:w-32 sm:h-32 sm:min-w-[8rem] sm:mb-0
-
-          /* DESKTOP: full width again */
-          lg:w-full lg:h-36 lg:mb-4
+          w-full h-36 mb-3 sm:w-32 sm:h-32 sm:min-w-[8rem] sm:mb-0 lg:w-full lg:h-36 lg:mb-4
         `}
       >
-        {item.imageUrl ? (
+        {item.imageUrl && !imageFailed ? (
           <img
             src={item.imageUrl}
-            alt={item.name || "Item image"}
+            alt={item.name || 'Food item'}
             className="w-full h-full object-cover rounded-lg"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.style.display = "none";
-              e.target.nextSibling.style.display = "flex";
-            }}
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <ImageIcon className="w-10 h-10 text-blue-200 sm:w-8 sm:h-8 lg:w-12 lg:h-12" />
         )}
-        {!item.isAvailable && (
+        {!isAvailable && (
           <div className="absolute inset-0 bg-gray-800/60 flex items-center justify-center">
             <span className="text-white font-semibold bg-red-500 px-3 py-1 rounded-full text-xs sm:text-xs lg:text-sm">
-              Sold Out
+              Hidden
             </span>
           </div>
         )}
       </div>
 
-      {/* ================================= */}
-      {/* CONTENT SECTION                   */}
-      {/* ================================= */}
       <div className="flex-1 min-w-0">
-        {/* Header: Name + Price + More button */}
         <div className="flex items-start justify-between mb-2 sm:mb-1.5 lg:mb-3">
           <div className="min-w-0 flex-1">
             <h3 className={`font-semibold text-base sm:text-sm lg:text-base truncate ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
               {item.name}
             </h3>
             <p className="text-lg sm:text-base lg:text-lg font-bold text-blue-600">
-              ₹{item.price}
+              Rs. {item.price}
             </p>
           </div>
-          <button className="p-1.5 sm:p-1 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0 ml-2">
-            <MoreVertical className="w-4 h-4 text-gray-500" />
-          </button>
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${
+              isVeg ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+            }`}
+          >
+            {isVeg ? <Leaf className="w-3 h-3" /> : <Drumstick className="w-3 h-3" />}
+            {isVeg ? 'Veg' : 'Non-veg'}
+          </span>
         </div>
 
-        {/* Stock Info */}
+        {item.description && (
+          <p className={`mb-3 line-clamp-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+            {item.description}
+          </p>
+        )}
+
         <div className="flex items-center justify-between mb-3 sm:mb-2 lg:mb-4">
           <span className={`text-sm sm:text-xs lg:text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Avalilablity :
+            Availability
           </span>
-          <span
-            className={`text-xs px-2 py-0.5 sm:py-0.5 lg:py-1 rounded-full font-medium ${stockBadge.className}`}
-          >
+          <span className={`text-xs px-2 py-0.5 sm:py-0.5 lg:py-1 rounded-full font-medium ${stockBadge.className}`}>
             {stockBadge.text}
           </span>
         </div>
 
-        {/* ================================= */}
-        {/* ACTION BUTTONS                    */}
-        {/* ================================= */}
-        <div
-          className={`
-            flex gap-2
-
-            /* MOBILE: full row */
-            flex-row
-
-            /* TABLET: compact buttons */
-            sm:flex-wrap
-
-            /* DESKTOP: full row again */
-            lg:flex-nowrap
-          `}
-        >
-          {/* Edit Button */}
+        <div className="flex gap-2 flex-row sm:flex-wrap lg:flex-nowrap">
           <button
             onClick={() => onEdit(item)}
-            className={`
+            className="
               flex items-center justify-center gap-1.5 rounded-xl transition-colors font-medium
-              bg-blue-50 text-blue-700 hover:bg-blue-100
-
-              /* MOBILE */
-              flex-1 px-3 py-2 text-sm
-
-              /* TABLET */
-              sm:flex-1 sm:px-2 sm:py-1.5 sm:text-xs
-
-              /* DESKTOP */
-              lg:flex-1 lg:px-3 lg:py-2 lg:text-sm
-            `}
+              bg-blue-50 text-blue-700 hover:bg-blue-100 flex-1 px-3 py-2 text-sm
+              sm:px-2 sm:py-1.5 sm:text-xs lg:px-3 lg:py-2 lg:text-sm
+            "
           >
             <Edit2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4" />
             <span>Edit</span>
           </button>
 
-          {/* Toggle Button */}
           <button
             onClick={handleToggle}
             disabled={togglingAvailability}
             className={`
               flex items-center justify-center gap-1.5 rounded-xl transition-colors font-medium disabled:opacity-50
-
-              ${item.isAvailable
+              ${isAvailable
                 ? 'bg-yellow-50 text-yellow-800 hover:bg-yellow-100'
                 : 'bg-green-50 text-green-800 hover:bg-green-100'
               }
-
-              /* MOBILE */
-              flex-1 px-3 py-2 text-sm
-
-              /* TABLET */
-              sm:flex-1 sm:px-2 sm:py-1.5 sm:text-xs
-
-              /* DESKTOP */
-              lg:flex-1 lg:px-3 lg:py-2 lg:text-sm
+              flex-1 px-3 py-2 text-sm sm:px-2 sm:py-1.5 sm:text-xs lg:px-3 lg:py-2 lg:text-sm
             `}
           >
             {togglingAvailability ? (
               <Loader2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 animate-spin" />
-            ) : item.isAvailable ? (
+            ) : isAvailable ? (
               <EyeOff className="w-4 h-4 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4" />
             ) : (
               <Eye className="w-4 h-4 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4" />
             )}
-            <span className="sm:hidden lg:inline">
-              {item.isAvailable ? 'Hide' : 'Show'}
-            </span>
-            <span className="hidden sm:inline lg:hidden">
-              {item.isAvailable ? 'Hide' : 'Show'}
-            </span>
+            <span>{isAvailable ? 'Hide' : 'Show'}</span>
           </button>
 
-          {/* Delete Button */}
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className={`
-              bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors disabled:opacity-50 flex items-center justify-center
-
-              /* MOBILE */
-              p-2
-
-              /* TABLET */
-              sm:p-1.5
-
-              /* DESKTOP */
-              lg:p-2
-            `}
+            className="
+              bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors disabled:opacity-50
+              flex items-center justify-center p-2 sm:p-1.5 lg:p-2
+            "
+            aria-label={`Delete ${item.name}`}
           >
             {deleting ? (
               <Loader2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 animate-spin" />
@@ -248,24 +179,6 @@ const MenuItemCard = ({ item, onEdit, onToggle, onDelete }) => {
               <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4" />
             )}
           </button>
-        </div>
-
-        {/* ================================= */}
-        {/* LANGUAGE TAGS                     */}
-        {/* ================================= */}
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 sm:mt-2 sm:pt-2 lg:mt-3 lg:pt-3">
-          <Globe className="w-4 h-4 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-gray-400 flex-shrink-0" />
-          <div className="flex gap-1 flex-wrap">
-            <span className="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">
-              EN 🇺🇸
-            </span>
-            <span className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">
-              HI 🇮🇳
-            </span>
-            <span className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">
-              GU 🇮🇳
-            </span>
-          </div>
         </div>
       </div>
     </div>

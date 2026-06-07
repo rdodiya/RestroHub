@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
-import { X, Loader2, Image as ImageIcon, Type, FileText, IndianRupee, Tag, Upload, Leaf, Eye } from 'lucide-react';
+import { X, Loader2, Image as ImageIcon, Type, FileText, IndianRupee, Tag, Upload, Leaf, Eye, Link, AlertCircle } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
+import toast from 'react-hot-toast';
 import api from "@services/common/api";
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+const getErrorMessage = (err, fallback) =>
+  err.response?.data?.message || err.response?.data?.error || fallback;
 
 const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories }) => {
   const [categories, setCategories] = useState([]);
@@ -16,6 +23,8 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
     isVeg: true,
     isDelete: false
   });
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   // ------------------------------------
@@ -48,7 +57,15 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
       });
     }
     setCategories(allCategories || []);
+    setErrors({});
+    setSubmitError('');
   }, [editingItem, isOpen, allCategories]);
+
+  useEffect(() => {
+    if (!formData.imageUrl?.startsWith('blob:')) return undefined;
+
+    return () => URL.revokeObjectURL(formData.imageUrl);
+  }, [formData.imageUrl]);
 
   // ------------------------------------
   // Handle image selection for preview
@@ -56,11 +73,54 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setErrors(prev => ({ ...prev, imageFile: 'Upload a PNG, JPG, WEBP, or GIF image.' }));
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setErrors(prev => ({ ...prev, imageFile: 'Image size must be 5MB or less.' }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       imageFile: file,
       imageUrl: URL.createObjectURL(file)
     }));
+    setErrors(prev => ({ ...prev, imageFile: undefined, imageUrl: undefined }));
+  };
+
+  const validateForm = () => {
+    const nextErrors = {};
+    const name = formData.name.trim();
+    const price = Number(formData.price);
+    const description = formData.description.trim();
+    const imageUrl = formData.imageFile ? '' : formData.imageUrl.trim();
+
+    if (!name) nextErrors.name = 'Food item name is required.';
+    if (name && name.length < 2) nextErrors.name = 'Name must be at least 2 characters.';
+    if (name.length > 100) nextErrors.name = 'Name must be 100 characters or less.';
+    if (description.length > 500) nextErrors.description = 'Description must be 500 characters or less.';
+    if (!formData.price) nextErrors.price = 'Price is required.';
+    if (formData.price && (!Number.isFinite(price) || price <= 0)) nextErrors.price = 'Enter a valid price greater than 0.';
+    if (price > 9999.99) nextErrors.price = 'Price must be 9999.99 or less.';
+    if (!formData.categoryId) nextErrors.categoryId = 'Select a category.';
+
+    if (imageUrl) {
+      try {
+        const url = new URL(imageUrl);
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          nextErrors.imageUrl = 'Image URL must start with http or https.';
+        }
+      } catch {
+        nextErrors.imageUrl = 'Enter a valid image URL.';
+      }
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
   // ------------------------------------
@@ -68,27 +128,33 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
   // ------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
+
+    if (!validateForm()) return;
+
     setSubmitting(true);
 
     try {
       const payload = new FormData();
-      payload.append("name", formData.name);
-      payload.append("description", formData.description);
-      payload.append("price", formData.price.toString());
+      payload.append("name", formData.name.trim());
+      payload.append("description", formData.description.trim());
+      payload.append("price", Number(formData.price).toFixed(2));
       payload.append("categoryId", formData.categoryId);
       payload.append("isAvailable", formData.isAvailable ? "true" : "false");
       payload.append("isVeg", formData.isVeg ? "true" : "false");
-      payload.append("isDelete", formData.isDelete ? "true" : "false");
 
       if (formData.imageFile) {
         payload.append("image", formData.imageFile);
+      } else if (formData.imageUrl.trim()) {
+        payload.append("imageUrl", formData.imageUrl.trim());
       }
 
       if (editingItem) {
-        payload.append("imageUrl", formData.imageUrl);
         await api.put(`/secure/api/v1/foods/${editingItem.foodId}`, payload);
+        toast.success('Food item updated successfully');
       } else {
         await api.post("/secure/api/v1/foods", payload);
+        toast.success('Food item created successfully');
       }
 
       if (onSaved) {
@@ -98,6 +164,9 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
       }
     } catch (err) {
       console.error("Failed to save item:", err.response?.data || err);
+      const message = getErrorMessage(err, 'Failed to save food item');
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -105,6 +174,7 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
 
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: undefined }));
   };
 
   // ------------------------------------
@@ -169,7 +239,9 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                                placeholder:text-gray-400"
                     placeholder="e.g. Paneer Tikka, Chicken Biryani"
                     required
+                    aria-invalid={Boolean(errors.name)}
                   />
+                  {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                 </div>
 
                 {/* Price */}
@@ -183,6 +255,8 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                                      font-medium">₹</span>
                     <input
                       type="number"
+                      min="0.01"
+                      max="9999.99"
                       step="0.01"
                       value={formData.price}
                       onChange={(e) => updateField('price', e.target.value)}
@@ -192,8 +266,10 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                                  transition-all text-gray-800 placeholder:text-gray-400"
                       placeholder="250.00"
                       required
+                      aria-invalid={Boolean(errors.price)}
                     />
                   </div>
+                  {errors.price && <p className="text-xs text-red-500">{errors.price}</p>}
                 </div>
               </div>
 
@@ -212,7 +288,16 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                              focus:bg-white outline-none transition-all text-gray-800
                              placeholder:text-gray-400 resize-none"
                   placeholder="Describe the food item, ingredients, taste..."
+                  aria-invalid={Boolean(errors.description)}
                 />
+                <div className="flex justify-between gap-3">
+                  {errors.description ? (
+                    <p className="text-xs text-red-500">{errors.description}</p>
+                  ) : (
+                    <span />
+                  )}
+                  <p className="text-xs text-gray-400">{formData.description.length}/500</p>
+                </div>
               </div>
 
               {/* ---- ROW 3: Category + Image (side by side) ---- */}
@@ -233,6 +318,7 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                                  focus:border-transparent focus:bg-white outline-none
                                  transition-all text-gray-800 appearance-none cursor-pointer"
                       required
+                      aria-invalid={Boolean(errors.categoryId)}
                     >
                       <option value="" disabled>
                         Select a category
@@ -251,6 +337,7 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
+                  {errors.categoryId && <p className="text-xs text-red-500">{errors.categoryId}</p>}
                 </div>
 
                 {/* Image Upload */}
@@ -290,15 +377,41 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                     )}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/png,image/jpeg,image/webp,image/gif"
                       onChange={handleImageSelect}
                       className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
                     />
                   </label>
+                  {errors.imageFile && <p className="text-xs text-red-500">{errors.imageFile}</p>}
                 </div>
               </div>
 
-              {/* ---- ROW 4: Veg Toggle + Availability Toggle ---- */}
+              {/* ---- ROW 4: Image URL fallback ---- */}
+              <div className="space-y-1.5">
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <Link className="w-4 h-4 text-blue-500" />
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.imageFile ? '' : formData.imageUrl}
+                  onChange={(e) => updateField('imageUrl', e.target.value)}
+                  disabled={Boolean(formData.imageFile)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                             focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                             focus:bg-white outline-none transition-all text-gray-800
+                             placeholder:text-gray-400 disabled:opacity-60"
+                  placeholder="https://example.com/food-image.jpg"
+                  aria-invalid={Boolean(errors.imageUrl)}
+                />
+                {errors.imageUrl ? (
+                  <p className="text-xs text-red-500">{errors.imageUrl}</p>
+                ) : (
+                  <p className="text-xs text-gray-400">Use a URL when no image file is uploaded.</p>
+                )}
+              </div>
+
+              {/* ---- ROW 5: Veg Toggle + Availability Toggle ---- */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {/* Vegetarian Toggle */}
@@ -410,6 +523,13 @@ const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories })
                   </div>
                 </div>
               </div>
+
+              {submitError && (
+                <div className="flex items-start gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <p>{submitError}</p>
+                </div>
+              )}
 
             </div>
 
