@@ -21,11 +21,8 @@ import java.util.Map;
 @Slf4j
 public class OrderDirector {
 
-//
-//    private final OrderBuilder orderBuilder;
-//    private final OrderItemBuilder orderItemBuilder;
-    private final OrderBuilder orderBuilder = new OrderBuilderImpl();
-    private final OrderItemBuilder orderItemBuilder = new OrderItemBuilder();
+    private final OrderBuilder orderBuilder;
+    private final OrderItemBuilder orderItemBuilder;
 
     /**
      * Build a standard dine-in order
