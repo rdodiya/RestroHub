@@ -43,8 +43,10 @@ public class OrderServiceImpl implements OrderService {
 	@Autowired
 	private OrderNotificationService notificationService;
 	
-	private final OrderDirector orderDirector = new OrderDirector();
-	private final OrderMapper orderMapper = new OrderMapper();
+	@Autowired
+	private OrderDirector orderDirector;
+	@Autowired
+	private OrderMapper orderMapper;
 
 	@Override
 	public OrderResponse createOrder(CreateOrderRequest request) {
