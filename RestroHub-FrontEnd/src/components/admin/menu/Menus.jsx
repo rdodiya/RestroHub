@@ -48,6 +48,11 @@ const Menus = () => {
     }
   };
 
+  const refreshFoodItemsAndCategoryCounts = () => {
+    menuGridRef.current?.refreshFoods();
+    categorySidebarRef.current?.refreshCategoryCounts();
+  };
+
   // FOOD ITEM MODAL HANDLERS
   const openAddModal = () => {
     setEditingItem(null);
@@ -62,7 +67,11 @@ const Menus = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
-    menuGridRef.current?.refreshFoods();
+  };
+
+  const handleFoodItemSaved = () => {
+    closeModal();
+    refreshFoodItemsAndCategoryCounts();
   };
 
   // CATEGORY MODAL HANDLERS
@@ -172,6 +181,7 @@ const Menus = () => {
               ref={menuGridRef}
               selectedCategory={selectedCategory}
               onEditItem={openEditModal}
+              onFoodItemsChanged={refreshFoodItemsAndCategoryCounts}
             />
           </div>
         </div>
@@ -192,6 +202,7 @@ const Menus = () => {
       <MenuFormModal
         isOpen={isModalOpen}
         onClose={closeModal}
+        onSaved={handleFoodItemSaved}
         editingItem={editingItem}
         allCategories={allCategories}
       />

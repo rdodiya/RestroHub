@@ -7,7 +7,7 @@ import AdminSkeleton from '../../AdminSkeleton';
 // ============================================
 // MAIN COMPONENT
 // ============================================
-const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
+const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem, onFoodItemsChanged }, ref) => {
   const [menuItems, setMenuItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -74,6 +74,7 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
 
   const handleDelete = (id) => {
     setMenuItems(prev => prev.filter(item => item.foodId !== id));
+    onFoodItemsChanged?.();
   };
 
   // ------------------------------------

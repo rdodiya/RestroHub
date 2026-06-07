@@ -5,7 +5,25 @@ import toast from "react-hot-toast";
 import api from "@services/common/api";
 
 const getErrorMessage = (err, fallback) =>
-  err.response?.data?.message || err.response?.data?.error || fallback;
+  err.response?.data?.message || err.response?.data?.error || err.message || fallback;
+
+const isValidCategoryId = (categoryId) => {
+  const normalizedId = String(categoryId ?? '').trim();
+  const isNumericId = /^\d+$/.test(normalizedId);
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalizedId);
+
+  return isNumericId || isUuid;
+};
+
+const getSafeCategoryId = (categoryId) => {
+  const normalizedId = String(categoryId ?? '').trim();
+
+  if (!isValidCategoryId(normalizedId)) {
+    throw new Error('Invalid category selected');
+  }
+
+  return encodeURIComponent(normalizedId);
+};
 
 const initialFormData = {
   name: "",
@@ -74,7 +92,8 @@ const CategoryFormModal = ({ isOpen, onClose, editingCategory, onSaved }) => {
       };
 
       if (isEditing) {
-        await api.put(`/secure/api/v1/categories/update/${editingCategory.categoryId}`, payload);
+        const safeCategoryId = getSafeCategoryId(editingCategory.categoryId);
+        await api.put(`/secure/api/v1/categories/update/${safeCategoryId}`, payload);
         toast.success("Category updated successfully");
       } else {
         await api.post("/secure/api/v1/categories/addCategory", payload);

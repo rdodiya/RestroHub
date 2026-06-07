@@ -22,7 +22,25 @@ const getRelationCount = (category) => {
 };
 
 const getErrorMessage = (err, fallback) =>
-  err.response?.data?.message || err.response?.data?.error || fallback;
+  err.response?.data?.message || err.response?.data?.error || err.message || fallback;
+
+const isValidCategoryId = (categoryId) => {
+  const normalizedId = String(categoryId ?? '').trim();
+  const isNumericId = /^\d+$/.test(normalizedId);
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalizedId);
+
+  return isNumericId || isUuid;
+};
+
+const getSafeCategoryId = (categoryId) => {
+  const normalizedId = String(categoryId ?? '').trim();
+
+  if (!isValidCategoryId(normalizedId)) {
+    throw new Error('Invalid category selected');
+  }
+
+  return encodeURIComponent(normalizedId);
+};
 
 const CategorySidebar = forwardRef(({
   selectedCategory,
@@ -44,6 +62,9 @@ const CategorySidebar = forwardRef(({
 
   useImperativeHandle(ref, () => ({
     refreshCategories() {
+      fetchCategories();
+    },
+    refreshCategoryCounts() {
       fetchCategories();
     }
   }));
@@ -73,6 +94,16 @@ const CategorySidebar = forwardRef(({
   };
 
   const handleDelete = async (category) => {
+    let safeCategoryId;
+
+    try {
+      safeCategoryId = getSafeCategoryId(category.categoryId);
+    } catch (err) {
+      console.error('Invalid category id:', category.categoryId);
+      toast.error('Invalid category selected');
+      return;
+    }
+
     const relationCount = getRelationCount(category);
     const relationText = relationCount > 0
       ? ` It is linked to ${relationCount} item${relationCount === 1 ? '' : 's'}.`
@@ -82,7 +113,7 @@ const CategorySidebar = forwardRef(({
 
     try {
       setDeletingId(category.categoryId);
-      await api.delete(`/secure/api/v1/categories/delete/${category.categoryId}`);
+      await api.delete(`/secure/api/v1/categories/delete/${safeCategoryId}`);
       toast.success('Category deleted successfully');
 
       setCategories((prev) => prev.filter((item) => item.categoryId !== category.categoryId));

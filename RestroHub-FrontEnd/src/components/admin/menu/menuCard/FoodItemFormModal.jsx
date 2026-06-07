@@ -3,7 +3,7 @@ import { X, Loader2, Image as ImageIcon, Type, FileText, IndianRupee, Tag, Uploa
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
 
-const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
+const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories }) => {
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -91,7 +91,11 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
         await api.post("/secure/api/v1/foods", payload);
       }
 
-      onClose();
+      if (onSaved) {
+        onSaved();
+      } else {
+        onClose();
+      }
     } catch (err) {
       console.error("Failed to save item:", err.response?.data || err);
     } finally {
