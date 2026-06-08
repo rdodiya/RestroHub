@@ -291,7 +291,7 @@ const [contactForm, setContactForm] = useState({
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy Policy', href: '#' },
+      { label: 'Privacy Policy', href: '/privacy-policy' },
       { label: 'Terms of Service', href: '#' },
       { label: 'Refund Policy', href: '#' },
     ],
@@ -953,26 +953,35 @@ const [contactForm, setContactForm] = useState({
               </p>
             </div>
 
-            {/* Link Columns */}
-            {footerColumns.map((col) => (
-              <div key={col.title}>
-                <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-300">
-                  {col.title}
-                </h4>
-                <ul className="space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        className="text-sm text-slate-400 transition-colors hover:text-white"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+         {/* Link Columns */}
+{footerColumns.map((col) => (
+  <div key={col.title}>
+    <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-300">
+      {col.title}
+    </h4>
+    <ul className="space-y-3">
+      {col.links.map((link) => (
+        <li key={link.label}>
+          {link.href.startsWith('/') ? (
+            <Link
+              to={link.href}
+              className="text-sm text-slate-400 transition-colors hover:text-white"
+            >
+              {link.label}
+            </Link>
+          ) : (
+            <a
+              href={link.href}
+              className="text-sm text-slate-400 transition-colors hover:text-white"
+            >
+              {link.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+))}
           </div>
 
           {/* Bottom Bar */}
