@@ -1,7 +1,7 @@
 package com.restroly.qrmenu.template.service;
 
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.template.dto.TemplateCreateRequest;
 import com.restroly.qrmenu.template.dto.TemplateDTO;
 import com.restroly.qrmenu.template.dto.TemplateUpdateRequest;

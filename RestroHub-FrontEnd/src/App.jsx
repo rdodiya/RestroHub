@@ -1,6 +1,7 @@
 // src/App.jsx
 import { BrowserRouter } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Toaster } from 'react-hot-toast';
 import AppRoutes from './routes';
 import { ThemeProvider } from '@context/ThemeContext';
 import './index.css';
@@ -21,6 +22,7 @@ function App() {
       <ThemeProvider>
         <BrowserRouter>
           <AppRoutes />
+          <Toaster position="top-right" reverseOrder={false} />
         </BrowserRouter>
       </ThemeProvider>
     </GoogleOAuthProvider>

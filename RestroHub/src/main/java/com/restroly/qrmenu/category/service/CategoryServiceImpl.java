@@ -2,11 +2,9 @@ package com.restroly.qrmenu.category.service;
 
 import com.restroly.qrmenu.category.dto.CategoryRequestDTO;
 import com.restroly.qrmenu.category.dto.CategoryResponseDTO;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
-
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import com.restroly.qrmenu.category.dto.CategoryDTO;
 import com.restroly.qrmenu.category.entity.Category;
 import com.restroly.qrmenu.category.repository.CategoryRepository;
@@ -14,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 
 @Service

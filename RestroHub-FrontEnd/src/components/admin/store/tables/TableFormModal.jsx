@@ -1,24 +1,63 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Loader2, LayoutGrid } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
+import api from '@services/common/api';
 
-const TableFormModal = ({ isOpen, onClose, branchId }) => {
-  const [formData, setFormData] = useState({ number: '', capacity: '' });
+const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) => {
+  const [formData, setFormData] = useState({
+    number: '',
+    capacity: '',
+    status: 'available',
+    isActive: true,
+  });
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (editingTable) {
+      setFormData({
+        number: editingTable.number || '',
+        capacity: editingTable.capacity || '',
+        status: editingTable.status || 'available',
+        isActive: editingTable.isActive !== false,
+      });
+    } else {
+      setFormData({ number: '', capacity: '', status: 'available', isActive: true });
+    }
+    setError(null);
+  }, [editingTable, isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
     try {
-      setSubmitting(true);
-      // 🔌 API call
-      await new Promise((r) => setTimeout(r, 500));
+      const payload = {
+        tableNumber: Number(formData.number),
+        capacity: Number(formData.capacity),
+        status: formData.status,
+        isActive: formData.isActive,
+      };
+
+      if (editingTable) {
+        await api.put(`/secure/api/v1/tables/${editingTable.id}`, payload);
+      } else {
+        await api.post(`/secure/api/v1/branches/${branchId}/tables`, payload);
+      }
+
+      onSaved?.();
       onClose();
-      setFormData({ number: '', capacity: '' });
     } catch (err) {
       console.error('Failed:', err);
+      setError(err.response?.data?.message || 'Failed to save table');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const updateField = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const inputClass = `
@@ -38,14 +77,13 @@ const TableFormModal = ({ isOpen, onClose, branchId }) => {
             border border-gray-200 bg-white shadow-xl
           "
         >
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
                 <LayoutGrid className="h-5 w-5 text-blue-600" />
               </div>
               <Dialog.Title className="text-lg font-bold text-gray-900">
-                Add New Table
+                {editingTable ? 'Edit Table' : 'Add New Table'}
               </Dialog.Title>
             </div>
             <button
@@ -59,17 +97,23 @@ const TableFormModal = ({ isOpen, onClose, branchId }) => {
             </button>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit}>
             <div className="space-y-4 px-5 py-5">
+              {error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-800">
                   Table Number
                 </label>
                 <input
                   type="number"
+                  min="1"
                   value={formData.number}
-                  onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                  onChange={(e) => updateField('number', e.target.value)}
                   className={inputClass}
                   placeholder="9"
                   required
@@ -81,16 +125,45 @@ const TableFormModal = ({ isOpen, onClose, branchId }) => {
                 </label>
                 <input
                   type="number"
+                  min="1"
                   value={formData.capacity}
-                  onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                  onChange={(e) => updateField('capacity', e.target.value)}
                   className={inputClass}
                   placeholder="4"
                   required
                 />
               </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-800">
+                  Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => updateField('status', e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="available">Available</option>
+                  <option value="occupied">Occupied</option>
+                  <option value="reserved">Reserved</option>
+                </select>
+              </div>
+              {editingTable && (
+                <label className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <span className="text-sm font-medium text-gray-800">Active table</span>
+                  <span className="relative inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={(e) => updateField('isActive', e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <span className="h-6 w-11 rounded-full bg-gray-300 transition-colors peer-checked:bg-blue-600" />
+                    <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                  </span>
+                </label>
+              )}
             </div>
 
-            {/* Footer */}
             <div className="flex items-center gap-3 border-t border-gray-100 px-5 py-4">
               <button
                 type="button"
@@ -116,7 +189,7 @@ const TableFormModal = ({ isOpen, onClose, branchId }) => {
                 "
               >
                 {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                Add Table
+                {editingTable ? 'Update Table' : 'Add Table'}
               </button>
             </div>
           </form>
@@ -126,4 +199,4 @@ const TableFormModal = ({ isOpen, onClose, branchId }) => {
   );
 };
 
-export default TableFormModal;  
+export default TableFormModal;

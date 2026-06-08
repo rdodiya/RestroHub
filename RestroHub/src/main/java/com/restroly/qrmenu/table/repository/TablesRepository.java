@@ -17,5 +17,9 @@ public interface TablesRepository extends JpaRepository<Tables, Long> {
 
 	List<Tables> findByBranch_BranchId(Long branchId);
 
-	Tables findByTableNumber(Long tableNumber);
+	boolean existsByBranch_BranchIdAndTableNumber(Long branchId, Integer tableNumber);
+
+	boolean existsByBranch_BranchIdAndTableNumberAndTableIdNot(Long branchId, Integer tableNumber, Long tableId);
+
+	Tables findByTableNumber(Integer tableNumber);
 }

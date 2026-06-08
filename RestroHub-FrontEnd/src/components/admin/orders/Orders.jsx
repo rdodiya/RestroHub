@@ -11,10 +11,11 @@ const Orders = () => {
 
   const filters = [
     { id: 'all', label: 'All' },
-    { id: 'pending', label: 'Pending' },
-    { id: 'cooking', label: 'Cooking' },
-    { id: 'ready', label: 'Ready' },
-    { id: 'billed', label: 'Billed' },
+    { id: 'PENDING', label: 'Pending' },
+    { id: 'PREPARING', label: 'Preparing' },
+    { id: 'READY', label: 'Ready' },
+    { id: 'BILLED', label: 'Billed' },
+    { id: 'CANCELLED', label: 'Cancelled' },
   ];
 
   return (

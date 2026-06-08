@@ -27,7 +27,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 123,
       table: 4,
       amount: 450,
-      status: 'cooking',
+      status: 'PREPARING',
       customer: 'John Doe',
       phone: '9876543210',
       items: [
@@ -40,7 +40,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 124,
       table: 7,
       amount: 320,
-      status: 'ready',
+      status: 'READY',
       customer: 'Priya Sharma',
       phone: '9876543211',
       items: [
@@ -53,7 +53,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 125,
       table: 2,
       amount: 780,
-      status: 'pending',
+      status: 'PENDING',
       customer: 'Amit Kumar',
       phone: '9876543212',
       items: [{ name: 'Special Thali', qty: 3, price: 260 }],
@@ -63,7 +63,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 126,
       table: 9,
       amount: 190,
-      status: 'billed',
+      status: 'BILLED',
       customer: 'Sara Khan',
       phone: '9876543213',
       items: [{ name: 'Sweet Lassi', qty: 2, price: 95 }],
@@ -87,9 +87,9 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       if (!loading) setRefreshing(true);
       setError(null);
 
-      // 🔌 UNCOMMENT WHEN API READY
-      // const response = await api.get('/api/orders');
-      // setOrders(response.data);
+      // 🔌 UNCOMMENT WHEN API READY (replace {branchId} with actual branch ID)
+      // const response = await api.get('/secure/api/v1/orders/branch/{branchId}/active');
+      // syncOrders(response.data);
 
       // 🎭 MOCK
       await new Promise((resolve) => setTimeout(resolve, 700));
@@ -108,7 +108,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
   // HANDLERS
   // ------------------------------------
   const handleStatusUpdate = (orderId, newStatus) => {
-    if (newStatus === 'complete' || newStatus === 'cancelled') {
+    if (newStatus === 'COMPLETED') {
       syncOrders(orders.filter((o) => o.id !== orderId));
     } else {
       syncOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)));

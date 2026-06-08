@@ -1,14 +1,28 @@
 package com.restroly.qrmenu.auth.controller;
 
+import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.GoogleAuthRequest;
 import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
+import com.restroly.qrmenu.auth.dto.RegisterRequest;
 import com.restroly.qrmenu.auth.service.AuthService;
 import com.restroly.qrmenu.auth.service.GoogleAuthService;
 import com.restroly.qrmenu.common.dto.ApiResponse;
-import com.restroly.qrmenu.common.exception.ErrorResponse;
-import com.restroly.qrmenu.common.util.ApiConstants;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
+
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -19,13 +33,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
-
-import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
 
 @RestController
 @RequestMapping(PUBLIC_API_VERSION + "/auth")
@@ -40,6 +47,19 @@ public class AuthController {
     @Autowired
     private GoogleAuthService googleAuthService;
 
+        //end points for register
+
+    @PostMapping("/register")
+        public ResponseEntity<ApiResponse<AuthResponse>> register(
+                @Valid @RequestBody RegisterRequest registerRequest) {
+
+        AuthResponse response = authService.register(registerRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response, "Registration successful")  //updated message to be more specific
+                );      
+        }
+        //end point for login
     @PostMapping("/login")
     @Operation(
             summary = "Authenticate user and generate tokens",
@@ -74,7 +94,7 @@ public class AuthController {
                     description = "Invalid request - validation failed",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -82,7 +102,7 @@ public class AuthController {
                     description = "Authentication failed - invalid credentials",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
+                            schema = @Schema(implementation = ApiErrorResponse.class),
                             examples = @ExampleObject(value = """
                                     {
                                         "status": 401,
@@ -154,7 +174,7 @@ public class AuthController {
                     description = "Invalid request - token missing or invalid",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -162,7 +182,7 @@ public class AuthController {
                     description = "Google token verification failed",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })
@@ -195,7 +215,7 @@ public class AuthController {
                     description = "Invalid or expired refresh token",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })
