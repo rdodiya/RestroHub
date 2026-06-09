@@ -20,8 +20,11 @@ const resetPasswordSchema = Yup.object({
     .max(64, "Reset code is too long")
     .required("Reset code is required"),
   newPassword: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("New password is required"),
+    .required("New password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?`~]).{8,}$/,
+      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
+    ),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
     .required("Confirm password is required"),
