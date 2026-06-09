@@ -10,6 +10,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { ArrowLeft } from "lucide-react";
 import api from "@services/common/api";
 import { useTheme } from "@context/ThemeContext";
+import { getDefaultAdminPath } from "../../utils/auth";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8181/restroly";
@@ -180,7 +181,7 @@ const Login = () => {
 
           toast.success("Login successful!");
 
-          navigate("/admin/dashboard");
+          navigate(getDefaultAdminPath(roles));
         } else {
           toast.error(result.message || "Login failed");
         }
@@ -215,7 +216,7 @@ const handleGoogleLogin = async (credentialResponse) => {
 
       toast.success("Google login successful!");
 
-      navigate("/admin/dashboard");
+      navigate(getDefaultAdminPath(roles));
     } else {
       toast.error(result.message || "Google login failed");
     }

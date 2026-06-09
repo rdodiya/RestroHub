@@ -17,11 +17,15 @@ import {
   ChefHat,
 } from 'lucide-react';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import { FULL_ADMIN_ROLES, hasAnyRole, readStoredRoles } from '../../utils/auth';
 
 const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const location = useLocation();
   const sidebarRef = useRef(null);
   const { isDark } = useAdminTheme();
+  const roles = readStoredRoles();
+  const limitedAdminRoles = ['MANAGER', 'STAFF'];
+  const allAdminRoles = [...FULL_ADMIN_ROLES, ...limitedAdminRoles];
 
   const [expandedMenus, setExpandedMenus] = useState({
     store: false,
@@ -61,10 +65,10 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
     {
       label: 'Menu',
       items: [
-        { type: 'link', name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-        { type: 'link', name: 'Kitchen Display', path: '/admin/kds', icon: ChefHat },
-        { type: 'link', name: 'Menus', path: '/admin/menus', icon: UtensilsCrossed },
-        { type: 'link', name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
+        { type: 'link', name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard, allowedRoles: FULL_ADMIN_ROLES },
+        { type: 'link', name: 'Kitchen Display', path: '/admin/kds', icon: ChefHat, allowedRoles: allAdminRoles },
+        { type: 'link', name: 'Menus', path: '/admin/menus', icon: UtensilsCrossed, allowedRoles: FULL_ADMIN_ROLES },
+        { type: 'link', name: 'Orders', path: '/admin/orders', icon: ShoppingCart, allowedRoles: allAdminRoles },
       ],
     },
     {
@@ -75,8 +79,9 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
           name: 'Store',
           icon: Store,
           menuKey: 'store',
+          allowedRoles: FULL_ADMIN_ROLES,
           children: [
-            { name: 'Branches', path: '/admin/store/branches', icon: Building2 },
+            { name: 'Branches', path: '/admin/store/branches', icon: Building2, allowedRoles: FULL_ADMIN_ROLES },
           ],
         },
         {
@@ -84,9 +89,10 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
           name: 'Marketing',
           icon: Megaphone,
           menuKey: 'marketing',
+          allowedRoles: FULL_ADMIN_ROLES,
           children: [
-            { name: 'Website', path: '/admin/marketing/website', icon: Globe },
-            { name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode },
+            { name: 'Website', path: '/admin/marketing/website', icon: Globe, allowedRoles: FULL_ADMIN_ROLES },
+            { name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode, allowedRoles: FULL_ADMIN_ROLES },
           ],
         },
       ],
@@ -94,10 +100,27 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
     {
       label: 'Payments',
       items: [
-        { type: 'link', name: 'UPI Links', path: '/admin/upi-links', icon: CreditCard },
+        { type: 'link', name: 'UPI Links', path: '/admin/upi-links', icon: CreditCard, allowedRoles: FULL_ADMIN_ROLES },
       ],
     },
   ];
+
+  const canViewItem = (item) => !item.allowedRoles || hasAnyRole(roles, item.allowedRoles);
+
+  const visibleNavSections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items
+        .map((item) => {
+          if (item.type !== 'expandable') return item;
+          return {
+            ...item,
+            children: item.children.filter(canViewItem),
+          };
+        })
+        .filter((item) => canViewItem(item) && (item.type !== 'expandable' || item.children.length > 0)),
+    }))
+    .filter((section) => section.items.length > 0);
 
   // ============================================
   // SINGLE NAV LINK
@@ -369,7 +392,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
         {/* NAVIGATION                        */}
         {/* ================================= */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
-          {navSections.map((section, sectionIndex) => (
+          {visibleNavSections.map((section, sectionIndex) => (
             <div key={section.label} className={sectionIndex > 0 ? 'mt-4' : ''}>
               {/* Section Label */}
               {!collapsed ? (

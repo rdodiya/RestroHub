@@ -13,6 +13,7 @@ import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
+import Unauthorized from '../pages/public/Unauthorized';
 
 // Customer Pages
 import RestaurantMenu from '../pages/customer/RestaurantMenu';
@@ -39,6 +40,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Route>
 
       {/* ========== CUSTOMER ROUTES ========== */}
