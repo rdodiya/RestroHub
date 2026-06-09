@@ -60,6 +60,7 @@ try {
     console.error("Failed to parse response:", err);
     throw new Error("Invalid server response");
 }
+};
 
 const ApiService = {
     // ============================================

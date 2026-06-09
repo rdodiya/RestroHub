@@ -28,6 +28,7 @@ import QRDisplay from '@components/admin/marketing/qr/QRDisplay';
 import UPILinks from '@components/admin/upi/UPILinks';
 import KitchenDisplaySystem from '@components/admin/kds/KitchenDisplaySystem';
 import Profile from '@components/admin/profile/Profile';
+import SubscriptionManagement from '@components/admin/subscriptions/SubscriptionManagement';
 
 const AppRoutes = () => {
   return (
@@ -64,6 +65,10 @@ const AppRoutes = () => {
         <Route path="marketing/website" element={<Website />} />
         <Route path="marketing/qr-display" element={<QRDisplay />} />
         <Route path="upi-links" element={<UPILinks />} />
+        <Route
+          path="subscriptions"
+          element={<SubscriptionManagement />}
+        />
         <Route path="kds" element={<KitchenDisplaySystem />} />
         <Route path="profile" element={<Profile />} />
       </Route>
