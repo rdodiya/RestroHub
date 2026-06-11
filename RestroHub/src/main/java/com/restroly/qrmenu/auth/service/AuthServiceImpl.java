@@ -3,8 +3,14 @@ package com.restroly.qrmenu.auth.service;
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
+import com.restroly.qrmenu.auth.dto.RegisterRequest;
 import com.restroly.qrmenu.exception.BusinessException;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
 import com.restroly.qrmenu.security.JwtTokenProvider;
+import com.restroly.qrmenu.user.entity.Role;
+import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.user.repository.RoleRepository;
+import com.restroly.qrmenu.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,18 +22,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Service;
-import com.restroly.qrmenu.auth.dto.RegisterRequest;
-import com.restroly.qrmenu.user.entity.User;
-import com.restroly.qrmenu.exception.DuplicateResourceException;
-import com.restroly.qrmenu.user.entity.Role;
-import com.restroly.qrmenu.user.repository.UserRepository;
-import com.restroly.qrmenu.user.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -150,7 +148,7 @@ public class AuthServiceImpl implements AuthService {
         Role customerRole = roleRepository.findByName("CUSTOMER")
                 .orElseThrow(() -> new RuntimeException("Default CUSTOMER role not found"));
 
-        user.setRoles(new ArrayList<>(Collections.singletonList(customerRole)));
+        //user.setRoles(new ArrayList<>(Collections.singletonList(customerRole)));
 
         userRepository.save(user);
 

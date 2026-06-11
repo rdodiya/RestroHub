@@ -1,7 +1,7 @@
 package com.restroly.qrmenu.auth.service;
 
-import com.google.auth.oauth2.TokenVerifier;
 import com.google.api.client.json.webtoken.JsonWebSignature;
+import com.google.auth.oauth2.TokenVerifier;
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.GoogleAuthRequest;
 import com.restroly.qrmenu.exception.BusinessException;
@@ -13,14 +13,10 @@ import com.restroly.qrmenu.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Service for handling Google OAuth 2.0 authentication.
@@ -110,7 +106,7 @@ public class GoogleAuthService {
                     Role customerRole = roleRepository.findByName("CUSTOMER")
                             .orElseThrow(() -> new BusinessException("CUSTOMER role not found in database. Please ensure roles are initialized."));
 
-                    newUser.setRoles(Collections.singletonList(customerRole));
+                    //newUser.setRoles(Collections.singletonList(customerRole));
 
                     User savedUser = userRepository.save(newUser);
                     log.info("Created new user from Google OAuth: {}", email);
@@ -122,9 +118,9 @@ public class GoogleAuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
 
-        List<String> roles = user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toList());
+//        List<String> roles = user.getRoles().stream()
+//                .map(Role::getName)
+//                .collect(Collectors.toList());
 
         log.info("Google OAuth authentication successful for user: {}", email);
 
@@ -134,7 +130,7 @@ public class GoogleAuthService {
                 .tokenType("Bearer")
                 .expiresIn(jwtTokenProvider.getExpirationInSeconds())
                 .username(user.getEmail())
-                .roles(roles)
+                //.roles(roles)
                 .build();
     }
 
@@ -188,18 +184,19 @@ public class GoogleAuthService {
      * @return UserDetails with email as username and user's roles as authorities
      */
     private UserDetails buildUserDetailsFromGoogleUser(User user) {
-        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                user.isActive(),
-                true,
-                true,
-                !user.isLocked(),
-                authorities
-        );
+//        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+//                .map(role -> new SimpleGrantedAuthority(role.getName()))
+//                .collect(Collectors.toList());
+//
+//        return new org.springframework.security.core.userdetails.User(
+//                user.getEmail(),
+//                user.getPassword(),
+//                user.isActive(),
+//                true,
+//                true,
+//                !user.isLocked(),
+//                authorities
+//        );
+        return null;
     }
 }

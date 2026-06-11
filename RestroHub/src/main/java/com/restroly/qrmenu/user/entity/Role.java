@@ -1,9 +1,11 @@
 package com.restroly.qrmenu.user.entity;
 
+import com.restroly.qrmenu.superAdmin.entity.UserRoleRestaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "t_role_master")
@@ -29,8 +31,8 @@ public class Role {
 	@Builder.Default
 	private Boolean isActive = true;
 
-	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-	private List<User> users;
+	@OneToMany(mappedBy = "role")
+	private Set<UserRoleRestaurant> userAssignments = new HashSet<>();
 
 
 }

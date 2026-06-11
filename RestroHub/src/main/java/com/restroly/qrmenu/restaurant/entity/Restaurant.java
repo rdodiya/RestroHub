@@ -1,10 +1,13 @@
 package com.restroly.qrmenu.restaurant.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.restroly.qrmenu.branch.entity.Branch;
 
+import com.restroly.qrmenu.superAdmin.entity.UserRoleRestaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,6 +50,9 @@ public class Restaurant {
 
 	@Column(name = "updated_date")
 	private LocalDateTime updatedDate;
+
+	@OneToMany(mappedBy = "restaurant")
+	private Set<UserRoleRestaurant> userAssignments = new HashSet<>();
 
 	@PrePersist
 	protected void onCreate() {

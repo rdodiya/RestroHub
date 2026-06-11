@@ -1,35 +1,32 @@
 package com.restroly.qrmenu.user.service;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
 import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.user.dto.RoleResponse;
+import com.restroly.qrmenu.exception.UserNotFoundException;
+import com.restroly.qrmenu.restaurant.entity.Restaurant;
+import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
 import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
-import com.restroly.qrmenu.restaurant.entity.Restaurant;
-import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.entity.User;
-import com.restroly.qrmenu.exception.DuplicateResourceException;
-import com.restroly.qrmenu.exception.UserNotFoundException;
 import com.restroly.qrmenu.user.repository.RoleRepository;
 import com.restroly.qrmenu.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -48,49 +45,49 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse registerUser(UserRequest request) {
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException(
-                    "User with email '" + request.getEmail() + "' already exists");
-        }
+//        if (userRepository.existsByEmail(request.getEmail())) {
+//            throw new DuplicateResourceException(
+//                    "User with email '" + request.getEmail() + "' already exists");
+//        }
+//
+//        if (request.getPhone() != null &&
+//                userRepository.existsByPhoneNumber(request.getPhone())) {
+//            throw new DuplicateResourceException(
+//                    "User with phone '" + request.getPhone() + "' already exists");
+//        }
+//
+//        User user = User.builder()
+//                .name(request.getFirstName() + " " + request.getLastName())
+//                .email(request.getEmail())
+//                .password(passwordEncoder.encode(request.getPassword()))
+//                .phoneNumber(request.getPhone())
+//                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+//                .isLocked(false)
+//                .build();
+//
+//        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
+//
+//            List<Role> roles = roleRepository.findByIdIn(request.getRoleIds())
+//                    .stream()
+//                    .toList(); // Java 16+
+//            // .collect(Collectors.toList()); // Java 8+
+//
+//            user.setRoles(roles);
+//
+//        } else {
+//            // Default to the CUSTOMER role which is used across auth flows
+//            Role customerRole = roleRepository.findByName("CUSTOMER")
+//        .orElseThrow(() ->
+//                new IllegalStateException("Default CUSTOMER role not found"));
+//
+//        user.setRoles(
+//                new ArrayList<>(Collections.singletonList(customerRole)));
+//        }
+//
+//        User savedUser = userRepository.save(user);
+//        createRestaurantIfRequested(request);
 
-        if (request.getPhone() != null &&
-                userRepository.existsByPhoneNumber(request.getPhone())) {
-            throw new DuplicateResourceException(
-                    "User with phone '" + request.getPhone() + "' already exists");
-        }
-
-        User user = User.builder()
-                .name(request.getFirstName() + " " + request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .phoneNumber(request.getPhone())
-                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
-                .isLocked(false)
-                .build();
-
-        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
-
-            List<Role> roles = roleRepository.findByIdIn(request.getRoleIds())
-                    .stream()
-                    .toList(); // Java 16+
-            // .collect(Collectors.toList()); // Java 8+
-
-            user.setRoles(roles);
-
-        } else {
-            // Default to the CUSTOMER role which is used across auth flows
-            Role customerRole = roleRepository.findByName("CUSTOMER")
-        .orElseThrow(() ->
-                new IllegalStateException("Default CUSTOMER role not found"));
-
-        user.setRoles(
-                new ArrayList<>(Collections.singletonList(customerRole)));
-        }
-
-        User savedUser = userRepository.save(user);
-        createRestaurantIfRequested(request);
-
-        return mapToResponse(savedUser);
+        return null;
     }
 
     private void createRestaurantIfRequested(UserRequest request) {
@@ -218,7 +215,7 @@ public class UserServiceImpl implements UserService {
             List<Role> roles = roleRepository.findByIdIn(request.getRoleIds())
                     .stream()
                     .collect(Collectors.toList());
-            user.setRoles(roles);
+            //user.setRoles(roles);
         }
 
         return mapToResponse(userRepository.save(user));
@@ -243,7 +240,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserIdWithRoles(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        user.getRoles().addAll(roleRepository.findByIdIn(roleIds));
+       // user.getRoles().addAll(roleRepository.findByIdIn(roleIds));
 
         return mapToResponse(userRepository.save(user));
     }
@@ -257,7 +254,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserIdWithRoles(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        user.getRoles().removeIf(role -> roleIds.contains(role.getId()));
+        //user.getRoles().removeIf(role -> roleIds.contains(role.getId()));
 
         return mapToResponse(userRepository.save(user));
     }
@@ -286,32 +283,34 @@ public class UserServiceImpl implements UserService {
     // =============================
     private UserResponse mapToResponse(User user) {
 
-        Set<RoleResponse> roles =
-                user.getRoles() == null ? null :
-                        user.getRoles().stream()
-                                .map(role -> RoleResponse.builder()
-                                        .id(role.getId())
-                                        .name(role.getName())
-                                        .description(role.getDescription())
-                                        .isActive(role.getIsActive())
-                                        .build())
-                                .collect(Collectors.toSet());
+//        Set<RoleResponse> roles =
+//                user.getRoles() == null ? null :
+//                        user.getRoles().stream()
+//                                .map(role -> RoleResponse.builder()
+//                                        .id(role.getId())
+//                                        .name(role.getName())
+//                                        .description(role.getDescription())
+//                                        .isActive(role.getIsActive())
+//                                        .build())
+//                                .collect(Collectors.toSet());
+//
+//        String[] names = user.getName() != null
+//                ? user.getName().split(" ", 2)
+//                : new String[]{"", ""};
 
-        String[] names = user.getName() != null
-                ? user.getName().split(" ", 2)
-                : new String[]{"", ""};
-
-        return UserResponse.builder()
-                .id(user.getUserId())
-                .firstName(names[0])
-                .lastName(names.length > 1 ? names[1] : "")
-                .fullName(user.getName())
-                .email(user.getEmail())
-                .phone(user.getPhoneNumber())
-                .isActive(user.isActive())
-                .roles(roles)
-                .build();
+//        return UserResponse.builder()
+//                .id(user.getUserId())
+//                .firstName(names[0])
+//                .lastName(names.length > 1 ? names[1] : "")
+//                .fullName(user.getName())
+//                .email(user.getEmail())
+//                .phone(user.getPhoneNumber())
+//                .isActive(user.isActive())
+//                .roles(roles)
+//                .build();
+        return  null;
     }
+
 
 @Override
 public UserProfileResponseDTO getCurrentUserProfile() {
@@ -383,9 +382,9 @@ public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request) {
         throw new IllegalStateException("User email became null during profile update");
     }
 
-    if (user.getRoles() == null || user.getRoles().isEmpty()) {
-        throw new IllegalStateException("User roles became empty during profile update");
-    }
+//    if (user.getRoles() == null || user.getRoles().isEmpty()) {
+//        throw new IllegalStateException("User roles became empty during profile update");
+//    }
 
     User updatedUser = userRepository.save(user);
 

@@ -1,5 +1,7 @@
 package com.restroly.qrmenu.security;
 
+import com.restroly.qrmenu.security.exception.UserDisabledException;
+import com.restroly.qrmenu.security.exception.UserLockedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,11 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.restroly.qrmenu.security.exception.UserDisabledException;
-import com.restroly.qrmenu.security.exception.UserLockedException;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -43,9 +42,10 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UserLockedException("User account is locked");
         }
 
-        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
+//        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+//                .map(role -> new SimpleGrantedAuthority(role.getName()))
+//                .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
         log.debug("User found: {} with roles: {}", email, authorities);
 

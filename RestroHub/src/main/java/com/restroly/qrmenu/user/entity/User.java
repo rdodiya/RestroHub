@@ -1,8 +1,10 @@
 package com.restroly.qrmenu.user.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import com.restroly.qrmenu.superAdmin.entity.UserRoleRestaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,13 +51,8 @@ public class User {
     @Column(name = "user_profile")
     private byte[] userProfile; // BLOB for storing profile image bytes
 
-    @ManyToMany
-    @JoinTable(
-        name = "t_rel_usr_role",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private List<Role> roles;
+    @OneToMany(mappedBy = "user")
+    private Set<UserRoleRestaurant> userAssignments = new HashSet<>();
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
