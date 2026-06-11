@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { QrCode, Edit2, Trash2, Users, Loader2 } from 'lucide-react';
 import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 const TableCard = ({ table, onShowQR, onEdit, onDelete }) => {
   const [saving, setSaving] = useState(false);
@@ -45,6 +46,7 @@ const TableCard = ({ table, onShowQR, onEdit, onDelete }) => {
       onDelete(table.id);
     } catch (err) {
       console.error('Delete failed:', err);
+      toast.error('Delete failed');
       alert(err.response?.data?.message || 'Failed to delete table');
     } finally {
       setSaving(false);

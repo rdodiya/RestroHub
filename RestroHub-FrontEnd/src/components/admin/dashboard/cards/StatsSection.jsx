@@ -10,6 +10,7 @@ import {
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import toast from 'react-hot-toast';
 
 // ============================================
 // STAT CARD (Private to this file)
@@ -161,6 +162,7 @@ const StatsSection = () => {
 
   } catch (err) {
     console.error("Failed to fetch stats:", err);
+    toast.error("Failed to fetch stats");
     setError("Failed to load stats");
     setStats(fallbackStats);
   } finally {

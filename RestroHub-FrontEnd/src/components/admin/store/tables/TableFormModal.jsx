@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { X, Loader2, LayoutGrid } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) => {
   const [formData, setFormData] = useState({
@@ -50,6 +51,7 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
       onClose();
     } catch (err) {
       console.error('Failed:', err);
+      toast.error('Failed');
       setError(err.response?.data?.message || 'Failed to save table');
     } finally {
       setSubmitting(false);

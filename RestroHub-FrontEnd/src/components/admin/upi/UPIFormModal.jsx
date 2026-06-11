@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Loader2, CreditCard, Info } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
+import toast from 'react-hot-toast';
 
 const UPIFormModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({ name: '', upiId: '' });
@@ -17,6 +18,7 @@ const UPIFormModal = ({ isOpen, onClose }) => {
       setFormData({ name: '', upiId: '' });
     } catch (err) {
       console.error('Failed:', err);
+      toast.error('Failed');
     } finally {
       setSubmitting(false);
     }

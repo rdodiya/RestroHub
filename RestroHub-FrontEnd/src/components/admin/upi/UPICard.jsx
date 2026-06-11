@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+import toast from 'react-hot-toast';
   CreditCard,
   Check,
   Copy,
@@ -27,6 +28,7 @@ const UPICard = ({ link, onCopy, onSetDefault, onDelete, onTest, copiedId }) => 
       onSetDefault(link.id);
     } catch (err) {
       console.error('Failed:', err);
+      toast.error('Failed');
     } finally {
       setSettingDefault(false);
     }
@@ -41,6 +43,7 @@ const UPICard = ({ link, onCopy, onSetDefault, onDelete, onTest, copiedId }) => 
       onDelete(link.id);
     } catch (err) {
       console.error('Failed:', err);
+      toast.error('Failed');
     } finally {
       setDeleting(false);
     }

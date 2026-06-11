@@ -13,6 +13,7 @@ const WebsiteHeader = ({ onSave }) => {
       console.log('Saved');
     } catch (err) {
       console.error('Save failed:', err);
+      toast.error('Save failed');
     } finally {
       setSaving(false);
     }

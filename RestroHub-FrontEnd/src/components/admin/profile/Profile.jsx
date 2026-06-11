@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 import ProfileHeader from './profileComponents/ProfileHeader';
 import ProfileSidebar from './profileComponents/ProfileSidebar';
@@ -70,6 +71,7 @@ const Profile = () => {
           'Failed to fetch profile:',
           error
         );
+        toast.error('Failed to fetch profile');
 
       } finally {
 
@@ -118,6 +120,7 @@ const Profile = () => {
         'Failed to update profile:',
         error
       );
+      toast.error('Failed to update profile');
     }
   };
 

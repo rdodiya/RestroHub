@@ -3,6 +3,7 @@ import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
 import OrderCard from './OrderCard';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
+import toast from 'react-hot-toast';
 
 // ============================================
 // MAIN COMPONENT
@@ -96,6 +97,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       syncOrders(fallbackOrders);
     } catch (err) {
       console.error('Failed to fetch orders:', err);
+      toast.error('Failed to fetch orders');
       setError('Failed to load orders');
       syncOrders(fallbackOrders);
     } finally {

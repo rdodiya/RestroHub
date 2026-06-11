@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { X, Loader2, Tag, Type, FileText  } from "lucide-react";
 import api from "@services/common/api";
+import toast from 'react-hot-toast';
 
 const CategoryFormModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -36,6 +37,7 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
     } catch (err) {
       console.error("Category create failed:", err.response?.data || err);
+      toast.error("Category create failed");
     } finally {
       setSubmitting(false);
     }

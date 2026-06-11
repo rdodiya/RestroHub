@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Download, Loader2, ExternalLink } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import QRCode from 'react-qr-code';
+import toast from 'react-hot-toast';
 
 const TableQRModal = ({ isOpen, onClose, table, branchId }) => {
   const [downloading, setDownloading] = useState(false);
@@ -17,6 +18,7 @@ const TableQRModal = ({ isOpen, onClose, table, branchId }) => {
       console.log('Download QR:', table.number);
     } catch (err) {
       console.error('Download failed:', err);
+      toast.error('Download failed');
     } finally {
       setDownloading(false);
     }
