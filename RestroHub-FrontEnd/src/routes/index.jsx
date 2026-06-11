@@ -6,6 +6,7 @@ import PublicLayout from '../layouts/PublicLayout';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
+import { AdminRoute } from './ProtectedRoute';
 
 // Public Pages
 import Landing from '../pages/public/Landing';
@@ -26,6 +27,7 @@ import Website from '@components/admin/marketing/website/Website';
 import QRDisplay from '@components/admin/marketing/qr/QRDisplay';
 import UPILinks from '@components/admin/upi/UPILinks';
 import Profile from '@components/admin/profile/Profile';
+import UserRoleManagement from '@components/admin/roles/UserRoleManagement';
 
 const AppRoutes = () => {
   return (
@@ -61,6 +63,7 @@ const AppRoutes = () => {
         <Route path="marketing/website" element={<Website />} />
         <Route path="marketing/qr-display" element={<QRDisplay />} />
         <Route path="upi-links" element={<UPILinks />} />
+        <Route path="role-management" element={<AdminRoute><UserRoleManagement /></AdminRoute>} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
