@@ -10,6 +10,7 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const updateField = (field, value) => {
     setFormData(prev => ({
@@ -20,6 +21,16 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // client-side validation
+    const errs = {};
+    if (!formData.name.trim()) errs.name = 'Category name is required';
+    else if (formData.name.trim().length < 2) errs.name = 'Minimum 2 characters';
+
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
+
     try {
       setSubmitting(true);
 
@@ -82,16 +93,22 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => updateField("name", e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+              onChange={(e) => {
+                updateField("name", e.target.value);
+                setFieldErrors((p) => ({ ...p, name: undefined }));
+              }}
+              className={`w-full px-4 py-3 bg-gray-50 rounded-xl
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
                          focus:bg-white outline-none transition-all text-gray-800
-                         placeholder:text-gray-400"
+                         placeholder:text-gray-400 ${fieldErrors.name ? 'border-red-500' : 'border-gray-200'}`}
               placeholder="e.g. Starters"
-              required
+              aria-required="true"
+              aria-invalid={fieldErrors.name ? 'true' : 'false'}
+              aria-describedby={fieldErrors.name ? 'err-cat-name' : undefined}
               minLength={2}
               maxLength={50}
             />
+            {fieldErrors.name && <p id="err-cat-name" className="mt-1.5 text-xs text-red-500">{fieldErrors.name}</p>}
           </div>
 
           {/* Description */}

@@ -235,9 +235,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                                placeholder:text-gray-400"
                     placeholder="e.g. Paneer Tikka, Chicken Biryani"
                     required
-                    aria-invalid={Boolean(errors.name)}
+                      aria-invalid={Boolean(errors.name)}
+                      aria-describedby={errors.name ? 'err-food-name' : undefined}
                   />
-                  {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
+                    {errors.name && <p id="err-food-name" className="text-xs text-red-500">{errors.name}</p>}
                 </div>
 
                 {/* Price */}
@@ -263,9 +264,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                       placeholder="250.00"
                       required
                       aria-invalid={Boolean(errors.price)}
+                      aria-describedby={errors.price ? 'err-food-price' : undefined}
                     />
                   </div>
-                  {errors.price && <p className="text-xs text-red-500">{errors.price}</p>}
+                  {errors.price && <p id="err-food-price" className="text-xs text-red-500">{errors.price}</p>}
                 </div>
               </div>
 
@@ -285,10 +287,11 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                              placeholder:text-gray-400 resize-none"
                   placeholder="Describe the food item, ingredients, taste..."
                   aria-invalid={Boolean(errors.description)}
+                  aria-describedby={errors.description ? 'err-food-description' : undefined}
                 />
                 <div className="flex justify-between gap-3">
                   {errors.description ? (
-                    <p className="text-xs text-red-500">{errors.description}</p>
+                    <p id="err-food-description" className="text-xs text-red-500">{errors.description}</p>
                   ) : (
                     <span />
                   )}
@@ -314,7 +317,8 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                                  focus:border-transparent focus:bg-white outline-none
                                  transition-all text-gray-800 appearance-none cursor-pointer"
                       required
-                      aria-invalid={Boolean(errors.categoryId)}
+                        aria-invalid={Boolean(errors.categoryId)}
+                        aria-describedby={errors.categoryId ? 'err-food-category' : undefined}
                     >
                       <option value="" disabled>
                         Select a category
@@ -333,7 +337,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
-                  {errors.categoryId && <p className="text-xs text-red-500">{errors.categoryId}</p>}
+                  {errors.categoryId && <p id="err-food-category" className="text-xs text-red-500">{errors.categoryId}</p>}
                 </div>
 
                 {/* Image Upload */}
@@ -378,7 +382,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                       className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
                     />
                   </label>
-                  {errors.imageFile && <p className="text-xs text-red-500">{errors.imageFile}</p>}
+                  {errors.imageFile && <p id="err-food-imagefile" className="text-xs text-red-500">{errors.imageFile}</p>}
                 </div>
               </div>
 
@@ -399,9 +403,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                              placeholder:text-gray-400 disabled:opacity-60"
                   placeholder="https://example.com/food-image.jpg"
                   aria-invalid={Boolean(errors.imageUrl)}
+                  aria-describedby={errors.imageUrl ? 'err-food-imageurl' : undefined}
                 />
                 {errors.imageUrl ? (
-                  <p className="text-xs text-red-500">{errors.imageUrl}</p>
+                  <p id="err-food-imageurl" className="text-xs text-red-500">{errors.imageUrl}</p>
                 ) : (
                   <p className="text-xs text-gray-400">Use a URL when no image file is uploaded.</p>
                 )}
