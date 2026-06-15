@@ -140,7 +140,7 @@ node --version     # expect 18+
 npm --version      # expect 9+
 psql --version     # expect 14+
 git --version
-=======
+
 - Node.js 18.0 or higher
 - npm 9.0 or higher (comes with Node.js)
 - Git
@@ -291,7 +291,6 @@ Edit `.env` and set:
 ```env
 # Spring Boot context path — no trailing slash
 VITE_API_BASE_URL=http://localhost:8181/restroly
-=======
 #### 2. Environment configuration - Google OAuth
 
 Create a `.env` file in `RestroHub-FrontEnd/` (see `.env.example`):
@@ -307,7 +306,7 @@ VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
 Optional:
 
 
-# Optional
+
 VITE_NODE_ENV=development
 VITE_ENABLE_ANALYTICS=false
 ```
@@ -416,7 +415,7 @@ RestroHub/
 │
 ├── CONTRIBUTING.md
 ├── LICENSE
-└── README.md
+└── READMe.md
 ```
 
 ---
@@ -667,7 +666,6 @@ java -version   # must be 21+
 ```
 </details>
 
----
 
 ### Frontend
 
@@ -703,7 +701,7 @@ npm run dev -- --port 5173
 ```
 </details>
 
----
+
 
 ## 📄 License
 
