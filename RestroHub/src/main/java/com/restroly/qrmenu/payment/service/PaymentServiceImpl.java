@@ -7,6 +7,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.restroly.qrmenu.payment.entity.PaymentStatus;
 import com.restroly.qrmenu.payment.entity.PaymentVerification;
+import com.restroly.qrmenu.payment.exception.PaymentNotFoundException;
 import com.restroly.qrmenu.payment.repository.PaymentVerificationRepository;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -106,19 +107,33 @@ public class PaymentServiceImpl implements PaymentService {
 
     public void markPaymentAsVerified(String paymentId, String transactionId) {
         log.info("Marking paymentId: {} as verified with transactionId: {}", paymentId, transactionId);
-        verificationRepository.findByPaymentId(paymentId).ifPresent(entity -> {
-            entity.setStatus(PaymentStatus.SUCCESS);
-            entity.setTransactionId(transactionId);
-            verificationRepository.save(entity);
-        });
+        
+        PaymentVerification entity = verificationRepository.findByPaymentId(paymentId)
+                .orElseThrow(() ->{
+                    log.warn("PaymentId: {} not found in database", paymentId);
+                    return new PaymentNotFoundException("Payment record not found for paymentId: " + paymentId);
+                });
+
+        entity.setStatus(PaymentStatus.SUCCESS);
+        entity.setTransactionId(transactionId);
+        verificationRepository.save(entity);
+
+        log.info("PaymentId: {} marked as SUCCESS with transactionId: {}", paymentId, transactionId);
     }
 
     public void markPaymentAsCancelled(String paymentId) {
         log.info("Marking paymentId: {} as cancelled", paymentId);
-        verificationRepository.findByPaymentId(paymentId).ifPresent(entity -> {
-            entity.setStatus(PaymentStatus.CANCELLED);
-            verificationRepository.save(entity);
-        });
+        
+        PaymentVerification entity = verificationRepository.findByPaymentId(paymentId)
+                .orElseThrow(() -> {
+                    log.warn("PaymentId: {} not found in database", paymentId);
+                    return new PaymentNotFoundException("Payment record not found for paymentId: " + paymentId);
+                });
+
+        entity.setStatus(PaymentStatus.CANCELLED);
+        verificationRepository.save(entity);
+
+        log.info("PaymentId: {} marked as cancelled", paymentId);
     }
 
     @Override

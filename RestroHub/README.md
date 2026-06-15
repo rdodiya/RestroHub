@@ -238,28 +238,40 @@ cd RestroHub/RestroHub
 createdb RestroHub_DB
 # Or via psql:
 # psql -U postgres -c 'CREATE DATABASE "RestroHub_DB";'
+```
 
-# Set up backend configuration
 Backend configuration is now managed through Spring property files in `src/main/resources`.
 Update `application-dev.properties` with your local database values if needed.
 
 The Google OAuth Client ID should be provided via an environment variable rather than committed into a config file.
 Backend Spring Boot reads this value from `GOOGLE_OAUTH_CLIENT_ID`.
+Cloudinary image upload credentials must also be provided through environment variables.
 
 Example environment setup:
+
+PowerShell:
+```powershell
+$env:GOOGLE_OAUTH_CLIENT_ID="your-google-client-id"
+$env:CLOUDINARY_CLOUD_NAME="your-cloud-name"
+$env:CLOUDINARY_API_KEY="your-cloudinary-api-key"
+$env:CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
 ```
-- PowerShell:
-  ```powershell
-  $env:GOOGLE_OAUTH_CLIENT_ID="your-google-client-id"
-  ```
-- CMD:
-  ```cmd
-  set GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
-  ```
-- Bash:
-  ```bash
-  export GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
-  ```
+
+CMD:
+```cmd
+set GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+set CLOUDINARY_CLOUD_NAME=your-cloud-name
+set CLOUDINARY_API_KEY=your-cloudinary-api-key
+set CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+```
+
+Bash:
+```bash
+export GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+export CLOUDINARY_CLOUD_NAME=your-cloud-name
+export CLOUDINARY_API_KEY=your-cloudinary-api-key
+export CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+```
 
 ---
 

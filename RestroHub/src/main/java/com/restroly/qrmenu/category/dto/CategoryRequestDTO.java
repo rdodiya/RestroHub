@@ -3,6 +3,7 @@ package com.restroly.qrmenu.category.dto; // Changed package to fit category DTO
 import com.restroly.qrmenu.category.entity.Category;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

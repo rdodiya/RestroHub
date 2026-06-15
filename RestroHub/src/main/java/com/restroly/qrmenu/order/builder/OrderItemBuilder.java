@@ -1,6 +1,7 @@
 // com/Restroly/qrmenu/order/builder/OrderItemBuilder.java
 package com.restroly.qrmenu.order.builder;
 
+import com.restroly.qrmenu.exception.ValidationException;
 import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.order.entity.OrderItem;
 import org.springframework.stereotype.Component;
@@ -40,11 +41,12 @@ public class OrderItemBuilder {
     }
 
     public OrderItem build() {
+        // FIXED: was IllegalStateException — now ValidationException (400 BAD REQUEST)
         if (food == null) {
-            throw new IllegalStateException("Food item is required");
+            throw new ValidationException("Food item is required");
         }
         if (quantity == null || quantity <= 0) {
-            throw new IllegalStateException("Quantity must be greater than 0");
+            throw new ValidationException("Quantity must be greater than 0");
         }
 
         OrderItem item = new OrderItem();

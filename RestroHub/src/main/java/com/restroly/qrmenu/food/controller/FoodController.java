@@ -1,10 +1,9 @@
 // src/main/java/com/Restroly/qrmenu/food/controller/FoodController.java
 package com.restroly.qrmenu.food.controller;
 
-import com.restroly.qrmenu.common.exception.ErrorResponse;
+import com.restroly.qrmenu.exception.ApiErrorResponse;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
 import com.restroly.qrmenu.common.util.ApiConstants;
-import com.restroly.qrmenu.food.dto.*;
 import com.restroly.qrmenu.food.dto.FoodRequestDTO;
 import com.restroly.qrmenu.food.dto.FoodResponseDTO;
 import com.restroly.qrmenu.food.dto.FoodUpdateDTO;
@@ -34,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.atomic.LongAccumulator;
 
 import static com.restroly.qrmenu.common.util.ApiConstants.SECURE_API_VERSION;
 
@@ -60,9 +58,9 @@ public class FoodController {
             @ApiResponse(responseCode = "201", description = "Food item created successfully",
                     content = @Content(schema = @Schema(implementation = FoodResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Food item already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions")
     })
@@ -86,7 +84,7 @@ public class FoodController {
             @ApiResponse(responseCode = "200", description = "Food item found",
                     content = @Content(schema = @Schema(implementation = FoodResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "Food item not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<FoodResponseDTO> getFoodById(
             @Parameter(description = "Long Id of the food item", required = true)
@@ -236,21 +234,21 @@ public class FoodController {
 
     @PutMapping(value = "/{foodId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Update a food item",
-            description = "Updates an existing food item. Requires ADMIN or MANAGER role.",
+            description = "Updates an existing food item. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Food item updated successfully",
                     content = @Content(schema = @Schema(implementation = FoodResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Food item not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Food name already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<FoodResponseDTO> updateFood(
             @Parameter(description = "UUID of the food item", required = true)
@@ -263,10 +261,10 @@ public class FoodController {
     }
 
     @PatchMapping(value = "/{foodId}/{available}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'RESTAURANT_OWNER')")
     @Operation(
             summary = "Update food availability",
-            description = "Updates the availability status of a food item",
+            description = "Updates the availability status of a food item. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
@@ -285,11 +283,11 @@ public class FoodController {
     }
 
     @DeleteMapping("/{foodId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESTAURANT_OWNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete a food item",
-            description = "Deletes a food item from the menu. Requires ADMIN role.",
+            description = "Deletes a food item from the menu. Requires ADMIN or RESTAURANT_OWNER role.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
