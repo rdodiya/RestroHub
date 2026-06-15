@@ -434,10 +434,10 @@ http://localhost:8181/restroly/swagger-ui.html
 #### Menus
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/menus` | List all menus |
-| `POST` | `/api/v1/menus` | Create a menu |
-| `PUT` | `/api/v1/menus/{id}` | Update a menu |
-| `DELETE` | `/api/v1/menus/{id}` | Delete a menu |
+| `GET` | `/secure/api/v1/menus` | List all menus |
+| `POST` | `/secure/api/v1/menus` | Create a menu |
+| `PUT` | `/secure/api/v1/menus/{id}` | Update a menu |
+| `DELETE` | `/secure/api/v1/menus/{id}` | Delete a menu |
 
 #### Categories
 | Method | Endpoint | Description |
