@@ -34,23 +34,48 @@ import com.restroly.qrmenu.user.entity.User;
 import com.restroly.qrmenu.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthServiceImpl implements AuthService {
+    private static class TokenData {
+    private final String token;
+    private final LocalDateTime expiryTime;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    public TokenData(String token, LocalDateTime expiryTime) {
+        this.token = token;
+        this.expiryTime = expiryTime;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public LocalDateTime getExpiryTime() {
+        return expiryTime;
+    }
+}
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    
+    private final Map<String, TokenData> resetTokenCache = new ConcurrentHashMap<>();
+
+    @Value("${reset.expiry.threshold.days:90}")
+    private int resetExpiryThresholdDays;
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
@@ -67,6 +92,16 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            boolean isResetRequired = false;
+
+            if (user.getResetPassExpiryDate() != null &&
+                    LocalDateTime.now().isAfter(user.getResetPassExpiryDate())) {
+
+                isResetRequired = true;
+            }
             String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
             String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
 
@@ -83,6 +118,7 @@ public class AuthServiceImpl implements AuthService {
                     .expiresIn(jwtTokenProvider.getExpirationInSeconds())
                     .username(userDetails.getUsername())
                     .roles(roles)
+                    .isResetRequire(isResetRequired)
                     .build();
 
         } catch (BadCredentialsException ex) {
@@ -144,28 +180,65 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse register(RegisterRequest registerRequest) {
 
-        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            throw new DuplicateResourceException("User already exists with this email");
-        }
+        User user = userRepository.findByEmail(email)
+            .orElse(null);
+            if (user == null) {
+                return;
+            }
 
-        User user = User.builder()
-                .name(registerRequest.getFirstName() + " " + registerRequest.getLastName())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .isActive(true)
-                .isLocked(false)
-                .authProvider("LOCAL")
-                .build();
+        String token = String.format("%06d", new Random().nextInt(999999));
 
-        Role customerRole = roleRepository.findByName("CUSTOMER")
-                .orElseThrow(() -> new RuntimeException("Default CUSTOMER role not found"));
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(10);
 
-        user.setRoles(new ArrayList<>(Collections.singletonList(customerRole)));
+        resetTokenCache.put(
+        email,
+        new TokenData(token, expiryTime)
+    );
 
-        userRepository.save(user);
+
 
         return AuthResponse.builder()
         .username(user.getEmail())
         .build();
     }
+    @Override
+    public void resetPassword(String email, String token, String newPassword) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    if (passwordEncoder.matches(newPassword, user.getPassword())) {
+        throw new RuntimeException("New password cannot be same as current password");
+    }
+
+    if (token != null && !token.trim().isEmpty()) {
+
+        TokenData tokenData = resetTokenCache.get(email);
+
+        if (tokenData == null) {
+            throw new RuntimeException("Invalid or expired token");
+        }
+
+        if (LocalDateTime.now().isAfter(tokenData.getExpiryTime())) {
+            resetTokenCache.remove(email);
+            throw new RuntimeException("Token expired, please regenerate token");
+        }
+
+        if (!tokenData.getToken().equals(token)) {
+            throw new RuntimeException("Invalid token");
+        }
+
+        resetTokenCache.remove(email);
+    }
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+
+    user.setResetPassExpiryDate(
+            LocalDateTime.now().plusDays(resetExpiryThresholdDays)
+    );
+
+    userRepository.save(user);
+
+    System.out.println("Password reset successful");
+}
 }

@@ -244,7 +244,8 @@ if(!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
 
 @PostMapping("/reset-password")
 public ResponseEntity<String> resetPassword(
-        @RequestParam String token,
+        @RequestParam String email,
+        @RequestParam(required = false) String token,
         @RequestParam String newPassword) {
                 if(newPassword == null || newPassword.trim().isEmpty()) {
     return ResponseEntity.badRequest().body("Password cannot be empty");
@@ -253,8 +254,10 @@ public ResponseEntity<String> resetPassword(
 if(newPassword.length() < 6) {
     return ResponseEntity.badRequest().body("Password must be at least 6 characters");
 }
-    authService.resetPassword(token, newPassword);
-
+if(token != null && token.trim().isEmpty()) {
+    return ResponseEntity.badRequest().body("Invalid token");
+}
+        authService.resetPassword(email, token, newPassword);
     return ResponseEntity.ok("Password reset successful");
 }
    

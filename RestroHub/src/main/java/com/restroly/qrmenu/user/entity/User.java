@@ -29,11 +29,8 @@ public class User {
     @Column(name = "user_password", nullable = false)
     private String password;
 
-    @Column(name = "reset_token")
-    private String resetToken;
-
-    @Column(name = "reset_token_expiry")
-    private LocalDateTime resetTokenExpiry;
+    @Column(name = "reset_pass_expiry_date")
+    private LocalDateTime resetPassExpiryDate;
 
     @Column(name = "phone_number")
     private String phoneNumber;
