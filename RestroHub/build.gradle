@@ -66,7 +66,7 @@ dependencies {
     // Testing
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-  //  testImplementation 'org.springframework.boot:spring-boot-starter-test';
+    testImplementation 'org.springframework.boot:spring-boot-starter-test';
     testImplementation 'org.springframework.security:spring-security-test';
 
     //OpenAPI Documentation
@@ -78,6 +78,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
+    // Google OAuth 2.0 for token verification
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.11.0'
+
     // Logging (JSON format for production)
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
@@ -85,10 +88,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
+// tasks.named('test') {
+//     enabled = false
+// }
 tasks.named('test') {
-    enabled = false
+    useJUnitPlatform()
 }
-
 
 //tasks.withType<Test> {
 //	useJUnitPlatform()

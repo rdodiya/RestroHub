@@ -9,6 +9,8 @@ import com.restroly.qrmenu.table.entity.Tables;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,37 +94,37 @@ public class OrderBuilderImpl implements OrderBuilder {
         validateOrder();
 
         Order order = new Order();
-//        order.setBranch(this.branch);
-//        order.setTable(this.table);
-//        order.setCustomerName(this.customerName);
-//        order.setCustomerPhone(this.customerPhone);
-//        order.setSpecialInstructions(this.specialInstructions);
-//        order.setStatus(this.status);
-//        order.setCreatedAt(LocalDateTime.now());
-//        order.setOrderItems(new ArrayList<>());
-//
-//        // Calculate total and set order reference in items
-//        BigDecimal totalAmount = BigDecimal.ZERO;
-//        
-//        for (OrderItem item : this.orderItems) {
-//            item.setOrder(order);
-//            
-//            // Calculate subtotal for each item
-//            BigDecimal subtotal = item.getUnitPrice()
-//                    .multiply(BigDecimal.valueOf(item.getQuantity()));
-//            item.setSubtotal(subtotal);
-//            
-//            totalAmount = totalAmount.add(subtotal);
-//            order.getOrderItems().add(item);
-//        }
-//        
-//        order.setTotalAmount(totalAmount);
-//
-//        log.info("Order built successfully with {} items, total: {}", 
-//                orderItems.size(), totalAmount);
+        order.setBranch(this.branch);
+        order.setTable(this.table);
+        order.setCustomerName(this.customerName);
+        order.setCustomerPhone(this.customerPhone);
+        order.setSpecialInstructions(this.specialInstructions);
+        order.setStatus(this.status);
+        order.setCreatedAt(LocalDateTime.now());
+        order.setOrderItems(new ArrayList<>());
+
+        // Calculate total and set order reference in items
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (OrderItem item : this.orderItems) {
+            item.setOrder(order);
+
+            // Calculate subtotal for each item
+            BigDecimal subtotal = item.getUnitPrice()
+                    .multiply(BigDecimal.valueOf(item.getQuantity()));
+            item.setSubtotal(subtotal);
+
+            totalAmount = totalAmount.add(subtotal);
+            order.getOrderItems().add(item);
+        }
+
+        order.setTotalAmount(totalAmount);
+
+        log.info("Order built successfully with {} items, total: {}",
+                orderItems.size(), totalAmount);
 
         // Reset for next build
-        reset();
+//        reset();
 
         return order;
     }

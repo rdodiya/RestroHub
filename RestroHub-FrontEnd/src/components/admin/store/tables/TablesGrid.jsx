@@ -1,69 +1,57 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, LayoutGrid } from 'lucide-react';
+import api from '@services/common/api';
 import TableCard from './TableCard';
+import AdminSkeleton from '../../AdminSkeleton';
+import { normalizeTable } from './tableMapper';
 
-// Skeleton
-const TableSkeleton = () => (
-  <div className="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white animate-pulse">
-    <div className="px-4 py-5 text-center">
-      <div className="mx-auto mb-2 h-14 w-14 rounded-xl bg-gray-100" />
-      <div className="mx-auto mb-1 h-4 w-14 rounded bg-gray-100" />
-      <div className="mx-auto mb-2 h-3 w-12 rounded bg-gray-100" />
-      <div className="mx-auto h-5 w-16 rounded-full bg-gray-100" />
-    </div>
-    <div className="flex justify-center gap-2 border-t border-gray-100 px-3 py-3">
-      <div className="h-8 w-8 rounded-lg bg-gray-100" />
-      <div className="h-8 w-8 rounded-lg bg-gray-100" />
-      <div className="h-8 w-8 rounded-lg bg-gray-100" />
-    </div>
-  </div>
-);
-
-const TablesGrid = ({ branchId, onShowQR, onTablesLoaded }) => {
+const TablesGrid = ({ branchId, onShowQR, onEdit, onTablesLoaded, refreshKey }) => {
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fallbackTables = [
-    { id: 1, number: 1, capacity: 4, status: 'available' },
-    { id: 2, number: 2, capacity: 2, status: 'occupied' },
-    { id: 3, number: 3, capacity: 6, status: 'available' },
-    { id: 4, number: 4, capacity: 4, status: 'occupied' },
-    { id: 5, number: 5, capacity: 8, status: 'reserved' },
-    { id: 6, number: 6, capacity: 4, status: 'available' },
-    { id: 7, number: 7, capacity: 2, status: 'available' },
-    { id: 8, number: 8, capacity: 4, status: 'occupied' },
-  ];
-
   useEffect(() => {
     fetchTables();
-  }, [branchId]);
+  }, [branchId, refreshKey]);
 
   const fetchTables = async () => {
+    if (!branchId) {
+      setTables([]);
+      onTablesLoaded?.([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
-      // 🔌 const response = await api.get(`/api/branches/${branchId}/tables`);
-      await new Promise((r) => setTimeout(r, 500));
-      setTables(fallbackTables);
-      onTablesLoaded?.(fallbackTables);
+      const response = await api.get(`/secure/api/v1/branches/${branchId}/tables`);
+      const tableList = (response.data || []).map(normalizeTable);
+      setTables(tableList);
+      onTablesLoaded?.(tableList);
     } catch (err) {
       console.error('Fetch failed:', err);
       setError('Failed to load tables');
-      setTables(fallbackTables);
+      setTables([]);
+      onTablesLoaded?.([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = (id) => {
-    setTables((prev) => prev.filter((t) => t.id !== id));
+  const removeTableState = (tableId) => {
+    setTables((prev) => {
+      const next = prev.filter((table) => table.id !== tableId);
+      onTablesLoaded?.(next);
+      return next;
+    });
   };
 
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <TableSkeleton key={i} />)}
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <AdminSkeleton key={i} variant="table" />)}
       </div>
     );
   }
@@ -102,13 +90,14 @@ const TablesGrid = ({ branchId, onShowQR, onTablesLoaded }) => {
             key={table.id}
             table={table}
             onShowQR={onShowQR}
-            onDelete={handleDelete}
+            onEdit={onEdit}
+            onDelete={removeTableState}
           />
         ))}
       </div>
       <p className="mt-4 text-center text-xs text-gray-500 sm:text-sm">
-        {tables.length} tables •{' '}
-        {tables.filter((t) => t.status === 'available').length} available
+        {tables.filter((t) => t.isActive).length} active tables -{' '}
+        {tables.filter((t) => t.isActive && t.status === 'available').length} available
       </p>
     </div>
   );

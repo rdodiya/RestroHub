@@ -1,15 +1,16 @@
-import { useState } from 'react';
-import { User, Save, Loader2, X, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Save, Loader2, X} from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const PersonalInfoCard = ({ profile, onSave }) => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstName: profile.firstName || 'Kashyap',
-    lastName: profile.lastName || 'Rathod',
-    email: profile.email || 'admin@restrohub.com',
-    phone: profile.phone || '9876543210',
+    email: profile.email || '',
+    phoneNumber: profile.phoneNumber || '',
+    firstName: profile.name ? profile.name.split(' ')[0] : '',
+    lastName: profile.name ? profile.name.split(' ').slice(1).join(' ') : '',
     altPhone: profile.altPhone || '',
     dateOfBirth: profile.dateOfBirth || '1995-06-15',
     gender: profile.gender || 'male',
@@ -20,16 +21,34 @@ const PersonalInfoCard = ({ profile, onSave }) => {
     bio: profile.bio || '',
   });
 
+  // Sync form data when profile prop updates (after API fetch completes)
+  useEffect(() => {
+    const names = profile.name ? profile.name.split(' ') : [];
+    setFormData((prev) => ({
+      ...prev,
+      firstName: names[0] || '',
+      lastName: names.slice(1).join(' ') || '',
+      email: profile.email || '',
+      phoneNumber: profile.phoneNumber || '',
+    }));
+  }, [profile]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setSaving(true);
-      // 🔌 await api.put('/api/profile', formData);
-      await new Promise((r) => setTimeout(r, 800));
-      onSave?.(formData);
+      if (onSave) {
+        const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+        await onSave({
+          name: fullName,
+          phoneNumber: formData.phoneNumber
+        });
+      }
+      toast.success('Profile updated successfully!');
       setEditing(false);
     } catch (err) {
       console.error('Save failed:', err);
+      toast.error('Failed to update profile.');
     } finally {
       setSaving(false);
     }
@@ -37,21 +56,15 @@ const PersonalInfoCard = ({ profile, onSave }) => {
 
   const handleCancel = () => {
     setEditing(false);
-    // Reset form
-    setFormData({
-      firstName: profile.firstName || 'Kashyap',
-      lastName: profile.lastName || 'Rathod',
-      email: profile.email || 'admin@restrohub.com',
-      phone: profile.phone || '9876543210',
-      altPhone: profile.altPhone || '',
-      dateOfBirth: profile.dateOfBirth || '1995-06-15',
-      gender: profile.gender || 'male',
-      address: profile.address || 'Kalawad Road, Rajkot',
-      city: profile.city || 'Rajkot',
-      state: profile.state || 'Gujarat',
-      pincode: profile.pincode || '360005',
-      bio: profile.bio || '',
-    });
+    const names = profile.name ? profile.name.split(' ') : [];
+    // Reset form to last fetched profile values
+    setFormData((prev) => ({
+      ...prev,
+      firstName: names[0] || '',
+      lastName: names.slice(1).join(' ') || '',
+      email: profile.email || '',
+      phoneNumber: profile.phoneNumber || '',
+    }));
   };
 
   const updateField = (field, value) => {
@@ -112,10 +125,10 @@ const PersonalInfoCard = ({ profile, onSave }) => {
 
       {/* Body */}
       {editing ? (
-        /* ============ EDIT MODE ============ */
+        /* edit mode */
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 px-4 py-5 sm:px-6">
-            {/* Name Row */}
+            {/* First Name & Last Name Row */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelClass}>First Name</label>
@@ -136,30 +149,28 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                   onChange={(e) => updateField('lastName', e.target.value)}
                   className={inputClass}
                   placeholder="Last name"
-                  required
                 />
               </div>
             </div>
 
-            {/* Email + Phone */}
+            {/* Email & Phone Row */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelClass}>Email Address</label>
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => updateField('email', e.target.value)}
                   className={inputClass}
-                  placeholder="admin@restrohub.com"
-                  required
+                  disabled
+                  title="Email cannot be changed"
                 />
               </div>
               <div>
                 <label className={labelClass}>Phone Number</label>
                 <input
                   type="tel"
-                  value={formData.phone}
-                  onChange={(e) => updateField('phone', e.target.value)}
+                  value={formData.phoneNumber}
+                  onChange={(e) => updateField('phoneNumber', e.target.value)}
                   className={inputClass}
                   placeholder="9876543210"
                   required
@@ -247,6 +258,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                 onChange={(e) => updateField('bio', e.target.value)}
                 className={`${inputClass} resize-none`}
                 rows={3}
+                maxLength={200}
                 placeholder="Tell us about yourself..."
               />
               <p className="mt-1 text-xs text-gray-400">
@@ -291,13 +303,13 @@ const PersonalInfoCard = ({ profile, onSave }) => {
           </div>
         </form>
       ) : (
-        /* ============ VIEW MODE ============ */
+        /* view mode */
         <div className="px-4 py-5 sm:px-6">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow label="First Name" value={formData.firstName} />
             <InfoRow label="Last Name" value={formData.lastName} />
             <InfoRow label="Email" value={formData.email} />
-            <InfoRow label="Phone" value={formData.phone} />
+            <InfoRow label="Phone" value={formData.phoneNumber} />
             <InfoRow label="Date of Birth" value={formData.dateOfBirth} />
             <InfoRow
               label="Gender"

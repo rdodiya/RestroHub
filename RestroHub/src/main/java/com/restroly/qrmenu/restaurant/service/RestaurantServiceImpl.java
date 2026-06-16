@@ -1,7 +1,7 @@
 package com.restroly.qrmenu.restaurant.service;
 
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.restaurant.dto.RestaurantRequestDTO;
 import com.restroly.qrmenu.restaurant.dto.RestaurantResponseDTO;
 import com.restroly.qrmenu.restaurant.dto.RestaurantUpdateDTO;

@@ -10,8 +10,8 @@ api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
     // Add token only for secure APIs
-    if (accessToken && config.url.includes("/secure/")) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    if (accessToken) {
+  config.headers.Authorization = `Bearer ${accessToken}`;
     }
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
@@ -25,8 +25,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/login";
+      if (!error.config?.url?.includes("/public/")) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("roles");
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(error);

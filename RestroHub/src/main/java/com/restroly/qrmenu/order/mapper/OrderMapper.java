@@ -30,6 +30,7 @@ public class OrderMapper {
 	             .status(order.getStatus())
 	             .createdAt(order.getCreatedAt())
 	             .items(toItemResponseList(order.getOrderItems()))
+				 .paymentLink(order.getPaymentId())
 	             .build();
 	 }
 
