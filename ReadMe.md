@@ -728,6 +728,6 @@ When reporting bugs, please include:
 
 **Made with ❤️ for Indian Restaurants**
 
-[⬆ Back to top](#-restrohub---digital-menu--restaurant-management-platform)
+[⬆ Back to top](#-restroly---digital-menu--restaurant-management-platform)
 
 </div>
