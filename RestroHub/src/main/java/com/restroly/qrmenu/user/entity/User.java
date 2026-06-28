@@ -45,8 +45,9 @@ public class User {
     @Column(name = "auth_provider")
     private String authProvider;  // e.g., "GOOGLE", "LOCAL", "FACEBOOK" (future)
 
-    @Column(name = "picture_url")
-    private String pictureUrl;  // User profile picture from OAuth provider
+    
+    @Column(name = "user_profile")
+    private byte[] userProfile; // BLOB for storing profile image bytes
 
     @ManyToMany
     @JoinTable(

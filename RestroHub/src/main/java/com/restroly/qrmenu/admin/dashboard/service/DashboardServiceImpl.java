@@ -2,14 +2,11 @@ package com.restroly.qrmenu.admin.dashboard.service;
 
 
 import com.restroly.qrmenu.admin.dashboard.dto.DashboardStatDTO;
-import com.restroly.qrmenu.branch.repository.BranchRepository;
 import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.order.repository.OrderRepository;
-import com.restroly.qrmenu.order.service.OrderNotificationService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -35,7 +32,7 @@ public class DashboardServiceImpl implements DashboardService {
         // Today's Revenue
         BigDecimal todayRevenue = orderRepository.getTodayRevenue(startOfDay, endOfDay);
 
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+        @SuppressWarnings("deprecation") NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
         String formattedRevenue = formatter.format(todayRevenue);
 
         // Live Orders (Active statuses)
