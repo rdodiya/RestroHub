@@ -29,6 +29,9 @@ public class User {
     @Column(name = "user_password", nullable = false)
     private String password;
 
+    @Column(name = "reset_pass_expiry_date")
+    private LocalDateTime resetPassExpiryDate;
+
     @Column(name = "phone_number")
     private String phoneNumber;
 

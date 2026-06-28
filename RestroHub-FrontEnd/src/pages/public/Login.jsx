@@ -170,18 +170,29 @@ const Login = () => {
         const result = res.data;
 
         if (result.success) {
-          const { accessToken, refreshToken, roles } = result.data;
+          const {
+            accessToken,
+            refreshToken,
+            roles,
+            isResetRequire
+          } = result.data;
 
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("refreshToken", refreshToken);
           localStorage.setItem("roles", JSON.stringify(roles));
+
+          if (isResetRequire) {
+            toast.error("Password expired. Please reset your password.");
+            navigate("/forgot-password");
+            return;
+          }
 
           axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
           toast.success("Login successful!");
 
           navigate("/admin/dashboard");
-        } else {
+        }else {
           toast.error(result.message || "Login failed");
         }
       } catch (err) {
