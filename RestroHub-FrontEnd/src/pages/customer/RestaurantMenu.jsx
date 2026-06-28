@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SiteProvider, useSiteData } from '@context/SiteContext.jsx';
 
 // Components
@@ -12,6 +12,7 @@ import ReservationsSection from '@components/customer/ReservationsSection.jsx';
 import ContactSection from '@components/customer/ContactSection.jsx';
 import Footer from '@components/customer/Footer.jsx';
 import ServiceFAB from '@components/customer/ServiceFAB.jsx';
+import CartDrawer from '@components/customer/CartDrawer.jsx';
 
 // ============================================
 // MAIN APP COMPONENT
@@ -19,6 +20,7 @@ import ServiceFAB from '@components/customer/ServiceFAB.jsx';
 
 const AppContent = () => {
     const { loading, error } = useSiteData();
+    const [cartOpen, setCartOpen] = useState(false);
 
     // Show loader while fetching data
     if (loading) {
@@ -32,7 +34,7 @@ const AppContent = () => {
 
     return (
         <div className="app">
-            <Navigation />
+            <Navigation onCartClick={() => setCartOpen(true)} />
             <main>
                 <HeroSection />
                 <AboutSection />
@@ -43,6 +45,7 @@ const AppContent = () => {
             </main>
             <Footer />
             <ServiceFAB />
+            <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
         </div>
     );
 };

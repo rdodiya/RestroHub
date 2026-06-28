@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSiteData } from '@context/SiteContext.jsx';
+import { useCart } from '@context/CartContext';
 
-const Navigation = () => {
+const Navigation = ({ onCartClick }) => {
     const { siteData } = useSiteData();
+    const { itemCount } = useCart();
     const navigate = useNavigate();
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,6 +46,23 @@ const Navigation = () => {
                         </a>
                     ))}
                 </div>
+
+                <button
+                    onClick={onCartClick}
+                    className="nav-cart-btn"
+                    aria-label={`Cart with ${itemCount} items`}
+                >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                         strokeLinejoin="round">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    {itemCount > 0 && (
+                        <span className="nav-cart-badge">{itemCount}</span>
+                    )}
+                </button>
 
                 <button 
                     className="nav-mobile-btn" 
@@ -113,8 +132,26 @@ const Navigation = () => {
                     align-items: center; 
                     gap: var(--spacing-xl, 20px); 
                 }
+                .nav-cart-btn { 
+                    position: relative; display: none; align-items: center; justify-content: center;
+                    background: none; border: 1px solid var(--color-border-primary, #d1d5db);
+                    border-radius: 50%; width: 40px; height: 40px; cursor: pointer;
+                    color: var(--color-text-primary, #333); transition: all 0.2s;
+                }
+                .nav-cart-btn:hover {
+                    border-color: var(--color-primary, #f59e0b);
+                    color: var(--color-primary, #f59e0b);
+                }
+                .nav-cart-badge {
+                    position: absolute; top: -4px; right: -4px;
+                    background: var(--color-primary, #f59e0b); color: #fff;
+                    font-size: 11px; font-weight: 700; min-width: 18px; height: 18px;
+                    border-radius: 9px; display: flex; align-items: center;
+                    justify-content: center; line-height: 1;
+                }
                 @media (min-width: 768px) {
                     .nav-links { display: flex; }
+                    .nav-cart-btn { display: flex; }
                 }
                 .nav-link { 
                     color: var(--color-text-primary, #333); 
