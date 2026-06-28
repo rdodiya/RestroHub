@@ -1,40 +1,7 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, CreditCard } from 'lucide-react';
 import UPICard from './UPICard';
-
-// ============================================
-// SKELETON
-// ============================================
-const UPISkeleton = () => (
-  <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white animate-pulse">
-    {/* Header */}
-    <div className="border-b border-gray-100 px-4 py-4 sm:px-6 sm:py-5">
-      <div className="flex items-start gap-3">
-        <div className="h-10 w-10 shrink-0 rounded-xl bg-gray-100 sm:h-12 sm:w-12" />
-        <div className="flex-1">
-          <div className="mb-2 h-5 w-32 rounded bg-gray-100" />
-          <div className="h-4 w-40 rounded bg-gray-100" />
-        </div>
-        <div className="h-9 w-9 rounded-lg bg-gray-100" />
-      </div>
-    </div>
-    {/* Body */}
-    <div className="px-4 py-4 sm:px-6 sm:py-5">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="h-20 rounded-xl bg-gray-100" />
-        <div className="h-20 rounded-xl bg-gray-100" />
-      </div>
-    </div>
-    {/* Footer */}
-    <div className="border-t border-gray-100 px-4 py-3 sm:px-6 sm:py-4">
-      <div className="flex gap-2">
-        <div className="h-10 flex-1 rounded-lg bg-gray-100" />
-        <div className="h-10 flex-1 rounded-lg bg-gray-100" />
-        <div className="h-10 w-10 rounded-lg bg-gray-100" />
-      </div>
-    </div>
-  </div>
-);
+import AdminSkeleton from '../AdminSkeleton';
 
 // ============================================
 // MAIN
@@ -107,7 +74,7 @@ const UPIGrid = ({ onTest, onCountChange }) => {
     return (
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
         {[1, 2].map((i) => (
-          <UPISkeleton key={i} />
+          <AdminSkeleton key={i} variant="upi" />
         ))}
       </div>
     );

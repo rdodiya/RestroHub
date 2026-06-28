@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.menu.entity.Menu;
 import jakarta.persistence.*;

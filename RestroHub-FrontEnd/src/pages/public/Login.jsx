@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { GoogleLogin } from "@react-oauth/google";
+import { ArrowLeft } from "lucide-react";
 import api from "@services/common/api";
 import { useTheme } from "@context/ThemeContext";
 
@@ -14,10 +15,13 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8181/restroly";
 
 const validationSchema = Yup.object({
-    username: Yup.string().required("Email or username is required"),
+  username: Yup.string().required("Email or username is required"),
   password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .required("Password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?`~]).{8,}$/,
+      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
+    ),
 });
 
 /* ──────────────────── SVG Icons (inlined) ──────────────────── */
@@ -286,6 +290,16 @@ const handleGoogleLogin = async (credentialResponse) => {
                 </span>
               </div>
 
+            <Link 
+              to="/"
+              className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
+              >
+                <ArrowLeft size={15}/>
+                  Back to Home 
+              </Link>
+
+              
+
               <p className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                 Welcome back!
               </p>
@@ -294,7 +308,7 @@ const handleGoogleLogin = async (credentialResponse) => {
               </h2>
 
               {/* ── FORM ── */}
-              <form onSubmit={formik.handleSubmit} noValidate>
+              <form onSubmit={(e) => { e.preventDefault(); formik.handleSubmit(e); }} noValidate>
                 {/* Email */}
                 <div className="mb-5">
                   <label
@@ -338,7 +352,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       name="password"
                       type={showPassword ? "text" : "password"}
                       autoComplete="new-password"
-                      placeholder="6+ Characters, 1 Capital letter"
+                      placeholder="Minimum 8 characters; include uppercase, lowercase, number, special character"
                       disabled={isLoading}
                       value={formik.values.password}
                       onChange={formik.handleChange}

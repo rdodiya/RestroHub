@@ -23,4 +23,7 @@ public class RestaurantUpdateDTO {
 
     @Schema(description = "Whether the restaurant is active", example = "true")
     private Boolean isActive;
+
+    @Schema(description = "Enable or disable service requests (Call Waiter / Request Bill)", example = "true")
+    private Boolean serviceRequestEnabled;
 }

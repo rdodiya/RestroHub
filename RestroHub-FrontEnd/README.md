@@ -180,6 +180,22 @@ After updating `.env`, restart the dev server.
 
 ---
 
+## 🛎️ Real-Time Customer Service Request Layer (Issue #120)
+
+We have successfully integrated a complete, E2E real-time "Call Waiter / Request Bill" service interaction layer across the entire stack.
+
+### Key Capabilities
+
+* **Customer Floating "Service" FAB:** Adds a modern, floating interactive menu on the customer menu view (`/Restrohub/:restaurantName/:branchId?table=X`), allowing diners to instantly request table services:
+  * 🔔 **Call Waiter**
+  * 💳 **Request Bill**
+* **Admin-Configured Feature Flags:** Toggled directly by restaurant owners from the **Restaurant Settings UI** (Profile → Restaurant Info). Modifying the feature toggle updates settings via `PUT /secure/api/v1/restaurants/{id}` to automatically show/hide the button E2E.
+* **Instant WebSocket Pushes:** Built on top of a reusable and generic notification module using STOMP WebSockets, instantly notifying the Admin Dashboard bell icon with the exact generating table details (e.g., `"Call Waiter — Table 5"`).
+* **Smart Anti-Spam Protections:** Enforces a 30-second submission cooldown timer per table to prevent notification floods on the staff dashboard.
+* **Counter QR Safety:** Automatically suppresses and hides the FAB if the scanned QR code corresponds to Table `0` (the main counter QR code).
+
+---
+
 ## 👍 Contributing
 
 Contributions are welcome! To contribute:

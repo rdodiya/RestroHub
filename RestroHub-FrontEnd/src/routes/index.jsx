@@ -12,6 +12,8 @@ import Landing from '../pages/public/Landing';
 import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
+import PrivacyPolicy from '../pages/public/PrivacyPolicy';
+import NotFound from '../pages/public/NotFound';
 
 // Customer Pages
 import RestaurantMenu from '../pages/customer/RestaurantMenu';
@@ -25,6 +27,7 @@ import Tables from '@components/admin/store/tables/Tables';
 import Website from '@components/admin/marketing/website/Website';
 import QRDisplay from '@components/admin/marketing/qr/QRDisplay';
 import UPILinks from '@components/admin/upi/UPILinks';
+import KitchenDisplaySystem from '@components/admin/kds/KitchenDisplaySystem';
 import Profile from '@components/admin/profile/Profile';
 
 const AppRoutes = () => {
@@ -36,6 +39,7 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Route>
 
       {/* ========== CUSTOMER ROUTES ========== */}
@@ -47,7 +51,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* ========== ADMIN ROUTES ========== */}
-      <Route path="/admin" 
+      <Route path="/admin"
             element={
                   <ProtectedRoute>
                     <AdminLayout />
@@ -61,11 +65,12 @@ const AppRoutes = () => {
         <Route path="marketing/website" element={<Website />} />
         <Route path="marketing/qr-display" element={<QRDisplay />} />
         <Route path="upi-links" element={<UPILinks />} />
+        <Route path="kds" element={<KitchenDisplaySystem />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
       {/* ========== 404 FALLBACK ========== */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

@@ -4,7 +4,7 @@ import com.google.auth.oauth2.TokenVerifier;
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.GoogleAuthRequest;
-import com.restroly.qrmenu.common.exception.BusinessException;
+import com.restroly.qrmenu.exception.BusinessException;
 import com.restroly.qrmenu.security.JwtTokenProvider;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.entity.User;
@@ -17,6 +17,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class GoogleAuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${google.oauth.client-id}")
     private String googleClientId;
@@ -61,6 +63,10 @@ public class GoogleAuthService {
 
         String idToken = googleAuthRequest.getToken();
 
+        if (idToken == null || idToken.isBlank()) {
+            throw new BusinessException("Google token is missing");
+        }
+        
         log.info("Google OAuth authentication initiated");
 
         JsonWebSignature jws = verifyGoogleToken(idToken);
@@ -87,9 +93,13 @@ public class GoogleAuthService {
                         existingUser.setAuthProvider("GOOGLE");
                         log.info("Updated existing user {} with Google OAuth", email);
                     }
-                    if (pictureUrl != null) {
-                        existingUser.setPictureUrl(pictureUrl);
+                    
+                    // Only download Google image if they don't already have a profile image
+                    if ((existingUser.getUserProfile() == null || existingUser.getUserProfile().length == 0) && pictureUrl != null) {
+                        byte[] imageBytes = downloadProfileImage(pictureUrl);
+                        existingUser.setUserProfile(imageBytes);
                     }
+                    
                     existingUser.setIsActive(true);
                     return userRepository.save(existingUser);
                 })
@@ -99,7 +109,7 @@ public class GoogleAuthService {
                             .name(finalName)
                             .googleSub(googleSub)
                             .authProvider("GOOGLE")
-                            .pictureUrl(pictureUrl)
+                            .userProfile(downloadProfileImage(pictureUrl))
                             .isActive(true)
                             .isLocked(false)
                             .password("") 
@@ -137,6 +147,22 @@ public class GoogleAuthService {
     }
 
     /**
+     * Downloads the profile image from Google's servers.
+     * Wrapped in a try-catch to ensure login succeeds even if the image download fails.
+     */
+    private byte[] downloadProfileImage(String pictureUrl) {
+        if (pictureUrl == null || pictureUrl.isEmpty()) {
+            return null;
+        }
+        try {
+            return restTemplate.getForObject(pictureUrl, byte[].class);
+        } catch (Exception ex) {
+            log.warn("Failed to download Google profile image from {}: {}", pictureUrl, ex.getMessage());
+            return null; // Return null so login can proceed without the image
+        }
+    }
+
+    /**
      * Verifies Google ID token signature and claims using Google's TokenVerifier.
      * Validates that the token is issued by Google and matches the expected audience (clientId).
      *
@@ -145,6 +171,7 @@ public class GoogleAuthService {
      * @throws BusinessException if token is invalid, expired, or signature verification fails
      */
     private JsonWebSignature verifyGoogleToken(String idToken) {
+        System.out.println("GOOGLE CLIENT ID => " + googleClientId);
         try {
             TokenVerifier verifier = TokenVerifier.newBuilder()
                     .setAudience(googleClientId)
@@ -156,7 +183,7 @@ public class GoogleAuthService {
             return jws;
 
         } catch (Exception ex) {
-            log.error("Failed to verify Google token: {}", ex.getMessage());
+            log.error("Failed to verify Google token", ex);
             throw new BusinessException("Invalid Google token: " + ex.getMessage());
         }
     }

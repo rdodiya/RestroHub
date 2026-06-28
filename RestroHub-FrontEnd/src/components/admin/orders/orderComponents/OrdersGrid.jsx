@@ -2,48 +2,7 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
 import OrderCard from './OrderCard';
 import api from "@services/common/api";
-
-// ============================================
-// SKELETON (Private)
-// ============================================
-const OrderCardSkeleton = () => (
-  <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-pulse">
-    <div className="flex items-start justify-between mb-4">
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gray-100 rounded-xl" />
-        <div>
-          <div className="w-28 h-5 bg-gray-100 rounded mb-1" />
-          <div className="w-20 h-3 bg-gray-100 rounded" />
-        </div>
-      </div>
-      <div className="w-8 h-8 bg-gray-100 rounded-lg" />
-    </div>
-    <div className="p-3 bg-gray-50 rounded-xl mb-4">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-gray-100 rounded-full" />
-        <div>
-          <div className="w-24 h-4 bg-gray-100 rounded mb-1" />
-          <div className="w-20 h-3 bg-gray-100 rounded" />
-        </div>
-      </div>
-    </div>
-    <div className="space-y-2 mb-4">
-      <div className="flex justify-between">
-        <div className="w-32 h-4 bg-gray-100 rounded" />
-        <div className="w-12 h-4 bg-gray-100 rounded" />
-      </div>
-      <div className="flex justify-between">
-        <div className="w-24 h-4 bg-gray-100 rounded" />
-        <div className="w-12 h-4 bg-gray-100 rounded" />
-      </div>
-      <div className="flex justify-between pt-2 border-t">
-        <div className="w-16 h-5 bg-gray-100 rounded" />
-        <div className="w-16 h-6 bg-gray-100 rounded" />
-      </div>
-    </div>
-    <div className="w-full h-10 bg-gray-100 rounded-xl" />
-  </div>
-);
+import AdminSkeleton from '../../AdminSkeleton';
 
 // ============================================
 // MAIN COMPONENT
@@ -68,7 +27,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 123,
       table: 4,
       amount: 450,
-      status: 'cooking',
+      status: 'PREPARING',
       customer: 'John Doe',
       phone: '9876543210',
       items: [
@@ -81,7 +40,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 124,
       table: 7,
       amount: 320,
-      status: 'ready',
+      status: 'READY',
       customer: 'Priya Sharma',
       phone: '9876543211',
       items: [
@@ -94,7 +53,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 125,
       table: 2,
       amount: 780,
-      status: 'pending',
+      status: 'PENDING',
       customer: 'Amit Kumar',
       phone: '9876543212',
       items: [{ name: 'Special Thali', qty: 3, price: 260 }],
@@ -104,7 +63,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       id: 126,
       table: 9,
       amount: 190,
-      status: 'billed',
+      status: 'BILLED',
       customer: 'Sara Khan',
       phone: '9876543213',
       items: [{ name: 'Sweet Lassi', qty: 2, price: 95 }],
@@ -128,9 +87,9 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
       if (!loading) setRefreshing(true);
       setError(null);
 
-      // 🔌 UNCOMMENT WHEN API READY
-      // const response = await api.get('/api/orders');
-      // setOrders(response.data);
+      // 🔌 UNCOMMENT WHEN API READY (replace {branchId} with actual branch ID)
+      // const response = await api.get('/secure/api/v1/orders/branch/{branchId}/active');
+      // syncOrders(response.data);
 
       // 🎭 MOCK
       await new Promise((resolve) => setTimeout(resolve, 700));
@@ -149,7 +108,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
   // HANDLERS
   // ------------------------------------
   const handleStatusUpdate = (orderId, newStatus) => {
-    if (newStatus === 'complete') {
+    if (newStatus === 'COMPLETED') {
       syncOrders(orders.filter((o) => o.id !== orderId));
     } else {
       syncOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)));
@@ -179,7 +138,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <OrderCardSkeleton key={i} />
+          <AdminSkeleton key={i} variant="order-card" />
         ))}
       </div>
     );
