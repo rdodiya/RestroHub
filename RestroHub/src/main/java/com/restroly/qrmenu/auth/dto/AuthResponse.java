@@ -33,6 +33,9 @@ public class AuthResponse {
 
     @Schema(description = "User roles", example = "[\"ROLE_ADMIN\"]")
     private List<String> roles;
+    
+    @Schema(description = "Indicates whether password reset is required")
+    private Boolean isResetRequire;
 
     @Schema(description = "Token issue timestamp")
     @Builder.Default
