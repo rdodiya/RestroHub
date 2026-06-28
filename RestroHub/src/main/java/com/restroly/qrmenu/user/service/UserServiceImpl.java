@@ -24,6 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,6 +44,9 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final RestaurantRepository restaurantRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${reset.expiry.threshold.days:90}")
+    private int resetExpiryThresholdDays;
 
     // =============================
     // REGISTER USER
@@ -66,6 +72,9 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(request.getPhone())
                 .isActive(request.getIsActive() != null ? request.getIsActive() : true)
                 .isLocked(false)
+                .resetPassExpiryDate(
+                        LocalDateTime.now().plusDays(resetExpiryThresholdDays)
+                )
                 .build();
 
         if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
