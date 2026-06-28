@@ -1,11 +1,14 @@
 // src/layouts/CustomerLayout.jsx
 import { Outlet } from 'react-router-dom';
+import { CartProvider } from '@context/CartContext';
 
 const CustomerLayout = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Outlet />
-    </div>
+    <CartProvider>
+      <div className="min-h-screen bg-gray-50">
+        <Outlet />
+      </div>
+    </CartProvider>
   );
 };
 

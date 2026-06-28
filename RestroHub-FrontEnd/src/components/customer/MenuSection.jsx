@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSiteData } from '@context/SiteContext.jsx';
+import { useCart } from '@context/CartContext';
 
 // ============================================
 // MENU SECTION COMPONENT
@@ -8,6 +9,7 @@ import { useSiteData } from '@context/SiteContext.jsx';
 
 const MenuSection = () => {
     const { siteData } = useSiteData();
+    const { addItem } = useCart();
     const [activeCategory, setActiveCategory] = useState('starters');
 
     if (!siteData) return null;
@@ -54,6 +56,18 @@ const MenuSection = () => {
                                         ))}
                                     </div>
                                 )}
+                                <button
+                                    onClick={() => addItem({
+                                        foodId: item.foodId || item.id || index,
+                                        name: item.name,
+                                        price: item.price === 'varies' ? 0 : parseFloat(item.price) || 0,
+                                        imageUrl: item.imageUrl || '',
+                                        isVeg: item.isVeg ?? true,
+                                    })}
+                                    className="menu-add-btn"
+                                >
+                                    Add to Cart
+                                </button>
                             </div>
                             <p className="menu-item-price font-heading">
                                 {item.price === 'varies' ? item.price : `$${item.price}`}
@@ -203,6 +217,24 @@ const MenuSection = () => {
                     font-size: var(--text-xl);
                     color: var(--color-primary);
                     white-space: nowrap;
+                }
+                .menu-add-btn {
+                    margin-top: var(--spacing-sm, 8px);
+                    padding: 6px 16px;
+                    font-size: var(--text-xs, 12px);
+                    font-weight: 600;
+                    letter-spacing: 0.05em;
+                    text-transform: uppercase;
+                    border: 1px solid var(--color-primary, #f59e0b);
+                    background: transparent;
+                    color: var(--color-primary, #f59e0b);
+                    border-radius: var(--radius-sm, 4px);
+                    cursor: pointer;
+                    transition: all var(--transition-normal, 0.3s);
+                }
+                .menu-add-btn:hover {
+                    background: var(--color-primary, #f59e0b);
+                    color: #fff;
                 }
 
                 @media (min-width: 768px) {
