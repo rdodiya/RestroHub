@@ -4,7 +4,7 @@ import { X, Loader2, ChevronDown, Tag, UtensilsCrossed, MapPin, FileText, Type }
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
 
-const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches }) => {
+const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches, branchesLoading = false, categoriesLoading = false }) => {
     const [categories, setCategories] = useState([]);
     const [branches, setBranches] = useState([]);
     const [formData, setFormData] = useState({
@@ -218,6 +218,12 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
                                         Branch
                                     </label>
                                     <div className="relative">
+                                        {branchesLoading ? (
+                                            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
+                                                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                                <span className="text-sm text-gray-500">Loading branches...</span>
+                                            </div>
+                                        ) : (
                                         <select
                                             value={formData.branchId}
                                             onChange={(e) => updateField('branchId', e.target.value)}
@@ -235,6 +241,7 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
                                                 </option>
                                             ))}
                                         </select>
+                                        )}
                                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5
                                                                 text-gray-400 pointer-events-none" />
                                     </div>
@@ -310,7 +317,12 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
                                 )}
 
                                 {/* Category Dropdown */}
-                                {categories.length === 0 ? (
+                                {categoriesLoading ? (
+                                    <div className="flex items-center gap-2 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                        <span className="text-sm text-gray-500">Loading categories...</span>
+                                    </div>
+                                ) : categories.length === 0 ? (
                                     <div className="p-4 bg-gray-50 border border-dashed border-gray-300
                                                     rounded-xl text-center">
                                         <p className="text-sm text-gray-400 italic">

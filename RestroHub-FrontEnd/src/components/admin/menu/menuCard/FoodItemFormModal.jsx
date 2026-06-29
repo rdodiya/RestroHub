@@ -3,7 +3,7 @@ import { X, Loader2, Image as ImageIcon, Type, FileText, IndianRupee, Tag, Uploa
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
 
-const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
+const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories, categoriesLoading = false }) => {
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -221,6 +221,12 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                     Category
                   </label>
                   <div className="relative">
+                    {categoriesLoading ? (
+                      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
+                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                        <span className="text-sm text-gray-500">Loading categories...</span>
+                      </div>
+                    ) : (
                     <select
                       value={formData.categoryId}
                       onChange={(e) => updateField('categoryId', e.target.value)}
@@ -239,6 +245,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                         </option>
                       ))}
                     </select>
+                    )}
                     <svg
                       className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5
                                  text-gray-400 pointer-events-none"

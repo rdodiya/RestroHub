@@ -28,6 +28,8 @@ const Menus = () => {
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
   const [allBranches, setAllBranches] = useState([]);
+  const [branchesLoading, setBranchesLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
     fetchBranches();
@@ -35,6 +37,7 @@ const Menus = () => {
 
   const fetchBranches = async () => {
     try {
+      setBranchesLoading(true);
       const response = await api.get('/secure/api/v1/branches', {
         params: { page: 0, size: 100, sortBy: 'name', sortDirection: 'asc' }
       });
@@ -43,7 +46,14 @@ const Menus = () => {
     } catch (err) {
       console.error('Failed to fetch branches:', err.response?.data || err);
       setAllBranches([]);
+    } finally {
+      setBranchesLoading(false);
     }
+  };
+
+  const handleCategoriesLoaded = (categories) => {
+    setAllCategories(Array.isArray(categories) ? categories : []);
+    setCategoriesLoading(false);
   };
 
   // FOOD ITEM MODAL HANDLERS
@@ -144,7 +154,7 @@ const Menus = () => {
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
               onAddCategory={openCategoryModal}
-              setAllCategories={setAllCategories}
+              setAllCategories={handleCategoriesLoaded}
             />
             <MenuItemsGrid
               ref={menuGridRef}
@@ -172,6 +182,7 @@ const Menus = () => {
         onClose={closeModal}
         editingItem={editingItem}
         allCategories={allCategories}
+        categoriesLoading={categoriesLoading}
       />
 
       {/* Category Modal */}
@@ -187,6 +198,8 @@ const Menus = () => {
         editingMenu={editingMenu}
         allCategories={allCategories}
         allBranches={allBranches}
+        branchesLoading={branchesLoading}
+        categoriesLoading={categoriesLoading}
       />
     </div>
   );
