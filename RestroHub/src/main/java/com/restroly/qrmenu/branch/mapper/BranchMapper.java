@@ -46,7 +46,7 @@ public class BranchMapper {
                 .address(toAddressDTO(branch.getAddress()))
                 .menu(toMenuDTO(branch.getMenu()))
                 .tables(toTableDTOList(branch.getTables()))
-                .tableCount(branch.getTables() != null ? branch.getTables().size() : 0)
+                .tableCount(countActiveTables(branch.getTables()))
                 .build();
     }
 
@@ -61,7 +61,7 @@ public class BranchMapper {
                 .isDelete(branch.getIsDelete())
                 .createdDate(branch.getCreatedDate())
                 .address(toAddressDTO(branch.getAddress()))
-                .tableCount(branch.getTables() != null ? branch.getTables().size() : 0)
+                .tableCount(countActiveTables(branch.getTables()))
                 .build();
     }
 
@@ -170,6 +170,8 @@ public class BranchMapper {
         return BranchResponseDTO.TableDTO.builder()
                 .tableId(table.getTableId())
                 .tableNumber(table.getTableNumber())
+                .capacity(table.getCapacity())
+                .status(table.getStatus())
                 .qrCodeUrl(table.getQrCodeUrl())
                 .isActive(table.getIsActive())
                 .build();
@@ -180,6 +182,13 @@ public class BranchMapper {
         return tables.stream()
                 .map(this::toTableDTO)
                 .collect(Collectors.toList());
+    }
+
+    private int countActiveTables(List<Tables> tables) {
+        if (tables == null) return 0;
+        return (int) tables.stream()
+                .filter(table -> Boolean.TRUE.equals(table.getIsActive()))
+                .count();
     }
 
     private String buildFullAddress(Address address) {

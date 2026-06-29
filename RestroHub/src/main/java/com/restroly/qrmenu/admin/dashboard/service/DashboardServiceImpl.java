@@ -4,6 +4,7 @@ package com.restroly.qrmenu.admin.dashboard.service;
 import com.restroly.qrmenu.admin.dashboard.dto.DashboardStatDTO;
 import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.order.repository.OrderRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class DashboardServiceImpl implements DashboardService {
         // Today's Revenue
         BigDecimal todayRevenue = orderRepository.getTodayRevenue(startOfDay, endOfDay);
 
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+        @SuppressWarnings("deprecation") NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
         String formattedRevenue = formatter.format(todayRevenue);
 
         // Live Orders (Active statuses)
@@ -68,5 +69,13 @@ public class DashboardServiceImpl implements DashboardService {
                 )
         );
     }
+
+    // @Override
+    // public SseEmitter switchOnNotificationsForBranch(Long branchId) {
+    //     if(branchRepository.existsById(branchId)){
+    //         return notificationService.subscribe(branchId);
+    //     }
+    //     throw new IllegalArgumentException("Branch not found with ID: " + branchId);
+    // }
 
 }

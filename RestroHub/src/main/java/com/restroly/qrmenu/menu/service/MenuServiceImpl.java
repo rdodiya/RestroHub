@@ -4,16 +4,15 @@ import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
 import com.restroly.qrmenu.category.entity.Category;
 import com.restroly.qrmenu.category.repository.CategoryRepository;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
 import com.restroly.qrmenu.menu.dto.MenuRequestDTO;
 import com.restroly.qrmenu.menu.dto.MenuResponseDTO;
 import com.restroly.qrmenu.menu.entity.Menu;
 import com.restroly.qrmenu.menu.mapper.MenuMapper;
 import com.restroly.qrmenu.menu.repository.MenuRepository;
-import com.restroly.qrmenu.menu.service.MenuService;
 
-import com.restroly.qrmenu.user.exception.DuplicateResourceException;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +50,7 @@ public class MenuServiceImpl implements MenuService {
             // Check duplicate name within same branch
             if (menuRepository.existsByMenuNameAndBranch_BranchId(
                     requestDTO.getMenuName(), requestDTO.getBranchId())) {
+                log.warn("Attempt to create duplicate menu: {}",requestDTO.getMenuName());
                 throw new DuplicateResourceException(
                         "Menu with name '" + requestDTO.getMenuName() +
                                 "' already exists for this branch");
@@ -139,9 +139,8 @@ public class MenuServiceImpl implements MenuService {
             // Check duplicate name (excluding current menu)
             if (menuRepository.existsByMenuNameAndBranch_BranchIdAndMenuIdNot(
                     requestDTO.getMenuName(), requestDTO.getBranchId(), menuId)) {
-                throw new DuplicateResourceException(
-                        "Menu with name '" + requestDTO.getMenuName() +
-                                "' already exists for this branch");
+                        log.warn("Attempt to update menu to duplicate name: {}", requestDTO.getMenuName());
+                        throw new DuplicateResourceException("Menu with name '" + requestDTO.getMenuName()+"' already exists for this branch");
             }
         }
 
@@ -201,6 +200,14 @@ public class MenuServiceImpl implements MenuService {
             return menuMapper.toResponseDTO(menu);
         }
 
+        if (menu.getBranch() != null
+                && menuRepository.existsByMenuNameAndBranch_BranchId(
+                        menu.getMenuName(), menu.getBranch().getBranchId())) {
+            throw new DuplicateResourceException(
+                    "Menu with name '" + menu.getMenuName()
+                            + "' already exists for this branch");
+        }
+
         menu.setDeleted(false);
         Menu restoredMenu = menuRepository.save(menu);
 
@@ -254,12 +261,14 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String menuName, Long branchId) {
+        log.debug("Checking existence of menu - name: {}, branchId: {}", menuName, branchId);
         return menuRepository.existsByMenuNameAndBranch_BranchId(menuName, branchId);
     }
 
     // ========== PRIVATE HELPERS ==========
 
     private List<Category> resolveCategories(List<Long> categoryIds) {
+        log.debug("Resolving categories for IDs: {}", categoryIds);
         if (categoryIds == null || categoryIds.isEmpty()) {
             return new ArrayList<>();
         }

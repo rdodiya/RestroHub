@@ -31,6 +31,9 @@ public class RestaurantResponseDTO {
     @Schema(description = "Whether the restaurant is active", example = "true")
     private Boolean isActive;
 
+    @Schema(description = "Whether service requests (Call Waiter / Request Bill) are enabled", example = "false")
+    private Boolean serviceRequestEnabled;
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Schema(description = "Timestamp when the restaurant was created")
     private LocalDateTime createdAt;

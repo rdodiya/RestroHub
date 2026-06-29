@@ -1,5 +1,6 @@
 // Menus.jsx
 import { useRef, useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import MenuHeader from './menuCard/Header';
 import BulkActions from './menuCard/BulkActions';
 import CategorySidebar from './menuCard/CategorySidebar';
@@ -62,9 +63,15 @@ const Menus = () => {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (item) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
+  const openEditModal = async (item) => {
+    try {
+      const response = await api.get(`/secure/api/v1/foods/${item.foodId}`);
+      setEditingItem(response.data);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error('Failed to fetch food item:', err.response?.data || err);
+      toast.error(err.response?.data?.message || 'Failed to load food item details');
+    }
   };
 
   const closeModal = () => {

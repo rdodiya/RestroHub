@@ -14,6 +14,7 @@ import {
   QrCode,
   ChevronsLeft,
   ChevronsRight,
+  ChefHat,
 } from 'lucide-react';
 import { useAdminTheme } from '@context/AdminThemeContext';
 
@@ -61,6 +62,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
       label: 'Menu',
       items: [
         { type: 'link', name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+        { type: 'link', name: 'Kitchen Display', path: '/admin/kds', icon: ChefHat },
         { type: 'link', name: 'Menus', path: '/admin/menus', icon: UtensilsCrossed },
         { type: 'link', name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
       ],

@@ -1,15 +1,12 @@
 // src/main/java/com/restroly/qrmenu/food/service/impl/FoodServiceImpl.java
 package com.restroly.qrmenu.food.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.restroly.qrmenu.category.entity.Category;
 import com.restroly.qrmenu.category.repository.CategoryRepository;
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
 import com.restroly.qrmenu.config.CloudinaryService;
-import com.restroly.qrmenu.food.dto.*;
 import com.restroly.qrmenu.food.dto.FoodMapper;
 import com.restroly.qrmenu.food.dto.FoodRequestDTO;
 import com.restroly.qrmenu.food.dto.FoodResponseDTO;
@@ -18,7 +15,6 @@ import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.food.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -31,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.lang.Long;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -50,9 +47,15 @@ public class FoodServiceImpl implements FoodService {
     @Transactional
     @CacheEvict(value = "foods", allEntries = true)
     public FoodResponseDTO createFood(FoodRequestDTO requestDTO, MultipartFile image) {
-
-        if (foodRepository.existsByNameIgnoreCase(requestDTO.getName())) {
-            throw new ResourceAlreadyExistsException("Food already exists: " + requestDTO.getName());
+        log.debug("Creating new food with name: {}", requestDTO.getName());
+        
+        // duplicate name check scoped by category
+        if(foodRepository.existsByNameIgnoreCaseAndCategory_CategoryId(
+            requestDTO.getName(), requestDTO.getCategoryId())) {
+            log.warn("Attempt to create duplicate food with name: {} in category: {}",
+                    requestDTO.getName(), requestDTO.getCategoryId());
+            throw new ResourceAlreadyExistsException("Food already exists with name: " + requestDTO.getName() +
+                    " in category id: " + requestDTO.getCategoryId());
         }
 
         String imageUrl = null;
@@ -159,15 +162,22 @@ public class FoodServiceImpl implements FoodService {
         Food existingFood = findFoodByIdOrThrow(id);
 
         // Check for duplicate name if name is being updated
-        if (updateDTO.getName() != null &&
-                !updateDTO.getName().equalsIgnoreCase(existingFood.getName()) &&
-                foodRepository.existsByNameIgnoreCase(updateDTO.getName())) {
+        if(updateDTO.getName() != null && !updateDTO.getName().equalsIgnoreCase(existingFood.getName())) {
+            // Determine the category ID to check
+            Long categoryIdToCheck = updateDTO.getCategoryId() != null ? updateDTO.getCategoryId() : existingFood.getCategory().getCategoryId();
 
-            log.warn("Attempt to update food with duplicate name: {}", updateDTO.getName());
-            throw new ResourceAlreadyExistsException(
-                    String.format(FOOD_EXISTS_MSG, updateDTO.getName()));
+            // check for duplicate name in the target category, excluding the current food item
+            if(foodRepository.existsByNameIgnoreCaseAndCategory_CategoryIdAndFoodIdNot(
+                    updateDTO.getName(), categoryIdToCheck, id)) {
+                log.warn("Attempt to update food to duplicate name: {} in category id: {}",
+                        updateDTO.getName(), categoryIdToCheck);
+                throw new ResourceAlreadyExistsException("Food already exists with name: " + updateDTO.getName() +
+                        " in category id: " + categoryIdToCheck);
+            }
         }
-        if(!updateDTO.getImageUrl().equals(existingFood.getImageUrl())){
+
+        // Safe null check for imageUrl
+        if(!Objects.equals(updateDTO.getImageUrl(), existingFood.getImageUrl())) {
             String imageUrl = null;
             if (image != null && !image.isEmpty()) {
                 imageUrl = cloudinaryService.uploadImage(image, "qrmenu/foods");
@@ -176,13 +186,16 @@ public class FoodServiceImpl implements FoodService {
                 updateDTO.setImageUrl(imageUrl);
             }
         }
-        if(existingFood.getCategory().getCategoryId() != updateDTO.getCategoryId()){
+
+        // Safe null check for categoryId
+        if(!Objects.equals(existingFood.getCategory().getCategoryId(), updateDTO.getCategoryId())) {
             if (updateDTO.getCategoryId() != null) {
                 Category category = categoryRepository.findById(updateDTO.getCategoryId())
                         .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + updateDTO.getCategoryId()));
                 existingFood.setCategory(category);
             }
         }
+        
         foodMapper.updateEntityFromDTO(updateDTO, existingFood);
         Food updatedFood = foodRepository.save(existingFood);
 
@@ -228,15 +241,18 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public boolean existsById(Long id) {
+        log.debug("Checking existence of food by id: {}", id);
         return foodRepository.existsById(id);
     }
 
     @Override
     public boolean existsByName(String name) {
+        log.debug("Checking existence of food by name: {}", name);
         return foodRepository.existsByNameIgnoreCase(name);
     }
 
     private Food findFoodByIdOrThrow(Long id) {
+        log.debug("Finding food by id: {}", id);
         return foodRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Food not found with id: {}", id);
