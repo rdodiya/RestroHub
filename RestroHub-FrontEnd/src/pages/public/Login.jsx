@@ -8,7 +8,12 @@ import toast from "react-hot-toast";
 import { GoogleLogin } from "@react-oauth/google";
 import { ArrowLeft } from "lucide-react";
 import api from "@services/common/api";
-import { storeAuthSession } from "@services/common/authStorage";
+import {
+  clearRememberedUsername,
+  getRememberedUsername,
+  setRememberedUsername,
+  storeAuthSession,
+} from "@services/common/authStorage";
 import { useTheme } from "@context/ThemeContext";
 
 const API_BASE_URL =
@@ -157,9 +162,14 @@ const Login = () => {
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const rememberedUsername = getRememberedUsername();
 
   const formik = useFormik({
-    initialValues: { username: "", password: "", rememberMe: true },
+    initialValues: {
+      username: rememberedUsername,
+      password: "",
+      rememberMe: Boolean(rememberedUsername),
+    },
     validationSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
@@ -176,6 +186,12 @@ const Login = () => {
             { accessToken, refreshToken, roles },
             values.rememberMe
           );
+
+          if (values.rememberMe) {
+            setRememberedUsername(values.username);
+          } else {
+            clearRememberedUsername();
+          }
 
           api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
@@ -194,6 +210,15 @@ const Login = () => {
       }
     },
   });
+
+  const handleRememberMeChange = (event) => {
+    const checked = event.target.checked;
+    formik.setFieldValue("rememberMe", checked);
+
+    if (!checked) {
+      clearRememberedUsername();
+    }
+  };
 
 const handleGoogleLogin = async (credentialResponse) => {
   try {
@@ -383,7 +408,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       name="rememberMe"
                       type="checkbox"
                       checked={formik.values.rememberMe}
-                      onChange={formik.handleChange}
+                      onChange={handleRememberMeChange}
                       disabled={isLoading}
                       className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
                     />

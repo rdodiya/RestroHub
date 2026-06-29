@@ -1,4 +1,5 @@
 const AUTH_KEYS = ["accessToken", "refreshToken", "roles"];
+const REMEMBERED_USERNAME_KEY = "rememberedUsername";
 
 const getStorage = (rememberMe) => (rememberMe ? localStorage : sessionStorage);
 
@@ -18,6 +19,18 @@ export const getStoredRoles = () => {
     console.error("Failed to parse roles", error);
     return [];
   }
+};
+
+export const getRememberedUsername = () =>
+  localStorage.getItem(REMEMBERED_USERNAME_KEY) || "";
+
+export const setRememberedUsername = (username) => {
+  if (!username) return;
+  localStorage.setItem(REMEMBERED_USERNAME_KEY, username);
+};
+
+export const clearRememberedUsername = () => {
+  localStorage.removeItem(REMEMBERED_USERNAME_KEY);
 };
 
 export const storeAuthSession = ({ accessToken, refreshToken, roles }, rememberMe) => {
