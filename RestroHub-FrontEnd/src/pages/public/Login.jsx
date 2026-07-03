@@ -10,6 +10,10 @@ import { GoogleLogin } from "@react-oauth/google";
 import { ArrowLeft } from "lucide-react";
 import api from "@services/common/api";
 import { useTheme } from "@context/ThemeContext";
+import {
+  clearAuthTokens,
+  persistAuthTokens,
+} from "@/utils/authTokenStorage";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8181/restroly";
@@ -157,6 +161,7 @@ const Login = () => {
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const formik = useFormik({
     initialValues: { username: "", password: "" },
@@ -172,9 +177,7 @@ const Login = () => {
         if (result.success) {
           const { accessToken, refreshToken, roles } = result.data;
 
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
-          localStorage.setItem("roles", JSON.stringify(roles));
+          persistAuthTokens({ accessToken, refreshToken, roles }, rememberMe);
 
           axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
@@ -207,9 +210,7 @@ const handleGoogleLogin = async (credentialResponse) => {
     if (result.success) {
       const { accessToken, refreshToken, roles } = result.data;
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("roles", JSON.stringify(roles));
+      persistAuthTokens({ accessToken, refreshToken, roles }, rememberMe);
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
@@ -374,8 +375,17 @@ const handleGoogleLogin = async (credentialResponse) => {
                   )}
                 </div>
 
-                {/* Forgot password */}
-                <div className="mb-6 flex justify-end">
+                {/* Remember me */}
+                <div className="mb-6 flex items-center justify-between">
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    Remember me
+                  </label>
                   <Link
                     to="/forgot-password"
                     className="text-sm text-blue-600 hover:underline dark:text-blue-400"

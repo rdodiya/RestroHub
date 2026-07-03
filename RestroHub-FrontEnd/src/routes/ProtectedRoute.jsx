@@ -1,8 +1,9 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { getAccessToken, getRolesJson } from "@/utils/authTokenStorage";
 
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = getAccessToken();
 
   if (!accessToken) {
     return <Navigate to="/login" replace />;
@@ -10,7 +11,7 @@ const ProtectedRoute = ({ children }) => {
 
   let roles = [];
   try {
-    const rolesStr = localStorage.getItem("roles");
+    const rolesStr = getRolesJson();
     if (rolesStr) roles = JSON.parse(rolesStr);
   } catch (e) {
     console.error("Failed to parse roles");
