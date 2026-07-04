@@ -1,6 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
+import {
+  ADMIN_ACCESS_ROLES,
+  FULL_ADMIN_ROLES,
+  LIMITED_ADMIN_ROLES,
+  getDefaultAdminPath,
+  hasAnyRole,
+  readStoredRoles,
+} from "../utils/auth";
 
-const ProtectedRoute = ({ children }) => {
+const LIMITED_ADMIN_PATHS = ["/admin/kds", "/admin/orders", "/admin/profile"];
+
+const ProtectedRoute = ({ children, allowedRoles = ADMIN_ACCESS_ROLES }) => {
   const location = useLocation();
   const accessToken = localStorage.getItem("accessToken");
 
@@ -8,32 +18,19 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  let roles = [];
-  try {
-    const rolesStr = localStorage.getItem("roles");
-    if (rolesStr) roles = JSON.parse(rolesStr);
-  } catch (e) {
-    console.error("Failed to parse roles");
+  const roles = readStoredRoles();
+
+  if (!hasAnyRole(roles, allowedRoles)) {
+    return <Navigate to="/unauthorized" replace state={{ from: location }} />;
   }
 
-  const hasRole = (roleToCheck) => {
-    if (!Array.isArray(roles)) return false;
-    return roles.some(r => {
-      const roleName = typeof r === 'string' ? r : r.authority || r.name;
-      return roleName === roleToCheck || roleName === `ROLE_${roleToCheck}`;
-    });
-  };
+  const hasFullAdminAccess = hasAnyRole(roles, FULL_ADMIN_ROLES);
+  const hasLimitedAdminAccess = hasAnyRole(roles, LIMITED_ADMIN_ROLES);
 
-  const isAdmin = hasRole("ADMIN");
-  const isManager = hasRole("MANAGER");
-  const isStaff = hasRole("STAFF");
-
-  if (!isAdmin && (isManager || isStaff)) {
-    const allowedPaths = ["/admin/kds", "/admin/orders", "/admin/profile"];
-    const isAllowed = allowedPaths.some(p => location.pathname.startsWith(p));
-
+  if (!hasFullAdminAccess && hasLimitedAdminAccess) {
+    const isAllowed = LIMITED_ADMIN_PATHS.some((path) => location.pathname.startsWith(path));
     if (!isAllowed || location.pathname === "/admin" || location.pathname === "/admin/dashboard") {
-      return <Navigate to="/admin/kds" replace />;
+      return <Navigate to={getDefaultAdminPath(roles)} replace />;
     }
   }
 
