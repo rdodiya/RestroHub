@@ -1,5 +1,6 @@
 package com.restroly.qrmenu.security;
 
+import com.restroly.qrmenu.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,9 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+
 import com.restroly.qrmenu.security.exception.UserDisabledException;
 import com.restroly.qrmenu.security.exception.UserLockedException;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,8 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
+    private final UserRepository userRepository;
     private final com.restroly.qrmenu.user.repository.UserRepository userRepository;
-
+  
     @Override
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
@@ -31,6 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     log.warn("User not found with email: {}", email);
                     return new UsernameNotFoundException("User not found with email: " + email);
                 });
+
         // Check if the user account is active
         if (!user.isActive()) {
             log.warn("User account is inactive: {}", email);
@@ -42,7 +45,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             log.warn("User account is locked: {}", email);
             throw new UserLockedException("User account is locked");
         }
-
         List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
@@ -52,9 +54,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
+                .authorities(authorities)
                 .disabled(!user.isActive())
                 .accountLocked(user.isLocked())
-                .authorities(authorities)
                 .build();
     }
 }

@@ -3,7 +3,7 @@
 // Handles all API calls for the application
 // ============================================
 
-const API_BASE_URL = 'http://localhost:8181/restroly';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8181/restroly';
 
 // Helper function for making API requests
 const apiRequest = async (endpoint, options = {}) => {

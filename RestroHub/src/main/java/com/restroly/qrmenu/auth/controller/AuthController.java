@@ -81,7 +81,7 @@ public class AuthController {
                                             "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                                             "tokenType": "Bearer",
                                             "expiresIn": 86400,
-                                            "username": "admin",
+                                            "email": "admin@restroly.com",
                                             "roles": ["ROLE_ADMIN"]
                                         },
                                         "timestamp": "2024-01-15T10:30:00"
@@ -107,7 +107,7 @@ public class AuthController {
                                     {
                                         "status": 401,
                                         "error": "UNAUTHORIZED",
-                                        "message": "Invalid username or password",
+                                        "message": "Invalid email or password",
                                         "path": "/api/v1/auth/login",
                                         "timestamp": "2024-01-15T10:30:00",
                                         "traceId": "abc123"
@@ -124,7 +124,7 @@ public class AuthController {
                     schema = @Schema(implementation = LoginRequest.class),
                     examples = @ExampleObject(value = """
                             {
-                                "username": "admin",
+                                "email": "admin@restroly.com",
                                 "password": "admin123"
                             }
                             """)
@@ -133,7 +133,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> login(
             @Valid @RequestBody LoginRequest loginRequest) {
 
-        log.info("Login request received for user: {}", loginRequest.getUsername());
+        log.info("Login request received for user: {}", loginRequest.getEmail());
 
         AuthResponse authResponse = authService.login(loginRequest);
 

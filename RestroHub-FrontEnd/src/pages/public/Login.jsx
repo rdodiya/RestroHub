@@ -186,7 +186,7 @@ const Login = () => {
         }
       } catch (err) {
         toast.error(
-          err.response?.data?.message || "Invalid username or password"
+          err.response?.data?.message || "Invalid email or password"
         );
       } finally {
         setIsLoading(false);
@@ -327,7 +327,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       value={formik.values.username}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      className={inputClass("username")}
+                      className={inputClass("email")}
                     />
                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
                       <EmailIcon />

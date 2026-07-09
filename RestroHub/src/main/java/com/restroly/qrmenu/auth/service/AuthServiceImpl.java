@@ -44,12 +44,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
-        log.info("Login attempt for user: {}", loginRequest.getUsername());
+        log.info("Login attempt for user: {}", loginRequest.getEmail());
 
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
+                            loginRequest.getEmail(),
                             loginRequest.getPassword()
                     )
             );
@@ -64,22 +64,22 @@ public class AuthServiceImpl implements AuthService {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
-            log.info("User {} logged in successfully", loginRequest.getUsername());
+            log.info("User {} logged in successfully", loginRequest.getEmail());
 
             return AuthResponse.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .tokenType("Bearer")
                     .expiresIn(jwtTokenProvider.getExpirationInSeconds())
-                    .username(userDetails.getUsername())
+                    .email(userDetails.getUsername())
                     .roles(roles)
                     .build();
 
         } catch (BadCredentialsException ex) {
-            log.warn("Failed login attempt for user: {}", loginRequest.getUsername());
+            log.warn("Failed login attempt for user: {}", loginRequest.getEmail());
             throw new BadCredentialsException("Invalid username or password");
         } catch (AuthenticationException ex) {
-            log.error("Authentication error for user {}: {}", loginRequest.getUsername(), ex.getMessage());
+            log.error("Authentication error for user {}: {}", loginRequest.getEmail(), ex.getMessage());
             throw new BusinessException("Authentication failed: " + ex.getMessage());
         }
     }
@@ -116,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(newRefreshToken)
                 .tokenType("Bearer")
                 .expiresIn(jwtTokenProvider.getExpirationInSeconds())
-                .username(username)
+                .email(username)
                 .roles(roles)
                 .build();
     }

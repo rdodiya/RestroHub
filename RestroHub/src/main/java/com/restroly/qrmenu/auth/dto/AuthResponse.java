@@ -28,8 +28,8 @@ public class AuthResponse {
     @Schema(description = "Token expiration time in seconds", example = "86400")
     private Long expiresIn;
 
-    @Schema(description = "Username of authenticated user", example = "admin")
-    private String username;
+    @Schema(description = "Email of authenticated user", example = "admin@restroly.com")
+    private String email;
 
     @Schema(description = "User roles", example = "[\"ROLE_ADMIN\"]")
     private List<String> roles;
