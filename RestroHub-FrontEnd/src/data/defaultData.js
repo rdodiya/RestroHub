@@ -35,11 +35,11 @@ export const defaultSiteData = {
 
     // Navigation Links
     navigation: [
-       { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "About Us", href: "#about" },
-    { label: "Contact", href: "#contact" }
+       { label: "Features", href: "/#features" },
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "Pricing", href: "/#pricing" },
+    { label: "About Us", href: "/#about" },
+    { label: "Contact", href: "/#contact" }
     ],
 
     // Hero Section
@@ -289,12 +289,9 @@ export const defaultSiteData = {
    footer: {
   copyright: "© 2026 Restroly. All rights reserved.",
   links: [
-    { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Testimonials", href: "#testimonials" },
-    { label: "About Us", href: "#about" },
-    { label: "Contact", href: "#contact" }
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Service", href: "/terms-of-service" },
+    { label: "Refund Policy", href: "/refund-policy" }
   ]
 },
     };
