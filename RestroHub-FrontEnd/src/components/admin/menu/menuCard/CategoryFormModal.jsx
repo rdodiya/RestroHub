@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { X, Loader2, Tag, Type, FileText  } from "lucide-react";
+import { X, Loader2, Tag, Type, FileText, AlertCircle } from "lucide-react";
 import api from "@services/common/api";
+import toast from "react-hot-toast";
 
 const CategoryFormModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -10,18 +11,21 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const updateField = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    setSubmitError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setSubmitting(true);
+      setSubmitError("");
 
       const payload = {
         name: formData.name,
@@ -31,11 +35,14 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
       await api.post("/secure/api/v1/categories/addCategory", payload);
 
+      toast.success("Category created successfully");
       onClose();
       setFormData({ name: "", description: "" });
 
     } catch (err) {
-      console.error("Category create failed:", err.response?.data || err);
+      const message = err.response?.data?.message || err.message || "Failed to create category";
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -72,6 +79,14 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
         {/* ========== FORM BODY ========== */}
         <form onSubmit={handleSubmit} className="px-6 py-6 space-y-5">
+
+          {/* Error Banner */}
+          {submitError && (
+            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{submitError}</p>
+            </div>
+          )}
 
           {/* Category Name */}
           <div className="space-y-1.5">
