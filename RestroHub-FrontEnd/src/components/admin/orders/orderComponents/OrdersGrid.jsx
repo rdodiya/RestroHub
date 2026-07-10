@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
+import { RefreshCw, AlertCircle, ClipboardList, Clock } from 'lucide-react';
 import OrderCard from './OrderCard';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
@@ -12,6 +12,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState(null);
 
   // Sync orders up to parent so OrderFilters gets real counts
   const syncOrders = (updated) => {
@@ -77,9 +78,8 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
   useEffect(() => {
     fetchOrders();
 
-    // 🔌 UNCOMMENT: Auto-refresh every 30 seconds
-    // const interval = setInterval(fetchOrders, 30000);
-    // return () => clearInterval(interval);
+    const interval = setInterval(fetchOrders, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchOrders = async () => {
@@ -101,6 +101,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setLastRefreshed(new Date());
     }
   };
 
@@ -178,13 +179,31 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
 
   return (
     <div>
-      {/* Refresh indicator */}
-      {refreshing && (
-        <div className="flex items-center gap-2 mb-4 text-sm text-blue-600">
-          <RefreshCw className="w-4 h-4 animate-spin" />
-          <span>Refreshing orders...</span>
+      {/* Refresh indicator & last refreshed */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          {refreshing && (
+            <>
+              <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
+              <span className="text-sm text-blue-600">Refreshing orders...</span>
+            </>
+          )}
+          {!refreshing && lastRefreshed && (
+            <div className="flex items-center gap-1.5 text-xs text-gray-400">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Last updated: {lastRefreshed.toLocaleTimeString()}</span>
+            </div>
+          )}
         </div>
-      )}
+        <button
+          onClick={fetchOrders}
+          disabled={refreshing}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
 
       {/* Orders Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
