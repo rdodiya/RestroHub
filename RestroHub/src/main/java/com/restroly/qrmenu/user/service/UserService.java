@@ -12,7 +12,7 @@ import java.util.Set;
 
 public interface UserService {
 
-    public UserResponse registerUser(UserRequest request);
+    //public UserResponse registerUser(UserRequest request);
     public UserResponse getUserById(Long userId);
     public UserResponse getUserByEmail(String email);
     public Page<UserResponse> getAllUsers(Pageable pageable);
