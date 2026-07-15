@@ -20,6 +20,7 @@ import com.restroly.qrmenu.order.dto.OrderResponse;
 import com.restroly.qrmenu.order.dto.UpdateOrderStatusRequest;
 import com.restroly.qrmenu.order.service.OrderService;
 import com.restroly.qrmenu.payment.service.PaymentService;
+import com.restroly.qrmenu.whatsapp.service.WhatsappOrderNotificationService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,12 @@ import static com.restroly.qrmenu.common.util.ApiConstants.*;
 @RequiredArgsConstructor
 public class OrderController {
 	
-	private final PaymentService paymentService;
+  @Autowired
+	private final WhatsappOrderNotificationService whatsapp = null;
+
+  private final PaymentService paymentService;
 	private final OrderService orderService;
+  
 	@PostMapping
 	public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
 		OrderResponse response = orderService.createOrder(request);
@@ -42,6 +47,9 @@ public class OrderController {
 		String paymentUrl = paymentService.generatePaymentLink(response.getTotalAmount(), response.getOrderId(), response.getPaymentLink());
 		//Genarated payment link is stored in response object to send it to client and use it for payment
 		response.setPaymentLink(paymentUrl);
+		//Sending whatsapp notification
+		if(response.getCustomerName() == null) response.setCustomerName("Customer");
+		if(response.getCustomerPhone() != null) whatsapp.sendOrderConfirmation(response);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
@@ -63,12 +71,19 @@ public class OrderController {
 	@PatchMapping("/{orderId}/status")
 	public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long orderId,
 			@Valid @RequestBody UpdateOrderStatusRequest request) {
-		return ResponseEntity.ok(orderService.updateOrderStatus(orderId, request.getStatus()));
+				OrderResponse response = orderService.updateOrderStatus(orderId, request.getStatus());
+				//Sending whatsapp notification
+				if(response.getCustomerName() == null) response.setCustomerName("Customer");
+		        if(response.getCustomerPhone() != null) whatsapp.sendOrderStatusUpdate(response);
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping("/{orderId}/cancel")
 	public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
-		orderService.cancelOrder(orderId);
+		OrderResponse response=orderService.cancelOrder(orderId);
+		//sending cancel message
+		if(response.getCustomerName() == null) response.setCustomerName("Customer");
+		if(response.getCustomerPhone() != null) whatsapp.sendOrderStatusUpdate(response);
 		return ResponseEntity.noContent().build();
 	}
 }

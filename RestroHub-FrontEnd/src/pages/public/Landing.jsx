@@ -109,6 +109,17 @@ const Landing = () => {
     return () => obs.disconnect();
   }, []);
 
+  const handleWatchDemoClick = () => {
+    const testimonialsSection = document.getElementById('testimonials');
+    if (!testimonialsSection) return;
+
+    setActiveLink('#testimonials');
+    testimonialsSection.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
   const features = [
     {
       icon: QrCode,
@@ -291,7 +302,7 @@ const [contactForm, setContactForm] = useState({
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy Policy', href: '#' },
+      { label: 'Privacy Policy', href: '/privacy-policy' },
       { label: 'Terms of Service', href: '#' },
       { label: 'Refund Policy', href: '#' },
     ],
@@ -508,8 +519,12 @@ const [contactForm, setContactForm] = useState({
                 Start Free Trial
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
-              <button className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-8 py-4 text-base font-bold text-slate-700 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-400 dark:hover:text-blue-400 sm:text-lg">
-                <Play className="h-5 w-5 fill-blue-600 text-blue-600" />
+              <button
+                type="button"
+                onClick={handleWatchDemoClick}
+                className="group inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-blue-300/40 transition-all hover:scale-105 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 sm:text-lg"
+              >
+                <Play className="h-5 w-5 fill-white text-white transition-transform group-hover:scale-110" />
                 Watch Demo
               </button>
             </div>
@@ -953,26 +968,35 @@ const [contactForm, setContactForm] = useState({
               </p>
             </div>
 
-            {/* Link Columns */}
-            {footerColumns.map((col) => (
-              <div key={col.title}>
-                <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-300">
-                  {col.title}
-                </h4>
-                <ul className="space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        className="text-sm text-slate-400 transition-colors hover:text-white"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+         {/* Link Columns */}
+{footerColumns.map((col) => (
+  <div key={col.title}>
+    <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-300">
+      {col.title}
+    </h4>
+    <ul className="space-y-3">
+      {col.links.map((link) => (
+        <li key={link.label}>
+          {link.href.startsWith('/') ? (
+            <Link
+              to={link.href}
+              className="text-sm text-slate-400 transition-colors hover:text-white"
+            >
+              {link.label}
+            </Link>
+          ) : (
+            <a
+              href={link.href}
+              className="text-sm text-slate-400 transition-colors hover:text-white"
+            >
+              {link.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+))}
           </div>
 
           {/* Bottom Bar */}

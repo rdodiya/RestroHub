@@ -349,7 +349,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       id="username"
                       name="username"
                       type="text"
-                      autoComplete="off"
+                      autoComplete="username"
                       placeholder="Enter email or username"
                       value={formik.values.username}
                       onChange={formik.handleChange}
@@ -378,7 +378,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      autoComplete="new-password"
+                      autoComplete="current-password"
                       placeholder="Minimum 8 characters; include uppercase, lowercase, number, special character"
                       disabled={isLoading}
                       value={formik.values.password}
