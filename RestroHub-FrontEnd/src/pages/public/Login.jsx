@@ -4,11 +4,16 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { GoogleLogin } from "@react-oauth/google";
 import { ArrowLeft } from "lucide-react";
 import api from "@services/common/api";
+import {
+  clearRememberedUsername,
+  getRememberedUsername,
+  setRememberedUsername,
+  storeAuthSession,
+} from "@services/common/authStorage";
 import { useTheme } from "@context/ThemeContext";
 
 const API_BASE_URL =
@@ -157,9 +162,14 @@ const Login = () => {
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const rememberedUsername = getRememberedUsername();
 
   const formik = useFormik({
-    initialValues: { username: "", password: "" },
+    initialValues: {
+      username: rememberedUsername,
+      password: "",
+      rememberMe: Boolean(rememberedUsername),
+    },
     validationSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
@@ -172,11 +182,18 @@ const Login = () => {
         if (result.success) {
           const { accessToken, refreshToken, roles } = result.data;
 
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
-          localStorage.setItem("roles", JSON.stringify(roles));
+          storeAuthSession(
+            { accessToken, refreshToken, roles },
+            values.rememberMe
+          );
 
-          axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+          if (values.rememberMe) {
+            setRememberedUsername(values.username);
+          } else {
+            clearRememberedUsername();
+          }
+
+          api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
           toast.success("Login successful!");
 
@@ -194,6 +211,15 @@ const Login = () => {
     },
   });
 
+  const handleRememberMeChange = (event) => {
+    const checked = event.target.checked;
+    formik.setFieldValue("rememberMe", checked);
+
+    if (!checked) {
+      clearRememberedUsername();
+    }
+  };
+
 const handleGoogleLogin = async (credentialResponse) => {
   try {
     setIsLoading(true);
@@ -207,11 +233,12 @@ const handleGoogleLogin = async (credentialResponse) => {
     if (result.success) {
       const { accessToken, refreshToken, roles } = result.data;
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("roles", JSON.stringify(roles));
+      storeAuthSession(
+        { accessToken, refreshToken, roles },
+        formik.values.rememberMe
+      );
 
-      axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
       toast.success("Google login successful!");
 
@@ -374,8 +401,19 @@ const handleGoogleLogin = async (credentialResponse) => {
                   )}
                 </div>
 
-                {/* Forgot password */}
-                <div className="mb-6 flex justify-end">
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <input
+                      id="rememberMe"
+                      name="rememberMe"
+                      type="checkbox"
+                      checked={formik.values.rememberMe}
+                      onChange={handleRememberMeChange}
+                      disabled={isLoading}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    />
+                    Remember me
+                  </label>
                   <Link
                     to="/forgot-password"
                     className="text-sm text-blue-600 hover:underline dark:text-blue-400"

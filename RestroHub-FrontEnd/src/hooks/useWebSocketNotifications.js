@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
 import toast from 'react-hot-toast';
+import { getAccessToken } from '@services/common/authStorage';
 
 // ============================================
 // useWebSocketNotifications Hook
@@ -55,7 +56,7 @@ const useWebSocketNotifications = (branchId) => {
 
         const fetchExisting = async () => {
             try {
-                const token = localStorage.getItem('accessToken');
+                const token = getAccessToken();
                 const res = await fetch(
                     `${API_BASE_URL}/secure/api/v1/service-requests/branch/${branchId}`,
                     { headers: { Authorization: `Bearer ${token}` } }
@@ -127,7 +128,7 @@ const useWebSocketNotifications = (branchId) => {
     // Acknowledge a request
     const acknowledgeRequest = useCallback(async (requestId) => {
         try {
-            const token = localStorage.getItem('accessToken');
+            const token = getAccessToken();
             await fetch(
                 `${API_BASE_URL}/secure/api/v1/service-requests/${requestId}/acknowledge`,
                 { method: 'PATCH', headers: { Authorization: `Bearer ${token}` } }
@@ -145,7 +146,7 @@ const useWebSocketNotifications = (branchId) => {
     // Complete/dismiss a request
     const completeRequest = useCallback(async (requestId) => {
         try {
-            const token = localStorage.getItem('accessToken');
+            const token = getAccessToken();
             await fetch(
                 `${API_BASE_URL}/secure/api/v1/service-requests/${requestId}/complete`,
                 { method: 'PATCH', headers: { Authorization: `Bearer ${token}` } }
