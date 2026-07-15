@@ -1,10 +1,13 @@
 package com.restroly.qrmenu.restaurant.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.restroly.qrmenu.branch.entity.Branch;
 
+import com.restroly.qrmenu.user.entity.UserRoleRestaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +41,10 @@ public class Restaurant {
 	@Builder.Default
 	private Boolean isActive = true;
 
+	@Column(name = "service_request_enabled")
+	@Builder.Default
+	private Boolean serviceRequestEnabled = false;
+
 	@Column(name = "created_at", updatable = false)
 	private LocalDateTime createdAt;
 
@@ -54,4 +61,9 @@ public class Restaurant {
 	protected void onUpdate() {
 		updatedDate = LocalDateTime.now();
 	}
+
+	// NEW: User-Role-Restaurant relationship
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<UserRoleRestaurant> userRoleRestaurants = new HashSet<>();
+
 }

@@ -8,6 +8,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 
 // ============================================
@@ -26,7 +27,7 @@ const StatCard = ({ title, value, change, positive, subtitle, icon: Icon, color,
   };
 
   return (
-    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       <div className="flex items-center justify-between mb-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${colorClasses[color]}`}>
           <Icon className="w-6 h-6" />
@@ -71,7 +72,7 @@ const StatCard = ({ title, value, change, positive, subtitle, icon: Icon, color,
 const StatCardSkeleton = () => {
   const { isDark } = useAdminTheme();
   return (
-    <div className={`rounded-2xl p-6 shadow-sm border animate-pulse ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+    <div className={`rounded-2xl p-6 shadow-sm border animate-pulse ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       <div className="flex items-center justify-between mb-4">
         <div className={`w-12 h-12 rounded-xl ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
         <div className={`w-16 h-5 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
@@ -181,7 +182,7 @@ const StatsSection = () => {
     return (
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {[1, 2, 3, 4].map(i => (
-          <StatCardSkeleton key={i} />
+           <AdminSkeleton key={i} variant="stats" />
         ))}
       </div>
     );

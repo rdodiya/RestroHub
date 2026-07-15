@@ -28,11 +28,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findByIsActiveTrue(Pageable pageable);
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.userId = :userId")
-    Optional<User> findByUserIdWithRoles(@Param("userId") Long userId);
-
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email")
-    Optional<User> findByEmailWithRoles(@Param("email") String email);
-
     long countByIsActiveTrue();
+
+    Optional<User> findByUserId(@Param("userId") Long userId);
+
+    @Query("""
+    SELECT DISTINCT u
+    FROM User u
+    LEFT JOIN FETCH u.userRoleRestaurants urr
+    LEFT JOIN FETCH urr.role
+    LEFT JOIN FETCH urr.restaurant
+    WHERE u.email = :email
+    """)
+    Optional<User> findByEmailWithUserRoleRestaurants(String email);
 }

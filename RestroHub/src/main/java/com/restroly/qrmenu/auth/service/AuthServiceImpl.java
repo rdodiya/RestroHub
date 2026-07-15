@@ -3,8 +3,11 @@ package com.restroly.qrmenu.auth.service;
 import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
-import com.restroly.qrmenu.common.exception.BusinessException;
+import com.restroly.qrmenu.exception.BusinessException;
+import com.restroly.qrmenu.restaurant.entity.Restaurant;
+import com.restroly.qrmenu.restaurant.service.RestaurantService;
 import com.restroly.qrmenu.security.JwtTokenProvider;
+import com.restroly.qrmenu.user.entity.UserRoleRestaurant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,8 +20,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import com.restroly.qrmenu.auth.dto.RegisterRequest;
+import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
+import com.restroly.qrmenu.user.entity.Role;
+import com.restroly.qrmenu.user.repository.UserRepository;
+import com.restroly.qrmenu.user.repository.RoleRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,9 +39,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final RestaurantService restaurantService;
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
@@ -78,10 +95,12 @@ public class AuthServiceImpl implements AuthService {
         log.debug("Refresh token request received");
 
         if (!jwtTokenProvider.validateToken(refreshToken)) {
+            log.warn("Invalid or expired refresh token");
             throw new BusinessException("Invalid or expired refresh token");
         }
 
         if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
+            log.warn("Provided token is not a refresh token");
             throw new BusinessException("Token is not a refresh token");
         }
 
@@ -115,5 +134,46 @@ public class AuthServiceImpl implements AuthService {
         // For now, we just clear the security context
         SecurityContextHolder.clearContext();
         log.info("User logged out successfully");
+    }
+
+    @Override
+    public AuthResponse register(RegisterRequest registerRequest) {
+
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new DuplicateResourceException("User already exists with this email");
+        }
+
+        User user = User.builder()
+                .name(registerRequest.getFirstName() + " " + registerRequest.getLastName())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .isActive(true)
+                .isLocked(false)
+                .authProvider("LOCAL")
+                .build();
+
+        Role customerRole = roleRepository.findByName("CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Default CUSTOMER role not found"));
+
+        UserRoleRestaurant userRoleRestaurant = UserRoleRestaurant.builder()
+                .role(customerRole)
+                .user(user)
+                .restaurant(
+                        restaurantService.getRestaurantByNameEntity(
+                                registerRequest.getRestaurantName()
+                        )
+                )
+                .build();
+        if (user.getUserRoleRestaurants() == null) {
+            user.setUserRoleRestaurants(new HashSet<>());
+        }
+
+        user.getUserRoleRestaurants().add(userRoleRestaurant);
+
+        userRepository.save(user);
+
+        return AuthResponse.builder()
+        .username(user.getEmail())
+        .build();
     }
 }

@@ -1,13 +1,15 @@
 package com.restroly.qrmenu.user.service;
 
+import com.restroly.qrmenu.exception.BusinessException;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
+import com.restroly.qrmenu.exception.RoleNotFoundException;
 import com.restroly.qrmenu.user.dto.RoleRequest;
 import com.restroly.qrmenu.user.dto.RoleResponse;
 import com.restroly.qrmenu.user.entity.Role;
-import com.restroly.qrmenu.user.exception.DuplicateResourceException;
-import com.restroly.qrmenu.user.exception.RoleNotFoundException;
 import com.restroly.qrmenu.user.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +51,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponse getRoleById(Long id) {
         log.info("Fetching role with ID: {}", id);
 
-        Role role = roleRepository.findByIdWithUsers(id)
+        Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
 
         return mapToResponseWithUserCount(role);
@@ -119,13 +121,18 @@ public class RoleServiceImpl implements RoleService {
     public void deleteRole(Long id) {
         log.info("Deleting role with ID: {}", id);
 
-        Role role = roleRepository.findByIdWithUsers(id)
+        Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
 
         // Check if role is assigned to any users
         long userCount = roleRepository.countUsersByRoleId(id);
         if (userCount > 0) {
-            throw new IllegalStateException("Cannot delete role. It is assigned to " + userCount + " user(s)");
+            // FIXED: was IllegalStateException — now BusinessException (409 CONFLICT)
+            throw new BusinessException(
+                    "Cannot delete role. It is assigned to " + userCount + " user(s)",
+                    HttpStatus.CONFLICT,
+                    "ROLE_IN_USE"
+            );
         }
 
         roleRepository.delete(role);
@@ -149,6 +156,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String name) {
+        log.debug("Checking existence of role with name: {}", name);
         return roleRepository.existsByName(name);
     }
 

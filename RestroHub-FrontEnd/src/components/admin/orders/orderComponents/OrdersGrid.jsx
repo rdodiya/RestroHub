@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
 import OrderCard from './OrderCard';
 import api from "@services/common/api";
+import AdminSkeleton from '../../AdminSkeleton';
 
 const OrderCardSkeleton = () => (
   <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-pulse">
@@ -42,22 +43,21 @@ const OrderCardSkeleton = () => (
   </div>
 );
 
-<<<<<<< HEAD
-// =====================================// MAIN COMPONENT
-// =====================================const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
+// ============================================
+// MAIN COMPONENT
+// ============================================
+  const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-<<<<<<< HEAD
   // Sync orders up to parent so OrderFilters gets real counts
   const syncOrders = (updated) => {
     setOrders(updated);
     onOrdersChange?.(updated);
   };
 
-<<<<<<< HEAD
   // ------------------------------------
   // FALLBACK DATA
   // ------------------------------------
@@ -66,7 +66,7 @@ const OrderCardSkeleton = () => (
       id: 123,
       table: 4,
       amount: 450,
-      status: 'cooking',
+      status: 'PREPARING',
       customer: 'John Doe',
       phone: '9876543210',
       items: [
@@ -79,7 +79,7 @@ const OrderCardSkeleton = () => (
       id: 124,
       table: 7,
       amount: 320,
-      status: 'ready',
+      status: 'READY',
       customer: 'Priya Sharma',
       phone: '9876543211',
       items: [
@@ -92,7 +92,7 @@ const OrderCardSkeleton = () => (
       id: 125,
       table: 2,
       amount: 780,
-      status: 'pending',
+      status: 'PENDING',
       customer: 'Amit Kumar',
       phone: '9876543212',
       items: [{ name: 'Special Thali', qty: 3, price: 260 }],
@@ -102,7 +102,7 @@ const OrderCardSkeleton = () => (
       id: 126,
       table: 9,
       amount: 190,
-      status: 'billed',
+      status: 'BILLED',
       customer: 'Sara Khan',
       phone: '9876543213',
       items: [{ name: 'Sweet Lassi', qty: 2, price: 95 }],
@@ -118,11 +118,10 @@ const OrderCardSkeleton = () => (
     try {
       if (!loading) setRefreshing(true);
       setError(null);
-<<<<<<< HEAD
 
-      // 🔌 UNCOMMENT WHEN API READY
-      // const response = await api.get('/api/orders');
-      // setOrders(response.data);
+      // 🔌 UNCOMMENT WHEN API READY (replace {branchId} with actual branch ID)
+      // const response = await api.get('/secure/api/v1/orders/branch/{branchId}/active');
+      // syncOrders(response.data);
 
       // 🎭 MOCK
       await new Promise((resolve) => setTimeout(resolve, 700));
@@ -147,7 +146,7 @@ const OrderCardSkeleton = () => (
   };
 
   const handleStatusUpdate = (orderId, newStatus) => {
-    if (newStatus === 'complete') {
+    if (newStatus === 'COMPLETED') {
       syncOrders(orders.filter((o) => o.id !== orderId));
     } else {
       syncOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)));
@@ -174,7 +173,7 @@ const OrderCardSkeleton = () => (
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <OrderCardSkeleton key={i} />
+          <AdminSkeleton key={i} variant="order-card" />
         ))}
       </div>
     );

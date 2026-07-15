@@ -1,5 +1,6 @@
 package com.restroly.qrmenu.security;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,12 +9,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.restroly.qrmenu.security.exception.UserDisabledException;
+import com.restroly.qrmenu.security.exception.UserLockedException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final com.restroly.qrmenu.user.repository.UserRepository userRepository;
@@ -23,20 +28,31 @@ public class CustomUserDetailsService implements UserDetailsService {
             throws UsernameNotFoundException {
         log.debug("Loading user by email: {}", email);
 
-        com.restroly.qrmenu.user.entity.User user = userRepository.findByEmailWithRoles(email)
+        com.restroly.qrmenu.user.entity.User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.warn("User not found with email: {}", email);
                     return new UsernameNotFoundException("User not found with email: " + email);
                 });
-
+        // Check if the user account is active
         if (!user.isActive()) {
             log.warn("User account is inactive: {}", email);
-            throw new UsernameNotFoundException("User account is inactive: " + email);
+            throw new UserDisabledException("User account is inactive");
         }
 
-        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
+        // Check if the user account is locked
+        if (user.isLocked()) {
+            log.warn("User account is locked: {}", email);
+            throw new UserLockedException("User account is locked");
+        }
+
+//        List<SimpleGrantedAuthority> authorities = user.getUserRoleRestaurants().stream().
+//               map(urr -> new SimpleGrantedAuthority(urr.getRole().getName())).
+//                collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities =
+                user.getUserRoleRestaurants().stream()
+                        .map(urr -> new SimpleGrantedAuthority(
+                                "ROLE_" + urr.getRole().getName()))
+                        .collect(Collectors.toList());
 
         log.debug("User found: {} with roles: {}", email, authorities);
 

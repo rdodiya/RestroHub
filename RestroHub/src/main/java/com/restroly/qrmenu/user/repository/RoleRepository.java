@@ -21,11 +21,18 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     List<Role> findByIsActiveTrue();
 
-    Set<Role> findByIdIn(Set<Long> ids);
+    List<Role> findByIdIn(Set<Long> ids);
 
-    @Query("SELECT r FROM Role r LEFT JOIN FETCH r.users WHERE r.id = :id")
-    Optional<Role> findByIdWithUsers(@Param("id") Long id);
-
-    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.id = :roleId")
+    @Query("""
+    SELECT COUNT(urr.user)
+    FROM UserRoleRestaurant urr
+    WHERE urr.role.id = :roleId
+    """)
     long countUsersByRoleId(@Param("roleId") Long roleId);
+
+//    @Query("SELECT r FROM Role r LEFT JOIN FETCH r.users WHERE r.id = :id")
+//    Optional<Role> findByIdWithUsers(@Param("id") Long id);
+//
+//    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.id = :roleId")
+//    long countUsersByRoleId(@Param("roleId") Long roleId);
 }

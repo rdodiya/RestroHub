@@ -57,6 +57,10 @@ public class Order {
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    //Not storing in database only for better payment utility
+    @Transient
+    private String paymentId;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

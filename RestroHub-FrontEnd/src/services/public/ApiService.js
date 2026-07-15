@@ -18,14 +18,49 @@ const apiRequest = async (endpoint, options = {}) => {
     };
 
     const response = await fetch(url, { ...defaultOptions, ...options });
-    
-    if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
-    
-    return response.json();
-};
+   if (!response.ok) {
+    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
 
+    try {
+        const contentType = response.headers.get("content-type");
+        const responseText = await response.text();
+
+        if (
+            contentType &&
+            contentType.includes("application/json") &&
+            responseText
+        ) {
+            const errorData = JSON.parse(responseText);
+            errorMessage = errorData.message || errorMessage;
+        }
+    } catch (err) {
+        console.error("Failed to parse error response:", err);
+    }
+
+    throw new Error(errorMessage);
+}
+
+try {
+    const contentType = response.headers.get("content-type");
+    const responseText = await response.text();
+
+    if (!responseText) {
+        return null;
+    }
+
+    if (
+        contentType &&
+        contentType.includes("application/json")
+    ) {
+        return JSON.parse(responseText);
+    }
+
+    return responseText;
+} catch (err) {
+    console.error("Failed to parse response:", err);
+    throw new Error("Invalid server response");
+}
+};
 const ApiService = {
     // ============================================
     // SITE DATA

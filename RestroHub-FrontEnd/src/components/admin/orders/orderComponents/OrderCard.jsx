@@ -8,6 +8,9 @@ import {
   Phone,
   MoreVertical,
   Loader2,
+  XCircle,
+  UserCheck,
+  UtensilsCrossed,
 } from 'lucide-react';
 import api from "@services/common/api";
 
@@ -16,72 +19,114 @@ const OrderCard = ({ order, onStatusUpdate }) => {
 
   // ------------------------------------
   // STATUS CONFIG
+  // Keys match backend OrderStatus enum values (uppercase)
   // ------------------------------------
   const statusConfig = {
-    pending: {
+    PENDING: {
       bg: 'bg-yellow-50',
       text: 'text-yellow-700',
       border: 'border-yellow-200',
       icon: Clock,
       label: 'Pending',
     },
-    cooking: {
+    CONFIRMED: {
+      bg: 'bg-indigo-50',
+      text: 'text-indigo-700',
+      border: 'border-indigo-200',
+      icon: UserCheck,
+      label: 'Confirmed',
+    },
+    PREPARING: {
       bg: 'bg-blue-50',
       text: 'text-blue-700',
       border: 'border-blue-200',
       icon: ChefHat,
-      label: 'Cooking',
+      label: 'Preparing',
     },
-    ready: {
+    READY: {
       bg: 'bg-green-50',
       text: 'text-green-700',
       border: 'border-green-200',
       icon: CheckCircle2,
       label: 'Ready',
     },
-    billed: {
+    SERVED: {
+      bg: 'bg-teal-50',
+      text: 'text-teal-700',
+      border: 'border-teal-200',
+      icon: UtensilsCrossed,
+      label: 'Served',
+    },
+    BILLED: {
       bg: 'bg-purple-50',
       text: 'text-purple-700',
       border: 'border-purple-200',
       icon: Receipt,
       label: 'Billed',
     },
+    COMPLETED: {
+      bg: 'bg-gray-50',
+      text: 'text-gray-600',
+      border: 'border-gray-200',
+      icon: CreditCard,
+      label: 'Completed',
+    },
+    CANCELLED: {
+      bg: 'bg-red-50',
+      text: 'text-red-700',
+      border: 'border-red-200',
+      icon: XCircle,
+      label: 'Cancelled',
+    },
   };
 
   // ------------------------------------
   // NEXT ACTION CONFIG
+  // Defines the order lifecycle transition for each status.
+  // Flow: PENDING → PREPARING → READY → BILLED → COMPLETED
+  // CONFIRMED also transitions to PREPARING.
+  // No action button for SERVED, COMPLETED, or CANCELLED.
   // ------------------------------------
   const actionConfig = {
-    pending: {
-      label: 'Start Cooking',
-      next: 'cooking',
+    PENDING: {
+      label: 'Start Preparing',
+      next: 'PREPARING',
       icon: ChefHat,
       bg: 'bg-blue-50',
       text: 'text-blue-700',
       hoverBg: 'hover:bg-blue-100',
       border: 'border border-blue-200',
     },
-    cooking: {
+    CONFIRMED: {
+      label: 'Start Preparing',
+      next: 'PREPARING',
+      icon: ChefHat,
+      bg: 'bg-blue-50',
+      text: 'text-blue-700',
+      hoverBg: 'hover:bg-blue-100',
+      border: 'border border-blue-200',
+    },
+    PREPARING: {
       label: 'Mark Ready',
-      next: 'ready',
+      next: 'READY',
       icon: CheckCircle2,
       bg: 'bg-green-50',
       text: 'text-green-700',
       hoverBg: 'hover:bg-green-100',
       border: 'border border-green-200',
     },
-    ready: {
+    READY: {
       label: 'Generate Bill',
-      next: 'billed',
+      next: 'BILLED',
       icon: Receipt,
       bg: 'bg-purple-50',
       text: 'text-purple-700',
       hoverBg: 'hover:bg-purple-100',
       border: 'border border-purple-200',
     },
-    billed: {
-      label: 'Complete Payment',
-      next: 'complete',
+    BILLED: {
+      label: 'Complete Order',
+      next: 'COMPLETED',
       icon: CreditCard,
       bg: 'bg-gray-50',
       text: 'text-gray-700',
@@ -90,7 +135,16 @@ const OrderCard = ({ order, onStatusUpdate }) => {
     },
   };
 
-  const status = statusConfig[order.status];
+  // Fallback for any unrecognised status to prevent crashes
+  const defaultStatus = {
+    bg: 'bg-gray-50',
+    text: 'text-gray-600',
+    border: 'border-gray-200',
+    icon: Clock,
+    label: order.status || 'Unknown',
+  };
+
+  const status = statusConfig[order.status] || defaultStatus;
   const action = actionConfig[order.status];
   const StatusIcon = status.icon;
 

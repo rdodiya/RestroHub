@@ -1,7 +1,7 @@
 package com.restroly.qrmenu.restaurant.service;
 
-import com.restroly.qrmenu.common.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.common.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.restaurant.dto.RestaurantRequestDTO;
 import com.restroly.qrmenu.restaurant.dto.RestaurantResponseDTO;
 import com.restroly.qrmenu.restaurant.dto.RestaurantUpdateDTO;
@@ -126,5 +126,22 @@ public class RestaurantServiceImpl implements  RestaurantService{
                     log.warn("Restaurant not found with id: {}", id);
                     return new ResourceNotFoundException(String.format(RESTAURANT_NOT_FOUND_MSG, id));
                 });
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    @Override
+    public Restaurant getRestaurantByNameEntity(String name) {
+        log.debug("Fetching restaurant by name: {}", name);
+
+        Restaurant restaurant = restaurantRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> {
+                    log.warn("Restaurant not found with name: {}", name);
+                    return new ResourceNotFoundException("Restaurant not found with name: " + name);
+                });
+
+        return restaurant;
     }
 }
