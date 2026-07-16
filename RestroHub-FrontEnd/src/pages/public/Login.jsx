@@ -18,7 +18,7 @@ const validationSchema = Yup.object({
   username: Yup.string().required("Email or username is required"),
   // Login should only require a password to be present; strict complexity
   // rules are enforced at registration. Keep login validation permissive.
-  password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters"),
+  password: Yup.string().required("Password is required"),
 });
 
 /* ──────────────────── SVG Icons (inlined) ──────────────────── */
