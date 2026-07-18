@@ -3,6 +3,7 @@ package com.restroly.qrmenu.restaurant.service;
 import com.restroly.qrmenu.restaurant.dto.RestaurantRequestDTO;
 import com.restroly.qrmenu.restaurant.dto.RestaurantResponseDTO;
 import com.restroly.qrmenu.restaurant.dto.RestaurantUpdateDTO;
+import com.restroly.qrmenu.restaurant.entity.Restaurant;
 
 public interface RestaurantService {
 
@@ -15,5 +16,7 @@ public interface RestaurantService {
     RestaurantResponseDTO updateRestaurant(Long id, RestaurantUpdateDTO updateDTO);
 
     void deleteRestaurant(Long id);
+
+    Restaurant getRestaurantByNameEntity(String name);
 
 }

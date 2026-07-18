@@ -18,7 +18,7 @@ import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
 import com.restroly.qrmenu.auth.dto.RegisterRequest;
 import com.restroly.qrmenu.auth.service.AuthService;
-import com.restroly.qrmenu.auth.service.GoogleAuthService;
+//import com.restroly.qrmenu.auth.service.GoogleAuthService;
 import com.restroly.qrmenu.common.dto.ApiResponse;
 import com.restroly.qrmenu.exception.ApiErrorResponse;
 
@@ -44,8 +44,8 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    private GoogleAuthService googleAuthService;
+//    @Autowired
+//    private GoogleAuthService googleAuthService;
 
         //end points for register
 
@@ -140,61 +140,61 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(authResponse, "Login successful"));
     }
 
-    @PostMapping("/google")
-    @Operation(
-            summary = "Google OAuth authentication",
-            description = "Authenticates user via Google OAuth token. Creates new user if doesn't exist or updates existing user with Google info."
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "Google authentication successful",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class),
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "success": true,
-                                        "message": "Google authentication successful",
-                                        "data": {
-                                            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                            "tokenType": "Bearer",
-                                            "expiresIn": 86400,
-                                            "username": "user@example.com",
-                                            "roles": ["ROLE_CUSTOMER"]
-                                        },
-                                        "timestamp": "2024-01-15T10:30:00"
-                                    }
-                                    """)
-                    )
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid request - token missing or invalid",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "Google token verification failed",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            )
-    })
-    public ResponseEntity<ApiResponse<AuthResponse>> googleAuth(
-            @Valid @RequestBody GoogleAuthRequest googleAuthRequest) {
-
-        log.info("Google OAuth authentication request received");
-
-        AuthResponse authResponse = googleAuthService.authenticateWithGoogle(googleAuthRequest);
-
-        return ResponseEntity.ok(ApiResponse.success(authResponse, "Google authentication successful"));
-    }
+//    @PostMapping("/google")
+//    @Operation(
+//            summary = "Google OAuth authentication",
+//            description = "Authenticates user via Google OAuth token. Creates new user if doesn't exist or updates existing user with Google info."
+//    )
+//    @ApiResponses(value = {
+//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+//                    responseCode = "200",
+//                    description = "Google authentication successful",
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            schema = @Schema(implementation = AuthResponse.class),
+//                            examples = @ExampleObject(value = """
+//                                    {
+//                                        "success": true,
+//                                        "message": "Google authentication successful",
+//                                        "data": {
+//                                            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+//                                            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+//                                            "tokenType": "Bearer",
+//                                            "expiresIn": 86400,
+//                                            "username": "user@example.com",
+//                                            "roles": ["ROLE_CUSTOMER"]
+//                                        },
+//                                        "timestamp": "2024-01-15T10:30:00"
+//                                    }
+//                                    """)
+//                    )
+//            ),
+//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+//                    responseCode = "400",
+//                    description = "Invalid request - token missing or invalid",
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            schema = @Schema(implementation = ApiErrorResponse.class)
+//                    )
+//            ),
+//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+//                    responseCode = "401",
+//                    description = "Google token verification failed",
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            schema = @Schema(implementation = ApiErrorResponse.class)
+//                    )
+//            )
+//    })
+//    public ResponseEntity<ApiResponse<AuthResponse>> googleAuth(
+//            @Valid @RequestBody GoogleAuthRequest googleAuthRequest) {
+//
+//        log.info("Google OAuth authentication request received");
+//
+//        AuthResponse authResponse = googleAuthService.authenticateWithGoogle(googleAuthRequest);
+//
+//        return ResponseEntity.ok(ApiResponse.success(authResponse, "Google authentication successful"));
+//    }
 
     @PostMapping("/refresh")
     @Operation(
