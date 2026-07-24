@@ -10,7 +10,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gi
 const getErrorMessage = (err, fallback) =>
   err.response?.data?.message || err.response?.data?.error || fallback;
 
-const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
+const MenuFormModal = ({ isOpen, onClose, onSaved, editingItem, allCategories }) => {
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -157,7 +157,11 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
         toast.success('Food item created successfully');
       }
 
-      onClose();
+      if (onSaved) {
+        onSaved();
+      } else {
+        onClose();
+      }
     } catch (err) {
       console.error("Failed to save item:", err.response?.data || err);
       const message = getErrorMessage(err, 'Failed to save food item');

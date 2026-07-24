@@ -17,6 +17,7 @@ const Menus = () => {
   const [allCategories, setAllCategories] = useState([]);
   const menuGridRef = useRef(null);
   const menusGridRef = useRef(null);
+  const categorySidebarRef = useRef(null);
 
   // FOOD ITEM MODAL STATE
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +25,7 @@ const Menus = () => {
 
   // CATEGORY MODAL STATE
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
   // MENU CREATION MODAL STATE
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
@@ -47,6 +49,11 @@ const Menus = () => {
     }
   };
 
+  const refreshFoodItemsAndCategoryCounts = () => {
+    menuGridRef.current?.refreshFoods();
+    categorySidebarRef.current?.refreshCategoryCounts();
+  };
+
   // FOOD ITEM MODAL HANDLERS
   const openAddModal = () => {
     setEditingItem(null);
@@ -67,16 +74,37 @@ const Menus = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
-    menuGridRef.current?.refreshFoods();
+  };
+
+  const handleFoodItemSaved = () => {
+    closeModal();
+    refreshFoodItemsAndCategoryCounts();
   };
 
   // CATEGORY MODAL HANDLERS
   const openCategoryModal = () => {
+    setEditingCategory(null);
+    setIsCategoryModalOpen(true);
+  };
+
+  const openEditCategoryModal = (category) => {
+    setEditingCategory(category);
     setIsCategoryModalOpen(true);
   };
 
   const closeCategoryModal = () => {
     setIsCategoryModalOpen(false);
+    setEditingCategory(null);
+  };
+
+  const handleCategorySaved = () => {
+    closeCategoryModal();
+    categorySidebarRef.current?.refreshCategories();
+    menuGridRef.current?.refreshFoods();
+  };
+
+  const handleCategoryDeleted = () => {
+    menuGridRef.current?.refreshFoods();
   };
 
   // MENU CREATION MODAL HANDLERS
@@ -148,15 +176,19 @@ const Menus = () => {
           <BulkActions />
           <div className="flex flex-col lg:flex-row gap-6 mt-6">
             <CategorySidebar
+              ref={categorySidebarRef}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
               onAddCategory={openCategoryModal}
+              onEditCategory={openEditCategoryModal}
               setAllCategories={setAllCategories}
+              onCategoryDeleted={handleCategoryDeleted}
             />
             <MenuItemsGrid
               ref={menuGridRef}
               selectedCategory={selectedCategory}
               onEditItem={openEditModal}
+              onFoodItemsChanged={refreshFoodItemsAndCategoryCounts}
             />
           </div>
         </div>
@@ -177,6 +209,7 @@ const Menus = () => {
       <MenuFormModal
         isOpen={isModalOpen}
         onClose={closeModal}
+        onSaved={handleFoodItemSaved}
         editingItem={editingItem}
         allCategories={allCategories}
       />
@@ -185,6 +218,8 @@ const Menus = () => {
       <CategoryFormModal
         isOpen={isCategoryModalOpen}
         onClose={closeCategoryModal}
+        editingCategory={editingCategory}
+        onSaved={handleCategorySaved}
       />
 
       {/* Menu Creation Modal */}

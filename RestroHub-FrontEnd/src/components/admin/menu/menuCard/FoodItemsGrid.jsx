@@ -11,7 +11,7 @@ const getPageContent = (data) => {
   return data?.content || data?.data?.content || [];
 };
 
-const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
+const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem, onFoodItemsChanged }, ref) => {
   const [menuItems, setMenuItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -108,6 +108,7 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
       ...prev,
       totalElements: Math.max(prev.totalElements - 1, 0),
     }));
+    onFoodItemsChanged?.();
   };
 
   const goToPreviousPage = () => {
