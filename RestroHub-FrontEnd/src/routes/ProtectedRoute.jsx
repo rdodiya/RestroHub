@@ -43,7 +43,7 @@ const ProtectedRoute = ({ children }) => {
  */
 const AdminRoute = ({ children }) => {
   if (!hasRole('ADMIN', 'SUPER_ADMIN')) {
-    return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to="/unauthorized" replace />;
   }
   return children;
 };
