@@ -6,6 +6,7 @@ import PublicLayout from '../layouts/PublicLayout';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
+import { AdminRoute } from './ProtectedRoute';
 
 // Public Pages
 import Landing from '../pages/public/Landing';
@@ -30,6 +31,7 @@ import QRDisplay from '@components/admin/marketing/qr/QRDisplay';
 import UPILinks from '@components/admin/upi/UPILinks';
 import KitchenDisplaySystem from '@components/admin/kds/KitchenDisplaySystem';
 import Profile from '@components/admin/profile/Profile';
+import UserRoleManagement from '@components/admin/roles/UserRoleManagement';
 import SubscriptionManagement from '@components/admin/subscriptions/SubscriptionManagement';
 
 const AppRoutes = () => {
@@ -73,6 +75,7 @@ const AppRoutes = () => {
           element={<SubscriptionManagement />}
         />
         <Route path="kds" element={<KitchenDisplaySystem />} />
+        <Route path="role-management" element={<AdminRoute><UserRoleManagement /></AdminRoute>} />
         <Route path="profile" element={<Profile />} />
       </Route>
 

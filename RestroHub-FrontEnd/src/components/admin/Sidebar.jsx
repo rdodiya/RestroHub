@@ -15,10 +15,12 @@ import {
   ChevronsLeft,
   ChevronsRight,
   ChefHat,
+Users,
   ShieldCheck,
 } from 'lucide-react';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import { FULL_ADMIN_ROLES, hasAnyRole, readStoredRoles } from '../../utils/auth';
+import { isAdmin } from '@hooks/useAuth';
 
 const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const location = useLocation();
@@ -76,6 +78,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
     {
       label: 'Management',
       items: [
+        ...(isAdmin() ? [{ type: 'link', name: 'User Roles', path: '/admin/role-management', icon: Users }] : []),
         {
           type: 'expandable',
           name: 'Store',
