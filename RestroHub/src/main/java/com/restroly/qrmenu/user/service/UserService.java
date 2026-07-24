@@ -2,6 +2,7 @@ package com.restroly.qrmenu.user.service;
 
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
+import com.restroly.qrmenu.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
@@ -25,5 +26,5 @@ public interface UserService {
     public boolean existsByEmail(String email);
     public UserProfileResponseDTO getCurrentUserProfile();
     public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request);
-
+    public User getUserByEmailEntity(String email);
 }

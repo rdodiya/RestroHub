@@ -45,12 +45,12 @@ const AboutSection = () => {
 
                     {/* Image */}
                     <div className="about-image-wrapper">
-                        <img 
-                            src={about.image} 
-                            alt="Chef preparing food" 
+                        <img
+                            src={about.image}
+                            alt="Chef preparing food"
                             className="about-image"
                         />
-                        
+
                         {/* Hours Badge */}
                         <div className="about-hours-badge">
                             <p className="about-hours-title font-heading">{about.hours.title}</p>
@@ -163,7 +163,7 @@ const AboutSection = () => {
                     bottom: -1rem;
                     left: var(--spacing-md);
                     background-color: var(--color-primary);
-                    color: var(--color-bg-primary);
+                    color: var(--color-button-text); /* Changed */
                     padding: var(--spacing-md) var(--spacing-lg);
                 }
 

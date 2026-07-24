@@ -56,7 +56,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         log.debug("User found: {} with roles: {}", email, authorities);
 
-        return org.springframework.security.core.userdetails.User.builder()
+         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
                 .disabled(!user.isActive())

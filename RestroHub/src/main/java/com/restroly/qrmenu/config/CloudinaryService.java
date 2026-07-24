@@ -3,11 +3,13 @@ package com.restroly.qrmenu.config;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.restroly.qrmenu.exception.BusinessException;
+import com.restroly.qrmenu.template.dto.ImageUploadDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Base64;
 import java.util.Map;
 
 @Service
@@ -77,5 +79,18 @@ public class CloudinaryService {
     private void sleep(long ms) {
         try { Thread.sleep(ms); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+    }
+
+    public String uploadBase64(ImageUploadDTO image) {
+
+        try {
+            byte[] bytes = Base64.getDecoder().decode(image.getBase64());
+            Map<?,?> upload = cloudinary.uploader().upload(
+                    bytes,
+                    ObjectUtils.emptyMap());
+            return upload.get("secure_url").toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Image upload failed",e);
+        }
     }
 }

@@ -91,22 +91,24 @@ const Register = () => {
   const [rolesLoading, setRolesLoading] = useState(false);
   const [rolesError, setRolesError] = useState("");
 
-  useEffect(() => {
-    const fetchRoles = async () => {
-      setRolesLoading(true);
-      setRolesError("");
-      try {
-        const res = await api.get("/api/v1/roles/active");
-        setRoles(res.data?.data || []);
-      } catch {
-        setRolesError("Unable to load roles. Please try again.");
-      } finally {
-        setRolesLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchRoles = 
+  //   async () => {
+  //     debugger
+  //     setRolesLoading(true);
+  //     setRolesError("");
+  //     try {
+  //       const res = await api.get("/api/v1/roles/active");
+  //       setRoles(res.data?.data || []);
+  //     } catch {
+  //       setRolesError("Unable to load roles. Please try again.");
+  //     } finally {
+  //       setRolesLoading(false);
+  //     }
+  //   };
 
-    fetchRoles();
-  }, []);
+  //   fetchRoles();
+  // }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -115,13 +117,13 @@ const Register = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      roleIds: [],
       restaurantName: "",
       restaurantDescription: "",
       restaurantPhoneNumber: "",
     },
     validationSchema,
     onSubmit: async (values) => {
+      debugger  
       setIsLoading(true);
       try {
         const { confirmPassword, ...registerData } = values;
@@ -228,7 +230,7 @@ const Register = () => {
                   {formik.touched.email && formik.errors.email && <p className="mt-1.5 text-xs text-red-500">{formik.errors.email}</p>}
                 </div>
 
-                <div className="mt-5">
+                {/* <div className="mt-5">
                   <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Roles</label>
                   <div className="rounded-lg border border-gray-300 bg-transparent p-3 dark:border-gray-600 dark:bg-gray-800">
                     {rolesLoading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading roles...</p>}
@@ -255,7 +257,7 @@ const Register = () => {
                     )}
                   </div>
                   {formik.touched.roleIds && formik.errors.roleIds && <p className="mt-1.5 text-xs text-red-500">{formik.errors.roleIds}</p>}
-                </div>
+                </div> */}
 
                 <div className="mt-5">
                   <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
