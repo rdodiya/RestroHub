@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { X, Loader2, Tag, Type, FileText  } from "lucide-react";
+import toast from "react-hot-toast";
 import api from "@services/common/api";
 
 const CategoryFormModal = ({ isOpen, onClose }) => {
@@ -31,11 +32,15 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
       await api.post("/secure/api/v1/categories/addCategory", payload);
 
+      toast.success("Category created successfully");
       onClose();
       setFormData({ name: "", description: "" });
 
     } catch (err) {
       console.error("Category create failed:", err.response?.data || err);
+      toast.error(
+        err.response?.data?.message || "Failed to save category. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }

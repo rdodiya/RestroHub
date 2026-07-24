@@ -14,6 +14,7 @@ import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
+import RefundPolicy from '../pages/public/RefundPolicy';
 import NotFound from '../pages/public/NotFound';
 
 // Customer Pages
@@ -43,6 +44,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
       </Route>
 
       {/* ========== CUSTOMER ROUTES ========== */}
