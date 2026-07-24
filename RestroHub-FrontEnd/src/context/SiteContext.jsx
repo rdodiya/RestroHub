@@ -206,21 +206,21 @@ function mapApiResponseToSiteData(apiData) {
     },
 
     about: {
-      subtitle: sectionMap.ABOUT?.subtitle ?? defaultSiteData.about.subtitle,
+      subtitle: getContent("ABOUT")?.subtitle ?? defaultSiteData.about.subtitle,
 
       title: Array.isArray(sectionMap.ABOUT?.title)
-        ? sectionMap.ABOUT.title
-        : [sectionMap.ABOUT?.title].filter(Boolean),
+        ? getContent("ABOUT").title
+        : [getContent("ABOUT")?.title].filter(Boolean),
 
       description: Array.isArray(sectionMap.ABOUT?.description)
-        ? sectionMap.ABOUT.description
-        : [sectionMap.ABOUT?.description].filter(Boolean),
+        ? getContent("ABOUT").description
+        : [getContent("ABOUT")?.description].filter(Boolean),
 
-      image: sectionMap.ABOUT?.image ?? defaultSiteData.about.image,
+      image: getContent("ABOUT")?.image ?? defaultSiteData.about.image,
 
-      stats: sectionMap.ABOUT?.stats ?? defaultSiteData.about.stats,
+      stats: getContent("ABOUT")?.stats ?? defaultSiteData.about.stats,
 
-      hours: sectionMap.ABOUT?.hours ?? defaultSiteData.about.hours
+      hours: getContent("ABOUT")?.hours ?? defaultSiteData.about.hours
     },
 
     menu: {

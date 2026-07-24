@@ -123,6 +123,7 @@ const Navigation = () => {
                     font-size: var(--text-xl);
                     font-weight: 700;
                     letter-spacing: 0.08em;
+                    width: 100%;
                     transition: opacity var(--transition-normal);
                 }
 

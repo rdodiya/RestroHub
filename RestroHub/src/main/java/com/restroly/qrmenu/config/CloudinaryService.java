@@ -81,13 +81,16 @@ public class CloudinaryService {
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
-    public String uploadBase64(ImageUploadDTO image) {
+    public String uploadBase64(ImageUploadDTO image, String folder) {
 
         try {
             byte[] bytes = Base64.getDecoder().decode(image.getBase64());
             Map<?,?> upload = cloudinary.uploader().upload(
                     bytes,
-                    ObjectUtils.emptyMap());
+                    ObjectUtils.asMap(
+                            "folder", folder,
+                            "resource_type", "image"
+                    ));
             return upload.get("secure_url").toString();
         } catch (Exception e) {
             throw new RuntimeException("Image upload failed",e);

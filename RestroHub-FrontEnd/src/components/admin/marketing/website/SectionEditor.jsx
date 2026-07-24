@@ -26,7 +26,7 @@ const SectionEditor = () => {
 
   if (!siteData) return null;
 
-  const navigation = siteData.navigation;
+  const { navigation, about, hero } = siteData;
 
   console.log(siteData);
 
@@ -37,14 +37,25 @@ const SectionEditor = () => {
     });
   };
 
-  const handleLogoUpload = async (e, sectionName) => {
+  const handleLogoUpload = async (e, sectionName, field) => {
     debugger
     const file = e.target.files[0];
     if (!file) return;
     const image = await fileToBase64(file);
     updateSection(sectionName, {
-      image: image
+      [field]: image
     });
+  };
+
+  const getImageSrc = (image) => {
+    if (!image) return "";
+    if (typeof image === "string") {
+      return image;
+    }
+    if (image.base64) {
+      return `data:${image.contentType};base64,${image.base64}`;
+    }
+    return "";
   };
 
   const styles = {
@@ -169,7 +180,7 @@ const SectionEditor = () => {
             {navigation.logo ? (
               <>
                 <img
-                  src={navigation.logo}
+                  src={getImageSrc(navigation.logo)}
                   alt="Restaurant Logo"
                   className="mb-5 h-36 w-36 rounded-xl border bg-white object-contain p-3 shadow"
                 />
@@ -200,7 +211,7 @@ const SectionEditor = () => {
             type="file"
             hidden
             accept="image/*"
-            onChange={(e) => handleLogoUpload(e, 'navigation')}
+            onChange={(e) => handleLogoUpload(e, 'navigation', 'logo')}
           />
 
           {navigation.logo && (
@@ -214,8 +225,449 @@ const SectionEditor = () => {
             </button>
           )}
         </div>
+
+        {/* ================= Subtitle ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Subtitle
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={about.subtitle || ""}
+            onChange={(e) =>
+              handleChange("about", "subtitle", e.target.value)
+            }
+            placeholder="Our Story"
+          />
+        </div>
+
+        {/* ================= Title Line 1 ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Title Line 1
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={about.title?.[0] || ""}
+            onChange={(e) => {
+              const title = [...about.title];
+              title[0] = e.target.value;
+              handleChange("about", "title", title);
+            }}
+            placeholder="Authentic"
+          />
+        </div>
+
+        {/* ================= Title Line 2 ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Title Line 2
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={about.title?.[1] || ""}
+            onChange={(e) => {
+              const title = [...about.title];
+              title[1] = e.target.value;
+              handleChange("about", "title", title);
+            }}
+            placeholder="Indian Cuisine"
+          />
+        </div>
+
+        {/* ================= Description 1 ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Description 1
+          </label>
+
+          <textarea
+            style={styles.textarea}
+            rows={4}
+            value={about.description?.[0] || ""}
+            onChange={(e) => {
+              const description = [...about.description];
+              description[0] = e.target.value;
+              handleChange("about", "description", description);
+            }}
+          />
+        </div>
+
+        {/* ================= Description 2 ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Description 2
+          </label>
+
+          <textarea
+            style={styles.textarea}
+            rows={4}
+            value={about.description?.[1] || ""}
+            onChange={(e) => {
+              const description = [...about.description];
+              description[1] = e.target.value;
+              handleChange("about", "description", description);
+            }}
+          />
+        </div>
+
+        {/* ================= Hours Title ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Hours Title
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={about.hours?.title || ""}
+            onChange={(e) =>
+              handleChange("about", "hours", {
+                ...about.hours,
+                title: e.target.value,
+              })
+            }
+            placeholder="Opening Hours"
+          />
+        </div>
+
+        {/* ================= Hours Time ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Hours Time
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={about.hours?.time || ""}
+            onChange={(e) =>
+              handleChange("about", "hours", {
+                ...about.hours,
+                time: e.target.value,
+              })
+            }
+            placeholder="11:00 AM - 11:00 PM"
+          />
+        </div>
+
+        {/* ================= Statistics ================= */}
+
+        <h3 className="text-lg font-semibold text-gray-900 mt-6">
+          Statistics
+        </h3>
+
+        {/* Stat 1 */}
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            style={styles.input}
+            placeholder="25+"
+            value={about.stats?.[0]?.value || ""}
+            onChange={(e) => {
+              const stats = [...about.stats];
+              stats[0] = {
+                ...stats[0],
+                value: e.target.value,
+              };
+              handleChange("about", "stats", stats);
+            }}
+          />
+
+          <input
+            style={styles.input}
+            placeholder="Expert Chefs"
+            value={about.stats?.[0]?.label || ""}
+            onChange={(e) => {
+              const stats = [...about.stats];
+              stats[0] = {
+                ...stats[0],
+                label: e.target.value,
+              };
+              handleChange("about", "stats", stats);
+            }}
+          />
+        </div>
+
+        {/* Stat 2 */}
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            style={styles.input}
+            placeholder="10K+"
+            value={about.stats?.[1]?.value || ""}
+            onChange={(e) => {
+              const stats = [...about.stats];
+              stats[1] = {
+                ...stats[1],
+                value: e.target.value,
+              };
+              handleChange("about", "stats", stats);
+            }}
+          />
+
+          <input
+            style={styles.input}
+            placeholder="Happy Customers"
+            value={about.stats?.[1]?.label || ""}
+            onChange={(e) => {
+              const stats = [...about.stats];
+              stats[1] = {
+                ...stats[1],
+                label: e.target.value,
+              };
+              handleChange("about", "stats", stats);
+            }}
+          />
+        </div>
+
+        {/* Stat 3 */}
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            style={styles.input}
+            placeholder="100+"
+            value={about.stats?.[2]?.value || ""}
+            onChange={(e) => {
+              const stats = [...about.stats];
+              stats[2] = {
+                ...stats[2],
+                value: e.target.value,
+              };
+              handleChange("about", "stats", stats);
+            }}
+          />
+
+          <input
+            style={styles.input}
+            placeholder="Signature Dishes"
+            value={about.stats?.[2]?.label || ""}
+            onChange={(e) => {
+              const stats = [...about.stats];
+              stats[2] = {
+                ...stats[2],
+                label: e.target.value,
+              };
+              handleChange("about", "stats", stats);
+            }}
+          />
+        </div>
+
+        {/* ================= About Image ================= */}
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            About Image
+          </label>
+
+          <div
+            onClick={() => fileInputRef.current.click()}
+            className="flex h-80 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-blue-500 hover:bg-blue-50"
+          >
+            {about.image ? (
+              <>
+                <img
+                  src={getImageSrc(about.image)}
+                  alt="About"
+                  className="mb-5 h-48 w-full rounded-xl border bg-white object-cover p-2 shadow"
+                />
+
+                <p className="text-sm text-gray-500">
+                  Click to change image
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mb-5 rounded-full bg-blue-100 p-5">
+                  <Upload className="h-8 w-8 text-blue-600" />
+                </div>
+
+                <p className="text-base font-semibold text-gray-800">
+                  Upload About Image
+                </p>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  PNG, JPG or WEBP
+                </p>
+              </>
+            )}
+          </div>
+
+          <input
+            ref={fileInputRef}
+            hidden
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleLogoUpload(e, "about", "image")}
+          />
+
+          {about.image && (
+            <button
+              type="button"
+              onClick={() => handleChange("about", "image", "")}
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100"
+            >
+              <Trash2 size={16} />
+              Remove Image
+            </button>
+          )}
+        </div>
+
+        {/* ================= Hero Title Line 1 ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Hero Title Line 1
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={hero.title?.[0] || ""}
+            onChange={(e) => {
+              const title = [...hero.title];
+              title[0] = e.target.value;
+              handleChange("hero", "title", title);
+            }}
+            placeholder="Taste The"
+          />
+        </div>
+
+        {/* ================= Hero Title Line 2 ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Hero Title Line 2
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={hero.title?.[1] || ""}
+            onChange={(e) => {
+              const title = [...hero.title];
+              title[1] = e.target.value;
+              handleChange("hero", "title", title);
+            }}
+            placeholder="Difference"
+          />
+        </div>
+
+        {/* ================= Primary Button Label ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Primary Button Text
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={hero.ctaPrimary?.label || ""}
+            onChange={(e) =>
+              handleChange("hero", "ctaPrimary", {
+                ...hero.ctaPrimary,
+                label: e.target.value,
+              })
+            }
+            placeholder="View Menu"
+          />
+        </div>
+
+        {/* ================= Secondary Button Label ================= */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Secondary Button Text
+          </label>
+
+          <input
+            style={styles.input}
+            type="text"
+            value={hero.ctaSecondary?.label || ""}
+            onChange={(e) =>
+              handleChange("hero", "ctaSecondary", {
+                ...hero.ctaSecondary,
+                label: e.target.value,
+              })
+            }
+            placeholder="Book Table"
+          />
+        </div>
+
+        {/* ================= Hero Background Image ================= */}
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Hero Background Image
+          </label>
+
+          <div
+            onClick={() => fileInputRef.current.click()}
+            className="flex h-80 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-blue-500 hover:bg-blue-50"
+          >
+            {hero.backgroundImage ? (
+              <>
+                <img
+                  src={getImageSrc(hero.backgroundImage)}
+                  alt="Hero Background"
+                  className="mb-5 h-48 w-full rounded-xl border bg-white object-cover p-2 shadow"
+                />
+
+                <p className="text-sm text-gray-500">
+                  Click to change background image
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mb-5 rounded-full bg-blue-100 p-5">
+                  <Upload className="h-8 w-8 text-blue-600" />
+                </div>
+
+                <p className="text-base font-semibold text-gray-800">
+                  Upload Hero Background
+                </p>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  PNG, JPG or WEBP
+                </p>
+              </>
+            )}
+          </div>
+
+          <input
+            ref={fileInputRef}
+            hidden
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              handleLogoUpload(e, "hero", "backgroundImage")
+            }
+          />
+
+          {hero.backgroundImage && (
+            <button
+              type="button"
+              onClick={() =>
+                handleChange("hero", "backgroundImage", "")
+              }
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100"
+            >
+              <Trash2 size={16} />
+              Remove Background
+            </button>
+          )}
+        </div>
+
+
+
+
+
+
+
       </div>
     </div>
+
+
 
 
   );

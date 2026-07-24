@@ -178,7 +178,7 @@ public class SiteConfigServiceImpl implements SiteConfigService {
                     ImageUploadDTO dto = objectMapper.convertValue(
                                     imageMap,
                                     ImageUploadDTO.class);
-                    String imageUrl = cloudinaryService.uploadBase64(dto);
+                    String imageUrl = cloudinaryService.uploadBase64(dto, "preview");
                     entry.setValue(imageUrl);
                 }
                 // Nested object
