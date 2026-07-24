@@ -129,14 +129,13 @@ const OrderCardSkeleton = () => (
     } catch (err) {
       console.error('Failed to fetch orders:', err);
       setError('Failed to load orders');
-      const response = await api.get('/secure/api/v1/orders/branch/1/active');
-      const data = response.data;
-      if (Array.isArray(data) && data.length > 0) {
-        syncOrders(data);
-      } else {
-        syncOrders(fallbackOrders);
-      }
-    } catch (err) {
+      // const response = await api.get('/secure/api/v1/orders/branch/1/active');
+      // const data = response.data;
+      // if (Array.isArray(data) && data.length > 0) {
+      //   syncOrders(data);
+      // } else {
+      //   syncOrders(fallbackOrders);
+      // }
       console.warn('API not available, using fallback data:', err);
       syncOrders(fallbackOrders);
     } finally {
