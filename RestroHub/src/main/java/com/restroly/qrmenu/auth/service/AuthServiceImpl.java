@@ -65,9 +65,9 @@ public class AuthServiceImpl implements AuthService {
             String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
             String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
 
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
+            List<String> roles = userRepository.findByEmailWithUserRoleRestaurants(userDetails.getUsername()).
+                    get().getUserRoleRestaurants().stream().map(UserRoleRestaurant::getRole)
+                    .map(Role::getName).distinct().collect(Collectors.toList());
 
             log.info("User {} logged in successfully", loginRequest.getUsername());
 

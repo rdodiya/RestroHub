@@ -6,6 +6,7 @@ import PublicLayout from '../layouts/PublicLayout';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
+import { AdminRoute } from './ProtectedRoute';
 
 import SiteProvider from "@context/SiteContext";
 
@@ -15,6 +16,7 @@ import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
+import RefundPolicy from '../pages/public/RefundPolicy';
 import NotFound from '../pages/public/NotFound';
 
 // Customer Pages
@@ -31,6 +33,8 @@ import QRDisplay from '@components/admin/marketing/qr/QRDisplay';
 import UPILinks from '@components/admin/upi/UPILinks';
 import KitchenDisplaySystem from '@components/admin/kds/KitchenDisplaySystem';
 import Profile from '@components/admin/profile/Profile';
+import UserRoleManagement from '@components/admin/roles/UserRoleManagement';
+import SubscriptionManagement from '@components/admin/subscriptions/SubscriptionManagement';
 
 const AppRoutes = () => {
   return (
@@ -42,6 +46,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
       </Route>
 
       {/* ========== CUSTOMER ROUTES ========== */}
@@ -67,7 +72,12 @@ const AppRoutes = () => {
         <Route path="marketing/website" element={<WebsiteWrapper />} />
         <Route path="marketing/qr-display" element={<QRDisplay />} />
         <Route path="upi-links" element={<UPILinks />} />
+        <Route
+          path="subscriptions"
+          element={<SubscriptionManagement />}
+        />
         <Route path="kds" element={<KitchenDisplaySystem />} />
+        <Route path="role-management" element={<AdminRoute><UserRoleManagement /></AdminRoute>} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
