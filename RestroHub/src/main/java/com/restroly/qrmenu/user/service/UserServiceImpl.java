@@ -451,4 +451,13 @@ private String encodeProfileImage(byte[] imageBytes) {
                 .profileImage(encodeProfileImage(updatedUser.getUserProfile()))
                 .build();
     }
+
+    @Override
+    public User getUserByEmailEntity(String email) {
+        User user = userRepository.findByEmailWithUserRoleRestaurants(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found with email: " + email));
+
+        return user;
+    }
 }

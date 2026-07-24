@@ -92,6 +92,7 @@ const Register = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      debugger  
       setIsLoading(true);
       try {
         const { confirmPassword, ...registerData } = values;

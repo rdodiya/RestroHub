@@ -34,20 +34,20 @@ const ContactSection = () => {
     const { contact } = siteData;
 
     const contactItems = [
-        { 
-            key: 'location', 
+        {
+            key: 'location',
             icon: <LocationIcon />,
-            ...contact.location 
+            ...contact.location
         },
-        { 
-            key: 'hours', 
+        {
+            key: 'hours',
             icon: <HoursIcon />,
-            ...contact.hours 
+            ...contact.hours
         },
-        { 
-            key: 'contact', 
+        {
+            key: 'contact',
             icon: <PhoneIcon />,
-            ...contact.contact 
+            ...contact.contact
         }
     ];
 
@@ -62,14 +62,14 @@ const ContactSection = () => {
                             </div>
                             <h3 className="contact-title font-heading">{item.title}</h3>
                             <div className="contact-lines">
-                                {item.lines.map((line, index) => (
+                                {(item.lines || []).map((line, index) => (
                                     <p key={index}>{line}</p>
                                 ))}
                             </div>
                             {item.key === 'location' && item.mapUrl && (
-                                <a 
-                                    href={item.mapUrl} 
-                                    target="_blank" 
+                                <a
+                                    href={item.mapUrl}
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="contact-link"
                                 >
@@ -121,11 +121,12 @@ const ContactSection = () => {
                     width: 56px;
                     height: 56px;
                     margin: 0 auto var(--spacing-md);
-                    border: 1px solid var(--color-primary);
+                    border: 1px solid var(--color-border-primary);   /* Updated */
                     border-radius: var(--radius-full);
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    background: var(--color-bg-primary);             /* Added */
                 }
 
                 @media (min-width: 768px) {
@@ -145,6 +146,7 @@ const ContactSection = () => {
                 .contact-title {
                     font-size: var(--text-xl);
                     margin-bottom: var(--spacing-md);
+                    color: var(--color-text-primary);               /* Updated */
                 }
 
                 @media (min-width: 768px) {
@@ -171,16 +173,26 @@ const ContactSection = () => {
                     color: var(--color-primary);
                     text-decoration: none;
                     font-size: var(--text-sm);
-                    transition: opacity var(--transition-normal);
+                    transition:
+                        color var(--transition-normal),
+                        opacity var(--transition-normal);
                 }
 
                 .contact-link:hover {
-                    opacity: 0.8;
+                    color: var(--color-primary-hover);              /* Updated */
+                    opacity: 0.85;
                 }
 
                 .contact-map {
                     margin-top: var(--spacing-2xl);
                     overflow: hidden;
+                    border: 1px solid var(--color-border-primary);  /* Updated */
+                    border-radius: var(--radius-lg);
+                }
+
+                .contact-map iframe {
+                    display: block;
+                    width: 100%;
                 }
 
                 @media (min-width: 768px) {
