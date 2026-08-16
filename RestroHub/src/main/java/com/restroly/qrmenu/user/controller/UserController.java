@@ -281,7 +281,7 @@ public class UserController {
         ));
     }
 
-    @GetMapping("/fetchRestaurantId")
+    @GetMapping(" /fetchRestaurantId")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> fetchRestaurantId() {
 

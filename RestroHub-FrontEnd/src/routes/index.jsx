@@ -65,7 +65,7 @@ const AppRoutes = () => {
         <Route path="store/branches" element={<Branches />} />
         <Route path="store/branches/:branchId/tables" element={<Tables />} />
         <Route path="marketing/website" element={<WebsiteWrapper />} />
-        <Route path="marketing/qr-display" element={<QRDisplay />} />
+        {/* <Route path="marketing/qr-display" element={<QRDisplay />} /> */}
         <Route path="upi-links" element={<UPILinks />} />
         <Route path="kds" element={<KitchenDisplaySystem />} />
         <Route path="profile" element={<Profile />} />

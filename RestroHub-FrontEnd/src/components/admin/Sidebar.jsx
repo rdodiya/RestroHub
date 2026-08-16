@@ -86,7 +86,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
           menuKey: 'marketing',
           children: [
             { name: 'Website', path: '/admin/marketing/website', icon: Globe },
-            { name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode },
+            // { name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode },
           ],
         },
       ],
