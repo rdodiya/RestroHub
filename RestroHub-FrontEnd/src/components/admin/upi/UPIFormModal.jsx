@@ -6,11 +6,24 @@ import toast from 'react-hot-toast';
 const UPIFormModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({ name: '', upiId: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // client-side validation
+    const errs = {};
+    if (!formData.name.trim()) errs.name = 'Account name is required';
+    if (!formData.upiId.trim()) errs.upiId = 'UPI ID is required';
+    else if (!/^[\w.+-]+@[\w-]+$/.test(formData.upiId.trim())) errs.upiId = 'Enter a valid UPI ID';
+
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
+
     try {
       setSubmitting(true);
+      setFieldErrors({});
       // 🔌 await api.post('/api/upi-links', formData);
       await new Promise((r) => setTimeout(r, 500));
       console.log('Add UPI:', formData);
@@ -74,13 +87,17 @@ const UPIFormModal = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className={inputClass}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    setFieldErrors((p) => ({ ...p, name: undefined }));
+                  }}
+                  className={`${fieldErrors.name ? 'border-red-500' : 'border-gray-200'} ${inputClass}`}
                   placeholder="e.g., Main Account"
-                  required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.name ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.name ? 'err-upi-name' : undefined}
                 />
+                {fieldErrors.name && <p id="err-upi-name" className="mt-1.5 text-xs text-red-500">{fieldErrors.name}</p>}
               </div>
 
               {/* UPI ID */}
@@ -91,13 +108,17 @@ const UPIFormModal = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   value={formData.upiId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, upiId: e.target.value })
-                  }
-                  className={inputClass}
+                  onChange={(e) => {
+                    setFormData({ ...formData, upiId: e.target.value });
+                    setFieldErrors((p) => ({ ...p, upiId: undefined }));
+                  }}
+                  className={`${fieldErrors.upiId ? 'border-red-500' : 'border-gray-200'} ${inputClass}`}
                   placeholder="yourname@paytm"
-                  required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.upiId ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.upiId ? 'err-upi-id' : undefined}
                 />
+                {fieldErrors.upiId && <p id="err-upi-id" className="mt-1.5 text-xs text-red-500">{fieldErrors.upiId}</p>}
                 <p className="mt-1.5 flex items-start gap-1.5 text-xs text-gray-500">
                   <Info className="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
                   Enter your UPI ID from Paytm, PhonePe, GPay, etc.

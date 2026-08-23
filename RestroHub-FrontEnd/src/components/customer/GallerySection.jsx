@@ -107,6 +107,7 @@ const GallerySection = () => {
                     position: relative;
                     overflow: hidden;
                     cursor: pointer;
+                    background-color: var(--color-bg-primary);
                 }
 
                 .gallery-item img {
@@ -167,7 +168,8 @@ const GallerySection = () => {
                     grid-column: span 2;
                 }
 
-                /* Lightbox */
+                /* ================= Lightbox ================= */
+
                 .lightbox {
                     position: fixed;
                     inset: 0;
@@ -184,27 +186,35 @@ const GallerySection = () => {
                     max-width: 100%;
                     max-height: 90vh;
                     object-fit: contain;
+                    border: 2px solid var(--color-border-primary);
+                    background-color: var(--color-bg-primary);
                 }
 
                 .lightbox-close {
                     position: absolute;
                     top: var(--spacing-lg);
                     right: var(--spacing-lg);
-                    background: none;
-                    border: none;
+                    width: 48px;
+                    height: 48px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid var(--color-border-primary);
+                    background-color: var(--color-bg-primary);
                     color: var(--color-text-primary);
                     cursor: pointer;
-                    padding: var(--spacing-sm);
-                    transition: color var(--transition-normal);
+                    transition: all var(--transition-normal);
                 }
 
                 .lightbox-close:hover {
-                    color: var(--color-primary);
+                    background-color: var(--color-button-bg);
+                    border-color: var(--color-primary);
+                    color: var(--color-button-text);
                 }
 
                 .lightbox-close svg {
-                    width: 32px;
-                    height: 32px;
+                    width: 28px;
+                    height: 28px;
                 }
             `}</style>
         </section>

@@ -1,5 +1,6 @@
 package com.restroly.qrmenu.security;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final com.restroly.qrmenu.user.repository.UserRepository userRepository;
@@ -26,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throws UsernameNotFoundException {
         log.debug("Loading user by email: {}", email);
 
-        com.restroly.qrmenu.user.entity.User user = userRepository.findByEmailWithRoles(email)
+        com.restroly.qrmenu.user.entity.User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.warn("User not found with email: {}", email);
                     return new UsernameNotFoundException("User not found with email: " + email);
@@ -43,13 +45,18 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UserLockedException("User account is locked");
         }
 
-        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
+//        List<SimpleGrantedAuthority> authorities = user.getUserRoleRestaurants().stream().
+//               map(urr -> new SimpleGrantedAuthority(urr.getRole().getName())).
+//                collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities =
+                user.getUserRoleRestaurants().stream()
+                        .map(urr -> new SimpleGrantedAuthority(
+                                "ROLE_" + urr.getRole().getName()))
+                        .collect(Collectors.toList());
 
         log.debug("User found: {} with roles: {}", email, authorities);
 
-        return org.springframework.security.core.userdetails.User.builder()
+         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
                 .disabled(!user.isActive())

@@ -23,6 +23,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   // ========== POPULATE FORM ON EDIT ==========
   useEffect(() => {
@@ -62,6 +63,20 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    setFieldErrors({});
+
+    const errs = {};
+    if (!formData.name.trim()) errs.name = 'Branch name is required';
+    if (!formData.add1.trim()) errs.add1 = 'Address line 1 is required';
+    if (!formData.city.trim()) errs.city = 'City is required';
+    if (!formData.state.trim()) errs.state = 'State is required';
+    if (!formData.postalCode.trim()) errs.postalCode = 'Postal code is required';
+
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      setSubmitting(false);
+      return;
+    }
 
     try {
       // Build payload matching BranchRequestDTO
@@ -163,16 +178,23 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => updateField('name', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                    onChange={(e) => {
+                      updateField('name', e.target.value);
+                      setFieldErrors((p) => ({ ...p, name: undefined }));
+                    }}
+                    className={`w-full px-4 py-3 bg-gray-50 rounded-xl
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                focus:bg-white outline-none transition-all text-gray-800
-                               placeholder:text-gray-400"
+                               placeholder:text-gray-400 ${fieldErrors.name ? 'border-red-500' : 'border-gray-200'}`}
+                    aria-required="true"
+                    aria-invalid={fieldErrors.name ? 'true' : 'false'}
+                    aria-describedby={fieldErrors.name ? 'err-branch-name' : undefined}
                     placeholder="e.g., Main Branch, Downtown Outlet"
                     required
                     minLength={2}
                     maxLength={100}
                   />
+                  {fieldErrors.name && <p id="err-branch-name" className="mt-1.5 text-xs text-red-500">{fieldErrors.name}</p>}
                 </div>
 
                 {/* Description */}
@@ -213,15 +235,22 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                   <input
                     type="text"
                     value={formData.add1}
-                    onChange={(e) => updateField('add1', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                    onChange={(e) => {
+                      updateField('add1', e.target.value);
+                      setFieldErrors((p) => ({ ...p, add1: undefined }));
+                    }}
+                    className={`w-full px-4 py-3 bg-gray-50 rounded-xl
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                focus:bg-white outline-none transition-all text-gray-800
-                               placeholder:text-gray-400"
+                               placeholder:text-gray-400 ${fieldErrors.add1 ? 'border-red-500' : 'border-gray-200'}`}
+                    aria-required="true"
+                    aria-invalid={fieldErrors.add1 ? 'true' : 'false'}
+                    aria-describedby={fieldErrors.add1 ? 'err-branch-add1' : undefined}
                     placeholder="Street address, building number"
                     required
                     maxLength={255}
                   />
+                  {fieldErrors.add1 && <p id="err-branch-add1" className="mt-1.5 text-xs text-red-500">{fieldErrors.add1}</p>}
                 </div>
 
                 {/* Address Line 2 */}
@@ -256,15 +285,22 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                     <input
                       type="text"
                       value={formData.city}
-                      onChange={(e) => updateField('city', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
-                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 focus:bg-white outline-none transition-all text-gray-800
-                                 placeholder:text-gray-400"
+                        onChange={(e) => {
+                          updateField('city', e.target.value);
+                          setFieldErrors((p) => ({ ...p, city: undefined }));
+                        }}
+                        className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                                   focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                   focus:bg-white outline-none transition-all text-gray-800
+                                   placeholder:text-gray-400 ${fieldErrors.city ? 'border-red-500' : 'border-gray-200'}`}
+                        aria-required="true"
+                        aria-invalid={fieldErrors.city ? 'true' : 'false'}
+                        aria-describedby={fieldErrors.city ? 'err-branch-city' : undefined}
                       placeholder="e.g., Mumbai"
                       required
                       maxLength={100}
                     />
+                     {fieldErrors.city && <p id="err-branch-city" className="mt-1.5 text-xs text-red-500">{fieldErrors.city}</p>}
                   </div>
 
                   {/* State */}
@@ -277,15 +313,22 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                     <input
                       type="text"
                       value={formData.state}
-                      onChange={(e) => updateField('state', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
-                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 focus:bg-white outline-none transition-all text-gray-800
-                                 placeholder:text-gray-400"
+                        onChange={(e) => {
+                          updateField('state', e.target.value);
+                          setFieldErrors((p) => ({ ...p, state: undefined }));
+                        }}
+                        className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                                   focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                   focus:bg-white outline-none transition-all text-gray-800
+                                   placeholder:text-gray-400 ${fieldErrors.state ? 'border-red-500' : 'border-gray-200'}`}
+                        aria-required="true"
+                        aria-invalid={fieldErrors.state ? 'true' : 'false'}
+                        aria-describedby={fieldErrors.state ? 'err-branch-state' : undefined}
                       placeholder="e.g., Maharashtra"
                       required
                       maxLength={100}
                     />
+                     {fieldErrors.state && <p id="err-branch-state" className="mt-1.5 text-xs text-red-500">{fieldErrors.state}</p>}
                   </div>
                 </div>
 
@@ -301,15 +344,22 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                     <input
                       type="text"
                       value={formData.postalCode}
-                      onChange={(e) => updateField('postalCode', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
-                                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 focus:bg-white outline-none transition-all text-gray-800
-                                 placeholder:text-gray-400"
+                        onChange={(e) => {
+                          updateField('postalCode', e.target.value);
+                          setFieldErrors((p) => ({ ...p, postalCode: undefined }));
+                        }}
+                        className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                                   focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                   focus:bg-white outline-none transition-all text-gray-800
+                                   placeholder:text-gray-400 ${fieldErrors.postalCode ? 'border-red-500' : 'border-gray-200'}`}
+                        aria-required="true"
+                        aria-invalid={fieldErrors.postalCode ? 'true' : 'false'}
+                        aria-describedby={fieldErrors.postalCode ? 'err-branch-postal' : undefined}
                       placeholder="e.g., 400001"
                       required
                       maxLength={20}
                     />
+                     {fieldErrors.postalCode && <p id="err-branch-postal" className="mt-1.5 text-xs text-red-500">{fieldErrors.postalCode}</p>}
                   </div>
 
                   {/* Country */}
