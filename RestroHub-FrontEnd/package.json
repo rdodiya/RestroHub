@@ -59,6 +59,6 @@
   "author": "",
   "license": "MIT",
   "overrides": {
-    "websocket-driver": "0.7.5"
+    "websocket-driver": "^0.7.5"
   }
 }
