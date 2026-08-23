@@ -1,16 +1,19 @@
-# 🍽️ Restroly - Digital Menu & Restaurant Management Platform
-
 <div align="center">
+
+# 🍽️ Restroly
+### Digital Menu & Restaurant Management Platform
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![GSSOC](https://img.shields.io/badge/GSSOC-2026-blue.svg)](https://gssoc.girlscript.tech/)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](#-prerequisites)
 [![React](https://img.shields.io/badge/React-18+-blue.svg)](#-prerequisites)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-336791.svg)](#-prerequisites)
+[![Gradle](https://img.shields.io/badge/Gradle-8.0+-02303A.svg)](#-prerequisites)
 
 **Empowering Indian Restaurants to Go Digital — Simple, Fast & Powerful!**
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Docs](#-documentation) • [Contributing](#-contributing) • [Contact](#-contact--support)
+[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [API Docs](#-api-documentation) • [Contributing](#-contributing) • [Contact](#-contact--support)
 
 </div>
 
@@ -23,8 +26,7 @@
 - [Tech Stack](#-tech-stack)
 - [Prerequisites](#-prerequisites)
 - [Quick Start](#-quick-start)
-  - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
+- [Architecture](#-architecture)
 - [Project Structure](#-project-structure)
 - [API Documentation](#-api-documentation)
 - [Contributing](#-contributing)
@@ -37,107 +39,108 @@
 
 ## 🎯 About
 
-**Restroly** is a comprehensive digital solution designed specifically for Indian restaurants. From street-side dhabas to fine dining establishments, Restroly helps restaurants create digital menus, accept payments, manage orders, and build their online presence with minimal effort.
+**Restroly** is a comprehensive digital solution built specifically for Indian restaurants — from street-side dhabas to fine dining establishments. It helps restaurants create digital menus, accept UPI payments, manage orders, and build an online presence with minimal effort and zero technical expertise required.
 
 ### Why Restroly?
 
-| Challenge | Our Solution |
-|-----------|--------------|
-| 🇮🇳 Complex payment integration | Direct UPI payment links & QR codes |
-| 📱 Limited digital presence | Auto-generated restaurant websites with QR menus |
-| 🌐 Language barriers | Multi-language menu support |
-| 📊 Manual order management | Centralized order dashboard |
-| 📦 Aggregator hassles | One-platform menu & order management |
+| Pain Point | How Restroly Solves It |
+|-----------|------------------------|
+| 🇮🇳 Complex payment integration | Direct UPI links & QR codes — GPay, PhonePe, Paytm, BHIM |
+| 📱 No digital presence | Auto-generated restaurant website with live QR menu |
+| 🌐 Language barriers | Multi-language menu support (25+ languages — roadmap) |
+| 📊 Manual order tracking | Centralized real-time order dashboard |
+| 📦 Aggregator dependency | Own your menu & orders — no middleman |
 
 ---
 
 ## ✨ Features
 
-### 📱 Core Features
+### ✅ Available Now
 
-- **📱 QR Menu Generation** - Generate scannable QR codes for contactless menus
-- **📂 Menu Management** - Organize items into categories with images and descriptions
-- **💳 UPI Payment Integration** - Direct payment links supporting GPay, PhonePe, Paytm, and BHIM
-- **🌐 Restaurant Website** - Auto-generated landing pages with live menus
-- **📊 Order Dashboard** - Centralized order management and tracking
-- **🔐 Authentication** - Secure login for restaurant owners and admins
-- **📈 Analytics** - Track orders, revenue, and popular items
-- **🎨 Customizable Templates** - Different themes for Cafes, Dhabas, Fine Dining, etc.
+| Feature | Description |
+|---------|-------------|
+| 📱 QR Menu Generation | Scannable QR codes for contactless menu access |
+| 📂 Menu Management | Categories, items, images, descriptions |
+| 💳 UPI Payment Integration | GPay · PhonePe · Paytm · BHIM direct payment links |
+| 🌐 Restaurant Website | Auto-generated landing page with live menu |
+| 📊 Order Dashboard | Centralized order management & tracking |
+| 🔐 Authentication | Secure JWT-based login for owners & admins |
+| 📈 Analytics | Orders, revenue, and popular item tracking |
+| 🎨 Customizable Templates | Themes for Cafes, Dhabas, Fine Dining, and more |
 
-### 🚀 Advanced Features (In Development)
+### 🚧 In Progress
 
-- WhatsApp Business API integration for status updates
-- AI-powered menu translation (25+ languages)
-- Zomato & Swiggy aggregator sync
-- Multi-branch management
-- Inventory & stock management
+| Feature | Status |
+|---------|--------|
+| Multi-branch support | Active development |
+| Real-time order updates | Planned |
+| Subscription tiers | Planned |
 
-### ✅ Feature Checklist
+### 🔜 Roadmap
 
-| Area | Status |
-|------|--------|
-| QR menu generation | ✅ Available |
-| Menu & category management | ✅ Available |
-| Order dashboard | ✅ Available |
-| UPI payment links | ✅ Available |
-| Admin authentication | ✅ Available |
-| Multi-branch support | 🚧 In progress |
-| Real-time order updates | 🚧 Planned |
-| Subscription tiers | 🚧 Planned |
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming (`feature/`, `fix/`, `docs/`), commit format, and PR workflow.
-
-### 🗺️ Roadmap
-
-- **Near term:** empty-state UX polish, order realtime updates, README/onboarding improvements
-- **Mid term:** subscription management, role-based access by plan
-- **Long term:** aggregator sync, WhatsApp notifications, AI menu translation
+| Timeline | Goals |
+|----------|-------|
+| **Near term** | Empty-state UX polish · real-time order updates · onboarding improvements |
+| **Mid term** | Subscription management · role-based access by plan |
+| **Long term** | Zomato & Swiggy aggregator sync · WhatsApp notifications · AI menu translation (25+ languages) |
 
 ---
 
-## 🏗️ Tech Stack
+## 🔧 Tech Stack
 
 ### Backend
-- **Language**: Java 21
-- **Framework**: Spring Boot
-- **Build Tool**: Gradle
-- **Database**: PostgreSQL
-- **Cache**: Redis (planned for some features; not required for local development)
-- **API Documentation**: Swagger/OpenAPI
+| Technology | Version | Role |
+|-----------|---------|------|
+| Java | 21 | Primary language |
+| Spring Boot | Latest stable | Application framework |
+| Gradle | 8.0+ | Build tool |
+| PostgreSQL | 14+ | Primary database |
+| Redis | Planned | Caching layer |
+| Swagger / OpenAPI | — | API documentation |
 
 ### Frontend
-- **Framework**: React 18+
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vite
-- **State Management**: Context API / Local State
-- **HTTP Client**: Axios
-- **Routing**: React Router v6+
+| Technology | Version | Role |
+|-----------|---------|------|
+| React | 18+ | UI framework |
+| Tailwind CSS | — | Utility-first styling |
+| Vite | — | Build tool & dev server |
+| Axios | — | HTTP client |
+| React Router | v6+ | Client-side routing |
+| Context API | — | Global state management |
 
-### DevOps & Deployment
-- **Containerization**: Docker & Docker Compose
-- **Frontend Hosting**: Vercel / Netlify
-- **Version Control**: Git
+### DevOps
+| Tool | Purpose |
+|------|---------|
+| Docker & Docker Compose | Containerisation |
+| Vercel / Netlify | Frontend hosting |
+| Git | Version control |
 
 ---
 
 ## 📋 Prerequisites
 
-### System Requirements
+Install the following before you begin:
 
-Before starting, ensure you have the following installed on your machine:
+| Tool | Minimum Version | Download |
+|------|----------------|---------|
+| JDK | 21 | [Adoptium](https://adoptium.net/) |
+| Gradle | 8.0 | [gradle.org](https://gradle.org/install/) |
+| PostgreSQL | 14 | [postgresql.org](https://www.postgresql.org/download/) |
+| Node.js | 18.0 | [nodejs.org](https://nodejs.org/) |
+| npm | 9.0 | Bundled with Node.js |
+| Git | Any | [git-scm.com](https://git-scm.com/) |
 
-**For Backend (Java Development):**
+### Verify your setup
+
 ```bash
-- Java Development Kit (JDK) 21 or higher
-- Gradle 8.0 or higher
-- PostgreSQL 14 or higher
-- Git
-- IDE: IntelliJ IDEA (recommended) or Eclipse
-- Maven/Gradle plugin for your IDE
-```
 
-**For Frontend (Web Development):**
-```bash
+java -version      # expect 21+
+gradle --version   # expect 8.0+
+node --version     # expect 18+
+npm --version      # expect 9+
+psql --version     # expect 14+
+git --version
+
 - Node.js 18.0 or higher
 - npm 9.0 or higher (comes with Node.js)
 - Git
@@ -167,45 +170,50 @@ npm --version
 
 # Verify PostgreSQL (if installed locally)
 psql --version
+
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### Clone the Repository
+### 1 · Clone the repository
 
 ```bash
-# Clone the repository
 git clone https://github.com/rdodiya/RestroHub.git
-
-# Navigate to project directory
 cd RestroHub
 
-# For GSSoC contributions, work from this branch
+# GSSoC contributors — always work from this branch
 git checkout gssoc_develop
 git pull origin gssoc_develop
 ```
 
-### Backend Setup
+---
 
-#### 1. Database configuration
+### 2 · Backend Setup
 
-Create a PostgreSQL database named **`RestroHub_DB`** (must match the default JDBC URL; use quotes in SQL if you need mixed case):
+#### Create the database *(one-time)*
 
 ```bash
+# Option A
 createdb RestroHub_DB
-# or: psql -U postgres -c 'CREATE DATABASE "RestroHub_DB";'
+
+# Option B
+psql -U postgres -c 'CREATE DATABASE "RestroHub_DB";'
 ```
 
-Ensure the PostgreSQL user you use can connect to that database. By default the app expects username **`postgres`** with password **`postgres`**. Override with environment variables if your setup differs:
+The app connects as `postgres` / `postgres` by default. Override with environment variables if needed:
 
 ```bash
 export DB_USERNAME=postgres
 export DB_PASSWORD=your_password
-# Optional: full JDBC URL
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/RestroHub_DB
 ```
+
+
+> **Tip:** The active Spring profile is `dev`. Settings load from `application.properties` → `application-dev.properties`. Never commit secrets — use environment variables for `DB_PASSWORD` and `JWT_SECRET`.
+
+#### Build & run
 
 #### 2. Google OAuth Setup (Required for Login)
 
@@ -246,44 +254,43 @@ Most defaults are already in `RestroHub/src/main/resources/application.propertie
 
 #### 4. Build and run backend
 
+
 ```bash
-# Navigate to backend directory
 cd RestroHub
 
-# If ./gradlew is not executable: chmod +x gradlew
+chmod +x gradlew          # first time on macOS/Linux only
 
-# Ensure the Gradle wrapper JAR is present (commit includes RestroHub/gradle/wrapper/gradle-wrapper.jar).
-# If it is missing, regenerate with: gradle wrapper --gradle-version 8.7
-
-# Build the project
-./gradlew clean build
-
-# Run the application
-./gradlew bootRun
+./gradlew clean build     # compile & test
+./gradlew bootRun         # start the server
 ```
 
-The backend will be available at:
-```
-http://localhost:8181/restroly/api/v1
-```
+Once you see `Started` in the terminal, the backend is live:
 
-**Swagger API Documentation:**
-```
-http://localhost:8181/restroly/swagger-ui.html
-```
+| URL | What it does |
+|-----|-------------|
+| `http://localhost:8181/restroly/api/v1` | REST API base path |
+| `http://localhost:8181/restroly/swagger-ui.html` | Interactive API docs |
+| `http://localhost:8181/restroly/actuator/health` | Health check — expect `{"status":"UP"}` |
 
-### Frontend Setup
+---
 
-#### 1. Install Dependencies
+### 3 · Frontend Setup
+
+Open a **new terminal window**, then:
 
 ```bash
-# Navigate to frontend directory
 cd RestroHub-FrontEnd
 
-# Install dependencies
-npm install
+npm install                # install dependencies (first time)
+cp .env.example .env       # create local env file
 ```
 
+
+Edit `.env` and set:
+
+```env
+# Spring Boot context path — no trailing slash
+VITE_API_BASE_URL=http://localhost:8181/restroly
 #### 2. Environment configuration - Google OAuth
 
 Create a `.env` file in `RestroHub-FrontEnd/` (see `.env.example`):
@@ -298,33 +305,60 @@ VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
 
 Optional:
 
-```env
+
+
 VITE_NODE_ENV=development
 VITE_ENABLE_ANALYTICS=false
 ```
 
-#### 3. Run Development Server
+```bash
+npm run dev
+# → http://localhost:3000  (Vite auto-picks the next free port if 3000 is busy)
+```
+
+---
+
+### ✅ Verify both services
 
 ```bash
-# Start development server
-npm run dev
+# Backend
+curl http://localhost:8181/restroly/actuator/health
+# → {"status":"UP"}
+
+# Frontend — open in browser
+open http://localhost:3000
 ```
 
-The frontend dev server uses port **3000** by default (see `RestroHub-FrontEnd/vite.config.js`). If that port is busy, Vite picks the next free port (for example **3001**).
+---
+
+## 📐 Architecture
 
 ```
-http://localhost:3000
+┌──────────────────────────────────────────────────────────────┐
+│                        CLIENT LAYER                          │
+│        React 18 + Vite  │  Tailwind CSS  │  React Router v6 │
+└───────────────────────────────┬──────────────────────────────┘
+                                │  HTTP/REST · JSON · Axios
+                                ▼
+┌──────────────────────────────────────────────────────────────┐
+│                      SPRING BOOT API                         │
+│          Controllers  │  JWT Auth  │  Swagger / OpenAPI      │
+└──────────────┬─────────────────────────────┬─────────────────┘
+               │                             │
+   ┌───────────┴──────────┐     ┌────────────┴───────────┐
+   │   Menu · Category    │     │   Order · Payment ·    │
+   │   Food Item Service  │     │   Auth · User Service  │
+   └───────────┬──────────┘     └────────────┬───────────┘
+               │                             │
+               └──────────────┬──────────────┘
+                              ▼
+                 ┌────────────────────────┐
+                 │    PostgreSQL 14+      │
+                 │   (Primary Database)   │
+                 └────────────────────────┘
 ```
 
-### Verify Both Services Are Running
-
-1. **Backend health (Spring Boot Actuator):**
-   ```bash
-   curl http://localhost:8181/restroly/actuator/health
-   ```
-   Expect `{"status":"UP"}`. API routes live under `/restroly/api/v1` (and related paths); there is no `/api/v1/health` endpoint.
-
-2. **Frontend:** Open the URL printed by Vite (usually `http://localhost:3000`).
+**Request flow:** Browser → React (Vite / CDN) → Spring Boot REST API → Service layer → PostgreSQL
 
 ---
 
@@ -332,42 +366,40 @@ http://localhost:3000
 
 ```
 RestroHub/
-├── RestroHub/                          # Backend (Java/Spring Boot)
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/restroly/
-│   │   │   │   ├── controller/         # REST API endpoints
-│   │   │   │   ├── service/            # Business logic
-│   │   │   │   ├── repository/         # Database access
-│   │   │   │   ├── model/              # Entity classes
-│   │   │   │   ├── dto/                # Data Transfer Objects
-│   │   │   │   ├── config/             # Configuration classes
-│   │   │   │   └── exception/          # Custom exceptions
-│   │   │   └── resources/
-│   │   │       ├── application.properties
-│   │   │       ├── application-dev.properties
-│   │   │       ├── application-prod.properties
-│   │   │       └── logback-spring.xml
-│   │   └── test/
-│   ├── build.gradle                    # Gradle build configuration
-│   ├── settings.gradle
-│   └── README.md
 │
-├── RestroHub-FrontEnd/                 # Frontend (React)
+├── RestroHub/                           # ● Backend — Java / Spring Boot
+│   ├── src/main/
+│   │   ├── java/com/restroly/
+│   │   │   ├── controller/              # REST endpoints (thin layer)
+│   │   │   ├── service/                 # Business logic
+│   │   │   ├── repository/              # JPA data access
+│   │   │   ├── model/                   # Domain / entity classes
+│   │   │   ├── dto/                     # Request & response DTOs
+│   │   │   ├── config/                  # Spring configuration
+│   │   │   └── exception/               # Custom exceptions & handlers
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── application-dev.properties
+│   │       ├── application-prod.properties
+│   │       └── logback-spring.xml
+│   ├── build.gradle
+│   └── settings.gradle
+│
+├── RestroHub-FrontEnd/                  # ● Frontend — React / Vite
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── admin/                  # Admin dashboard components
-│   │   │   ├── customer/               # Customer-facing components
-│   │   │   └── common/                 # Reusable components
+│   │   │   ├── admin/                   # Admin dashboard components
+│   │   │   ├── customer/                # Customer-facing components
+│   │   │   └── common/                  # Shared / reusable components
 │   │   ├── pages/
 │   │   │   ├── admin/
 │   │   │   ├── customer/
 │   │   │   └── public/
 │   │   ├── services/
-│   │   │   ├── api.js                  # API client configuration
-│   │   │   └── ApiService.js           # API service functions
+│   │   │   ├── api.js                   # Axios instance & interceptors
+│   │   │   └── ApiService.js            # Per-resource API functions
 │   │   ├── context/
-│   │   │   └── SiteContext.jsx         # Context for state management
+│   │   │   └── SiteContext.jsx          # Global state (Context API)
 │   │   ├── styles/
 │   │   │   ├── global.css
 │   │   │   ├── landing.css
@@ -378,349 +410,344 @@ RestroHub/
 │   ├── package.json
 │   ├── vite.config.js
 │   ├── tailwind.config.js
-│   ├── .env.example                    # Template for Vite env (copy to .env)
-│   ├── .env                            # Local env (create from .env.example; not committed)
-│   └── README.md
+│   ├── .env.example                     # Copy this → .env
+│   └── .env                             # ← never commit this file
 │
-├── ReadMe.md                           # Main project README (this file)
+├── CONTRIBUTING.md
 ├── LICENSE
-└── CONTRIBUTING.md
+└── READMe.md
 ```
 
 ---
 
 ## 📚 API Documentation
 
-### Running Swagger UI
-
-Once the backend is running, access the complete API documentation at:
+Interactive docs are auto-generated by Swagger — no extra setup required.
 
 ```
 http://localhost:8181/restroly/swagger-ui.html
 ```
 
-### Key API Endpoints
+### Endpoint Reference
 
-#### Menu Management
-- `GET /api/v1/menus` - Get all menus
-- `POST /api/v1/menus` - Create new menu
-- `PUT /api/v1/menus/{id}` - Update menu
-- `DELETE /api/v1/menus/{id}` - Delete menu
+#### Menus
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/secure/api/v1/menus` | List all menus |
+| `POST` | `/secure/api/v1/menus` | Create a menu |
+| `PUT` | `/secure/api/v1/menus/{id}` | Update a menu |
+| `DELETE` | `/secure/api/v1/menus/{id}` | Delete a menu |
 
 #### Categories
-- `GET /api/v1/categories` - Get all categories
-- `POST /api/v1/categories` - Create category
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/categories` | List all categories |
+| `POST` | `/api/v1/categories` | Create a category |
 
 #### Food Items
-- `GET /api/v1/foods` - Get all food items
-- `POST /api/v1/foods` - Add food item
-- `PUT /api/v1/foods/{id}` - Update food item
-- `DELETE /api/v1/foods/{id}` - Delete food item
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/foods` | List all food items |
+| `POST` | `/api/v1/foods` | Add a food item |
+| `PUT` | `/api/v1/foods/{id}` | Update a food item |
+| `DELETE` | `/api/v1/foods/{id}` | Delete a food item |
 
 #### Orders
-- `GET /api/v1/orders` - Get all orders
-- `POST /api/v1/orders` - Place new order
-- `GET /api/v1/orders/{id}` - Get order details
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/orders` | List all orders |
+| `POST` | `/api/v1/orders` | Place a new order |
+| `GET` | `/api/v1/orders/{id}` | Get order details |
+
+> Full request/response schemas, auth headers, and error codes are documented in Swagger UI.
 
 ---
 
 ## 🤝 Contributing
 
-We love contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is valuable.
+All contributions are welcome — bug fixes, features, tests, and docs.
 
-### 🎯 How to Contribute
+### Branch naming
 
-**1. Fork the Repository**
-```bash
-# Click the Fork button on GitHub
+```
+feature/short-description    # new feature
+fix/short-description        # bug fix
+docs/short-description       # documentation only
+refactor/short-description   # code cleanup, no behaviour change
+test/short-description       # adding or updating tests
 ```
 
-**2. Clone Your Fork**
+> ⚠️ Always branch **from `gssoc_develop`**, never from `main`.
+
+### Contribution workflow
+
 ```bash
+# 1. Fork on GitHub, then clone your fork
 git clone https://github.com/YOUR_USERNAME/RestroHub.git
 cd RestroHub
-```
 
-**3. Create a Feature Branch from gssoc_develop branch**
-```bash
-git checkout -b feature/your-feature-name gssoc_develop
-# or for bug fixes:
-git checkout -b fix/bug-name gssoc_develop
-```
+# 2. Add the upstream remote
+git remote add upstream https://github.com/rdodiya/RestroHub.git
 
-**4. Make Your Changes**
-- Write clean, well-commented code
-- Follow the project's coding standards
-- Test your changes thoroughly
+# 3. Stay up to date
+git fetch upstream
+git checkout gssoc_develop
+git merge upstream/gssoc_develop
 
-**5. Build & Test Locally**
+# 4. Create your branch
+git checkout -b feature/your-feature-name
 
-**For Backend:**
-```bash
-cd RestroHub
-./gradlew clean build
-./gradlew bootRun
-# Test at: http://localhost:8181/restroly/swagger-ui.html
-```
+# 5. Make changes & test locally
+#    Backend:
+cd RestroHub && ./gradlew clean build && ./gradlew bootRun
+#    Frontend:
+cd RestroHub-FrontEnd && npm install && npm run dev
 
-**For Frontend:**
-```bash
-cd RestroHub-FrontEnd
-npm install
-npm run dev
-# Test at: http://localhost:3000 (or the URL Vite prints)
-```
+# 6. Commit using Conventional Commits
+git commit -m "feat(menu): add vegetarian filter to category list"
 
-**6. Commit with Conventional Commits**
-```bash
-git commit -m "type(scope): description"
-
-# Examples:
-git commit -m "feat(menu): add menu categories"
-git commit -m "fix(api): resolve food item endpoint"
-git commit -m "docs(readme): update setup instructions"
-```
-
-**Commit Types:**
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `style:` - Code style changes (formatting, semicolons, etc.)
-- `refactor:` - Code refactoring without feature changes
-- `test:` - Adding or updating tests
-- `chore:` - Maintenance tasks, dependency updates
-
-**7. Push to Your Fork**
-```bash
+# 7. Push and open a PR against gssoc_develop
 git push origin feature/your-feature-name
 ```
 
-**8. Open a Pull Request**
-- Go to the original repository
-- Click "New Pull Request"
-- Select your branch and provide a clear description
-- Wait for review and feedback
+### Commit message format
 
-### 📋 Contribution Guidelines
+```
+type(scope): concise description in present tense
 
-- **Code Style**: Follow existing code patterns
-- **Testing**: Test your changes locally before submitting
-- **Documentation**: Update ReadMe.md if adding new features
-- **Commit Messages**: Use clear, descriptive messages
-- **PR Descriptions**: Explain what and why, not just what
+Types:
+  feat      → new feature
+  fix       → bug fix
+  docs      → documentation only
+  style     → formatting, no logic change
+  refactor  → code change, no feature/fix
+  test      → adding or updating tests
+  chore     → maintenance, dependency updates
 
-### 🔍 Areas Needing Contributions
+Examples:
+  feat(orders): add real-time status polling
+  fix(auth): handle expired JWT tokens gracefully
+  docs(readme): add architecture diagram
+```
 
-| Feature | Difficulty | Impact |
-|---------|-----------|--------|
-| Backend Api Changes as per requirements of Frontend | Low | High |
-| Frontend Highly Responsive UI | Low | High |
-| Frontend & Backend Integration | Low | High |
-| WhatsApp Integration | Medium | High |
-| UPI Payment Service | Medium | High |
-| Menu Templates | Easy | Medium |
-| Aggregator Sync | Hard | High |
-| Analytics Dashboard | Medium | Medium |
-| Multi-language Support | Easy | Medium |
+### PR checklist
+
+Before opening your pull request, confirm:
+
+- [ ] Branched from `gssoc_develop`
+- [ ] `./gradlew build` passes with no errors
+- [ ] `npm run build` passes with no errors
+- [ ] Tested end-to-end locally
+- [ ] No `.env` files or secrets committed
+- [ ] README updated if a new feature was added
+- [ ] PR title and description explain *what* and *why*
+
+### Code style
+
+**Java (Backend)**
+- Standard naming: `camelCase` methods, `PascalCase` classes, `UPPER_SNAKE_CASE` constants
+- Controllers stay thin — all business logic goes in the service layer
+- Use constructor injection; avoid field-level `@Autowired`
+- Add Javadoc to every public service method
+
+**React (Frontend)**
+- Functional components and hooks only — no class components
+- One component per file; filename must match the component name exactly
+- Use `SiteContext` for shared state; avoid prop-drilling beyond 2 levels
+- Prefer Tailwind utility classes over custom CSS
+
+### Open issues & good first contributions
+
+| Area | Difficulty | Impact |
+|------|-----------|--------|
+| Frontend ↔ Backend API integration | 🟢 Low | 🔴 High |
+| Responsive UI improvements | 🟢 Low | 🔴 High |
+| UPI Payment Service | 🟡 Medium | 🔴 High |
+| WhatsApp Business API integration | 🟡 Medium | 🔴 High |
+| Analytics Dashboard | 🟡 Medium | 🟡 Medium |
+| Menu Templates (Cafe, Dhaba, Fine Dining) | 🟢 Easy | 🟡 Medium |
+| Multi-language support | 🟢 Easy | 🟡 Medium |
+| Aggregator Sync (Zomato / Swiggy) | 🔴 Hard | 🔴 High |
 
 ---
 
-## 🚀 Deployment (Not for Local)
+## 🚀 Deployment
 
-### Docker Deployment
+### Docker (all-in-one)
 
-**1. Build Docker Images**
 ```bash
-# Build the entire stack
-docker-compose build
+docker-compose build          # build images
+docker-compose up -d          # start all services
+docker-compose logs -f        # tail logs
+docker-compose down           # stop and remove containers
 ```
 
-**2. Run with Docker Compose**
+### Frontend
+
+**Vercel**
 ```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-### Frontend Deployment
-
-#### Option 0: Local (Recommended)
-npm run dev
-
-#### Option 1: Vercel
-
-```bash
-# Install Vercel CLI
 npm install -g vercel
-
-# Navigate to frontend
 cd RestroHub-FrontEnd
-
-# Deploy
 vercel --prod
 ```
 
-#### Option 2: Netlify
-
+**Netlify**
 ```bash
-# Build the project
 npm run build
-
-# Deploy using Netlify CLI or upload the dist folder manually
 netlify deploy --prod --dir=dist
 ```
 
-### Backend Deployment
+### Backend
 
-#### Option 0: Embedded Tomcat
-
-For local development, use the embedded Tomcat server from Spring Boot (`./gradlew bootRun`).
-
-#### Option 1: Docker to Cloud (AWS, GCP, Azure)
-
+**Docker → Cloud (AWS / GCP / Azure)**
 ```bash
-# Build JAR
 cd RestroHub
 ./gradlew build
-
-# Create Docker image and push to registry
 docker build -t your-registry/restrohub:latest .
 docker push your-registry/restrohub:latest
 ```
 
-#### Option 2: Traditional Server 
-
+**Traditional server (Tomcat)**
 ```bash
-# Build JAR
 ./gradlew build
-
-# Copy WAR to server
-build/libs/restroly-0.0.1-SNAPSHOT-plain.war user@server:/opt/tomcat/webapps/restroly
-
-# Restart web server
-systemctl restart tomcat
+scp build/libs/restroly-0.0.1-SNAPSHOT-plain.war \
+  user@server:/opt/tomcat/webapps/restroly
+ssh user@server "systemctl restart tomcat"
 ```
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Backend Issues
+### Backend
 
-**Issue: PostgreSQL Connection Failed**
-```
-Error: org.postgresql.util.PSQLException: Connection refused
-```
-**Solution:**
+<details>
+<summary><strong>PostgreSQL connection refused</strong></summary>
+
 ```bash
-# Check if PostgreSQL is running
+# Test the connection
 psql -U postgres -c "SELECT version();"
 
-# If not running, start PostgreSQL service
-# On Windows: Services > PostgreSQL
-# On macOS: brew services start postgresql
-# On Linux: sudo systemctl start postgresql
+# Start the service
+sudo systemctl start postgresql   # Linux
+brew services start postgresql    # macOS
+# Windows: Start menu → Services → PostgreSQL → Start
 ```
+</details>
 
-**Issue: Port 8181 Already in Use**
+<details>
+<summary><strong>Port 8181 already in use</strong></summary>
+
 ```bash
-# Find process using port 8181
-lsof -i :8181    # macOS/Linux
-netstat -ano | findstr :8181  # Windows
+# macOS / Linux
+lsof -i :8181
+kill -9 <PID>
 
-# Kill process (get PID from above)
-kill -9 <PID>    # macOS/Linux
-taskkill /PID <PID> /F  # Windows
+# Windows
+netstat -ano | findstr :8181
+taskkill /PID <PID> /F
 ```
+</details>
 
-### Frontend Issues
+<details>
+<summary><strong>Gradle wrapper JAR missing</strong></summary>
 
-**Issue: Dependencies Installation Failed**
 ```bash
-# Clear cache and reinstall
+gradle wrapper --gradle-version 8.7
+```
+</details>
+
+<details>
+<summary><strong>Build fails — Java version mismatch</strong></summary>
+
+```bash
+java -version   # must be 21+
+# Download JDK 21 from https://adoptium.net/ if needed
+```
+</details>
+
+
+### Frontend
+
+<details>
+<summary><strong>npm install fails</strong></summary>
+
+```bash
 rm -rf node_modules package-lock.json
 npm install
 ```
+</details>
 
-**Issue: API Calls Returning 404**
+<details>
+<summary><strong>API calls returning 404</strong></summary>
+
 ```bash
-# Verify backend is running:
+# Confirm backend is running
 curl http://localhost:8181/restroly/actuator/health
 
-# Check .env: base URL should be the server + context path (not .../api/v1)
+# Check .env — base URL must NOT end with /api/v1
 grep VITE_API_BASE_URL .env
+# Correct:   VITE_API_BASE_URL=http://localhost:8181/restroly
+# Incorrect: VITE_API_BASE_URL=http://localhost:8181/restroly/api/v1
 ```
+</details>
 
-**Issue: Port 3000 Already in Use**
+<details>
+<summary><strong>Port 3000 already in use</strong></summary>
+
 ```bash
-# Run on a different port (ensure CORS_ALLOWED_ORIGINS on the backend includes that origin)
 npm run dev -- --port 5173
+# Then add http://localhost:5173 to CORS_ALLOWED_ORIGINS in your backend config
 ```
+</details>
 
-### General Issues
 
-**Issue: Git Clone Fails**
-```bash
-# Check git is installed
-git --version
-
-# Verify SSH/HTTPS connection
-git ls-remote https://github.com/rdodiya/RestroHub.git
-```
-
----
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
 
-**You are free to:**
-- ✅ Use commercially
-- ✅ Modify the code
-- ✅ Distribute the software
-- ✅ Use privately
+| Permission | |
+|------------|--|
+| ✅ Commercial use | ✅ Modification |
+| ✅ Distribution | ✅ Private use |
 
-**You must:**
-- ✅ Include license and copyright notice
+**Requirement:** Include the original license and copyright notice in any copy or substantial portion.
 
 ---
 
 ## 📞 Contact & Support
 
-### Project Owner
-**Raj Dodiya**
-- 👨‍💻 LinkedIn : [@rdodiya](https://www.linkedin.com/in/rdodiya/)
-- 🐙 GitHub: [@rdodiya](https://github.com/rdodiya)
-- 📧 Email: rdodiya2601@gmail.com
-- 💬 Twitter: [@RestroHub](https://x.com/rdodiya2001)
+<div align="center">
 
-### Support Channels
-- 📝 **Issue Tracker**: [GitHub Issues](https://github.com/rdodiya/RestroHub/issues)
-- 📧 **Email**: rdodiya2601@gmail.com
+**Raj Dodiya** — Project Owner
 
-### Reporting Issues
+| | |
+|--|--|
+| 🐙 GitHub | [@rdodiya](https://github.com/rdodiya) |
+| 💼 LinkedIn | [@rdodiya](https://www.linkedin.com/in/rdodiya/) |
+| 📧 Email | rdodiya2601@gmail.com |
+| 🐦 Twitter / X | [@rdodiya2001](https://x.com/rdodiya2001) |
+| 📝 Bug reports | [GitHub Issues](https://github.com/rdodiya/RestroHub/issues) |
 
-When reporting bugs, please include:
-1. Description of the issue
-2. Steps to reproduce
-3. Expected vs actual behavior
-4. Screenshots/error logs (if applicable)
-5. Your environment (OS, Java version, Node version, etc.)
+</div>
+
+When filing a bug report, please include:
+1. A clear description of the problem
+2. Steps to reproduce it
+3. Expected vs. actual behaviour
+4. Error logs or screenshots
+5. Your OS, Java version, and Node.js version
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **Spring Boot Team** - For the amazing backend framework
-- **React Team** - For the powerful frontend library
-- **Tailwind CSS** - For beautiful styling
-- **PostgreSQL Community** - For reliable database
-- **All Contributors** - For making RestroHub better
+- **Spring Boot Team** — for the robust backend framework
+- **React Team** — for the powerful UI library
+- **Tailwind CSS** — for utility-first, beautiful styling
+- **PostgreSQL Community** — for a rock-solid open-source database
+- **GSSoC Contributors** — for making Restroly better every day
 
 ---
 
