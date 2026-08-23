@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { X, Loader2, LayoutGrid } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     if (editingTable) {
@@ -31,6 +33,18 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    setFieldErrors({});
+
+    const errs = {};
+    if (!formData.number) errs.number = 'Table number is required';
+    if (!formData.capacity) errs.capacity = 'Seating capacity is required';
+    else if (Number(formData.capacity) <= 0) errs.capacity = 'Enter a valid capacity';
+
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      setSubmitting(false);
+      return;
+    }
 
     try {
       const payload = {
@@ -50,6 +64,7 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
       onClose();
     } catch (err) {
       console.error('Failed:', err);
+      toast.error('Failed');
       setError(err.response?.data?.message || 'Failed to save table');
     } finally {
       setSubmitting(false);
@@ -113,11 +128,17 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
                   type="number"
                   min="1"
                   value={formData.number}
-                  onChange={(e) => updateField('number', e.target.value)}
-                  className={inputClass}
+                  onChange={(e) => {
+                    updateField('number', e.target.value);
+                    setFieldErrors((p) => ({ ...p, number: undefined }));
+                  }}
+                  className={`${inputClass} ${fieldErrors.number ? 'border-red-500' : ''}`}
                   placeholder="9"
-                  required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.number ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.number ? 'err-table-number' : undefined}
                 />
+                {fieldErrors.number && <p id="err-table-number" className="mt-1.5 text-xs text-red-500">{fieldErrors.number}</p>}
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-800">
@@ -127,11 +148,17 @@ const TableFormModal = ({ isOpen, onClose, onSaved, branchId, editingTable }) =>
                   type="number"
                   min="1"
                   value={formData.capacity}
-                  onChange={(e) => updateField('capacity', e.target.value)}
-                  className={inputClass}
+                  onChange={(e) => {
+                    updateField('capacity', e.target.value);
+                    setFieldErrors((p) => ({ ...p, capacity: undefined }));
+                  }}
+                  className={`${inputClass} ${fieldErrors.capacity ? 'border-red-500' : ''}`}
                   placeholder="4"
-                  required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.capacity ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.capacity ? 'err-table-capacity' : undefined}
                 />
+                {fieldErrors.capacity && <p id="err-table-capacity" className="mt-1.5 text-xs text-red-500">{fieldErrors.capacity}</p>}
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-800">

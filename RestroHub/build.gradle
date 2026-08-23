@@ -84,6 +84,9 @@ dependencies {
     // Logging (JSON format for production)
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
+
+    //Excel Dependency
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
 }
 
 // tasks.named('test') {

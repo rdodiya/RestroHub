@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Download, Eye, Loader2 } from 'lucide-react';
 import QRCode from 'react-qr-code';
+import toast from 'react-hot-toast';
 
 const QRPreview = ({ qrColor, selectedStyle }) => {
   const [downloading, setDownloading] = useState(null);
@@ -21,6 +22,7 @@ const QRPreview = ({ qrColor, selectedStyle }) => {
       console.log('Download:', format);
     } catch (err) {
       console.error('Download failed:', err);
+      toast.error('Download failed');
     } finally {
       setDownloading(null);
     }

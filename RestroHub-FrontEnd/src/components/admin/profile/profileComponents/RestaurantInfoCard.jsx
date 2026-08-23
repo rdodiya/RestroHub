@@ -9,6 +9,7 @@ import {
   Facebook,
 } from 'lucide-react';
 import api from '../../../../services/common/api';
+import toast from 'react-hot-toast';
 
 const RestaurantInfoCard = ({ profile, onSave }) => {
   const [editing, setEditing] = useState(false);
@@ -83,6 +84,7 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
       setEditing(false);
     } catch (err) {
       console.error('Save failed:', err);
+      toast.error('Save failed');
     } finally {
       setSaving(false);
     }

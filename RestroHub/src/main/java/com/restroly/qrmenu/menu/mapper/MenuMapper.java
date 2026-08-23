@@ -12,6 +12,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -60,6 +61,7 @@ public class MenuMapper {
                 .isDeleted(menu.isDeleted())
                 .createdDate(menu.getCreatedDate())
                 .branch(toBranchDTO(menu.getBranch()))
+                .categories(toCategoryDTOList(menu.getCategories()))
                 .categoryCount(menu.getCategories() != null ? menu.getCategories().size() : 0)
                 .build();
     }
@@ -128,6 +130,8 @@ public class MenuMapper {
                 .categoryId(category.getCategoryId())
                 .name(category.getName())
                 .description(category.getDescription())
+                .foods(toFoodDTOList(category.getFoods()))
+                .foodCount(category.getFoods().size())
                 .build();
     }
 
@@ -136,6 +140,27 @@ public class MenuMapper {
         return categories.stream()
                 .map(this::toCategoryDTO)
                 .collect(Collectors.toList());
+    }
+
+    private List<MenuResponseDTO.FoodDTO> toFoodDTOList(Set<Food> foods) {
+        if (foods == null) return Collections.emptyList();
+        return foods.stream()
+                .map(this::toFoodDTO)
+                .collect(Collectors.toList());
+    }
+
+    private MenuResponseDTO.FoodDTO toFoodDTO(Food food) {
+        if (food == null) return null;
+
+        return MenuResponseDTO.FoodDTO.builder()
+                .foodId(food.getFoodId())
+                .imageUrl(food.getImageUrl())
+                .description(food.getDescription())
+                .isVeg(food.getIsVeg())
+                .isAvailable(food.getIsAvailable())
+                .price(food.getPrice())
+                .name(food.getName())
+                .build();
     }
 
     private String buildFullAddress(Branch branch) {

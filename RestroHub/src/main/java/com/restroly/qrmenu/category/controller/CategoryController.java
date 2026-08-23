@@ -59,6 +59,12 @@ public class CategoryController {
 		return ResponseEntity.ok(ApiResponse.success(null, "Category deleted (soft-deleted) successfully"));
 	}
 
+	@PutMapping("/restore/{id}")
+	public ResponseEntity<ApiResponse<CategoryResponseDTO>> restoreCategory(@PathVariable Long id) {
+		CategoryResponseDTO restored = categoryService.restoreCategory(id);
+		return ResponseEntity.ok(ApiResponse.success(restored, "Category restored successfully"));
+	}
+
 	@GetMapping("/activecategories")
 	public ResponseEntity<ApiResponse<PagedResponse<CategoryResponseDTO>>> getActiveCategories(
 			@PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable) {

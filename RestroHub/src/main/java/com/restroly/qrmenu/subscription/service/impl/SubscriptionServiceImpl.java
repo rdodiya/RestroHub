@@ -102,14 +102,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public List<SubscriptionPlanDto> getAllPlans() {
-        return planRepository.findAll().stream()
+        return planRepository.findAllWithFeatures().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public SubscriptionPlanDto getPlanById(Long planId) {
-        return planRepository.findById(planId)
+        return planRepository.findByIdWithFeatures(planId)
                 .map(this::mapToDto)
                 .orElseThrow(() -> new RuntimeException("Plan not found with id: " + planId));
     }

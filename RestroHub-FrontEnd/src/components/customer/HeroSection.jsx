@@ -11,19 +11,24 @@ const HeroSection = () => {
 
     if (!siteData) return null;
 
-    const { hero, brand } = siteData;
+    const { hero, navigation } = siteData;
 
     return (
-        <section 
+        <section
             className="hero hero-bg"
             style={{
-                backgroundImage: `linear-gradient(var(--color-overlay-dark), var(--color-overlay-darker)), url('${hero.backgroundImage}')`
-            }}
+                backgroundImage: `
+                linear-gradient(
+                    rgba(0,0,0,0.65),
+                    rgba(0,0,0,0.75)
+                ),
+                url('${hero.backgroundImage}')
+            `}}
         >
             <div className="hero-content">
                 {/* Established Tag */}
                 <p className="hero-established animate-pulse">
-                    {brand.established}
+                    {navigation.established}
                 </p>
 
                 {/* Title */}
@@ -35,7 +40,7 @@ const HeroSection = () => {
 
                 {/* Tagline */}
                 <p className="hero-tagline">
-                    {brand.tagline}
+                    {navigation.tagline}
                 </p>
 
                 {/* CTA Buttons */}
@@ -64,7 +69,6 @@ const HeroSection = () => {
                     justify-content: center;
                     position: relative;
                     padding: var(--spacing-md);
-                    /* Hero is always a photo with dark overlay — force white text regardless of site theme */
                     color: #ffffff;
                 }
 
@@ -94,6 +98,7 @@ const HeroSection = () => {
                     font-weight: 700;
                     line-height: 1.1;
                     margin-bottom: var(--spacing-md);
+                    color: #ffffff;
                 }
 
                 @media (min-width: 640px) {
@@ -115,10 +120,15 @@ const HeroSection = () => {
                     }
                 }
 
+                .text-stroke {
+                    color: transparent;
+                    -webkit-text-stroke: 2px var(--color-primary);
+                }
+
                 .hero-tagline {
                     font-size: var(--text-base);
                     font-weight: 300;
-                    color: var(--color-text-secondary);
+                    color: rgba(255,255,255,0.9);
                     max-width: 600px;
                     margin: 0 auto var(--spacing-xl);
                     line-height: 1.8;
@@ -159,7 +169,7 @@ const HeroSection = () => {
                     bottom: var(--spacing-2xl);
                     left: 50%;
                     transform: translateX(-50%);
-                    color: var(--color-text-primary);
+                    color: #ffffff;
                     display: none;
                 }
 
@@ -167,6 +177,10 @@ const HeroSection = () => {
                     .hero-scroll {
                         display: block;
                     }
+                }
+
+                .hero-scroll svg {
+                    stroke: var(--color-primary);
                 }
             `}</style>
         </section>

@@ -3,6 +3,7 @@ import { ChevronRight, RefreshCw, FolderPlus } from 'lucide-react';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import toast from 'react-hot-toast';
 
 // ============================================
 // SKELETON (Private)
@@ -58,6 +59,7 @@ const CategorySidebar = ({ selectedCategory, onCategoryChange, onAddCategory, se
       setAllCategories(response.data.data.content);
     } catch (err) {
       console.error('Failed to fetch categories:', err);
+      toast.error('Failed to fetch categories');
       setCategories(fallbackCategories);
       setAllCategories(fallbackCategories);
     } finally {

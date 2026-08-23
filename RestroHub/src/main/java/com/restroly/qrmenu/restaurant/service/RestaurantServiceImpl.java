@@ -127,4 +127,21 @@ public class RestaurantServiceImpl implements  RestaurantService{
                     return new ResourceNotFoundException(String.format(RESTAURANT_NOT_FOUND_MSG, id));
                 });
     }
+
+    /**
+     * @param name
+     * @return
+     */
+    @Override
+    public Restaurant getRestaurantByNameEntity(String name) {
+        log.debug("Fetching restaurant by name: {}", name);
+
+        Restaurant restaurant = restaurantRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> {
+                    log.warn("Restaurant not found with name: {}", name);
+                    return new ResourceNotFoundException("Restaurant not found with name: " + name);
+                });
+
+        return restaurant;
+    }
 }

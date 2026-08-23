@@ -1,12 +1,12 @@
 // src/pages/public/Register.jsx
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
 import api from "@services/common/api";
-import { ArrowLeft, Building2, Moon, Phone, Sun, Users } from "lucide-react";
+import { ArrowLeft, Moon, Sun } from "lucide-react";
 import { useTheme } from "@context/ThemeContext";
 
 /* ──────────────────── SVG Icons ──────────────────── */
@@ -74,12 +74,6 @@ const validationSchema = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password'), null], 'Passwords must match')
     .required('Confirm password is required'),
-  roleIds: Yup.array().min(1, "Select at least one role"),
-  restaurantName: Yup.string().min(2, "Minimum 2 characters").required("Restaurant name is required"),
-  restaurantDescription: Yup.string().min(5, "Minimum 5 characters").required("Restaurant description is required"),
-  restaurantPhoneNumber: Yup.string()
-    .matches(/^[0-9+\s-]{10,15}$/, "Enter a valid phone number")
-    .required("Restaurant phone number is required"),
 });
 
 const Register = () => {
@@ -90,6 +84,9 @@ const Register = () => {
   const [roles, setRoles] = useState([]);
   const [rolesLoading, setRolesLoading] = useState(false);
   const [rolesError, setRolesError] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [showVerificationScreen, setShowVerificationScreen] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -115,21 +112,19 @@ const Register = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      roleIds: [],
-      restaurantName: "",
-      restaurantDescription: "",
-      restaurantPhoneNumber: "",
     },
     validationSchema,
     onSubmit: async (values) => {
+      debugger  
       setIsLoading(true);
       try {
         const { confirmPassword, ...registerData } = values;
         const res = await api.post("/public/api/v1/auth/register", registerData);
 
         if (res.data.success) {
-          toast.success("Registration successful! Please login.");
-          navigate("/login");
+          setRegisteredEmail(values.email);
+          setShowVerificationScreen(true);
+          toast.success("Registration successful! Please check your email.");
         } else {
           toast.error(res.data.message || "Registration failed");
         }
@@ -140,6 +135,18 @@ const Register = () => {
       }
     },
   });
+
+  const handleResendVerification = async () => {
+    setIsResending(true);
+    try {
+      await api.post("/public/api/v1/auth/resend-verification", { email: registeredEmail });
+      toast.success("Verification email resent! Please check your inbox.");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to resend verification email.");
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const inputClass = (field) =>
     `w-full rounded-lg border ${
@@ -155,6 +162,39 @@ const Register = () => {
 
     formik.setFieldValue("roleIds", nextRoleIds);
   };
+
+  if (showVerificationScreen) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10 dark:bg-gray-900 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white p-10 shadow-xl dark:border-gray-700 dark:bg-gray-800 text-center">
+          <div className="mb-6 flex justify-center">
+            <span className="text-6xl">📧</span>
+          </div>
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">Check your email</h2>
+          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+            We sent a verification link to
+          </p>
+          <p className="mb-6 font-medium text-blue-600 dark:text-blue-400">{registeredEmail}</p>
+          <p className="mb-8 text-sm text-gray-500 dark:text-gray-400">
+            Didn&apos;t receive the email? Check your spam folder or resend it.
+          </p>
+          <button
+            onClick={handleResendVerification}
+            disabled={isResending}
+            className="mb-4 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-600"
+          >
+            {isResending ? <><SpinnerIcon /> Resending…</> : "Resend Verification Email"}
+          </button>
+          <Link
+            to="/login"
+            className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+          >
+            Back to Sign In
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10 dark:bg-gray-900 sm:px-6 lg:px-8">
@@ -229,35 +269,6 @@ const Register = () => {
                 </div>
 
                 <div className="mt-5">
-                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Roles</label>
-                  <div className="rounded-lg border border-gray-300 bg-transparent p-3 dark:border-gray-600 dark:bg-gray-800">
-                    {rolesLoading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading roles...</p>}
-                    {rolesError && <p className="text-sm text-red-500">{rolesError}</p>}
-                    {!rolesLoading && !rolesError && (
-                      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
-                        {roles.map((role) => (
-                          <label
-                            key={role.id}
-                            className="flex min-w-0 cursor-pointer items-start gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-blue-400 dark:border-gray-700 dark:text-gray-200"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={formik.values.roleIds.includes(role.id)}
-                              onChange={() => toggleRole(role.id)}
-                              onBlur={() => formik.setFieldTouched("roleIds", true)}
-                              className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <Users size={16} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
-                            <span className="min-w-0 break-words leading-snug">{role.name}</span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  {formik.touched.roleIds && formik.errors.roleIds && <p className="mt-1.5 text-xs text-red-500">{formik.errors.roleIds}</p>}
-                </div>
-
-                <div className="mt-5">
                   <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
                   <div className="relative">
                     <input name="password" type={showPassword ? "text" : "password"} placeholder="••••••••" {...formik.getFieldProps('password')} className={inputClass("password")} />
@@ -274,39 +285,6 @@ const Register = () => {
                     <input name="confirmPassword" type="password" placeholder="••••••••" {...formik.getFieldProps('confirmPassword')} className={inputClass("confirmPassword")} />
                   </div>
                   {formik.touched.confirmPassword && formik.errors.confirmPassword && <p className="mt-1.5 text-xs text-red-500">{formik.errors.confirmPassword}</p>}
-                </div>
-
-                <div className="mb-5 border-t border-gray-200 pt-5 dark:border-gray-700">
-                  <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Restaurant Details</h3>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Restaurant Name</label>
-                    <div className="relative">
-                      <input name="restaurantName" type="text" placeholder="Restroly Cafe" {...formik.getFieldProps('restaurantName')} className={inputClass("restaurantName")} />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"><Building2 size={22} /></span>
-                    </div>
-                    {formik.touched.restaurantName && formik.errors.restaurantName && <p className="mt-1.5 text-xs text-red-500">{formik.errors.restaurantName}</p>}
-                  </div>
-
-                  <div className="mt-5">
-                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Restaurant Description</label>
-                    <textarea
-                      name="restaurantDescription"
-                      rows="3"
-                      placeholder="A modern multi-cuisine restaurant"
-                      {...formik.getFieldProps('restaurantDescription')}
-                      className={`${inputClass("restaurantDescription")} min-h-[110px] resize-y pr-6`}
-                    />
-                    {formik.touched.restaurantDescription && formik.errors.restaurantDescription && <p className="mt-1.5 text-xs text-red-500">{formik.errors.restaurantDescription}</p>}
-                  </div>
-
-                  <div className="mt-5">
-                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Restaurant Phone Number</label>
-                    <div className="relative">
-                      <input name="restaurantPhoneNumber" type="tel" placeholder="9876543210" {...formik.getFieldProps('restaurantPhoneNumber')} className={inputClass("restaurantPhoneNumber")} />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"><Phone size={22} /></span>
-                    </div>
-                    {formik.touched.restaurantPhoneNumber && formik.errors.restaurantPhoneNumber && <p className="mt-1.5 text-xs text-red-500">{formik.errors.restaurantPhoneNumber}</p>}
-                  </div>
                 </div>
 
                 <button type="submit" disabled={isLoading} className="mb-5 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-base font-medium text-white transition hover:bg-blue-700 focus:outline-none disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-600">
