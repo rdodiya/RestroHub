@@ -13,6 +13,7 @@ import {
   UtensilsCrossed,
 } from 'lucide-react';
 import api from "@services/common/api";
+import toast from 'react-hot-toast';
 
 const OrderCard = ({ order, onStatusUpdate }) => {
   const [updating, setUpdating] = useState(false);
@@ -174,7 +175,8 @@ const OrderCard = ({ order, onStatusUpdate }) => {
 
       onStatusUpdate(order.id, action.next);
     } catch (err) {
-      console.error('Failed to update order status:', err);
+      console.error('Failed to update order:', err);
+      toast.error('Failed to update order');
     } finally {
       setUpdating(false);
     }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, ArrowLeft, Download, Loader2, LayoutGrid } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const TablesHeader = ({ branchId, onAddTable, totalTables = 0 }) => {
   const [downloading, setDownloading] = useState(false);
@@ -13,6 +14,7 @@ const TablesHeader = ({ branchId, onAddTable, totalTables = 0 }) => {
       console.log('Download all QRs');
     } catch (err) {
       console.error('Download failed:', err);
+      toast.error('Download failed');
     } finally {
       setDownloading(false);
     }

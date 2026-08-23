@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
+import toast from 'react-hot-toast';
 
 const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
   const [formData, setFormData] = useState({
@@ -106,6 +107,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
       onClose();
     } catch (err) {
       console.error('Save failed:', err);
+      toast.error('Save failed');
       const message = err.response?.data?.message || 'Failed to save branch';
       setError(message);
     } finally {

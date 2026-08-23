@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, CreditCard } from 'lucide-react';
 import UPICard from './UPICard';
 import AdminSkeleton from '../AdminSkeleton';
+import toast from 'react-hot-toast';
 
 // ============================================
 // MAIN
@@ -39,6 +40,7 @@ const UPIGrid = ({ onTest, onCountChange }) => {
       onCountChange?.(fallbackLinks.length);
     } catch (err) {
       console.error('Fetch failed:', err);
+      toast.error('Fetch failed');
       setError('Failed to load UPI links');
       setUpiLinks(fallbackLinks);
     } finally {

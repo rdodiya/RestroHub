@@ -3,6 +3,7 @@ import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
 import OrderCard from './OrderCard';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
+import toast from 'react-hot-toast';
 
 const OrderCardSkeleton = () => (
   <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-pulse">
@@ -128,6 +129,7 @@ const OrderCardSkeleton = () => (
       syncOrders(fallbackOrders);
     } catch (err) {
       console.error('Failed to fetch orders:', err);
+      toast.error('Failed to fetch orders');
       setError('Failed to load orders');
       // const response = await api.get('/secure/api/v1/orders/branch/1/active');
       // const data = response.data;
