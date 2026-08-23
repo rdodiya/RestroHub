@@ -99,13 +99,24 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
     const description = formData.description.trim();
     const imageUrl = formData.imageFile ? '' : formData.imageUrl.trim();
 
-    if (!name) nextErrors.name = 'Food item name is required.';
-    if (name && name.length < 2) nextErrors.name = 'Name must be at least 2 characters.';
-    if (name.length > 100) nextErrors.name = 'Name must be 100 characters or less.';
+    if (!name) {
+      nextErrors.name = 'Food item name is required.';
+    } else if (name.length < 2) {
+      nextErrors.name = 'Name must be at least 2 characters.';
+    } else if (name.length > 100) {
+      nextErrors.name = 'Name must be 100 characters or less.';
+    }
+
     if (description.length > 500) nextErrors.description = 'Description must be 500 characters or less.';
-    if (!formData.price) nextErrors.price = 'Price is required.';
-    if (formData.price && (!Number.isFinite(price) || price <= 0)) nextErrors.price = 'Enter a valid price greater than 0.';
-    if (price > 9999.99) nextErrors.price = 'Price must be 9999.99 or less.';
+
+    if (!formData.price) {
+      nextErrors.price = 'Price is required.';
+    } else if (!Number.isFinite(price) || price <= 0) {
+      nextErrors.price = 'Enter a valid price greater than 0.';
+    } else if (price > 9999.99) {
+      nextErrors.price = 'Price must be 9999.99 or less.';
+    }
+
     if (!formData.categoryId) nextErrors.categoryId = 'Select a category.';
 
     if (imageUrl) {
