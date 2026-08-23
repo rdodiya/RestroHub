@@ -21,12 +21,9 @@ const API_BASE_URL =
 
 const validationSchema = Yup.object({
   username: Yup.string().required("Email or username is required"),
-  password: Yup.string()
-    .required("Password is required")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?`~]).{8,}$/,
-      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
-    ),
+  // Login should only require a password to be present; strict complexity
+  // rules are enforced at registration. Keep login validation permissive.
+  password: Yup.string().required("Password is required"),
 });
 
 /* ──────────────────── SVG Icons (inlined) ──────────────────── */
