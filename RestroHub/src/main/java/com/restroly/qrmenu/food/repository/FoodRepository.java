@@ -162,4 +162,5 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
 
     boolean existsByNameIgnoreCaseAndCategory_CategoryIdAndFoodIdNot(String name, Long categoryId, Long foodId);
 
+    List<Food> findByCategory_CategoryIdInAndIsDeleteFalse(List<Long> categoryIds);
 }
