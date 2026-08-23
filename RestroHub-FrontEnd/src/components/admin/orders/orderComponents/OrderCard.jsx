@@ -151,19 +151,30 @@ const OrderCard = ({ order, onStatusUpdate }) => {
   // ------------------------------------
   // HANDLER
   // ------------------------------------
+  // Map frontend status to backend enum
+  const statusMap = {
+    cooking: 'PREPARING',
+    ready: 'READY',
+    billed: 'COMPLETED',
+    complete: 'COMPLETED',
+    pending: 'PENDING',
+  };
+
   const handleAction = async () => {
     if (!action) return;
 
     try {
       setUpdating(true);
 
-      // 🔌 UNCOMMENT WHEN API READY
-      // await api.patch(`/secure/api/v1/orders/${order.id}/status`, { status: action.next });
+      const backendStatus = statusMap[action.next] || action.next.toUpperCase();
 
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await api.patch(`/secure/api/v1/orders/${order.id}/status`, {
+        status: backendStatus,
+      });
+
       onStatusUpdate(order.id, action.next);
     } catch (err) {
-      console.error('Failed to update order:', err);
+      console.error('Failed to update order status:', err);
     } finally {
       setUpdating(false);
     }

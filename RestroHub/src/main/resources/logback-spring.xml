@@ -3,7 +3,7 @@
 
     <!-- Define properties -->
     <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="Restroly"/>
-    <property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-D:/var/logs/restroly}"/>
     <property name="LOG_FILE" value="${LOG_PATH}/${APP_NAME}"/>
 
     <!-- Console Appender with colors for development -->

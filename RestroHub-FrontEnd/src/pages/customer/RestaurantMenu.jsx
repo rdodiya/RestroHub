@@ -38,6 +38,7 @@ const AppContent = () => {
                 <AboutSection />
                 <MenuSection />
                 <GallerySection />
+                <ServiceFAB />
                 <ReservationsSection />
                 <ContactSection />
             </main>

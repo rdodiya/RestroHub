@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearAuthSession, getAccessToken } from "./authStorage";
 
 const api = axios.create({
   baseURL:
@@ -8,10 +9,10 @@ const api = axios.create({
 // Add interceptor
 api.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = getAccessToken();
     // Add token only for secure APIs
     if (accessToken) {
-  config.headers.Authorization = `Bearer ${accessToken}`;
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
@@ -26,9 +27,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
       if (!error.config?.url?.includes("/public/")) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("roles");
+        clearAuthSession();
         window.location.href = "/login";
       }
     }

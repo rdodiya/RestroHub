@@ -1,5 +1,7 @@
 package com.restroly.qrmenu.user.service;
 
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.user.entity.UserRoleRestaurant;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
@@ -45,53 +47,53 @@ public class UserServiceImpl implements UserService {
     // =============================
     // REGISTER USER
     // =============================
-    @Override
-    public UserResponse registerUser(UserRequest request) {
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException(
-                    "User with email '" + request.getEmail() + "' already exists");
-        }
-
-        if (request.getPhone() != null &&
-                userRepository.existsByPhoneNumber(request.getPhone())) {
-            throw new DuplicateResourceException(
-                    "User with phone '" + request.getPhone() + "' already exists");
-        }
-
-        User user = User.builder()
-                .name(request.getFirstName() + " " + request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .phoneNumber(request.getPhone())
-                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
-                .isLocked(false)
-                .build();
-
-        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
-
-            List<Role> roles = roleRepository.findByIdIn(request.getRoleIds())
-                    .stream()
-                    .toList(); // Java 16+
-            // .collect(Collectors.toList()); // Java 8+
-
-            user.setRoles(roles);
-
-        } else {
-            // Default to the CUSTOMER role which is used across auth flows
-            Role customerRole = roleRepository.findByName("CUSTOMER")
-        .orElseThrow(() ->
-                new IllegalStateException("Default CUSTOMER role not found"));
-
-        user.setRoles(
-                new ArrayList<>(Collections.singletonList(customerRole)));
-        }
-
-        User savedUser = userRepository.save(user);
-        createRestaurantIfRequested(request);
-
-        return mapToResponse(savedUser);
-    }
+//    @Override
+//    public UserResponse registerUser(UserRequest request) {
+//
+//        if (userRepository.existsByEmail(request.getEmail())) {
+//            throw new DuplicateResourceException(
+//                    "User with email '" + request.getEmail() + "' already exists");
+//        }
+//
+//        if (request.getPhone() != null &&
+//                userRepository.existsByPhoneNumber(request.getPhone())) {
+//            throw new DuplicateResourceException(
+//                    "User with phone '" + request.getPhone() + "' already exists");
+//        }
+//
+//        User user = User.builder()
+//                .name(request.getFirstName() + " " + request.getLastName())
+//                .email(request.getEmail())
+//                .password(passwordEncoder.encode(request.getPassword()))
+//                .phoneNumber(request.getPhone())
+//                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+//                .isLocked(false)
+//                .build();
+//
+//        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
+//
+//            List<Role> roles = roleRepository.findByIdIn(request.getRoleIds())
+//                    .stream()
+//                    .toList(); // Java 16+
+//            // .collect(Collectors.toList()); // Java 8+
+//
+//            user.setRoles(roles);
+//
+//        } else {
+//            // Default to the CUSTOMER role which is used across auth flows
+//            Role customerRole = roleRepository.findByName("CUSTOMER")
+//        .orElseThrow(() ->
+//                new IllegalStateException("Default CUSTOMER role not found"));
+//
+//        user.setRoles(
+//                new ArrayList<>(Collections.singletonList(customerRole)));
+//        }
+//
+//        User savedUser = userRepository.save(user);
+//        createRestaurantIfRequested(request);
+//
+//        return mapToResponse(savedUser);
+//    }
 
     private void createRestaurantIfRequested(UserRequest request) {
         if (request.getRestaurantName() == null || request.getRestaurantName().isBlank()) {
@@ -130,7 +132,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long userId) {
 
-        User user = userRepository.findByUserIdWithRoles(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         return mapToResponse(user);
@@ -143,7 +145,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserByEmail(String email) {
 
-        User user = userRepository.findByEmailWithRoles(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new UserNotFoundException("User not found with email: " + email));
 
@@ -214,11 +216,20 @@ public class UserServiceImpl implements UserService {
             user.setIsActive(request.getIsActive());
         }
 
+//        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
+//            List<Role> roles = roleRepository.findByIdIn(request.getRoleIds())
+//                    .stream()
+//                    .collect(Collectors.toList());
+//            user.setRoles(roles);
+//        }
         if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
-            List<Role> roles = roleRepository.findByIdIn(request.getRoleIds())
-                    .stream()
-                    .collect(Collectors.toList());
-            user.setRoles(roles);
+            Restaurant restaurant = restaurantRepository.findByNameIgnoreCase(request.getRestaurantName())
+                    .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
+            List<Role> roles = roleRepository.findByIdIn(request.getRoleIds());
+            user.clearUserRoleRestaurants();
+            for (Role role : roles) {
+                user.addUserRoleRestaurant(role, restaurant);
+            }
         }
 
         return mapToResponse(userRepository.save(user));
@@ -234,16 +245,45 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
     }
 
-    // =============================
-    // ASSIGN ROLES
-    // =============================
-    @Override
-    public UserResponse assignRolesToUser(Long userId, Set<Long> roleIds) {
+    @Transactional
+    public UserResponse assignRolesToUser(
+            Long userId,
+            Set<Long> roleIds) {
 
-        User user = userRepository.findByUserIdWithRoles(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        user.getRoles().addAll(roleRepository.findByIdIn(roleIds));
+        UserRoleRestaurant existingAssignment = user.getUserRoleRestaurants()
+                .stream()
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "User has no restaurant assigned"));
+
+        Restaurant restaurant = existingAssignment.getRestaurant();
+
+        List<Role> roles = roleRepository.findByIdIn(roleIds);
+
+        for (Role role : roles) {
+
+            boolean alreadyAssigned = user.getUserRoleRestaurants()
+                    .stream()
+                    .anyMatch(urr ->
+                            urr.getRole().getId().equals(role.getId()) &&
+                                    urr.getRestaurant().getRestId() == restaurant.getRestId()
+                    );
+
+            if (!alreadyAssigned) {
+
+                UserRoleRestaurant urr = UserRoleRestaurant.builder()
+                        .user(user)
+                        .role(role)
+                        .restaurant(restaurant)
+                        .build();
+
+                user.getUserRoleRestaurants().add(urr);
+            }
+        }
 
         return mapToResponse(userRepository.save(user));
     }
@@ -251,13 +291,17 @@ public class UserServiceImpl implements UserService {
     // =============================
     // REMOVE ROLES
     // =============================
-    @Override
-    public UserResponse removeRolesFromUser(Long userId, Set<Long> roleIds) {
+    @Transactional
+    public UserResponse removeRolesFromUser(
+            Long userId,
+            Set<Long> roleIds) {
 
-        User user = userRepository.findByUserIdWithRoles(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        user.getRoles().removeIf(role -> roleIds.contains(role.getId()));
+        user.getUserRoleRestaurants().removeIf(urr ->
+                roleIds.contains(urr.getRole().getId())
+        );
 
         return mapToResponse(userRepository.save(user));
     }
@@ -287,8 +331,10 @@ public class UserServiceImpl implements UserService {
     private UserResponse mapToResponse(User user) {
 
         Set<RoleResponse> roles =
-                user.getRoles() == null ? null :
-                        user.getRoles().stream()
+                user.getUserRoleRestaurants() == null ? null :
+                        user.getUserRoleRestaurants().stream()
+                                .map(UserRoleRestaurant::getRole)
+                                .distinct()
                                 .map(role -> RoleResponse.builder()
                                         .id(role.getId())
                                         .name(role.getName())
@@ -321,7 +367,7 @@ public UserProfileResponseDTO getCurrentUserProfile() {
 
     String email = authentication.getName();
 
-        User user = userRepository.findByEmailWithRoles(email)
+        User user = userRepository.findByEmail(email)
             .orElseThrow(() ->
                 new UserNotFoundException(
                     "User not found with email: " + email));
@@ -342,62 +388,76 @@ private String encodeProfileImage(byte[] imageBytes) {
     return Base64.getEncoder().encodeToString(imageBytes);
 }
 
-@Override
-public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request) {
+    @Override
+    @Transactional
+    public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request) {
 
-    Authentication authentication =
-            SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-    String email = authentication.getName();
+        String email = authentication.getName();
 
-    User user = userRepository.findByEmailWithRoles(email)
-            .orElseThrow(() ->
-                    new UserNotFoundException(
-                            "User not found with email: " + email));
-        // System.out.println("BEFORE UPDATE ROLES: " + user.getRoles()); line added fo debugging
+        User user = userRepository.findByEmailWithUserRoleRestaurants(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found with email: " + email));
 
-    log.info("Updating profile for user: {}", email);
-    log.info("Incoming request: {}", request);
+        log.info("Updating profile for user: {}", email);
+        log.info("Incoming request: {}", request);
 
-    // Update only non-null fields
-    if (request.getName() != null && !request.getName().isBlank()) {
-        user.setName(request.getName());
-    }
-
-    if (request.getPhoneNumber() != null &&
-            !request.getPhoneNumber().isBlank()) {
-        user.setPhoneNumber(request.getPhoneNumber());
-    }
-
-    // Handle profile image safely
-    if (request.getProfileImageBytes() != null &&
-            request.getProfileImageBytes().length > 0) {
-
-        log.info("Updating profile image for user: {}", email);
-
-        user.setUserProfile(request.getProfileImageBytes());
-    }
-
-    // Prevent accidental auth corruption
-    if (user.getEmail() == null || user.getEmail().isBlank()) {
-        throw new IllegalStateException("User email became null during profile update");
-    }
-
-    if (user.getRoles() == null || user.getRoles().isEmpty()) {
-        throw new IllegalStateException("User roles became empty during profile update");
-    }
-
-    User updatedUser = userRepository.save(user);
-
-    log.info("Profile updated successfully for user: {}", email);
-
-    return UserProfileResponseDTO.builder()
-            .userId(updatedUser.getUserId())
-            .name(updatedUser.getName())
-            .email(updatedUser.getEmail())
-            .phoneNumber(updatedUser.getPhoneNumber())
-            .profileImage(encodeProfileImage(updatedUser.getUserProfile()))
-            .build();
-
+        // Update name
+        if (request.getName() != null && !request.getName().isBlank()) {
+            user.setName(request.getName());
         }
+
+        // Update phone
+        if (request.getPhoneNumber() != null &&
+                !request.getPhoneNumber().isBlank()) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        // Update profile image
+        if (request.getProfileImageBytes() != null &&
+                request.getProfileImageBytes().length > 0) {
+
+            log.info("Updating profile image for user: {}", email);
+
+            user.setUserProfile(request.getProfileImageBytes());
+        }
+
+        // Validate email
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalStateException(
+                    "User email became null during profile update");
+        }
+
+        // Validate role assignments
+        if (user.getUserRoleRestaurants() == null ||
+                user.getUserRoleRestaurants().isEmpty()) {
+
+            throw new IllegalStateException(
+                    "User role assignments became empty during profile update");
+        }
+
+        User updatedUser = userRepository.save(user);
+
+        log.info("Profile updated successfully for user: {}", email);
+
+        return UserProfileResponseDTO.builder()
+                .userId(updatedUser.getUserId())
+                .name(updatedUser.getName())
+                .email(updatedUser.getEmail())
+                .phoneNumber(updatedUser.getPhoneNumber())
+                .profileImage(encodeProfileImage(updatedUser.getUserProfile()))
+                .build();
+    }
+
+    @Override
+    public User getUserByEmailEntity(String email) {
+        User user = userRepository.findByEmailWithUserRoleRestaurants(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found with email: " + email));
+
+        return user;
+    }
 }

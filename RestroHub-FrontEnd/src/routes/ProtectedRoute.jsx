@@ -1,20 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { hasRole } from "@hooks/useAuth";
+import { getAccessToken, getStoredRoles } from "@services/common/authStorage";
 
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = getAccessToken();
 
   if (!accessToken) {
     return <Navigate to="/login" replace />;
   }
 
-  let roles = [];
-  try {
-    const rolesStr = localStorage.getItem("roles");
-    if (rolesStr) roles = JSON.parse(rolesStr);
-  } catch (e) {
-    console.error("Failed to parse roles");
-  }
+  const roles = getStoredRoles();
 
   const hasRole = (roleToCheck) => {
     if (!Array.isArray(roles)) return false;
@@ -40,4 +36,17 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+/**
+ * Route guard that restricts access to users with ADMIN or SUPER_ADMIN roles.
+ * Wraps individual routes inside an already-authenticated layout.
+ * Non-admin users are redirected to the admin dashboard.
+ */
+const AdminRoute = ({ children }) => {
+  if (!hasRole('ADMIN', 'SUPER_ADMIN')) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+  return children;
+};
+
+export { AdminRoute };
 export default ProtectedRoute;

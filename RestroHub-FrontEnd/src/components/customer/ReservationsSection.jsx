@@ -218,7 +218,8 @@ const ReservationsSection = () => {
                     inset: 0;
                     background-size: cover;
                     background-position: center;
-                    opacity: 0.2;
+                    opacity: 0.18;
+                    pointer-events: none;
                 }
 
                 .reservations-container {
@@ -239,19 +240,24 @@ const ReservationsSection = () => {
                 }
 
                 .reservations-description {
-                    color: var(--color-text-secondary);
                     margin-top: var(--spacing-md);
+                    color: var(--color-text-secondary);
+                    line-height: 1.8;
                 }
 
                 .reservations-form {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-md);
+                    background: var(--color-bg-primary);
+                    border: 1px solid var(--color-border-primary);
+                    padding: var(--spacing-xl);
                 }
 
                 @media (min-width: 768px) {
                     .reservations-form {
                         gap: var(--spacing-lg);
+                        padding: var(--spacing-2xl);
                     }
                 }
 
@@ -272,17 +278,17 @@ const ReservationsSection = () => {
                 }
 
                 .form-error {
-                    background: rgba(239, 68, 68, 0.1);
-                    border: 1px solid #ef4444;
-                    color: #ef4444;
                     padding: var(--spacing-md);
-                    border-radius: var(--radius-sm);
                     text-align: center;
+                    color: var(--color-primary);
+                    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+                    border: 1px solid var(--color-primary);
+                    border-radius: var(--radius-sm);
                 }
 
                 textarea.input {
-                    resize: none;
-                    min-height: 120px;
+                    resize: vertical;
+                    min-height: 140px;
                 }
 
                 .reservations-submit {
@@ -291,6 +297,11 @@ const ReservationsSection = () => {
                     align-items: center;
                     justify-content: center;
                     gap: var(--spacing-sm);
+                }
+
+                .reservations-submit:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
                 }
 
                 .btn-loader {
@@ -302,11 +313,27 @@ const ReservationsSection = () => {
                     animation: spin 0.8s linear infinite;
                 }
 
+                @keyframes spin {
+                    to {
+                        transform: rotate(360deg);
+                    }
+                }
+
+                /* ============================= */
                 /* Success State */
+                /* ============================= */
+
                 .reservations-success {
                     text-align: center;
-                    padding: var(--spacing-2xl);
+                    background: var(--color-bg-primary);
                     border: 1px solid var(--color-primary);
+                    padding: var(--spacing-2xl);
+                }
+
+                @media (min-width: 768px) {
+                    .reservations-success {
+                        padding: var(--spacing-3xl);
+                    }
                 }
 
                 .success-icon {
@@ -327,8 +354,15 @@ const ReservationsSection = () => {
                     margin-bottom: var(--spacing-md);
                 }
 
+                @media (min-width: 768px) {
+                    .success-title {
+                        font-size: var(--text-3xl);
+                    }
+                }
+
                 .success-message {
                     color: var(--color-text-secondary);
+                    line-height: 1.8;
                     margin-bottom: var(--spacing-md);
                 }
 

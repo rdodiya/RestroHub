@@ -6,6 +6,9 @@ import PublicLayout from '../layouts/PublicLayout';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
+import { AdminRoute } from './ProtectedRoute';
+
+import SiteProvider from "@context/SiteContext";
 
 // Public Pages
 import Landing from '../pages/public/Landing';
@@ -13,6 +16,8 @@ import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
+import TermsOfService from '../pages/public/TermsOfService';
+import RefundPolicy from '../pages/public/RefundPolicy';
 import NotFound from '../pages/public/NotFound';
 
 // Customer Pages
@@ -24,11 +29,13 @@ import Menus from '@components/admin/menu/Menus';
 import Orders from '@components/admin/orders/Orders';
 import Branches from '@components/admin/store/branch/Branches';
 import Tables from '@components/admin/store/tables/Tables';
-import Website from '@components/admin/marketing/website/Website';
+import WebsiteWrapper from '@components/admin/marketing/website/WebsiteWrapper';
 import QRDisplay from '@components/admin/marketing/qr/QRDisplay';
 import UPILinks from '@components/admin/upi/UPILinks';
 import KitchenDisplaySystem from '@components/admin/kds/KitchenDisplaySystem';
 import Profile from '@components/admin/profile/Profile';
+import UserRoleManagement from '@components/admin/roles/UserRoleManagement';
+import SubscriptionManagement from '@components/admin/subscriptions/SubscriptionManagement';
 
 const AppRoutes = () => {
   return (
@@ -40,6 +47,8 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
       </Route>
 
       {/* ========== CUSTOMER ROUTES ========== */}
@@ -52,20 +61,25 @@ const AppRoutes = () => {
 
       {/* ========== ADMIN ROUTES ========== */}
       <Route path="/admin"
-            element={
-                  <ProtectedRoute>
-                    <AdminLayout />
-                    </ProtectedRoute>}>
+        element={
+          <ProtectedRoute>
+              <AdminLayout />
+          </ProtectedRoute>}>
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="menus" element={<Menus />} />
         <Route path="orders" element={<Orders />} />
         <Route path="store/branches" element={<Branches />} />
         <Route path="store/branches/:branchId/tables" element={<Tables />} />
-        <Route path="marketing/website" element={<Website />} />
-        <Route path="marketing/qr-display" element={<QRDisplay />} />
+        <Route path="marketing/website" element={<WebsiteWrapper />} />
+        {/* <Route path="marketing/qr-display" element={<QRDisplay />} /> */}
         <Route path="upi-links" element={<UPILinks />} />
+        <Route
+          path="subscriptions"
+          element={<SubscriptionManagement />}
+        />
         <Route path="kds" element={<KitchenDisplaySystem />} />
+        <Route path="role-management" element={<AdminRoute><UserRoleManagement /></AdminRoute>} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
