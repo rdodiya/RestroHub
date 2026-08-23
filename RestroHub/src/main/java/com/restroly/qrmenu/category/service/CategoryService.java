@@ -18,6 +18,8 @@ public interface CategoryService {
 
 	public void deleteCategory(Long id);
 
+	public CategoryResponseDTO restoreCategory(Long id);
+
 	public Page<CategoryResponseDTO> getActiveCategories(Pageable pageable);
 
 }
