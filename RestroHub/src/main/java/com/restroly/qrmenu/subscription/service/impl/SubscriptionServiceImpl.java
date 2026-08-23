@@ -7,6 +7,7 @@ import com.restroly.qrmenu.subscription.entity.*;
 import com.restroly.qrmenu.subscription.repository.*;
 import com.restroly.qrmenu.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
+
+    @Value("${subscription.status.active}")
+    private String STATUS_ACTIVE;
+
+    @Value("${subscription.status.cancelled}")
+    private String STATUS_CANCELLED;
+
+    @Value("${subscription.status.expired}")
+    private String STATUS_EXPIRED;
 
     @Autowired
     private SubscriptionPlanRepository planRepository;
@@ -126,7 +136,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Optional<RestaurantSubscription> existingActive = restaurantSubscriptionRepository.findActiveSubscriptionByRestaurantId(restaurantId);
         if (existingActive.isPresent()) {
             RestaurantSubscription activeSub = existingActive.get();
-            activeSub.setStatus("CANCELLED");
+            activeSub.setStatus(STATUS_CANCELLED);
             activeSub.setEndDate(LocalDateTime.now());
             restaurantSubscriptionRepository.save(activeSub);
         }
@@ -139,7 +149,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .plan(plan)
                 .startDate(startDate)
                 .endDate(endDate)
-                .status("ACTIVE")
+                .status(STATUS_ACTIVE)
                 .isAutoRenew(request.getIsAutoRenew() != null ? request.getIsAutoRenew() : true)
                 .build();
 
