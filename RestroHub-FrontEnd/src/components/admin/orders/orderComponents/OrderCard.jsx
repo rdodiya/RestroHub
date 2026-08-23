@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Clock,
   ChefHat,
@@ -28,7 +28,7 @@ const OrderCard = ({ order, onStatusUpdate }) => {
       text: 'text-yellow-700',
       border: 'border-yellow-200',
       icon: Clock,
-      label: 'Pending',
+      label: "Pending",
     },
     CONFIRMED: {
       bg: 'bg-indigo-50',
@@ -49,7 +49,7 @@ const OrderCard = ({ order, onStatusUpdate }) => {
       text: 'text-green-700',
       border: 'border-green-200',
       icon: CheckCircle2,
-      label: 'Ready',
+      label: "Ready",
     },
     SERVED: {
       bg: 'bg-teal-50',
@@ -63,7 +63,14 @@ const OrderCard = ({ order, onStatusUpdate }) => {
       text: 'text-purple-700',
       border: 'border-purple-200',
       icon: Receipt,
-      label: 'Billed',
+      label: "Billed",
+    },
+    cancelled: {
+      bg: "bg-red-50",
+      text: "text-red-700",
+      border: "border-red-200",
+      icon: X,
+      label: "Cancelled",
     },
     COMPLETED: {
       bg: 'bg-gray-50',
@@ -102,37 +109,46 @@ const OrderCard = ({ order, onStatusUpdate }) => {
       label: 'Start Preparing',
       next: 'PREPARING',
       icon: ChefHat,
-      bg: 'bg-blue-50',
-      text: 'text-blue-700',
-      hoverBg: 'hover:bg-blue-100',
-      border: 'border border-blue-200',
+      bg: "bg-blue-50",
+      text: "text-blue-700",
+      hoverBg: "hover:bg-blue-100",
+      border: "border border-blue-200",
     },
     PREPARING: {
       label: 'Mark Ready',
       next: 'READY',
       icon: CheckCircle2,
-      bg: 'bg-green-50',
-      text: 'text-green-700',
-      hoverBg: 'hover:bg-green-100',
-      border: 'border border-green-200',
+      bg: "bg-green-50",
+      text: "text-green-700",
+      hoverBg: "hover:bg-green-100",
+      border: "border border-green-200",
     },
     READY: {
       label: 'Generate Bill',
       next: 'BILLED',
       icon: Receipt,
-      bg: 'bg-purple-50',
-      text: 'text-purple-700',
-      hoverBg: 'hover:bg-purple-100',
-      border: 'border border-purple-200',
+      bg: "bg-purple-50",
+      text: "text-purple-700",
+      hoverBg: "hover:bg-purple-100",
+      border: "border border-purple-200",
     },
     BILLED: {
       label: 'Complete Order',
       next: 'COMPLETED',
       icon: CreditCard,
-      bg: 'bg-gray-50',
-      text: 'text-gray-700',
-      hoverBg: 'hover:bg-gray-100',
-      border: 'border border-gray-200',
+      bg: "bg-gray-50",
+      text: "text-gray-700",
+      hoverBg: "hover:bg-gray-100",
+      border: "border border-gray-200",
+    },
+    cancelled: {
+      label: "Cancelled",
+      next: null,
+      icon: X,
+      bg: "bg-red-50",
+      text: "text-red-700",
+      hoverBg: "hover:bg-red-100",
+      border: "border border-red-200",
     },
   };
 
@@ -175,8 +191,29 @@ const OrderCard = ({ order, onStatusUpdate }) => {
 
       onStatusUpdate(order.id, action.next);
     } catch (err) {
-      console.error('Failed to update order:', err);
-      toast.error('Failed to update order');
+      console.error("Failed to update order:", err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to cancel this order?",
+    );
+    if (!isConfirmed) return;
+
+    try {
+      setUpdating(true);
+
+      // 🔌 UNCOMMENT WHEN API READY
+      // await api.put(`/api/orders/${order.id}/status`, { status: 'cancelled' });
+      // toast.success(`Order #${order.id} cancelled`);
+
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      onStatusUpdate(order.id, "cancelled");
+    } catch (err) {
+      console.error("Failed to cancel order:", err);
     } finally {
       setUpdating(false);
     }
@@ -197,7 +234,9 @@ const OrderCard = ({ order, onStatusUpdate }) => {
 
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-gray-900">Table {order.table}</span>
+              <span className="font-semibold text-gray-900">
+                Table {order.table}
+              </span>
               {/* Status Badge */}
               <span
                 className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.bg} ${status.text} border ${status.border}`}
@@ -247,24 +286,38 @@ const OrderCard = ({ order, onStatusUpdate }) => {
         {/* Total */}
         <div className="flex justify-between pt-2 border-t border-gray-100">
           <span className="font-semibold text-gray-900">Total</span>
-          <span className="font-bold text-lg text-gray-900">₹{order.amount}</span>
+          <span className="font-bold text-lg text-gray-900">
+            ₹{order.amount}
+          </span>
         </div>
       </div>
 
       {/* Action Button - NO WHITE TEXT */}
       {action && (
-        <button
-          onClick={handleAction}
-          disabled={updating}
-          className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold disabled:opacity-50 ${action.bg} ${action.text} ${action.hoverBg} ${action.border}`}
-        >
-          {updating ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <action.icon className="w-4 h-4" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleAction}
+            disabled={updating}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold disabled:opacity-50 ${action.bg} ${action.text} ${action.hoverBg} ${action.border}`}
+          >
+            {updating ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <action.icon className="w-4 h-4" />
+            )}
+            {action.label}
+          </button>
+          {order.status === "pending" && (
+            <button
+              onClick={handleCancel}
+              disabled={updating}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 disabled:opacity-50"
+            >
+              <X className="w-4 h-4" />
+              Cancel
+            </button>
           )}
-          {action.label}
-        </button>
+        </div>
       )}
     </div>
   );
