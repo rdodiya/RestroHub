@@ -1,9 +1,16 @@
 package com.restroly.qrmenu.template.dto;
 
+import com.restroly.qrmenu.template.entity.SectionType;
+import com.restroly.qrmenu.template.entity.SiteConfig;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -15,21 +22,12 @@ import java.util.Map;
 public class SectionDTO {
 
     private Long id;
-    private String sectionKey;
-    private String sectionType;
-    private String reactComponentName;
+    private SectionType sectionKey;
     private Integer displayOrder;
-    private String title;
-    private String subtitle;
+    private Boolean isVisible = true;
     private Map<String, Object> content;
-    private Map<String, Object> settings;
-    private Map<String, Object> styleOverrides;
-    private String backgroundImage;
-    private String backgroundColor;
-    private Boolean isVisible;
-    private Boolean isFullWidth;
-    private String paddingTop;
-    private String paddingBottom;
+    private Map<String, Object> styles;
+    private SiteConfigDTO siteConfig;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

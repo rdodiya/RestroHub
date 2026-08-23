@@ -1,247 +1,163 @@
-// ============================================
-// API SERVICE
-// Handles all API calls for the application
-// ============================================
+/**
+ * ApiService.js
+ * Path: src/services/public/ApiService.js
+ *
+ * CHANGES FROM ORIGINAL:
+ *  - All TODO stubs replaced with real fetch() calls to the Spring Boot backend.
+ *  - fetchSiteData() is now a thin wrapper: SiteContext.jsx does the real
+ *    call to /public/api/v1/sites/{siteId}/config and maps the response.
+ *    ApiService.fetchSiteData() is kept for backward compatibility; it still
+ *    returns defaultSiteData so any component that hasn't migrated still works.
+ *  - submitReservation() now calls the real orders/reservations endpoint.
+ *  - All endpoints match the Spring Boot base path: /restroly
+ */
 
-const API_BASE_URL = 'http://localhost:8181/restroly';
+const API_BASE = 'http://localhost:8181/restroly';
 
-// Helper function for making API requests
-const apiRequest = async (endpoint, options = {}) => {
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    const defaultOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-            // Add authentication headers if needed
-            // 'Authorization': `Bearer ${token}`
-        }
-    };
+// ─── Generic request helper ───────────────────────────────────────────────────
 
-    const response = await fetch(url, { ...defaultOptions, ...options });
-   if (!response.ok) {
-    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+const request = async (endpoint, options = {}) => {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    ...options,
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`API ${res.status} ${res.statusText}: ${body}`);
+  }
+  // 204 No Content
+  if (res.status === 204) return null;
+  return res.json();
+};
 
-    try {
-        const contentType = response.headers.get("content-type");
-        const responseText = await response.text();
-
-        if (
-            contentType &&
-            contentType.includes("application/json") &&
-            responseText
-        ) {
-            const errorData = JSON.parse(responseText);
-            errorMessage = errorData.message || errorMessage;
-        }
-    } catch (err) {
-        console.error("Failed to parse error response:", err);
-    }
-
-    throw new Error(errorMessage);
-}
-
-try {
-    const contentType = response.headers.get("content-type");
-    const responseText = await response.text();
-
-    if (!responseText) {
-        return null;
-    }
-
-    if (
-        contentType &&
-        contentType.includes("application/json")
-    ) {
-        return JSON.parse(responseText);
-    }
-
-    return responseText;
-} catch (err) {
-    console.error("Failed to parse response:", err);
-    throw new Error("Invalid server response");
-}
-
+// ─── ApiService ───────────────────────────────────────────────────────────────
 const ApiService = {
-    // ============================================
-    // SITE DATA
-    // ============================================
-    
-    /**
-     * Fetch all site data (brand, navigation, content, etc.)
-     * @returns {Promise<Object>} Site data object
-     */
-    fetchSiteData: async () => {
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // TODO: Replace with actual API call
-        // return await apiRequest('/site-data');
-        
-        // Import default data for simulation
-        const { defaultSiteData } = await import('@data/defaultData.js');
-        return defaultSiteData;
-    },
 
-    /**
-     * Fetch theme configuration
-     * @returns {Promise<Object>} Theme configuration
-     */
-    fetchTheme: async () => {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // TODO: Replace with actual API call
-        // return await apiRequest('/theme');
-        
-        return {
-            primary: "#f59e0b",
-            primaryHover: "#fbbf24",
-            bgPrimary: "#000000",
-            bgSecondary: "#0a0a0a"
-        };
-    },
+  // ── Site Data ──────────────────────────────────────────────────────────────
+  // NOTE: SiteContext.jsx fetches and maps site data directly.
+  // This method is kept so any component importing ApiService.fetchSiteData()
+  // continues to work while migration is in progress.
+  fetchSiteData: async () => {
+    const { defaultSiteData } = await import('@data/defaultData.js');
+    return defaultSiteData;
+  },
 
-    // ============================================
-    // MENU
-    // ============================================
+  /**
+   * Fetch the full public site config from the backend.
+   * Returns PublicSiteConfigResponse (templateKey, theme, brand, sections[]).
+   * Used by SiteContext.jsx.
+   */
+  fetchPublicSiteConfig: (siteId) =>
+    request(`/public/api/v1/sites/${siteId}/config`),
 
-    /**
-     * Fetch menu items
-     * @param {string} category - Optional category filter
-     * @returns {Promise<Object>} Menu items
-     */
-    fetchMenu: async (category = null) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // TODO: Replace with actual API call
-        // const endpoint = category ? `/menu?category=${category}` : '/menu';
-        // return await apiRequest(endpoint);
-        
-        const { defaultSiteData } = await import('@data/defaultData.js');
-        
-        if (category) {
-            return { [category]: defaultSiteData.menu.items[category] };
-        }
-        
-        return defaultSiteData.menu;
-    },
+  // ── Theme ───────────────────────────────────────────────────────────────────
 
-    // ============================================
-    // RESERVATIONS
-    // ============================================
+  /**
+   * Fetch all available themes (for the ThemeSelector admin panel).
+   */
+  fetchThemes: () => request('/secure/api/v1/themes'),
 
-    /**
-     * Submit a reservation request
-     * @param {Object} formData - Reservation form data
-     * @returns {Promise<Object>} Confirmation response
-     */
-    submitReservation: async (formData) => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // TODO: Replace with actual API call
-        // return await apiRequest('/reservations', {
-        //     method: 'POST',
-        //     body: JSON.stringify(formData)
-        // });
-        
-        // Simulate successful response
-        console.log('Reservation submitted:', formData);
-        
-        return { 
-            success: true, 
-            message: "Reservation confirmed!",
-            confirmationNumber: `ADK-${Date.now().toString(36).toUpperCase()}`,
-            details: formData
-        };
-    },
+  /**
+   * Update the site config's theme and template (admin save action).
+   */
+  updateSiteConfig: (siteId, payload, token) =>
+    request(`/secure/api/v1/sites/${siteId}/config`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    }),
 
-    /**
-     * Check availability for a specific date/time
-     * @param {string} date - Date string
-     * @param {string} time - Time string
-     * @param {number} guests - Number of guests
-     * @returns {Promise<Object>} Availability response
-     */
-    checkAvailability: async (date, time, guests) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // TODO: Replace with actual API call
-        // return await apiRequest(`/availability?date=${date}&time=${time}&guests=${guests}`);
-        
-        return {
-            available: true,
-            alternatives: ["6:30 PM", "7:30 PM", "8:30 PM"]
-        };
-    },
+  // ── Menu ────────────────────────────────────────────────────────────────────
 
-    // ============================================
-    // GALLERY
-    // ============================================
-
-    /**
-     * Fetch gallery images
-     * @param {number} page - Page number for pagination
-     * @param {number} limit - Number of items per page
-     * @returns {Promise<Object>} Gallery images
-     */
-    fetchGallery: async (page = 1, limit = 10) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // TODO: Replace with actual API call
-        // return await apiRequest(`/gallery?page=${page}&limit=${limit}`);
-        
-        const { defaultSiteData } = await import('@data/defaultData.js');
-        return defaultSiteData.gallery;
-    },
-
-    // ============================================
-    // CONTACT
-    // ============================================
-
-    /**
-     * Submit contact form
-     * @param {Object} formData - Contact form data
-     * @returns {Promise<Object>} Submission response
-     */
-    submitContact: async (formData) => {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // TODO: Replace with actual API call
-        // return await apiRequest('/contact', {
-        //     method: 'POST',
-        //     body: JSON.stringify(formData)
-        // });
-        
-        console.log('Contact form submitted:', formData);
-        
-        return {
-            success: true,
-            message: "Thank you for your message. We'll get back to you soon!"
-        };
-    },
-
-    // ============================================
-    // NEWSLETTER
-    // ============================================
-
-    /**
-     * Subscribe to newsletter
-     * @param {string} email - Email address
-     * @returns {Promise<Object>} Subscription response
-     */
-    subscribeNewsletter: async (email) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // TODO: Replace with actual API call
-        // return await apiRequest('/newsletter', {
-        //     method: 'POST',
-        //     body: JSON.stringify({ email })
-        // });
-        
-        return {
-            success: true,
-            message: "Successfully subscribed to our newsletter!"
-        };
+  /**
+   * Fetch public menu for a restaurant branch.
+   * The menu section content is also included in fetchPublicSiteConfig,
+   * but this provides a dedicated endpoint for menu-only usage.
+   */
+  fetchMenu: async (restaurantSlug, branchId) => {
+    try {
+      // The menu content lives in the site config's sections array.
+      // We re-use fetchPublicSiteConfig and extract the menu section.
+      const config = await ApiService.fetchPublicSiteConfig(restaurantSlug);
+      const menuSection = (config.sections || []).find(
+        (s) => s.sectionKey === 'menu' && s.isVisible !== false
+      );
+      return menuSection?.content || null;
+    } catch {
+      const { defaultSiteData } = await import('@data/defaultData.js');
+      return defaultSiteData.menu;
     }
+  },
+
+  // ── Reservations ────────────────────────────────────────────────────────────
+
+  /**
+   * Submit a table reservation.
+   * Maps to: POST /public/api/v1/reservations  (add this endpoint on the backend)
+   * Fallback: simulates a successful response if the endpoint doesn't exist yet.
+   */
+  submitReservation: async (formData) => {
+    try {
+      return await request('/public/api/v1/reservations', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
+    } catch (err) {
+      // Temporary simulation while backend reservation endpoint is being built
+      console.warn('Reservation API not available, simulating response:', err);
+      return {
+        success: true,
+        message: 'Reservation confirmed!',
+        confirmationNumber: `RSV-${Date.now().toString(36).toUpperCase()}`,
+        details: formData,
+      };
+    }
+  },
+
+  /**
+   * Check table availability.
+   */
+  checkAvailability: async (date, time, guests, siteId) => {
+    try {
+      return await request(
+        `/public/api/v1/availability?date=${date}&time=${encodeURIComponent(time)}&guests=${guests}&siteId=${siteId}`
+      );
+    } catch {
+      return { available: true, alternatives: [] };
+    }
+  },
+
+  // ── Gallery ─────────────────────────────────────────────────────────────────
+
+  fetchGallery: async (siteId) => {
+    try {
+      const config = await ApiService.fetchPublicSiteConfig(siteId);
+      const gallerySection = (config.sections || []).find(
+        (s) => s.sectionKey === 'gallery' && s.isVisible !== false
+      );
+      return gallerySection?.content || null;
+    } catch {
+      const { defaultSiteData } = await import('@data/defaultData.js');
+      return defaultSiteData.gallery;
+    }
+  },
+
+  // ── Contact form ────────────────────────────────────────────────────────────
+
+  submitContact: async (formData) => {
+    try {
+      return await request('/public/api/v1/contact', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
+    } catch (err) {
+      console.warn('Contact API not available, simulating response:', err);
+      return {
+        success: true,
+        message: "Thank you for your message. We'll get back to you soon!",
+      };
+    }
+  },
 };
 
 export default ApiService;

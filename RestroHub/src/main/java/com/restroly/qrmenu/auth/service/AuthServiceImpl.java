@@ -4,7 +4,10 @@ import com.restroly.qrmenu.auth.dto.AuthResponse;
 import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
 import com.restroly.qrmenu.exception.BusinessException;
+import com.restroly.qrmenu.restaurant.entity.Restaurant;
+import com.restroly.qrmenu.restaurant.service.RestaurantService;
 import com.restroly.qrmenu.security.JwtTokenProvider;
+import com.restroly.qrmenu.user.entity.UserRoleRestaurant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +28,7 @@ import com.restroly.qrmenu.user.repository.UserRepository;
 import com.restroly.qrmenu.user.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final RestaurantService restaurantService;
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
@@ -60,9 +65,9 @@ public class AuthServiceImpl implements AuthService {
             String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
             String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
 
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
+            List<String> roles = userRepository.findByEmailWithUserRoleRestaurants(userDetails.getUsername()).
+                    get().getUserRoleRestaurants().stream().map(UserRoleRestaurant::getRole)
+                    .map(Role::getName).distinct().collect(Collectors.toList());
 
             log.info("User {} logged in successfully", loginRequest.getUsername());
 
@@ -150,7 +155,20 @@ public class AuthServiceImpl implements AuthService {
         Role customerRole = roleRepository.findByName("CUSTOMER")
                 .orElseThrow(() -> new RuntimeException("Default CUSTOMER role not found"));
 
-        user.setRoles(new ArrayList<>(Collections.singletonList(customerRole)));
+        UserRoleRestaurant userRoleRestaurant = UserRoleRestaurant.builder()
+                .role(customerRole)
+                .user(user)
+                .restaurant(
+                        restaurantService.getRestaurantByNameEntity(
+                                registerRequest.getRestaurantName()
+                        )
+                )
+                .build();
+        if (user.getUserRoleRestaurants() == null) {
+            user.setUserRoleRestaurants(new HashSet<>());
+        }
+
+        user.getUserRoleRestaurants().add(userRoleRestaurant);
 
         userRepository.save(user);
 

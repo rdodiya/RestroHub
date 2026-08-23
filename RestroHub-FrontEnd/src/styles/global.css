@@ -331,3 +331,34 @@ input[type="password"]::-ms-clear {
 .dark .admin-content .text-gray-500 {
     color: rgb(209 213 219) !important; /* gray-300 */
 }
+
+.admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]),
+.admin-content textarea,
+.admin-content select {
+    background-color: rgb(255 255 255);
+    border-color: rgb(209 213 219);
+    color: rgb(17 24 39);
+}
+
+.admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"])::placeholder,
+.admin-content textarea::placeholder {
+    color: rgb(107 114 128);
+}
+
+.dark .admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]),
+.dark .admin-content textarea,
+.dark .admin-content select {
+    background-color: rgb(17 24 39) !important;
+    border-color: rgb(75 85 99) !important;
+    color: rgb(243 244 246) !important;
+}
+
+.dark .admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"])::placeholder,
+.dark .admin-content textarea::placeholder {
+    color: rgb(156 163 175) !important;
+}
+
+.dark .admin-content select option {
+    background-color: rgb(17 24 39);
+    color: rgb(243 244 246);
+}
