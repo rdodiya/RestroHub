@@ -280,7 +280,7 @@ public class UserController {
                 "exists", exists
         ));
     }
-
+    
     @GetMapping("/fetchRestaurantId")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> fetchRestaurantId() {

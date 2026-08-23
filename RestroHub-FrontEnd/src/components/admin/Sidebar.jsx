@@ -97,7 +97,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
           allowedRoles: FULL_ADMIN_ROLES,
           children: [
             { name: 'Website', path: '/admin/marketing/website', icon: Globe, allowedRoles: FULL_ADMIN_ROLES },
-            { name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode, allowedRoles: FULL_ADMIN_ROLES },
+            //{ name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode, allowedRoles: FULL_ADMIN_ROLES },
           ],
         },
       ],
