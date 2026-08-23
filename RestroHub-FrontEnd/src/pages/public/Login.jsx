@@ -4,11 +4,16 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { GoogleLogin } from "@react-oauth/google";
 import { ArrowLeft } from "lucide-react";
 import api from "@services/common/api";
+import {
+  clearRememberedUsername,
+  getRememberedUsername,
+  setRememberedUsername,
+  storeAuthSession,
+} from "@services/common/authStorage";
 import { useTheme } from "@context/ThemeContext";
 
 const API_BASE_URL =
@@ -16,12 +21,9 @@ const API_BASE_URL =
 
 const validationSchema = Yup.object({
   username: Yup.string().required("Email or username is required"),
-  password: Yup.string()
-    .required("Password is required")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?`~]).{8,}$/,
-      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
-    ),
+  // Login should only require a password to be present; strict complexity
+  // rules are enforced at registration. Keep login validation permissive.
+  password: Yup.string().required("Password is required"),
 });
 
 /* ──────────────────── SVG Icons (inlined) ──────────────────── */
@@ -157,9 +159,14 @@ const Login = () => {
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const rememberedUsername = getRememberedUsername();
 
   const formik = useFormik({
-    initialValues: { username: "", password: "" },
+    initialValues: {
+      username: rememberedUsername,
+      password: "",
+      rememberMe: Boolean(rememberedUsername),
+    },
     validationSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
@@ -172,15 +179,23 @@ const Login = () => {
         if (result.success) {
           const { accessToken, refreshToken, roles } = result.data;
 
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
-          localStorage.setItem("roles", JSON.stringify(roles));
+          storeAuthSession(
+            { accessToken, refreshToken, roles },
+            values.rememberMe
+          );
 
-          axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+          if (values.rememberMe) {
+            setRememberedUsername(values.username);
+          } else {
+            clearRememberedUsername();
+          }
+
+          api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
           toast.success("Login successful!");
 
-          navigate("/admin/dashboard");
+          const redirectPath = roles && roles.includes("ADMIN") ? "/admin/dashboard" : "/";
+          navigate(redirectPath);
         } else {
           toast.error(result.message || "Login failed");
         }
@@ -193,6 +208,15 @@ const Login = () => {
       }
     },
   });
+
+  const handleRememberMeChange = (event) => {
+    const checked = event.target.checked;
+    formik.setFieldValue("rememberMe", checked);
+
+    if (!checked) {
+      clearRememberedUsername();
+    }
+  };
 
 const handleGoogleLogin = async (credentialResponse) => {
   try {
@@ -207,15 +231,17 @@ const handleGoogleLogin = async (credentialResponse) => {
     if (result.success) {
       const { accessToken, refreshToken, roles } = result.data;
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("roles", JSON.stringify(roles));
+      storeAuthSession(
+        { accessToken, refreshToken, roles },
+        formik.values.rememberMe
+      );
 
-      axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
       toast.success("Google login successful!");
 
-      navigate("/admin/dashboard");
+      const redirectPath = roles && roles.includes("ADMIN") ? "/admin/dashboard" : "/";
+          navigate(redirectPath);
     } else {
       toast.error(result.message || "Google login failed");
     }
@@ -322,7 +348,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       id="username"
                       name="username"
                       type="text"
-                      autoComplete="off"
+                      autoComplete="username"
                       placeholder="Enter email or username"
                       value={formik.values.username}
                       onChange={formik.handleChange}
@@ -351,7 +377,7 @@ const handleGoogleLogin = async (credentialResponse) => {
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      autoComplete="new-password"
+                      autoComplete="current-password"
                       placeholder="Minimum 8 characters; include uppercase, lowercase, number, special character"
                       disabled={isLoading}
                       value={formik.values.password}
@@ -374,8 +400,19 @@ const handleGoogleLogin = async (credentialResponse) => {
                   )}
                 </div>
 
-                {/* Forgot password */}
-                <div className="mb-6 flex justify-end">
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <input
+                      id="rememberMe"
+                      name="rememberMe"
+                      type="checkbox"
+                      checked={formik.values.rememberMe}
+                      onChange={handleRememberMeChange}
+                      disabled={isLoading}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    />
+                    Remember me
+                  </label>
                   <Link
                     to="/forgot-password"
                     className="text-sm text-blue-600 hover:underline dark:text-blue-400"

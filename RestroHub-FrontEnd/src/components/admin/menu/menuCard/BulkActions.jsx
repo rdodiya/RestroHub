@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Copy, EyeOff, RefreshCw, Download, Loader2 } from 'lucide-react';
 import api from "@services/common/api";
+import toast from 'react-hot-toast';
 
 const BulkActions = ({ onRefresh }) => {
   const [loadingAction, setLoadingAction] = useState(null);
@@ -21,6 +22,7 @@ const BulkActions = ({ onRefresh }) => {
       onRefresh?.();
     } catch (err) {
       console.error('Failed to copy menu:', err);
+      toast.error('Failed to copy menu');
     } finally {
       setLoadingAction(null);
     }
@@ -38,6 +40,7 @@ const BulkActions = ({ onRefresh }) => {
       onRefresh?.();
     } catch (err) {
       console.error('Failed to hide items:', err);
+      toast.error('Failed to hide items');
     } finally {
       setLoadingAction(null);
     }
@@ -59,6 +62,7 @@ const BulkActions = ({ onRefresh }) => {
       console.log('Export menu');
     } catch (err) {
       console.error('Failed to export:', err);
+      toast.error('Failed to export');
     } finally {
       setLoadingAction(null);
     }

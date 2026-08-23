@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import api from "@services/common/api";
 import { useAdminTheme } from '@context/AdminThemeContext';
+import toast from 'react-hot-toast';
 // import { useNavigate } from 'react-router-dom';  // if using react-router
 
 // ============================================
@@ -51,6 +52,7 @@ const QuickActions = () => {
       console.log('Navigate to new order page');
     } catch (err) {
       console.error('Failed to create order:', err);
+      toast.error('Failed to create order');
     } finally {
       setLoadingAction(null);
     }
@@ -68,6 +70,7 @@ const QuickActions = () => {
       console.log('All orders marked ready');
     } catch (err) {
       console.error('Failed to mark orders:', err);
+      toast.error('Failed to mark orders');
     } finally {
       setLoadingAction(null);
     }
@@ -91,6 +94,7 @@ const QuickActions = () => {
       console.log('WhatsApp broadcast sent');
     } catch (err) {
       console.error('Failed to send broadcast:', err);
+      toast.error('Failed to send broadcast');
     } finally {
       setLoadingAction(null);
     }
@@ -112,6 +116,7 @@ const QuickActions = () => {
       console.log('Report exported');
     } catch (err) {
       console.error('Failed to export report:', err);
+      toast.error('Failed to export report');
     } finally {
       setLoadingAction(null);
     }

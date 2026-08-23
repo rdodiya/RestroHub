@@ -4,6 +4,7 @@ import api from '@services/common/api';
 import TableCard from './TableCard';
 import AdminSkeleton from '../../AdminSkeleton';
 import { normalizeTable } from './tableMapper';
+import toast from 'react-hot-toast';
 
 const TablesGrid = ({ branchId, onShowQR, onEdit, onTablesLoaded, refreshKey }) => {
   const [tables, setTables] = useState([]);
@@ -32,6 +33,7 @@ const TablesGrid = ({ branchId, onShowQR, onEdit, onTablesLoaded, refreshKey }) 
       onTablesLoaded?.(tableList);
     } catch (err) {
       console.error('Fetch failed:', err);
+      toast.error('Fetch failed');
       setError('Failed to load tables');
       setTables([]);
       onTablesLoaded?.([]);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Download, QrCode, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const QRHeader = () => {
   const [downloading, setDownloading] = useState(false);
@@ -12,6 +13,7 @@ const QRHeader = () => {
       console.log('Download all QRs');
     } catch (err) {
       console.error('Download failed:', err);
+      toast.error('Download failed');
     } finally {
       setDownloading(false);
     }

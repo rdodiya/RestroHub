@@ -51,7 +51,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponse getRoleById(Long id) {
         log.info("Fetching role with ID: {}", id);
 
-        Role role = roleRepository.findByIdWithUsers(id)
+        Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
 
         return mapToResponseWithUserCount(role);
@@ -121,13 +121,13 @@ public class RoleServiceImpl implements RoleService {
     public void deleteRole(Long id) {
         log.info("Deleting role with ID: {}", id);
 
-        Role role = roleRepository.findByIdWithUsers(id)
+        Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
 
         // Check if role is assigned to any users
         long userCount = roleRepository.countUsersByRoleId(id);
         if (userCount > 0) {
-            //FIXED: was IllegalStateException — now BusinessException (409 CONFLICT)
+            // FIXED: was IllegalStateException — now BusinessException (409 CONFLICT)
             throw new BusinessException(
                     "Cannot delete role. It is assigned to " + userCount + " user(s)",
                     HttpStatus.CONFLICT,

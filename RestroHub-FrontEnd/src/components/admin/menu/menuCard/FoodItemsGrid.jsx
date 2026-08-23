@@ -3,6 +3,7 @@ import { Search, RefreshCw, AlertCircle, UtensilsCrossed, ChevronLeft, ChevronRi
 import MenuItemCard from './FoodItemCard';
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
+import toast from 'react-hot-toast';
 
 const PAGE_SIZE = 9;
 
@@ -88,6 +89,7 @@ const MenuItemsGrid = forwardRef(({ selectedCategory, onEditItem }, ref) => {
       });
     } catch (err) {
       console.error('Failed to fetch menu:', err.response?.data || err);
+      toast.error('Failed to fetch menu');
       setError(err.response?.data?.message || 'Failed to load menu items');
       setMenuItems([]);
       setPageInfo({ totalElements: 0, totalPages: 0, first: true, last: true });

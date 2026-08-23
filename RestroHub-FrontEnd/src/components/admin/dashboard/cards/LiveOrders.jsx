@@ -11,6 +11,7 @@ import {
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import toast from 'react-hot-toast';
 
 // ============================================
 // STATUS BADGE (Private to this file)
@@ -107,6 +108,7 @@ const LiveOrders = () => {
 
     } catch (err) {
       console.error('Failed to fetch orders:', err);
+      toast.error('Failed to fetch orders');
       setError('Failed to load orders');
       setOrders(fallbackOrders);
     } finally {

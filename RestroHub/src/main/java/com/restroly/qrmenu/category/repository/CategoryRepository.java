@@ -1,6 +1,7 @@
 package com.restroly.qrmenu.category.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,5 +16,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 	List<Category> findByMenu_MenuId(long menuId);
 
 	Page<Category> findByIsDeleteFalse(Pageable pageable);
+
+	List<Category> findByNameInAndIsDeleteFalse(Set<String> names);
 
 }

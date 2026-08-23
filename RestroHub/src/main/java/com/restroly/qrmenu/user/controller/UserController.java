@@ -4,6 +4,7 @@ import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
 import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
+import com.restroly.qrmenu.user.entity.User;
 import com.restroly.qrmenu.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,14 +18,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.token.Token;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.restroly.qrmenu.common.util.ApiConstants.SECURE_API_VERSION;
+
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping(SECURE_API_VERSION + "/users")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "User Management", description = "APIs for user management")
@@ -272,6 +278,29 @@ public class UserController {
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "exists", exists
+        ));
+    }
+    
+    @GetMapping("/fetchRestaurantId")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> fetchRestaurantId() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Usually this is the email if you set it while creating the Authentication object
+        String email = authentication.getName();
+
+        User user = userService.getUserByEmailEntity(email);
+
+        String restaurantId = user.getUserRoleRestaurants()
+                .stream()
+                .map(urr -> urr.getRestaurant().getName())
+                .findFirst()
+                .orElse(null);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "data", restaurantId
         ));
     }
 }

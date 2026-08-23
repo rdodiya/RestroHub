@@ -18,6 +18,8 @@ import { useAdminTheme } from '@context/AdminThemeContext';
 import profileService from '../../services/user/profileService';
 import useWebSocketNotifications from '@hooks/useWebSocketNotifications';
 import api from '../../services/common/api';
+import toast from 'react-hot-toast';
+import { clearAuthSession } from '../../services/common/authStorage';
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -40,10 +42,9 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
     await api.post('/public/api/v1/auth/logout');  //handles logout on backend and invalidates refresh token
   } catch (error) {
     console.error('Logout API failed:', error);  //catches errors if API call breaks
+    toast.error('Logout API failed');
   } finally {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('roles');
+    clearAuthSession();
 
     if (api?.defaults?.headers?.common?.Authorization) {  //cleans up axios default auth header if it exists
       delete api.defaults.headers.common.Authorization;
@@ -79,6 +80,7 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
         });
       } catch (error) {
         console.error('Failed to fetch user for header:', error);
+        toast.error('Failed to fetch user for header');
       }
     };
     fetchUser();

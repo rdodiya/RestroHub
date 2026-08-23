@@ -12,6 +12,7 @@ import {
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import toast from 'react-hot-toast';
 
 // ============================================
 // MAIN COMPONENT (Exported)
@@ -57,6 +58,7 @@ const RevenueChart = () => {
 
     } catch (err) {
       console.error('Failed to fetch revenue:', err);
+      toast.error('Failed to fetch revenue');
       setError('Failed to load chart');
       setData(fallbackData);
     } finally {

@@ -22,6 +22,7 @@ const ReservationsSection = () => {
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState(null);
     const [confirmationNumber, setConfirmationNumber] = useState(null);
+    const [fieldErrors, setFieldErrors] = useState({});
 
     if (!siteData) return null;
 
@@ -37,6 +38,26 @@ const ReservationsSection = () => {
         e.preventDefault();
         setSubmitting(true);
         setError(null);
+        setFieldErrors({});
+
+        // Client-side validation
+        const errors = {};
+        if (!formData.name.trim()) errors.name = 'Name is required';
+        if (!formData.email.trim()) errors.email = 'Email is required';
+        else if (!/^\S+@\S+\.\S+$/.test(formData.email)) errors.email = 'Enter a valid email address';
+        if (!formData.phone.trim()) errors.phone = 'Phone number is required';
+        else if (!/^\+?[0-9\s-]{7,15}$/.test(formData.phone)) errors.phone = 'Enter a valid phone number';
+        if (!formData.date) errors.date = 'Select a date';
+        else if (new Date(formData.date) < new Date(getMinDate())) errors.date = 'Date cannot be in the past';
+        if (!formData.time) errors.time = 'Select a time slot';
+        if (!formData.guests) errors.guests = 'Select number of guests';
+
+        if (Object.keys(errors).length) {
+            setFieldErrors(errors);
+            setError('Please fix the highlighted fields and try again.');
+            setSubmitting(false);
+            return;
+        }
 
         try {
             const response = await ApiService.submitReservation(formData);
@@ -53,6 +74,7 @@ const ReservationsSection = () => {
                     guests: '',
                     requests: ''
                 });
+                setFieldErrors({});
             }
         } catch (err) {
             setError('Failed to submit reservation. Please try again.');
@@ -123,60 +145,117 @@ const ReservationsSection = () => {
                         )}
 
                         <div className="form-row">
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                placeholder="Your Name *"
-                                required
-                                className="input"
-                            />
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Email Address *"
-                                required
-                                className="input"
-                            />
+                            <div>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Your Name *"
+                                    aria-required="true"
+                                    aria-invalid={fieldErrors.name ? "true" : "false"}
+                                    aria-describedby={fieldErrors.name ? "err-name" : undefined}
+                                    className={`${fieldErrors.name ? 'border-red-500' : ''} input`}
+                                />
+                                {fieldErrors.name && (
+                                    <p id="err-name" className="mt-1.5 text-xs text-red-500">{fieldErrors.name}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="Email Address *"
+                                    aria-required="true"
+                                    aria-invalid={fieldErrors.email ? "true" : "false"}
+                                    aria-describedby={fieldErrors.email ? "err-email" : undefined}
+                                    className={`${fieldErrors.email ? 'border-red-500' : ''} input`}
+                                />
+                                {fieldErrors.email && (
+                                    <p id="err-email" className="mt-1.5 text-xs text-red-500">{fieldErrors.email}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    placeholder="Phone Number *"
+                                    aria-required="true"
+                                    aria-invalid={fieldErrors.phone ? "true" : "false"}
+                                    aria-describedby={fieldErrors.phone ? "err-phone" : undefined}
+                                    className={`${fieldErrors.phone ? 'border-red-500' : ''} input`}
+                                />
+                                {fieldErrors.phone && (
+                                    <p id="err-phone" className="mt-1.5 text-xs text-red-500">{fieldErrors.phone}</p>
+                                )}
+                            </div>
                         </div>
 
                         <div className="form-row form-row-3">
-                            <input
-                                type="date"
-                                name="date"
-                                value={formData.date}
-                                onChange={handleChange}
-                                min={getMinDate()}
-                                required
-                                className="input"
-                            />
-                            <select
-                                name="time"
-                                value={formData.time}
-                                onChange={handleChange}
-                                required
-                                className="input"
-                            >
-                                <option value="">Select Time *</option>
-                                {reservations.timeSlots.map((time, index) => (
-                                    <option key={index} value={time}>{time}</option>
-                                ))}
-                            </select>
-                            <select
-                                name="guests"
-                                value={formData.guests}
-                                onChange={handleChange}
-                                required
-                                className="input"
-                            >
-                                <option value="">Guests *</option>
-                                {reservations.guestOptions.map((option, index) => (
-                                    <option key={index} value={option}>{option}</option>
-                                ))}
-                            </select>
+                            <div>
+                                <input
+                                    type="date"
+                                    name="date"
+                                    value={formData.date}
+                                    onChange={handleChange}
+                                    min={getMinDate()}
+                                    aria-required="true"
+                                    aria-invalid={fieldErrors.date ? "true" : "false"}
+                                    aria-describedby={fieldErrors.date ? "err-date" : undefined}
+                                    className={`${fieldErrors.date ? 'border-red-500' : ''} input`}
+                                />
+                                {fieldErrors.date && (
+                                    <p id="err-date" className="mt-1.5 text-xs text-red-500">{fieldErrors.date}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <select
+                                    name="time"
+                                    value={formData.time}
+                                    onChange={handleChange}
+                                    aria-required="true"
+                                    aria-invalid={fieldErrors.time ? "true" : "false"}
+                                    aria-describedby={fieldErrors.time ? "err-time" : undefined}
+                                    className={`${fieldErrors.time ? 'border-red-500' : ''} input`}
+                                >
+                                    <option value="">Select Time *</option>
+                                    {reservations.timeSlots.map((time, index) => (
+                                        <option key={index} value={time}>{time}</option>
+                                    ))}
+                                </select>
+                                {fieldErrors.time && (
+                                    <p id="err-time" className="mt-1.5 text-xs text-red-500">{fieldErrors.time}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <select
+                                    name="guests"
+                                    value={formData.guests}
+                                    onChange={handleChange}
+                                    aria-required="true"
+                                    aria-invalid={fieldErrors.guests ? "true" : "false"}
+                                    aria-describedby={fieldErrors.guests ? "err-guests" : undefined}
+                                    className={`${fieldErrors.guests ? 'border-red-500' : ''} input`}
+                                >
+                                    <option value="">Guests *</option>
+                                    {reservations.guestOptions.map((option, index) => (
+                                        <option key={index} value={option}>{option}</option>
+                                    ))}
+                                </select>
+                                {fieldErrors.guests && (
+                                    <p id="err-guests" className="mt-1.5 text-xs text-red-500">{fieldErrors.guests}</p>
+                                )}
+                            </div>
                         </div>
 
                         <textarea
@@ -218,7 +297,8 @@ const ReservationsSection = () => {
                     inset: 0;
                     background-size: cover;
                     background-position: center;
-                    opacity: 0.2;
+                    opacity: 0.18;
+                    pointer-events: none;
                 }
 
                 .reservations-container {
@@ -239,19 +319,24 @@ const ReservationsSection = () => {
                 }
 
                 .reservations-description {
-                    color: var(--color-text-secondary);
                     margin-top: var(--spacing-md);
+                    color: var(--color-text-secondary);
+                    line-height: 1.8;
                 }
 
                 .reservations-form {
                     display: flex;
                     flex-direction: column;
                     gap: var(--spacing-md);
+                    background: var(--color-bg-primary);
+                    border: 1px solid var(--color-border-primary);
+                    padding: var(--spacing-xl);
                 }
 
                 @media (min-width: 768px) {
                     .reservations-form {
                         gap: var(--spacing-lg);
+                        padding: var(--spacing-2xl);
                     }
                 }
 
@@ -272,17 +357,17 @@ const ReservationsSection = () => {
                 }
 
                 .form-error {
-                    background: rgba(239, 68, 68, 0.1);
-                    border: 1px solid #ef4444;
-                    color: #ef4444;
                     padding: var(--spacing-md);
-                    border-radius: var(--radius-sm);
                     text-align: center;
+                    color: var(--color-primary);
+                    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+                    border: 1px solid var(--color-primary);
+                    border-radius: var(--radius-sm);
                 }
 
                 textarea.input {
-                    resize: none;
-                    min-height: 120px;
+                    resize: vertical;
+                    min-height: 140px;
                 }
 
                 .reservations-submit {
@@ -291,6 +376,11 @@ const ReservationsSection = () => {
                     align-items: center;
                     justify-content: center;
                     gap: var(--spacing-sm);
+                }
+
+                .reservations-submit:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
                 }
 
                 .btn-loader {
@@ -302,11 +392,27 @@ const ReservationsSection = () => {
                     animation: spin 0.8s linear infinite;
                 }
 
+                @keyframes spin {
+                    to {
+                        transform: rotate(360deg);
+                    }
+                }
+
+                /* ============================= */
                 /* Success State */
+                /* ============================= */
+
                 .reservations-success {
                     text-align: center;
-                    padding: var(--spacing-2xl);
+                    background: var(--color-bg-primary);
                     border: 1px solid var(--color-primary);
+                    padding: var(--spacing-2xl);
+                }
+
+                @media (min-width: 768px) {
+                    .reservations-success {
+                        padding: var(--spacing-3xl);
+                    }
                 }
 
                 .success-icon {
@@ -327,8 +433,15 @@ const ReservationsSection = () => {
                     margin-bottom: var(--spacing-md);
                 }
 
+                @media (min-width: 768px) {
+                    .success-title {
+                        font-size: var(--text-3xl);
+                    }
+                }
+
                 .success-message {
                     color: var(--color-text-secondary);
+                    line-height: 1.8;
                     margin-bottom: var(--spacing-md);
                 }
 

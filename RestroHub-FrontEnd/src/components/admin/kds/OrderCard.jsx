@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, ChefHat, CheckCircle, AlertCircle } from 'lucide-react';
 import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 const OrderCard = ({ order, onStatusUpdate }) => {
   const [elapsedMinutes, setElapsedMinutes] = useState(0);
@@ -25,6 +26,7 @@ const OrderCard = ({ order, onStatusUpdate }) => {
       onStatusUpdate(order.orderId, newStatus);
     } catch (error) {
       console.error('Failed to update order status', error);
+      toast.error('Failed to update order status');
     } finally {
       setIsUpdating(false);
     }
