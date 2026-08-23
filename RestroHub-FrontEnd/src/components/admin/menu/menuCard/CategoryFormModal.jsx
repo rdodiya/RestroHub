@@ -82,8 +82,12 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
           {/* Error Banner */}
           {submitError && (
-            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+            <div
+              role="alert"
+              aria-live="polite"
+              className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl"
+            >
+              <AlertCircle aria-hidden="true" className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
               <p className="text-sm text-red-700">{submitError}</p>
             </div>
           )}
