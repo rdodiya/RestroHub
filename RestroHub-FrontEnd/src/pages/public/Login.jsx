@@ -197,7 +197,8 @@ const Login = () => {
 
           toast.success("Login successful!");
 
-          navigate("/admin/dashboard");
+          const redirectPath = roles && roles.includes("ADMIN") ? "/admin/dashboard" : "/";
+          navigate(redirectPath);
         } else {
           toast.error(result.message || "Login failed");
         }
@@ -242,7 +243,8 @@ const handleGoogleLogin = async (credentialResponse) => {
 
       toast.success("Google login successful!");
 
-      navigate("/admin/dashboard");
+      const redirectPath = roles && roles.includes("ADMIN") ? "/admin/dashboard" : "/";
+          navigate(redirectPath);
     } else {
       toast.error(result.message || "Google login failed");
     }
