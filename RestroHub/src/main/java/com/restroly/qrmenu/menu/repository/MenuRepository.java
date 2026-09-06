@@ -54,4 +54,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     // ========== FIND BY CATEGORY ==========
     @Query("SELECT m FROM Menu m JOIN m.categories c WHERE c.categoryId = :categoryId AND m.isDeleted = false")
     List<Menu> findByCategoryId(@Param("categoryId") Long categoryId);
+
+    // ========== FIND BY DATE & BRANCH ==========
+    @Query("SELECT m FROM Menu m WHERE m.isDeleted = false AND " +
+            "(:branchId IS NULL OR m.branch.branchId = :branchId) AND " +
+            "(:date IS NULL OR ((m.startDate IS NULL OR m.startDate <= :date) AND (m.endDate IS NULL OR m.endDate >= :date)))")
+    List<Menu> findActiveMenusByDateAndBranch(@Param("date") java.time.LocalDate date,
+                                              @Param("branchId") Long branchId);
 }

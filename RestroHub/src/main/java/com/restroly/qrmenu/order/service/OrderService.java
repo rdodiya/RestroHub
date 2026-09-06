@@ -19,4 +19,6 @@ public interface OrderService {
 	OrderResponse updateOrderStatus(Long orderId, OrderStatus status);
 
 	OrderResponse cancelOrder(Long orderId);
+
+	int markAllActiveOrdersReady(Long branchId);
 }

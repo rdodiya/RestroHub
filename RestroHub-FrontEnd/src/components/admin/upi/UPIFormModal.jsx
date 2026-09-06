@@ -1,22 +1,40 @@
 import { useState } from 'react';
-import { X, Loader2, CreditCard, Info } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
+import { X, Loader2, CreditCard, Info, AlertCircle } from 'lucide-react';
+import api from '@services/common/api';
 import toast from 'react-hot-toast';
 
-const UPIFormModal = ({ isOpen, onClose }) => {
-  const [formData, setFormData] = useState({ name: '', upiId: '' });
+const UPI_REGEX = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
+
+const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({ name: '', upiId: '', isDefault: false });
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // client-side validation
+    setError('');
     const errs = {};
-    if (!formData.name.trim()) errs.name = 'Account name is required';
-    if (!formData.upiId.trim()) errs.upiId = 'UPI ID is required';
-    else if (!/^[\w.+-]+@[\w-]+$/.test(formData.upiId.trim())) errs.upiId = 'Enter a valid UPI ID';
 
-    if (Object.keys(errs).length) {
+    const trimmedName = formData.name?.trim() || '';
+    if (!trimmedName) {
+      errs.name = 'Account name is required';
+    }
+
+    const trimmedUpi = formData.upiId?.trim() || '';
+    if (!trimmedUpi) {
+      errs.upiId = 'UPI ID is required';
+    } else if (!UPI_REGEX.test(trimmedUpi)) {
+      errs.upiId = 'Enter a valid UPI ID (e.g. restaurant@okicici, merchant@paytm)';
+    }
+
+    if (!branchId) {
+      setError('Branch information is missing. Please reload the page.');
+      return;
+    }
+
+    if (Object.keys(errs).length > 0) {
       setFieldErrors(errs);
       return;
     }
@@ -24,17 +42,31 @@ const UPIFormModal = ({ isOpen, onClose }) => {
     try {
       setSubmitting(true);
       setFieldErrors({});
-      // 🔌 await api.post('/api/upi-links', formData);
-      await new Promise((r) => setTimeout(r, 500));
-      console.log('Add UPI:', formData);
+      await api.post('/secure/api/v1/upi-links', {
+        branchId: Number(branchId),
+        name: trimmedName,
+        upiId: trimmedUpi,
+        isDefault: Boolean(formData.isDefault)
+      });
+
+      toast.success('UPI link added successfully!');
+      setFormData({ name: '', upiId: '', isDefault: false });
+      onSuccess?.();
       onClose();
-      setFormData({ name: '', upiId: '' });
     } catch (err) {
-      console.error('Failed:', err);
-      toast.error('Failed');
+      console.error('Failed to create UPI link:', err.response?.data || err);
+      const msg = err.response?.data?.message || 'Failed to add UPI link. Please verify the details and try again.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleClose = () => {
+    setError('');
+    setFormData({ name: '', upiId: '', isDefault: false });
+    onClose();
   };
 
   const inputClass = `
@@ -45,7 +77,7 @@ const UPIFormModal = ({ isOpen, onClose }) => {
   `;
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+    <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel
@@ -65,7 +97,7 @@ const UPIFormModal = ({ isOpen, onClose }) => {
               </Dialog.Title>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="
                 inline-flex h-8 w-8 items-center justify-center
                 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600
@@ -79,6 +111,13 @@ const UPIFormModal = ({ isOpen, onClose }) => {
           {/* Form */}
           <form onSubmit={handleSubmit}>
             <div className="space-y-4 px-5 py-5 sm:px-6">
+              {error && (
+                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               {/* Name */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-800">
@@ -92,7 +131,7 @@ const UPIFormModal = ({ isOpen, onClose }) => {
                     setFieldErrors((p) => ({ ...p, name: undefined }));
                   }}
                   className={`${fieldErrors.name ? 'border-red-500' : 'border-gray-200'} ${inputClass}`}
-                  placeholder="e.g., Main Account"
+                  placeholder="e.g., Main Account, PhonePe Merchant"
                   aria-required="true"
                   aria-invalid={fieldErrors.name ? 'true' : 'false'}
                   aria-describedby={fieldErrors.name ? 'err-upi-name' : undefined}
@@ -113,7 +152,7 @@ const UPIFormModal = ({ isOpen, onClose }) => {
                     setFieldErrors((p) => ({ ...p, upiId: undefined }));
                   }}
                   className={`${fieldErrors.upiId ? 'border-red-500' : 'border-gray-200'} ${inputClass}`}
-                  placeholder="yourname@paytm"
+                  placeholder="yourname@paytm or 9876543210@ybl"
                   aria-required="true"
                   aria-invalid={fieldErrors.upiId ? 'true' : 'false'}
                   aria-describedby={fieldErrors.upiId ? 'err-upi-id' : undefined}
@@ -121,9 +160,22 @@ const UPIFormModal = ({ isOpen, onClose }) => {
                 {fieldErrors.upiId && <p id="err-upi-id" className="mt-1.5 text-xs text-red-500">{fieldErrors.upiId}</p>}
                 <p className="mt-1.5 flex items-start gap-1.5 text-xs text-gray-500">
                   <Info className="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
-                  Enter your UPI ID from Paytm, PhonePe, GPay, etc.
+                  Enter your VPA / UPI ID from GPay, PhonePe, Paytm, BHIM, etc.
                 </p>
               </div>
+
+              {/* Is Default Checkbox */}
+              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={formData.isDefault}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isDefault: e.target.checked })
+                  }
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                />
+                <span className="font-medium">Set as default payment handle</span>
+              </label>
 
               {/* Info Box */}
               <div
@@ -132,9 +184,7 @@ const UPIFormModal = ({ isOpen, onClose }) => {
                 "
               >
                 <p className="text-xs leading-relaxed text-blue-700">
-                  <strong className="font-semibold">Note:</strong> After
-                  adding, we recommend testing with a ₹1 transaction to verify
-                  the UPI link is working correctly.
+                  <strong className="font-semibold">Note:</strong> Setting as default will automatically route all table QR code customer payments to this UPI account.
                 </p>
               </div>
             </div>
@@ -143,7 +193,7 @@ const UPIFormModal = ({ isOpen, onClose }) => {
             <div className="flex items-center gap-3 border-t border-gray-100 px-5 py-4 sm:px-6">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={submitting}
                 className="
                   flex-1 rounded-lg border border-gray-200 px-4 py-2.5
@@ -159,10 +209,9 @@ const UPIFormModal = ({ isOpen, onClose }) => {
                 disabled={submitting}
                 className="
                   flex-1 inline-flex items-center justify-center gap-2
-                  rounded-lg bg-blue-50 px-4 py-2.5
-                  text-sm font-medium text-blue-700
-                  border border-blue-200
-                  hover:bg-blue-100 transition-colors
+                  rounded-lg bg-blue-600 px-4 py-2.5
+                  text-sm font-semibold text-white shadow-sm
+                  hover:bg-blue-700 transition-colors
                   disabled:opacity-50
                 "
               >

@@ -19,6 +19,8 @@ public interface MenuService {
 
     List<MenuResponseDTO> getMenusByBranchId(Long branchId);
 
+    List<MenuResponseDTO> getMenusByDate(java.time.LocalDate date, Long branchId);
+
     // ========== UPDATE ==========
     MenuResponseDTO updateMenu(Long menuId, MenuRequestDTO requestDTO);
 

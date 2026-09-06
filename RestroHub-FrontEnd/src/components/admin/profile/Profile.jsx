@@ -44,83 +44,87 @@ const Profile = () => {
 
   // fetch current authenticated user profile
   useEffect(() => {
-
     const fetchProfile = async () => {
-
       try {
-
         setLoading(true);
-
-        const data =
-          await profileService.getCurrentUserProfile();
+        const data = await profileService.getCurrentUserProfile();
 
         // update frontend state with backend response
         setProfile((prev) => ({
           ...prev,
-
           name: data.name || '',
           email: data.email || '',
           phoneNumber: data.phoneNumber || '',
-
-          avatar: data.profileImage ? `data:image/jpeg;base64,${data.profileImage}` : null,
+          role: data.role || 'Restaurant Owner',
+          restaurantId: data.restaurantId || null,
+          restaurantName: data.restaurantName || prev.restaurantName,
+          tagline: data.restaurantDescription || prev.tagline,
+          branches: data.branches || prev.branches,
+          joinedDate: data.joinedDate || prev.joinedDate,
+          dateOfBirth: data.dateOfBirth || '',
+          gender: data.gender || 'male',
+          address: data.address || '',
+          city: data.city || '',
+          state: data.state || '',
+          pincode: data.pincode || '',
+          bio: data.bio || '',
+          avatar: data.profileImage
+            ? data.profileImage.startsWith('data:')
+              ? data.profileImage
+              : `data:image/jpeg;base64,${data.profileImage}`
+            : null,
         }));
-
       } catch (error) {
-
-        console.error(
-          'Failed to fetch profile:',
-          error
-        );
+        console.error('Failed to fetch profile:', error);
         toast.error('Failed to fetch profile');
-
       } finally {
-
         setLoading(false);
       }
     };
 
     fetchProfile();
-
   }, []);
 
   // handles saving updated personal info
   const handleSaveProfile = async (updatedFields) => {
-
     try {
-
       const requestData = {
-
-        name:
-          updatedFields.name ||
-          profile.name,
-
-        phoneNumber:
-          updatedFields.phoneNumber ||
-          profile.phoneNumber,
+        name: updatedFields.name || profile.name,
+        phoneNumber: updatedFields.phoneNumber || profile.phoneNumber,
+        dateOfBirth: updatedFields.dateOfBirth,
+        gender: updatedFields.gender,
+        address: updatedFields.address,
+        city: updatedFields.city,
+        state: updatedFields.state,
+        pincode: updatedFields.pincode,
+        bio: updatedFields.bio,
       };
 
-      const updatedData =
-        await profileService.updateUserProfile(
-          requestData
-        );
+      const updatedData = await profileService.updateUserProfile(requestData);
 
       // sync updated backend data into ui
       setProfile((prev) => ({
         ...prev,
-
-        name: updatedData.name,
-
-        phoneNumber:
-          updatedData.phoneNumber,
+        ...updatedFields,
+        name: updatedData.name || prev.name,
+        phoneNumber: updatedData.phoneNumber || prev.phoneNumber,
+        dateOfBirth: updatedData.dateOfBirth || updatedFields.dateOfBirth || prev.dateOfBirth,
+        gender: updatedData.gender || updatedFields.gender || prev.gender,
+        address: updatedData.address || updatedFields.address || prev.address,
+        city: updatedData.city || updatedFields.city || prev.city,
+        state: updatedData.state || updatedFields.state || prev.state,
+        pincode: updatedData.pincode || updatedFields.pincode || prev.pincode,
+        bio: updatedData.bio || updatedFields.bio || prev.bio,
+        avatar: updatedData.profileImage
+          ? updatedData.profileImage.startsWith('data:')
+            ? updatedData.profileImage
+            : `data:image/jpeg;base64,${updatedData.profileImage}`
+          : prev.avatar,
       }));
-
     } catch (error) {
-
-      console.error(
-        'Failed to update profile:',
-        error
-      );
+      console.error('Failed to update profile:', error);
       toast.error('Failed to update profile');
+      throw error;
     }
   };
 

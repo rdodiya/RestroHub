@@ -3,7 +3,6 @@ import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import api from '@services/common/api';
 import KanbanBoard from './KanbanBoard';
-import { toast } from 'react-hot-toast';
 import toast from 'react-hot-toast';
 
 const KitchenDisplaySystem = () => {

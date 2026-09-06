@@ -1,36 +1,59 @@
 import { useState, useEffect } from 'react';
-import { User, Save, Loader2, X} from 'lucide-react';
+import { User, Save, Loader2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const getNames = (nameStr) => {
+  if (!nameStr) return { firstName: '', lastName: '' };
+  const parts = nameStr.trim().split(/\s+/);
+  return {
+    firstName: parts[0] || '',
+    lastName: parts.slice(1).join(' ') || ''
+  };
+};
+
+const formatGender = (g) => {
+  if (!g) return '—';
+  if (g === 'prefer-not') return 'Prefer not to say';
+  return g.charAt(0).toUpperCase() + g.slice(1);
+};
 
 const PersonalInfoCard = ({ profile, onSave }) => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const initialNames = getNames(profile.name);
   const [formData, setFormData] = useState({
     email: profile.email || '',
     phoneNumber: profile.phoneNumber || '',
-    firstName: profile.name ? profile.name.split(' ')[0] : '',
-    lastName: profile.name ? profile.name.split(' ').slice(1).join(' ') : '',
+    firstName: initialNames.firstName,
+    lastName: initialNames.lastName,
     altPhone: profile.altPhone || '',
-    dateOfBirth: profile.dateOfBirth || '1995-06-15',
+    dateOfBirth: profile.dateOfBirth || '',
     gender: profile.gender || 'male',
-    address: profile.address || 'Kalawad Road, Rajkot',
-    city: profile.city || 'Rajkot',
-    state: profile.state || 'Gujarat',
-    pincode: profile.pincode || '360005',
+    address: profile.address || '',
+    city: profile.city || '',
+    state: profile.state || '',
+    pincode: profile.pincode || '',
     bio: profile.bio || '',
   });
 
   // Sync form data when profile prop updates (after API fetch completes)
   useEffect(() => {
-    const names = profile.name ? profile.name.split(' ') : [];
-    setFormData((prev) => ({
-      ...prev,
-      firstName: names[0] || '',
-      lastName: names.slice(1).join(' ') || '',
+    const { firstName, lastName } = getNames(profile.name);
+    setFormData({
+      firstName,
+      lastName,
       email: profile.email || '',
       phoneNumber: profile.phoneNumber || '',
-    }));
+      altPhone: profile.altPhone || '',
+      dateOfBirth: profile.dateOfBirth || '',
+      gender: profile.gender || 'male',
+      address: profile.address || '',
+      city: profile.city || '',
+      state: profile.state || '',
+      pincode: profile.pincode || '',
+      bio: profile.bio || '',
+    });
   }, [profile]);
 
   const handleSubmit = async (e) => {
@@ -49,18 +72,27 @@ const PersonalInfoCard = ({ profile, onSave }) => {
 
     try {
       setSaving(true);
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const payload = {
+        name: fullName,
+        phoneNumber: formData.phoneNumber?.trim() || '',
+        dateOfBirth: formData.dateOfBirth || '',
+        gender: formData.gender || 'male',
+        address: formData.address?.trim() || '',
+        city: formData.city?.trim() || '',
+        state: formData.state?.trim() || '',
+        pincode: formData.pincode?.trim() || '',
+        bio: formData.bio?.trim() || '',
+      };
+
       if (onSave) {
-        const fullName = `${formData.firstName} ${formData.lastName}`.trim();
-        await onSave({
-          name: fullName,
-          phoneNumber: formData.phoneNumber
-        });
+        await onSave(payload);
       }
-      toast.success('Profile updated successfully!');
+      toast.success('Personal details updated successfully!');
       setEditing(false);
     } catch (err) {
       console.error('Save failed:', err);
-      toast.error('Failed to update profile.');
+      toast.error('Failed to update personal details.');
     } finally {
       setSaving(false);
     }
@@ -68,15 +100,21 @@ const PersonalInfoCard = ({ profile, onSave }) => {
 
   const handleCancel = () => {
     setEditing(false);
-    const names = profile.name ? profile.name.split(' ') : [];
-    // Reset form to last fetched profile values
-    setFormData((prev) => ({
-      ...prev,
-      firstName: names[0] || '',
-      lastName: names.slice(1).join(' ') || '',
+    const { firstName, lastName } = getNames(profile.name);
+    setFormData({
+      firstName,
+      lastName,
       email: profile.email || '',
       phoneNumber: profile.phoneNumber || '',
-    }));
+      altPhone: profile.altPhone || '',
+      dateOfBirth: profile.dateOfBirth || '',
+      gender: profile.gender || 'male',
+      address: profile.address || '',
+      city: profile.city || '',
+      state: profile.state || '',
+      pincode: profile.pincode || '',
+      bio: profile.bio || '',
+    });
   };
 
   const updateField = (field, value) => {
@@ -99,7 +137,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
   const InfoRow = ({ label, value }) => (
     <div>
       <p className="text-xs font-medium text-gray-500">{label}</p>
-      <p className="mt-0.5 text-sm text-gray-900">{value || '—'}</p>
+      <p className="mt-0.5 text-sm text-gray-900 font-medium">{value || '—'}</p>
     </div>
   );
 
@@ -339,10 +377,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
             <InfoRow label="Email" value={formData.email} />
             <InfoRow label="Phone" value={formData.phoneNumber} />
             <InfoRow label="Date of Birth" value={formData.dateOfBirth} />
-            <InfoRow
-              label="Gender"
-              value={formData.gender?.charAt(0).toUpperCase() + formData.gender?.slice(1)}
-            />
+            <InfoRow label="Gender" value={formatGender(formData.gender)} />
             <InfoRow label="City" value={formData.city} />
             <InfoRow label="State" value={formData.state} />
             <InfoRow label="Pincode" value={formData.pincode} />

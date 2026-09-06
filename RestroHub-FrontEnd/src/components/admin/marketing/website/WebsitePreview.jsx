@@ -1,52 +1,31 @@
 /**
  * WebsitePreview.jsx
  * Path: src/components/admin/marketing/website/WebsitePreview.jsx
- *
- * CHANGES FROM ORIGINAL:
- *  1. Replaced the placeholder box with a real <iframe> that loads the
- *     customer landing page URL.  The iframe src is built from
- *     window.location so it works in both dev and prod.
- *
- *  2. The iframe gets a ?preview=1 query param so the customer page can
- *     optionally suppress its own analytics/tracking in preview mode.
- *
- *  3. The "Open" button now links to the real restaurant URL.
- *
- *  4. The iframe reloads when websiteMode changes (so the dark/light
- *     class applied by ThemeContext is visible in the preview).
- *
- *  NOTE: The iframe picks up the theme the admin just set because
- *  Website.jsx writes to localStorage on every change, and SiteContext
- *  reads localStorage on load.  For cross-tab live-reload you can add a
- *  window.addEventListener('storage', ...) in SiteContext — see comment there.
  */
 
 import { Eye, ExternalLink, Monitor, Smartphone, Tablet, RefreshCw } from 'lucide-react';
-import { useState, useCallback, useRef , useEffect} from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useSiteData } from '../../../../context/SiteContext';
+import { useAdminTheme } from '@context/AdminThemeContext';
 
-// Derive the customer-facing base URL from the current host.
-// In dev: http://localhost:5173
-// In prod: https://yourdomain.com
 const SITE_ORIGIN = window.location.origin;
 
-// This should match the route pattern in your router:
-// /Restrohub/:restaurantSlug/:branchId
-// For the admin preview we use a demo slug; adjust as needed.
 const getPreviewUrl = (slug) => {
-  debugger
-  const branch = localStorage.getItem('current_branch_id') || '1';
-  return `${SITE_ORIGIN}/Restrohub/${slug}/${branch}?preview=1`;
+  const branch = localStorage.getItem('current_branch_id') || localStorage.getItem('selectedBranchId') || '1';
+  const activeSlug = slug || 'rajkot-dhaba';
+  return `${SITE_ORIGIN}/Restrohub/${activeSlug}/${branch}?preview=1`;
 };
 
-const WebsitePreview = ({ selectedTemplate, selectedTheme, websiteMode }) => {
-  debugger
-
+const WebsitePreview = () => {
   const [device, setDevice] = useState('desktop');
   const [reloadKey, setReloadKey] = useState(0);
-  const { slug, fetchSlug } = useSiteData();
+  const { slug, siteData } = useSiteData();
+  const { isDark } = useAdminTheme();
   const iframeRef = useRef(null);
-  let previewUrl = "";
+
+  const templateName = siteData?.templateKey || 'Modern';
+  const themeName = siteData?.theme?.name || siteData?.theme?.themeKey || 'Custom';
+  const isSiteDark = siteData?.theme?.isDarkMode ?? false;
 
   const devices = [
     { id: 'desktop', icon: Monitor, label: 'Desktop' },
@@ -61,29 +40,36 @@ const WebsitePreview = ({ selectedTemplate, selectedTheme, websiteMode }) => {
   };
 
   const previewHeights = {
-    desktop: 'h-[520px]',
-    tablet: 'h-[600px]',
-    mobile: 'h-[700px]',
+    desktop: 'h-[540px]',
+    tablet: 'h-[620px]',
+    mobile: 'h-[720px]',
   };
 
-  previewUrl = getPreviewUrl(slug);
+  const previewUrl = getPreviewUrl(slug);
 
   const handleReload = useCallback(() => setReloadKey((k) => k + 1), []);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <div className={`overflow-hidden rounded-2xl border shadow-sm ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
-        <div className="flex items-center gap-2">
-          <Eye className="h-4 w-4 text-blue-600" />
-          <h3 className="text-sm font-semibold text-gray-900 sm:text-base">
-            Live Preview
-          </h3>
+      <div className={`flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 ${isDark ? 'border-gray-700 bg-gray-800/80' : 'border-gray-100 bg-gray-50/50'}`}>
+        <div className="flex items-center gap-2.5">
+          <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${isDark ? 'bg-blue-900/40 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+            <Eye className="h-4 w-4" />
+          </div>
+          <div>
+            <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Live Customer Website Preview
+            </h3>
+            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              Test how your live menu renders across desktop, tablet, and mobile devices
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Device Toggle */}
-          <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+          <div className={`inline-flex rounded-xl border p-1 ${isDark ? 'border-gray-700 bg-gray-900/60' : 'border-gray-200 bg-gray-100/70'}`}>
             {devices.map((d) => {
               const Icon = d.icon;
               const isActive = device === d.id;
@@ -92,11 +78,15 @@ const WebsitePreview = ({ selectedTemplate, selectedTheme, websiteMode }) => {
                   key={d.id}
                   onClick={() => setDevice(d.id)}
                   className={`
-                    inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5
-                    text-xs font-medium transition-all
+                    inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5
+                    text-xs font-semibold transition-all
                     ${isActive
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? isDark
+                        ? 'bg-gray-800 text-blue-400 shadow-sm'
+                        : 'bg-white text-blue-600 shadow-sm'
+                      : isDark
+                        ? 'text-gray-400 hover:text-gray-200'
+                        : 'text-gray-600 hover:text-gray-900'
                     }
                   `}
                   title={d.label}
@@ -111,7 +101,11 @@ const WebsitePreview = ({ selectedTemplate, selectedTheme, websiteMode }) => {
           {/* Reload */}
           <button
             onClick={handleReload}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+              isDark
+                ? 'border-gray-700 bg-gray-700/60 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 shadow-sm'
+            }`}
             title="Reload preview"
           >
             <RefreshCw className="h-3.5 w-3.5" />
@@ -123,46 +117,53 @@ const WebsitePreview = ({ selectedTemplate, selectedTheme, websiteMode }) => {
             href={previewUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+              isDark
+                ? 'border-blue-700/50 bg-blue-900/30 text-blue-400 hover:bg-blue-900/50'
+                : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 shadow-sm'
+            }`}
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Open</span>
+            <span className="hidden sm:inline">Open Live Site</span>
           </a>
         </div>
       </div>
 
       {/* ── Info badges ─────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-center gap-2 border-b border-gray-50 bg-gray-50 px-4 py-2">
-        <span className="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-          Template: {selectedTemplate}
+      <div className={`flex flex-wrap items-center justify-center gap-2.5 border-b px-4 py-2.5 ${isDark ? 'border-gray-700/80 bg-gray-900/40' : 'border-gray-100 bg-gray-50/70'}`}>
+        <span className={`rounded-lg px-2.5 py-1 text-xs font-medium ${isDark ? 'bg-blue-950/60 text-blue-300 border border-blue-800/40' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>
+          Template: {templateName}
         </span>
-        <span className="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-          Theme: {selectedTheme}
+        <span className={`rounded-lg px-2.5 py-1 text-xs font-medium ${isDark ? 'bg-purple-950/60 text-purple-300 border border-purple-800/40' : 'bg-purple-50 text-purple-700 border border-purple-200'}`}>
+          Theme: {themeName}
         </span>
-        <span className={`rounded px-2 py-0.5 text-xs font-medium ${websiteMode === 'dark' ? 'bg-gray-800 text-white' : 'bg-yellow-50 text-yellow-700'
-          }`}>
-          {websiteMode === 'dark' ? '🌙 Dark' : '☀️ Light'}
+        <span className={`rounded-lg px-2.5 py-1 text-xs font-medium ${
+          isSiteDark
+            ? 'bg-gray-800 text-gray-200 border border-gray-700'
+            : 'bg-amber-50 text-amber-800 border border-amber-200'
+        }`}>
+          {isSiteDark ? '🌙 Dark Mode' : '☀️ Light Mode'}
         </span>
-        <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
-          {device}
+        <span className={`rounded-lg px-2.5 py-1 text-xs font-medium uppercase tracking-wider ${isDark ? 'bg-gray-800 text-gray-400 border border-gray-700' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
+          Viewport: {device}
         </span>
       </div>
 
-      {/* ── Preview iframe ───────────────────────────────────────────────── */}
-      <div className="bg-gray-100 px-4 py-6 sm:px-6 sm:py-8">
+      {/* ── Preview iframe container ─────────────────────────────────────── */}
+      <div className={`px-4 py-6 sm:px-6 sm:py-8 ${isDark ? 'bg-gray-900/80' : 'bg-gray-100/70'}`}>
         <div className={`${previewWidths[device]} transition-all duration-300`}>
           {/* Browser chrome bar */}
-          <div className="flex items-center gap-1.5 rounded-t-lg bg-gray-200 px-3 py-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-            <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-            <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-            <span className="ml-2 flex-1 rounded bg-white px-2 py-0.5 text-xs text-gray-400 truncate">
+          <div className={`flex items-center gap-2 rounded-t-xl border border-b-0 px-4 py-2.5 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-200/90'}`}>
+            <span className="h-3 w-3 rounded-full bg-red-400" />
+            <span className="h-3 w-3 rounded-full bg-yellow-400" />
+            <span className="h-3 w-3 rounded-full bg-green-400" />
+            <div className={`ml-2 flex-1 rounded-lg px-3 py-1 text-xs font-mono truncate border ${isDark ? 'border-gray-700 bg-gray-900 text-gray-400' : 'border-gray-200 bg-white text-gray-500 shadow-inner'}`}>
               {previewUrl}
-            </span>
+            </div>
           </div>
 
           {/* Iframe */}
-          <div className={`${previewHeights[device]} w-full overflow-hidden rounded-b-lg border border-t-0 border-gray-200 shadow-sm`}>
+          <div className={`${previewHeights[device]} w-full overflow-hidden rounded-b-xl border shadow-lg ${isDark ? 'border-gray-700 bg-gray-950' : 'border-gray-200 bg-white'}`}>
             <iframe
               key={reloadKey}
               ref={iframeRef}
@@ -175,9 +176,8 @@ const WebsitePreview = ({ selectedTemplate, selectedTheme, websiteMode }) => {
           </div>
         </div>
 
-        <p className="mt-3 text-center text-xs text-gray-400">
-          Theme changes are applied after the preview reloads.
-          Click <strong>Reload</strong> to see the latest changes.
+        <p className={`mt-3 text-center text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+          Theme changes take effect immediately in the preview. Click <strong>Reload</strong> if iframe caching delays updates.
         </p>
       </div>
     </div>

@@ -48,6 +48,15 @@ public class Menu {
 	)
 	private List<Category> categories = new ArrayList<>();
 
+	@Column(name = "start_date")
+	private java.time.LocalDate startDate;
+
+	@Column(name = "end_date")
+	private java.time.LocalDate endDate;
+
+	@Column(name = "day_of_week", length = 100)
+	private String dayOfWeek;
+
 	@OneToOne
 	@JoinColumn(name = "branch_id")
 	private Branch branch;

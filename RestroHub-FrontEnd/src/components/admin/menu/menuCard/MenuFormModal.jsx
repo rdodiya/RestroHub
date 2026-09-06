@@ -1,9 +1,19 @@
 // MenuCreation.jsx
 import { useState, useEffect } from 'react';
-import { X, Loader2, ChevronDown, Tag, UtensilsCrossed, MapPin, FileText, Type } from 'lucide-react';
+import { X, Loader2, ChevronDown, Tag, UtensilsCrossed, MapPin, FileText, Type, Calendar, Clock, CalendarRange } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
 import toast from 'react-hot-toast';
+
+const DAYS_OF_WEEK = [
+    { id: 'MONDAY', label: 'Mon' },
+    { id: 'TUESDAY', label: 'Tue' },
+    { id: 'WEDNESDAY', label: 'Wed' },
+    { id: 'THURSDAY', label: 'Thu' },
+    { id: 'FRIDAY', label: 'Fri' },
+    { id: 'SATURDAY', label: 'Sat' },
+    { id: 'SUNDAY', label: 'Sun' },
+];
 
 const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches }) => {
     const [categories, setCategories] = useState([]);
@@ -13,7 +23,10 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
         menuDesc: '',
         categoryIds: [],
         branchId: '',
-        isDeleted: false
+        isDeleted: false,
+        startDate: '',
+        endDate: '',
+        selectedDays: []
     });
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
@@ -21,22 +34,24 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
 
     // ------------------------------------
     // Populate form when editing
-    // MenuResponseDTO has: menuId, menuName, menuDesc, isDeleted,
-    //   branch: { branchId, name, city, ... },
-    //   categories: [{ categoryId, name, ... }]
     // ------------------------------------
     useEffect(() => {
         if (editingMenu) {
+            const parsedDays = editingMenu.dayOfWeek
+                ? editingMenu.dayOfWeek.split(',').map((d) => d.trim().toUpperCase()).filter(Boolean)
+                : [];
+
             setFormData({
                 menuName: editingMenu.menuName || '',
                 menuDesc: editingMenu.menuDesc || '',
-                // MenuResponseDTO.categories is List<CategoryDTO> with categoryId
                 categoryIds: editingMenu.categories
                     ? editingMenu.categories.map((cat) => cat.categoryId)
                     : [],
-                // MenuResponseDTO.branch is BranchDTO with branchId
                 branchId: editingMenu.branch?.branchId?.toString() || '',
-                isDeleted: editingMenu.isDeleted ?? false
+                isDeleted: editingMenu.isDeleted ?? false,
+                startDate: editingMenu.startDate ? editingMenu.startDate.toString().split('T')[0] : '',
+                endDate: editingMenu.endDate ? editingMenu.endDate.toString().split('T')[0] : '',
+                selectedDays: parsedDays
             });
         } else {
             setFormData({
@@ -44,11 +59,13 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
                 menuDesc: '',
                 categoryIds: [],
                 branchId: '',
-                isDeleted: false
+                isDeleted: false,
+                startDate: '',
+                endDate: '',
+                selectedDays: []
             });
         }
         setError(null);
-        // Safety: ensure arrays
         setCategories(Array.isArray(allCategories) ? allCategories : []);
         setBranches(Array.isArray(allBranches) ? allBranches : []);
     }, [editingMenu, isOpen, allCategories, allBranches]);
@@ -84,15 +101,20 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
         return categories.find((c) => c.categoryId === id)?.name || 'Unknown';
     };
 
+    const handleDayToggle = (dayId) => {
+        setFormData((prev) => {
+            const exists = prev.selectedDays.includes(dayId);
+            return {
+                ...prev,
+                selectedDays: exists
+                    ? prev.selectedDays.filter((d) => d !== dayId)
+                    : [...prev.selectedDays, dayId]
+            };
+        });
+    };
+
     // ------------------------------------
-    // Submit — matches MenuRequestDTO:
-    // {
-    //   menuName: String,
-    //   menuDesc: String,
-    //   branchId: Long,
-    //   categoryIds: List<Long>,
-    //   isDeleted: Boolean
-    // }
+    // Submit — matches MenuRequestDTO
     // ------------------------------------
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -107,6 +129,9 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
                 branchId: formData.branchId ? Number(formData.branchId) : null,
                 categoryIds: formData.categoryIds,
                 isDeleted: formData.isDeleted,
+                startDate: formData.startDate || null,
+                endDate: formData.endDate || null,
+                dayOfWeek: formData.selectedDays.length > 0 ? formData.selectedDays.join(',') : null
             };
 
             if (editingMenu) {
@@ -431,7 +456,101 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
                                 )}
                             </div>
 
-                            {/* ---- ROW 4: Status Toggle → MenuRequestDTO.isDeleted ---- */}
+                            {/* ---- ROW 4: Datewise & Day Schedule Assignment ---- */}
+                            <div className="p-5 bg-gradient-to-br from-blue-50/50 to-indigo-50/40 rounded-2xl border border-blue-100/80 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm">
+                                            <CalendarRange className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-gray-800">Datewise Schedule & Recurrence</h4>
+                                            <p className="text-xs text-gray-500">Assign specific dates or days of the week when this menu is active</p>
+                                        </div>
+                                    </div>
+                                    {(formData.startDate || formData.endDate || formData.selectedDays.length > 0) && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                updateField('startDate', '');
+                                                updateField('endDate', '');
+                                                setFormData(prev => ({ ...prev, selectedDays: [] }));
+                                            }}
+                                            className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-white px-2.5 py-1 rounded-lg border border-blue-200 transition-colors shadow-xs"
+                                        >
+                                            Reset to Everyday
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Start Date & End Date */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                                    <div className="space-y-1.5">
+                                        <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                                            <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                                            Active From (Start Date)
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={formData.startDate}
+                                            onChange={(e) => updateField('startDate', e.target.value)}
+                                            className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                        />
+                                        <p className="text-[11px] text-gray-400">Leave blank for no start restriction</p>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                                            <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                                            Active Until (End Date)
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={formData.endDate}
+                                            onChange={(e) => updateField('endDate', e.target.value)}
+                                            min={formData.startDate || undefined}
+                                            className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                        />
+                                        <p className="text-[11px] text-gray-400">Leave blank for continuous schedule</p>
+                                    </div>
+                                </div>
+
+                                {/* Days of Week Filter */}
+                                <div className="space-y-2 pt-1">
+                                    <div className="flex items-center justify-between">
+                                        <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                                            <Clock className="w-3.5 h-3.5 text-purple-500" />
+                                            Active Days of Week
+                                        </label>
+                                        <span className="text-[11px] text-gray-400">
+                                            {formData.selectedDays.length === 0
+                                                ? 'Active all 7 days'
+                                                : `Active on ${formData.selectedDays.length} day(s)`}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {DAYS_OF_WEEK.map((day) => {
+                                            const isSelected = formData.selectedDays.includes(day.id);
+                                            return (
+                                                <button
+                                                    key={day.id}
+                                                    type="button"
+                                                    onClick={() => handleDayToggle(day.id)}
+                                                    className={`px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
+                                                        isSelected
+                                                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                            : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50/50'
+                                                    }`}
+                                                >
+                                                    {day.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ---- ROW 5: Status Toggle → MenuRequestDTO.isDeleted ---- */}
                             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl
                                             border border-gray-200">
                                 <div className="flex-1 min-w-0">

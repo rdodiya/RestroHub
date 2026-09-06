@@ -39,10 +39,10 @@ const Navigation = () => {
         <nav className={`nav ${scrolled ? 'nav-scrolled' : ''}`}>
             <div className="nav-container">
                 <Link to="/" className="nav-logo" onClick={handleLogoClick}>
-                    {siteData.navigation.logo ? (
-                        <img src={siteData.navigation.logo} alt={siteData.navigation.name} />
+                    {siteData.navigation?.logo ? (
+                        <img src={siteData.navigation.logo} alt={siteData.navigation?.name || 'Restaurant'} />
                     ) : (
-                        siteData.navigation.name
+                        siteData.navigation?.name || 'Restroly'
                     )}
                 </Link>
 
