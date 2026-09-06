@@ -30,6 +30,8 @@ import {
   Flame,
   Coffee,
   BadgePercent,
+  Calendar,
+  CalendarRange,
 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
@@ -635,6 +637,36 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                     </div>
                   </div>
                 </div>
+
+                {/* Schedule & Recurrence */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                      <CalendarRange className="w-4 h-4 text-indigo-600" />
+                    </div>
+                    <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                      Schedule & Recurrence
+                    </h3>
+                  </div>
+                  <div className="ml-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100">
+                      <p className="text-xs text-indigo-500 font-medium mb-1">Assigned Date Range</p>
+                      <p className="text-sm font-bold text-indigo-900">
+                        {menu.startDate || menu.endDate
+                          ? `${menu.startDate || 'Start'} to ${menu.endDate || 'Ongoing'}`
+                          : 'Everyday / All Dates'}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-100">
+                      <p className="text-xs text-purple-500 font-medium mb-1">Active Days of Week</p>
+                      <p className="text-sm font-bold text-purple-900">
+                        {menu.dayOfWeek
+                          ? menu.dayOfWeek.split(',').map(d => d.trim()).join(', ')
+                          : 'All 7 Days (Mon - Sun)'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -760,6 +792,27 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
                   <span className="text-xs text-gray-400 italic">No branch</span>
                 </div>
               )}
+
+              {/* Datewise Schedule Badge */}
+              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                {menu.startDate || menu.endDate ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-700 bg-blue-50/90 px-2 py-0.5 rounded-md border border-blue-100">
+                    <Calendar className="w-3 h-3 text-blue-500 shrink-0" />
+                    {menu.startDate || 'Any'} &rarr; {menu.endDate || 'Ongoing'}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
+                    <Calendar className="w-3 h-3 text-gray-400 shrink-0" />
+                    All Dates
+                  </span>
+                )}
+                {menu.dayOfWeek && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
+                    <Clock className="w-3 h-3 text-purple-500 shrink-0" />
+                    {menu.dayOfWeek.split(',').map(d => d.slice(0, 3)).join(', ')}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -964,6 +1017,7 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
 
   // Detail modal
   const [viewingMenu, setViewingMenu] = useState(null);
+  const [selectedDateFilter, setSelectedDateFilter] = useState(''); // '' means All, 'YYYY-MM-DD'
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   useEffect(() => {
@@ -1023,11 +1077,41 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
     setTimeout(() => setViewingMenu(null), 200);
   };
 
-  const filteredMenus = menus.filter((menu) =>
-    menu.menuName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    menu.menuDesc?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    menu.branch?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const checkMenuDateActive = (menu, dateStr) => {
+    if (!dateStr) return true;
+
+    // Date range check
+    const checkDate = new Date(dateStr);
+    if (menu.startDate) {
+      const start = new Date(menu.startDate);
+      if (checkDate < start) return false;
+    }
+    if (menu.endDate) {
+      const end = new Date(menu.endDate);
+      if (checkDate > end) return false;
+    }
+
+    // Day of week check
+    if (menu.dayOfWeek) {
+      const dayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+      const dayName = dayNames[checkDate.getDay()];
+      const activeDays = menu.dayOfWeek.split(',').map(d => d.trim().toUpperCase());
+      if (!activeDays.includes(dayName)) return false;
+    }
+
+    return true;
+  };
+
+  const filteredMenus = menus.filter((menu) => {
+    const matchesSearch =
+      menu.menuName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      menu.menuDesc?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      menu.branch?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesDate = checkMenuDateActive(menu, selectedDateFilter);
+
+    return matchesSearch && matchesDate;
+  });
 
   return (
     <div className="space-y-5">
@@ -1067,8 +1151,8 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
         </div>
       )}
 
-      {/* Search + Refresh */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      {/* Search + Date Filter + Refresh */}
+      <div className="flex flex-col md:flex-row gap-3">
         <div className="flex-1 flex items-center gap-2 bg-white rounded-xl border border-gray-200
                         shadow-sm px-4 py-3 focus-within:border-blue-400 focus-within:ring-2
                         focus-within:ring-blue-100 transition-all">
@@ -1088,6 +1172,45 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
             </button>
           )}
         </div>
+
+        {/* Datewise Filter Selector */}
+        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 shadow-sm shrink-0">
+          <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const todayStr = new Date().toISOString().split('T')[0];
+                setSelectedDateFilter(prev => prev === todayStr ? '' : todayStr);
+              }}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
+                selectedDateFilter === new Date().toISOString().split('T')[0]
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Active Today
+            </button>
+            <input
+              type="date"
+              value={selectedDateFilter}
+              onChange={(e) => setSelectedDateFilter(e.target.value)}
+              className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-700 outline-none focus:ring-1 focus:ring-blue-500"
+              title="Filter by specific date"
+            />
+            {selectedDateFilter && (
+              <button
+                type="button"
+                onClick={() => setSelectedDateFilter('')}
+                className="text-gray-400 hover:text-red-500 p-1"
+                title="Clear date filter"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
         <button onClick={fetchMenus} disabled={loading}
                 className="flex items-center justify-center gap-2 px-4 py-3 bg-white border
                            border-gray-200 rounded-xl hover:bg-gray-50 transition-colors

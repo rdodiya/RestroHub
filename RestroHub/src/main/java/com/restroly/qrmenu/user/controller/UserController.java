@@ -1,10 +1,14 @@
 package com.restroly.qrmenu.user.controller;
 
+import com.restroly.qrmenu.branch.entity.Branch;
+import com.restroly.qrmenu.restaurant.entity.Restaurant;
+import com.restroly.qrmenu.user.dto.ChangePasswordRequestDTO;
 import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
 import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
 import com.restroly.qrmenu.user.dto.UserRequest;
 import com.restroly.qrmenu.user.dto.UserResponse;
 import com.restroly.qrmenu.user.entity.User;
+import com.restroly.qrmenu.user.entity.UserRoleRestaurant;
 import com.restroly.qrmenu.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.token.Token;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,6 +68,17 @@ public class UserController {
                 userService.updateUserProfile(request);
 
         return ResponseEntity.ok(updatedProfile);
+    }
+
+    @PutMapping("/change-password")
+    @Operation(summary = "Change password for authenticated user")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @Valid @RequestBody ChangePasswordRequestDTO request) {
+
+        log.info("Changing password for authenticated user");
+        userService.changePassword(request);
+
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
     // =========================================================
@@ -283,6 +299,7 @@ public class UserController {
     
     @GetMapping("/fetchRestaurantId")
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
     public ResponseEntity<Map<String, Object>> fetchRestaurantId() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -292,15 +309,29 @@ public class UserController {
 
         User user = userService.getUserByEmailEntity(email);
 
-        String restaurantId = user.getUserRoleRestaurants()
+        Restaurant restaurant = user.getUserRoleRestaurants()
                 .stream()
-                .map(urr -> urr.getRestaurant().getName())
+                .map(UserRoleRestaurant::getRestaurant)
                 .findFirst()
                 .orElse(null);
 
+        Long restaurantId = restaurant != null ? restaurant.getRestId() : null;
+        String restaurantName = restaurant != null ? restaurant.getName() : null;
+
+        Long branchId = null;
+        String branchName = null;
+        if (restaurant != null && restaurant.getBranches() != null && !restaurant.getBranches().isEmpty()) {
+            Branch branch = restaurant.getBranches().get(0);
+            branchId = branch.getBranchId();
+            branchName = branch.getName();
+        }
+
         return ResponseEntity.ok(Map.of(
                 "success", true,
-                "data", restaurantId
+                "restaurantId", restaurantId,
+                "restaurantName", restaurantName,
+                "branchId", branchId,
+                "branchName", branchName
         ));
     }
 }

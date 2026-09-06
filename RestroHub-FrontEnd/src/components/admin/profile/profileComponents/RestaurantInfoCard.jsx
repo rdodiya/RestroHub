@@ -10,10 +10,13 @@ import {
 } from 'lucide-react';
 import api from '../../../../services/common/api';
 
+import toast from 'react-hot-toast';
+
 const RestaurantInfoCard = ({ profile, onSave }) => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [backupFormData, setBackupFormData] = useState(null);
+  const [restaurantId, setRestaurantId] = useState(profile.restaurantId || null);
 
   const handleStartEdit = () => {
     setBackupFormData({ ...formData });
@@ -29,7 +32,7 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
 
   const [formData, setFormData] = useState({
     restaurantName: profile.restaurantName || 'Rajkot Dhaba',
-    tagline: profile.tagline || 'Authentic Gujarati Food',
+    tagline: profile.tagline || profile.restaurantDescription || 'Authentic Gujarati Food',
     cuisineType: profile.cuisineType || 'Gujarati, North Indian',
     gstNumber: profile.gstNumber || '24AAACR1234F1Z5',
     fssaiNumber: profile.fssaiNumber || '11223344556677',
@@ -46,43 +49,56 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
   useEffect(() => {
     const fetchRestaurantSettings = async () => {
       try {
-        const res = await api.get('/public/api/v1/restaurants/1');
-        if (res.data) {
-          setFormData(prev => ({
-            ...prev,
-            restaurantName: res.data.name || prev.restaurantName,
-            tagline: res.data.description || prev.tagline,
-            serviceRequestEnabled: res.data.serviceRequestEnabled !== false,
-          }));
+        let restId = profile.restaurantId;
+        if (!restId) {
+          const authRes = await api.get('/secure/api/v1/users/fetchRestaurantId');
+          restId = authRes.data?.restaurantId || authRes.data?.branchId || authRes.data?.data?.restaurantId;
+        }
+
+        if (restId) {
+          setRestaurantId(restId);
+          const res = await api.get(`/public/api/v1/restaurants/${restId}`);
+          const restData = res.data?.data || res.data;
+          if (restData) {
+            setFormData(prev => ({
+              ...prev,
+              restaurantName: restData.name || prev.restaurantName,
+              tagline: restData.description || prev.tagline,
+              serviceRequestEnabled: restData.serviceRequestEnabled !== false,
+            }));
+          }
         }
       } catch (err) {
-        console.warn('Could not fetch restaurant details, using mock defaults.', err);
+        console.warn('Could not fetch restaurant details:', err);
       }
     };
     fetchRestaurantSettings();
-  }, []);
+  }, [profile.restaurantId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setSaving(true);
       
+      const restId = restaurantId || profile.restaurantId || 1;
       try {
-        await api.put('/secure/api/v1/restaurants/1', {
+        await api.put(`/secure/api/v1/restaurants/${restId}`, {
           name: formData.restaurantName,
           description: formData.tagline,
-          phoneNumber: '+91-9876543210',
+          phoneNumber: profile.phoneNumber || '+91-9876543210',
           isActive: true,
           serviceRequestEnabled: formData.serviceRequestEnabled,
         });
+        toast.success('Restaurant information saved successfully!');
       } catch (err) {
-        console.warn('Backend restaurant update failed. Syncing locally.', err);
+        console.warn('Backend restaurant update warning:', err);
       }
 
       onSave?.(formData);
       setEditing(false);
     } catch (err) {
       console.error('Save failed:', err);
+      toast.error('Failed to save restaurant details.');
     } finally {
       setSaving(false);
     }
@@ -97,16 +113,18 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
     setFormData((prev) => ({ ...prev, serviceRequestEnabled: newValue }));
 
     try {
-      await api.put('/secure/api/v1/restaurants/1', {
+      const restId = restaurantId || profile.restaurantId || 1;
+      await api.put(`/secure/api/v1/restaurants/${restId}`, {
         name: formData.restaurantName,
         description: formData.tagline,
-        phoneNumber: '+91-9876543210',
+        phoneNumber: profile.phoneNumber || '+91-9876543210',
         isActive: true,
         serviceRequestEnabled: newValue,
       });
       onSave?.({ ...formData, serviceRequestEnabled: newValue });
+      toast.success(`Service requests ${newValue ? 'enabled' : 'disabled'}`);
     } catch (err) {
-      console.warn('Backend restaurant update failed. Syncing locally.', err);
+      console.warn('Backend restaurant update failed.', err);
     }
   };
 

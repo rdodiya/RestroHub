@@ -126,35 +126,56 @@ const SelectField = ({ label, value, onChange, options }) => (
 );
 
 const ToggleField = ({ label, description, checked, onChange }) => (
-  <label className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-gray-200 p-3">
-    <div>
-      <p className="text-sm font-medium text-gray-800">{label}</p>
-      {description && <p className="text-xs text-gray-500">{description}</p>}
+  <div
+    role="button"
+    tabIndex={0}
+    onClick={() => onChange(!checked)}
+    onKeyDown={(e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        onChange(!checked);
+      }
+    }}
+    className={`
+      flex cursor-pointer items-center justify-between gap-3 rounded-xl border p-3.5 transition-all duration-200 select-none
+      ${checked
+        ? 'border-blue-200 bg-blue-50/50 shadow-xs'
+        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/60'
+      }
+    `}
+  >
+    <div className="min-w-0 flex-1">
+      <p className={`text-xs font-semibold sm:text-sm transition-colors ${checked ? 'text-blue-900' : 'text-gray-800'}`}>
+        {label}
+      </p>
+      {description && (
+        <p className={`mt-0.5 text-[11px] sm:text-xs transition-colors ${checked ? 'text-blue-700/80' : 'text-gray-500'}`}>
+          {description}
+        </p>
+      )}
     </div>
-    <button
-      type="button"
-      role="switch"
-      aria-checked={!!checked}
-      onClick={() => onChange(!checked)}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${checked ? 'bg-blue-600' : 'bg-gray-200'
-        }`}
+    <div
+      className={`
+        relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out sm:h-6 sm:w-11
+        ${checked ? 'bg-blue-600' : 'bg-gray-200'}
+      `}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'
-          }`}
+        className={`
+          pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out sm:h-5 sm:w-5
+          ${checked ? 'translate-x-4 sm:translate-x-5' : 'translate-x-0'}
+        `}
       />
-    </button>
-  </label>
+    </div>
+  </div>
 );
 
 const ThemeSelector = () => {
-  debugger
   const { siteData, updateTheme } = useSiteData();
 
   const theme = siteData?.theme ?? {};
 
   const updateField = (field, value) => {
-    debugger
     updateTheme({
       ...theme,
       [field]: value
@@ -162,11 +183,11 @@ const ThemeSelector = () => {
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <div className="flex max-h-[85vh] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* ============================= */}
       {/* HEADER + LIVE PREVIEW         */}
       {/* ============================= */}
-      <div className="border-b border-gray-100 px-4 py-4 sm:px-6 sm:py-5">
+      <div className="sticky top-0 z-10 shrink-0 border-b border-gray-100 bg-white/95 px-4 py-4 backdrop-blur-sm sm:px-6 sm:py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
             <Palette className="h-5 w-5 text-blue-600" />
@@ -176,45 +197,12 @@ const ThemeSelector = () => {
             <p className="text-xs text-gray-500 sm:text-sm">Edit every color, font, and setting for this theme</p>
           </div>
         </div>
-
-        {/* Live preview strip
-        <div
-          className="mt-4 flex items-center justify-between rounded-xl border p-4"
-          style={{
-            background: `linear-gradient(135deg, ${theme.bgPrimary || '#111'}, ${theme.bgSecondary || '#222'})`,
-            borderColor: theme.borderColor || '#333',
-          }}
-        >
-          <div>
-            <p
-              className="text-lg font-semibold"
-              style={{ fontFamily: theme.fontHeading, color: theme.primaryTextColor || '#fff' }}
-            >
-              {theme.name || 'Untitled Theme'}
-            </p>
-            <p
-              className="text-xs"
-              style={{ fontFamily: theme.fontPrimary, color: theme.secondaryTextColor || '#aaa' }}
-            >
-              Live preview
-            </p>
-          </div>
-          <span
-            className="rounded-lg px-3 py-1.5 text-xs font-medium"
-            style={{ background: theme.buttonBackground || theme.primaryColor, color: theme.buttonText || '#fff' }}
-          >
-            Sample Button
-          </span>
-        </div> */}
       </div>
 
       {/* ============================= */}
-      {/* BODY                          */}
+      {/* BODY (SCROLLABLE)             */}
       {/* ============================= */}
-      {/* ============================= */}
-      {/* BODY                         */}
-      {/* ============================= */}
-      <div className="space-y-8 px-4 py-5 sm:px-6 sm:py-6">
+      <div className="flex-1 overflow-y-auto space-y-8 px-4 py-5 sm:px-6 sm:py-6">
 
         {/* Identity */}
         {/* <div>

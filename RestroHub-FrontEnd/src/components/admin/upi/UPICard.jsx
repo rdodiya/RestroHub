@@ -22,25 +22,21 @@ const UPICard = ({ link, onCopy, onSetDefault, onDelete, onTest, copiedId }) => 
   const handleSetDefault = async () => {
     try {
       setSettingDefault(true);
-      // 🔌 await api.put(`/api/upi/${link.id}/default`);
-      await new Promise((r) => setTimeout(r, 400));
-      onSetDefault(link.id);
+      await onSetDefault(link.id);
     } catch (err) {
-      console.error('Failed:', err);
+      console.error('Failed to set default:', err);
     } finally {
       setSettingDefault(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`Delete "${link.name}" UPI link?`)) return;
+    if (!window.confirm(`Delete "${link.name}" (${link.upiId}) UPI link?`)) return;
     try {
       setDeleting(true);
-      // 🔌 await api.delete(`/api/upi/${link.id}`);
-      await new Promise((r) => setTimeout(r, 300));
-      onDelete(link.id);
+      await onDelete(link.id);
     } catch (err) {
-      console.error('Failed:', err);
+      console.error('Failed to delete:', err);
     } finally {
       setDeleting(false);
     }

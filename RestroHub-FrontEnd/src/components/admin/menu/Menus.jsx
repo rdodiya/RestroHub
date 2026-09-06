@@ -145,7 +145,10 @@ const Menus = () => {
       {/* TAB 1: Food Items (existing) */}
       {activeTab === 'foods' && (
         <div className="animate-in fade-in duration-300">
-          <BulkActions />
+          <BulkActions
+            onRefresh={() => menuGridRef.current?.refreshFoods()}
+            allCategories={allCategories}
+          />
           <div className="flex flex-col lg:flex-row gap-6 mt-6">
             <CategorySidebar
               selectedCategory={selectedCategory}

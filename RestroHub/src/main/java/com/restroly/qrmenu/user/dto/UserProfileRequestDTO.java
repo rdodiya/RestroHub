@@ -1,6 +1,5 @@
 package com.restroly.qrmenu.user.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +16,20 @@ public class UserProfileRequestDTO {
 
     private String phoneNumber;
 
+    private String dateOfBirth;
+
+    private String gender;
+
+    private String address;
+
+    private String city;
+
+    private String state;
+
+    private String pincode;
+
+    private String bio;
+
     // Transient field to carry file data from Controller to Service layer
     private byte[] profileImageBytes;
-}
+}

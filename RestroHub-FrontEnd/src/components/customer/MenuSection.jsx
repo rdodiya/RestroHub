@@ -18,7 +18,6 @@ const VegDot = ({ isVeg, size = 'sm' }) => (
 );
 
 const FoodDetailModal = ({ item, onClose }) => {
-    debugger
     // Close on Escape key
     useEffect(() => {
         const handleKey = (e) => {
@@ -93,35 +92,64 @@ const MenuSection = () => {
     const [activeCategory, setActiveCategory] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
 
-    // Categories come from the real Menu module now, so default to the
-    // first one once siteData loads rather than a hardcoded key.
+    const menu = siteData?.menu || {};
+
+    // Safely extract category names list
+    const categoryList = (menu.categories || []).map((cat) =>
+        typeof cat === 'string' ? cat : cat?.name || `Category ${cat?.categoryId || ''}`
+    );
+
+    // Set initial active category
     useEffect(() => {
-        if (siteData?.menu?.categories?.length && !activeCategory) {
-            setActiveCategory(siteData.menu.categories[0]);
+        if (categoryList.length > 0 && (!activeCategory || !categoryList.includes(activeCategory))) {
+            setActiveCategory(categoryList[0]);
         }
-    }, [siteData, activeCategory]);
+    }, [categoryList, activeCategory]);
 
     const openItem = useCallback((item) => setSelectedItem(item), []);
     const closeItem = useCallback(() => setSelectedItem(null), []);
 
     if (!siteData) return null;
 
-    const { menu } = siteData;
-    debugger
-    const items = menu.items?.[activeCategory] || [];
+    // Safely resolve items for activeCategory
+    const getItemsForActiveCategory = () => {
+        if (!activeCategory) return [];
+        if (menu.items && menu.items[activeCategory]) {
+            return menu.items[activeCategory];
+        }
+        if (Array.isArray(menu.categories)) {
+            const foundCategory = menu.categories.find(
+                (c) => typeof c === 'object' && (c.name === activeCategory || String(c.categoryId) === String(activeCategory))
+            );
+            if (foundCategory && Array.isArray(foundCategory.foods)) {
+                return foundCategory.foods.map((f) => ({
+                    id: f.foodId ?? f.id,
+                    name: f.name,
+                    description: f.description,
+                    image: f.imageUrl || f.image,
+                    price: f.price,
+                    isVeg: f.isVeg,
+                    isAvailable: f.isAvailable,
+                }));
+            }
+        }
+        return [];
+    };
+
+    const items = getItemsForActiveCategory();
 
     return (
         <section id="how-it-works" className="menu section">
             <div className="container">
                 {/* Header */}
                 <div className="menu-header">
-                    <p className="section-subtitle">{menu.subtitle}</p>
-                    <h2 className="section-title font-heading">{menu.title}</h2>
+                    <p className="section-subtitle">{menu.subtitle || "Explore our dishes"}</p>
+                    <h2 className="section-title font-heading">{menu.title || "Our Menu"}</h2>
                 </div>
 
                 {/* Category Tabs */}
                 <div className="menu-tabs">
-                    {menu.categories.map((category) => (
+                    {categoryList.map((category) => (
                         <button
                             key={category}
                             onClick={() => setActiveCategory(category)}

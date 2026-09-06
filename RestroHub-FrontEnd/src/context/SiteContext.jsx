@@ -33,10 +33,13 @@ import React, {
   useCallback,
 } from 'react';
 import { defaultSiteData } from '@data/defaultData.js';
+import { getAccessToken } from '@services/common/authStorage';
+import api from '@services/common/api';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const API_BASE = 'http://localhost:8181/restroly/public/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8181/restroly';
+const API_BASE = `${BASE_URL}/public/api/v1`;
 const STORAGE_KEY = 'website-theme-config';
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -63,7 +66,6 @@ export const useTheme = () => {
 // We extract each section's content block and merge it into the flat siteData shape.
 
 function mapApiResponseToSiteData(apiData) {
-  debugger
   const sectionMap = {};
   (apiData.sections || []).forEach(section => {
     if (section.isVisible !== false) {
@@ -354,11 +356,10 @@ export const SiteProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [slug, setSlug] = useState("");
+  const [branch, setBranch] = useState("");
 
   // ── Apply theme CSS variables to :root ──────────────────────────────────────
   const applyTheme = useCallback((theme) => {
-    debugger
-
     if (!theme) return;
     const root = document.documentElement;
     const varMap = {
@@ -411,7 +412,6 @@ export const SiteProvider = ({ children }) => {
 
   // ── Main data loader ─────────────────────────────────────────────────────────
   const loadSiteData = useCallback(async () => {
-    debugger
     setLoading(true);
     setError(null);
 
@@ -420,7 +420,7 @@ export const SiteProvider = ({ children }) => {
     })();
 
     try {
-      const currentSlug = await fetchSlug();
+      const currentSlug = (await fetchSlug());
       let data;
 
       if (currentSlug) {
@@ -451,7 +451,7 @@ export const SiteProvider = ({ children }) => {
       if (savedConfig?.theme) {
         applyTheme(savedConfig.theme);
       } else {
-        applyTheme(data.theme);
+        applyTheme(fallback.theme);
       }
     } finally {
       setLoading(false);
@@ -460,7 +460,6 @@ export const SiteProvider = ({ children }) => {
 
   // ── Update theme (called by admin Website panel on palette change) ──────────
   const updateTheme = useCallback((newTheme) => {
-    debugger
     setSiteData((prev) => {
       const updatedTheme = {
         ...prev.theme,
@@ -474,21 +473,18 @@ export const SiteProvider = ({ children }) => {
     });
   }, [applyTheme]);
 
-  // ── Update specific section data (admin live-edit future use) ───────────────
+  // ── Update specific section data (admin live-edit) ──────────────────────────
   const updateSection = useCallback((section, data) => {
-    debugger
     setSiteData((prev) => ({
       ...prev,
       [section]: { ...prev?.[section], ...data },
     }));
   }, []);
 
-
-  const updateSiteConfig = useCallback(async (token) => {
-    debugger
-
+  const updateSiteConfig = useCallback(async () => {
     if (!siteData) return;
-    const currentSlug = await fetchSlug();
+    const currentSlug = slug || (await fetchSlug()) || '1';
+
     // 1. Save current theme to localStorage
     localStorage.setItem(
       STORAGE_KEY,
@@ -501,45 +497,47 @@ export const SiteProvider = ({ children }) => {
     applyTheme(siteData.theme);
 
     // 3. Persist to backend
-
     try {
-      await fetch(`${API_BASE}/sites/${currentSlug}/config`, {
+      const token = getAccessToken();
+      const res = await fetch(`${API_BASE}/sites/${currentSlug}/config`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           theme: siteData.theme,
           sections: buildSectionsPayload(siteData),
         }),
       });
+
+      if (!res.ok) {
+        throw new Error(`Failed to save configuration (Status: ${res.status})`);
+      }
     } catch (err) {
       console.warn("SiteContext: could not persist config to backend", err);
+      throw err;
     }
-  }, [siteData, applyTheme, getSiteIdFromUrl]);
+  }, [siteData, slug, applyTheme]);
 
   const fetchSlug = async () => {
     debugger
-    const token = localStorage.getItem("accessToken");
-
     try {
-      const response = await fetch('http://localhost:8181/restroly/secure/api/v1/users/fetchRestaurantId', {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.get('/secure/api/v1/users/fetchRestaurantId');
+      const data = response.data || {};
+      const resolvedSlug =
+        data.restaurantName
+          ? data.restaurantName
+          //.trim().toLowerCase().replace(/\s+/g, '-')
+          : (data.restaurantId ? String(data.restaurantId) : 'rajkot-dhaba');
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch user");
-      }
-
-      const json = await response.json();
-      setSlug(json.data);
-      return json.data;
+      setSlug(resolvedSlug);
+      return resolvedSlug;
     } catch (err) {
-      console.error("Could not fetch slug", err);
+      console.error("Could not fetch slug from /fetchRestaurantId:", err);
+      const fallbackSlug = 'rajkot-dhaba';
+      setSlug(fallbackSlug);
+      return fallbackSlug;
     }
   };
 

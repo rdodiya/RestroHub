@@ -2,21 +2,26 @@ import { useState } from 'react';
 import { X, CheckCircle2, AlertCircle, Loader2, ExternalLink } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import QRCode from 'react-qr-code';
+import api from '@services/common/api';
 
 const UPITestModal = ({ isOpen, onClose, link }) => {
   const [testStatus, setTestStatus] = useState('idle'); // idle | loading | success | failed
 
   if (!link) return null;
 
-  const upiUrl = `upi://pay?pa=${link.upiId}&pn=Restroly&am=1&cu=INR`;
+  const upiUrl = `upi://pay?pa=${encodeURIComponent(link.upiId)}&pn=RestroHub&am=1.00&cu=INR&tn=${encodeURIComponent('Test Payment for ' + (link.name || 'RestroHub'))}`;
 
   const handleVerify = async () => {
     try {
       setTestStatus('loading');
-      // 🔌 await api.post('/api/upi/verify', { linkId: link.id });
-      await new Promise((r) => setTimeout(r, 2000));
-      setTestStatus('success');
+      const res = await api.post('/secure/api/v1/upi-links/verify', { linkId: link.id });
+      if (res.data?.success || res.data?.status === 'VERIFIED') {
+        setTestStatus('success');
+      } else {
+        setTestStatus('failed');
+      }
     } catch (err) {
+      console.error('Test verification failed:', err);
       setTestStatus('failed');
     }
   };
@@ -90,15 +95,20 @@ const UPITestModal = ({ isOpen, onClose, link }) => {
             </p>
 
             {/* UPI URL */}
-            <div
+            <a
+              href={upiUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="
                 mx-auto mt-3 flex max-w-xs items-center justify-center
-                gap-1.5 rounded-lg bg-gray-50 px-3 py-2
+                gap-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 px-3 py-2
+                text-blue-700 transition-colors
               "
+              title="Click to open in UPI App"
             >
-              <ExternalLink className="h-3 w-3 shrink-0 text-gray-400" />
-              <p className="truncate text-xs text-gray-500">{link.upiId}</p>
-            </div>
+              <ExternalLink className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+              <p className="truncate text-xs font-medium">{link.upiId}</p>
+            </a>
 
             {/* Status Messages */}
             {testStatus === 'loading' && (

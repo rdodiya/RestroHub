@@ -3,6 +3,8 @@ import { X, Upload, Loader2, Camera, Trash2 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import profileService from '../../../../services/user/profileService';
 
+import toast from 'react-hot-toast';
+
 const ProfileImageModal = ({ isOpen, onClose, currentImage, onSave }) => {
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -28,10 +30,12 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage, onSave }) => {
       // server returns profileImage as base64 string; update parent with data URL
       const returnedBase64 = resp.profileImage || base64;
       onSave?.(`data:image/jpeg;base64,${returnedBase64}`);
+      toast.success('Profile photo updated successfully!');
       onClose();
       setPreview(null);
     } catch (err) {
       console.error('Upload failed:', err);
+      toast.error('Failed to upload profile photo.');
     } finally {
       setUploading(false);
     }

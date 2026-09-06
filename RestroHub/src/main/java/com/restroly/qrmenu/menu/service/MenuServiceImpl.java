@@ -119,6 +119,35 @@ public class MenuServiceImpl implements MenuService {
         return menuMapper.toResponseDTOList(menus);
     }
 
+    // ========== GET BY DATE & BRANCH ==========
+    @Override
+    @Transactional(readOnly = true)
+    public List<MenuResponseDTO> getMenusByDate(java.time.LocalDate date, Long branchId) {
+        log.debug("Fetching menus for date: {}, branch ID: {}", date, branchId);
+
+        java.time.LocalDate queryDate = date != null ? date : java.time.LocalDate.now();
+        List<Menu> candidateMenus = menuRepository.findActiveMenusByDateAndBranch(queryDate, branchId);
+
+        // Filter by day of week if menu specifies recurring day(s)
+        String dayOfWeekName = queryDate.getDayOfWeek().name(); // e.g. MONDAY
+        List<Menu> filteredMenus = candidateMenus.stream()
+                .filter(menu -> {
+                    if (menu.getDayOfWeek() == null || menu.getDayOfWeek().trim().isEmpty()) {
+                        return true;
+                    }
+                    String[] days = menu.getDayOfWeek().toUpperCase().split(",");
+                    for (String d : days) {
+                        if (d.trim().equals(dayOfWeekName)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .toList();
+
+        return menuMapper.toResponseDTOList(filteredMenus);
+    }
+
     // ========== UPDATE ==========
     @Override
     public MenuResponseDTO updateMenu(Long menuId, MenuRequestDTO requestDTO) {

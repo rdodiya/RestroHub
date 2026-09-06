@@ -1,18 +1,13 @@
 // src/hooks/useAuth.js
-// Utility hook to read user roles from localStorage.
-// Once backend APIs are integrated, this can be extended to use context/API calls.
+// Utility hook to read user roles from storage (localStorage or sessionStorage).
+import { getStoredRoles } from '@services/common/authStorage';
 
 /**
- * Returns the current user's roles from localStorage.
+ * Returns the current user's roles from storage.
  * The login flow stores roles as JSON.stringify(["ROLE_ADMIN", "ROLE_CUSTOMER", ...])
  */
 export const getUserRoles = () => {
-  try {
-    const raw = localStorage.getItem('roles');
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
+  return getStoredRoles();
 };
 
 /**
@@ -28,12 +23,12 @@ export const hasRole = (...requiredRoles) => {
     const normalised = role.trim().toUpperCase();
     return userRoles.some(
       (ur) => {
-        const cleaned = ur.trim().toUpperCase();
+        const roleName = typeof ur === 'string' ? ur : ur?.authority || ur?.name || '';
+        const cleaned = roleName.trim().toUpperCase();
         return cleaned === normalised || cleaned === `ROLE_${normalised}`;
       }
     );
   });
-  console.log("Checking roles:", { userRoles, requiredRoles, matched });
   return matched;
 };
 

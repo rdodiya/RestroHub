@@ -1,75 +1,100 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, AlertCircle, CreditCard } from 'lucide-react';
 import UPICard from './UPICard';
 import AdminSkeleton from '../AdminSkeleton';
+import api from '@services/common/api';
+
+// Helper to safely extract list from response
+const extractList = (resData) => {
+  if (!resData) return [];
+  if (Array.isArray(resData)) return resData;
+  if (Array.isArray(resData.data)) return resData.data;
+  if (Array.isArray(resData.content)) return resData.content;
+  return [];
+};
 
 // ============================================
-// MAIN
+// MAIN COMPONENT
 // ============================================
-const UPIGrid = ({ onTest, onCountChange }) => {
+const UPIGrid = ({ branchId, refreshKey, onTest, onCountChange }) => {
   const [upiLinks, setUpiLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
 
-  // Fallback
-  const fallbackLinks = [
-    {
-      id: 1, name: 'Main Account', upiId: 'restaurant@paytm',
-      isDefault: true, transactions: 89, revenue: 45230,
-    },
-    {
-      id: 2, name: 'Backup Account', upiId: 'restaurant@upi',
-      isDefault: false, transactions: 12, revenue: 5670,
-    },
-  ];
+  const fetchLinks = useCallback(async () => {
+    if (!branchId) {
+      setLoading(false);
+      return;
+    }
 
-  useEffect(() => {
-    fetchLinks();
-  }, []);
-
-  const fetchLinks = async () => {
     try {
       setLoading(true);
       setError(null);
-      // 🔌 const response = await api.get('/api/upi-links');
-      // setUpiLinks(response.data);
-      await new Promise((r) => setTimeout(r, 600));
-      setUpiLinks(fallbackLinks);
-      onCountChange?.(fallbackLinks.length);
+      const response = await api.get(`/secure/api/v1/upi-links/branch/${branchId}`);
+      const list = extractList(response.data);
+      setUpiLinks(list);
+      onCountChange?.(list.length);
     } catch (err) {
-      console.error('Fetch failed:', err);
-      setError('Failed to load UPI links');
-      setUpiLinks(fallbackLinks);
+      console.error('Failed to fetch UPI links:', err.response?.data || err);
+      setError('Failed to load UPI links from server');
+      setUpiLinks([]);
+      onCountChange?.(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, [branchId, onCountChange]);
+
+  useEffect(() => {
+    fetchLinks();
+  }, [fetchLinks, refreshKey]);
 
   // ------------------------------------
   // HANDLERS
   // ------------------------------------
   const handleCopy = (upiId, id) => {
+    if (!upiId) return;
     navigator.clipboard.writeText(upiId);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleSetDefault = (id) => {
-    setUpiLinks((prev) =>
-      prev.map((link) => ({ ...link, isDefault: link.id === id }))
-    );
+  const handleSetDefault = async (id) => {
+    try {
+      const res = await api.put(`/secure/api/v1/upi-links/${id}/default`, null, {
+        params: { branchId }
+      });
+      const updated = res.data?.data || res.data;
+      setUpiLinks((prev) =>
+        prev.map((link) => ({
+          ...link,
+          isDefault: link.id === id
+        }))
+      );
+      return updated;
+    } catch (err) {
+      console.error('Failed to set default UPI link:', err.response?.data || err);
+      throw err;
+    }
   };
 
-  const handleDelete = (id) => {
-    setUpiLinks((prev) => prev.filter((link) => link.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/secure/api/v1/upi-links/${id}`);
+      setUpiLinks((prev) => {
+        const next = prev.filter((link) => link.id !== id);
+        onCountChange?.(next.length);
+        return next;
+      });
+    } catch (err) {
+      console.error('Failed to delete UPI link:', err.response?.data || err);
+      throw err;
+    }
   };
 
   // ------------------------------------
   // RENDER
   // ------------------------------------
-
-  // Loading
   if (loading) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
@@ -80,7 +105,6 @@ const UPIGrid = ({ onTest, onCountChange }) => {
     );
   }
 
-  // Error
   if (error && upiLinks.length === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white px-6 py-12 text-center sm:py-16">
@@ -101,20 +125,18 @@ const UPIGrid = ({ onTest, onCountChange }) => {
     );
   }
 
-  // Empty
   if (upiLinks.length === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white px-6 py-12 text-center sm:py-16">
         <CreditCard className="mx-auto mb-4 h-12 w-12 text-blue-200 sm:h-16 sm:w-16" />
         <p className="font-medium text-gray-700">No UPI links yet</p>
         <p className="mt-1 text-sm text-gray-500">
-          Add your first UPI link to accept payments
+          Add your primary UPI handle (GPay, PhonePe, Paytm, BHIM) to receive direct customer payments.
         </p>
       </div>
     );
   }
 
-  // Grid
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
       {upiLinks.map((link) => (

@@ -5,6 +5,7 @@ import com.restroly.qrmenu.user.dto.UserResponse;
 import com.restroly.qrmenu.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.restroly.qrmenu.user.dto.ChangePasswordRequestDTO;
 import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
 import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
 
@@ -26,5 +27,6 @@ public interface UserService {
     public boolean existsByEmail(String email);
     public UserProfileResponseDTO getCurrentUserProfile();
     public UserProfileResponseDTO updateUserProfile(UserProfileRequestDTO request);
+    public void changePassword(ChangePasswordRequestDTO request);
     public User getUserByEmailEntity(String email);
 }
