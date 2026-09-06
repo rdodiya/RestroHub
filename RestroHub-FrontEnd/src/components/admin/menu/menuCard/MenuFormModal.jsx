@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { X, Loader2, ChevronDown, Tag, UtensilsCrossed, MapPin, FileText, Type, Calendar, Clock, CalendarRange } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import api from "@services/common/api";
+import toast from 'react-hot-toast';
 
 const DAYS_OF_WEEK = [
     { id: 'MONDAY', label: 'Mon' },
@@ -144,6 +145,7 @@ const MenuCreation = ({ isOpen, onClose, editingMenu, allCategories, allBranches
             onClose();
         } catch (err) {
             console.error("Failed to save menu:", err.response?.data || err);
+            toast.error("Failed to save menu");
             const message = err.response?.data?.message
                 || err.response?.data?.error
                 || 'Failed to save menu. Please try again.';

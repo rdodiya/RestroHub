@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Loader2, CreditCard, Info, AlertCircle } from 'lucide-react';
-import { Dialog } from '@headlessui/react';
 import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 const UPI_REGEX = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
 
@@ -9,20 +9,23 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({ name: '', upiId: '', isDefault: false });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const errs = {};
 
-    if (!formData.name?.trim()) {
-      setError('Please enter an account name.');
-      return;
+    const trimmedName = formData.name?.trim() || '';
+    if (!trimmedName) {
+      errs.name = 'Account name is required';
     }
 
-    const trimmedUpi = formData.upiId?.trim();
-    if (!trimmedUpi || !UPI_REGEX.test(trimmedUpi)) {
-      setError('Please enter a valid UPI ID (e.g., restaurant@okicici, merchant@paytm).');
-      return;
+    const trimmedUpi = formData.upiId?.trim() || '';
+    if (!trimmedUpi) {
+      errs.upiId = 'UPI ID is required';
+    } else if (!UPI_REGEX.test(trimmedUpi)) {
+      errs.upiId = 'Enter a valid UPI ID (e.g. restaurant@okicici, merchant@paytm)';
     }
 
     if (!branchId) {
@@ -30,24 +33,30 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
       return;
     }
 
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      return;
+    }
+
     try {
       setSubmitting(true);
+      setFieldErrors({});
       await api.post('/secure/api/v1/upi-links', {
         branchId: Number(branchId),
-        name: formData.name.trim(),
+        name: trimmedName,
         upiId: trimmedUpi,
         isDefault: Boolean(formData.isDefault)
       });
 
+      toast.success('UPI link added successfully!');
       setFormData({ name: '', upiId: '', isDefault: false });
       onSuccess?.();
       onClose();
     } catch (err) {
       console.error('Failed to create UPI link:', err.response?.data || err);
-      setError(
-        err.response?.data?.message ||
-        'Failed to add UPI link. Please verify the details and try again.'
-      );
+      const msg = err.response?.data?.message || 'Failed to add UPI link. Please verify the details and try again.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -116,13 +125,17 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className={inputClass}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    setFieldErrors((p) => ({ ...p, name: undefined }));
+                  }}
+                  className={`${fieldErrors.name ? 'border-red-500' : 'border-gray-200'} ${inputClass}`}
                   placeholder="e.g., Main Account, PhonePe Merchant"
-                  required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.name ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.name ? 'err-upi-name' : undefined}
                 />
+                {fieldErrors.name && <p id="err-upi-name" className="mt-1.5 text-xs text-red-500">{fieldErrors.name}</p>}
               </div>
 
               {/* UPI ID */}
@@ -133,13 +146,17 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
                 <input
                   type="text"
                   value={formData.upiId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, upiId: e.target.value })
-                  }
-                  className={inputClass}
+                  onChange={(e) => {
+                    setFormData({ ...formData, upiId: e.target.value });
+                    setFieldErrors((p) => ({ ...p, upiId: undefined }));
+                  }}
+                  className={`${fieldErrors.upiId ? 'border-red-500' : 'border-gray-200'} ${inputClass}`}
                   placeholder="yourname@paytm or 9876543210@ybl"
-                  required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.upiId ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.upiId ? 'err-upi-id' : undefined}
                 />
+                {fieldErrors.upiId && <p id="err-upi-id" className="mt-1.5 text-xs text-red-500">{fieldErrors.upiId}</p>}
                 <p className="mt-1.5 flex items-start gap-1.5 text-xs text-gray-500">
                   <Info className="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
                   Enter your VPA / UPI ID from GPay, PhonePe, Paytm, BHIM, etc.

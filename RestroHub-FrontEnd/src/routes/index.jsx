@@ -16,6 +16,7 @@ import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
+import TermsOfService from '../pages/public/TermsOfService';
 import RefundPolicy from '../pages/public/RefundPolicy';
 import NotFound from '../pages/public/NotFound';
 
@@ -46,6 +47,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/refund-policy" element={<RefundPolicy />} />
       </Route>
 

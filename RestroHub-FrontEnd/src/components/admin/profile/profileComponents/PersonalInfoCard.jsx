@@ -58,6 +58,18 @@ const PersonalInfoCard = ({ profile, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // client-side validation
+    const errs = {};
+    if (!formData.firstName.trim()) errs.firstName = 'First name is required';
+    if (!formData.phoneNumber.trim()) errs.phoneNumber = 'Phone number is required';
+    else if (!/^\+?[0-9\s-]{7,15}$/.test(formData.phoneNumber)) errs.phoneNumber = 'Enter a valid phone number';
+
+    if (Object.keys(errs).length) {
+      setSaving(false);
+      setFieldErrors(errs);
+      return;
+    }
+
     try {
       setSaving(true);
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
@@ -119,6 +131,8 @@ const PersonalInfoCard = ({ profile, onSave }) => {
 
   const labelClass = 'mb-1.5 block text-sm font-medium text-gray-800';
 
+  const [fieldErrors, setFieldErrors] = useState({});
+
   // View Mode Row
   const InfoRow = ({ label, value }) => (
     <div>
@@ -173,11 +187,18 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                 <input
                   type="text"
                   value={formData.firstName}
-                  onChange={(e) => updateField('firstName', e.target.value)}
-                  className={inputClass}
+                  onChange={(e) => {
+                    updateField('firstName', e.target.value);
+                    setFieldErrors((p) => ({ ...p, firstName: undefined }));
+                  }}
+                  className={`${inputClass} ${fieldErrors.firstName ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder="First name"
                   required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.firstName ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.firstName ? 'err-personal-firstname' : undefined}
                 />
+                {fieldErrors.firstName && <p id="err-personal-firstname" className="mt-1 text-xs text-red-500">{fieldErrors.firstName}</p>}
               </div>
               <div>
                 <label className={labelClass}>Last Name</label>
@@ -208,11 +229,18 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                 <input
                   type="tel"
                   value={formData.phoneNumber}
-                  onChange={(e) => updateField('phoneNumber', e.target.value)}
-                  className={inputClass}
+                  onChange={(e) => {
+                    updateField('phoneNumber', e.target.value);
+                    setFieldErrors((p) => ({ ...p, phoneNumber: undefined }));
+                  }}
+                  className={`${inputClass} ${fieldErrors.phoneNumber ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder="9876543210"
                   required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.phoneNumber ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.phoneNumber ? 'err-personal-phone' : undefined}
                 />
+                {fieldErrors.phoneNumber && <p id="err-personal-phone" className="mt-1 text-xs text-red-500">{fieldErrors.phoneNumber}</p>}
               </div>
             </div>
 

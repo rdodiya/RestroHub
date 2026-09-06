@@ -7,6 +7,7 @@ import {
   UtensilsCrossed, FileText
 } from 'lucide-react';
 import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
   const [toggling, setToggling] = useState(false);
@@ -41,6 +42,7 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
       }
     } catch (err) {
       console.error('Toggle failed:', err);
+      toast.error('Toggle failed');
     } finally {
       setToggling(false);
     }

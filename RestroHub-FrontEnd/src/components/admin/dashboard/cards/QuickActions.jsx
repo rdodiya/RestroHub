@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import api from "@services/common/api";
 import { useAdminTheme } from '@context/AdminThemeContext';
 
+
 // ============================================
 // ACTION BUTTON (Private to this file)
 // ============================================
@@ -78,6 +79,9 @@ const QuickActions = () => {
     try {
       setLoadingAction('new-order');
       navigate('/admin/orders', { state: { openCreateOrder: true } });
+    } catch (err) {
+      console.error('Failed to create order:', err);
+      toast.error('Failed to create order');
     } finally {
       setLoadingAction(null);
     }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Clock,
   UserCheck,
@@ -11,8 +11,9 @@ import {
   Phone,
   MoreVertical,
   Loader2,
+  X,
 } from 'lucide-react';
-
+import toast from 'react-hot-toast';
 import api from '@services/common/api';
 
 // Format ISO createdAt into a human-readable time
@@ -221,10 +222,32 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
         err.response?.data || err
       );
 
-      alert(
+      toast.error(
         err.response?.data?.message ||
           'Failed to update order status'
       );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!order?.orderId) return;
+    const isConfirmed = window.confirm(
+      `Are you sure you want to cancel Order #${order.orderId}?`,
+    );
+    if (!isConfirmed) return;
+
+    try {
+      setUpdating(true);
+      await api.post(`/secure/api/v1/orders/${order.orderId}/cancel`);
+      toast.success(`Order #${order.orderId} cancelled`);
+      if (onStatusUpdate) {
+        onStatusUpdate(order.orderId, 'CANCELLED');
+      }
+    } catch (err) {
+      console.error('Failed to cancel order:', err);
+      toast.error(err.response?.data?.message || 'Failed to cancel order');
     } finally {
       setUpdating(false);
     }
@@ -254,7 +277,7 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
 
               {/* Table */}
               <span className={`font-semibold text-gray-900 ${compact ? 'text-sm' : ''}`}>
-                Table {order?.tableNumber || '—'}
+                Table {order?.tableNumber || order?.table || '—'}
               </span>
 
               {/* Status */}
@@ -344,7 +367,7 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
           </span>
 
           <span className={`font-bold text-gray-900 ${compact ? 'text-base' : 'text-lg'}`}>
-            {formatAmount(order?.totalAmount)}
+            {formatAmount(order?.totalAmount ?? order?.amount)}
           </span>
 
         </div>
@@ -353,24 +376,37 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
 
       {/* Action Button */}
       {action && (
-        <button
-          type="button"
-          onClick={handleAction}
-          disabled={updating}
-          className={`w-full flex items-center justify-center gap-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 ${compact ? 'px-3 py-2 text-xs' : 'px-4 py-2.5 text-sm'} ${action.bg} ${action.text} ${action.hoverBg} ${action.border}`}
-        >
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleAction}
+            disabled={updating}
+            className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 ${compact ? 'px-2.5 py-2 text-xs' : 'px-4 py-2.5 text-sm'} ${action.bg} ${action.text} ${action.hoverBg} ${action.border}`}
+          >
 
-          {updating ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <action.icon className="w-3.5 h-3.5" />
+            {updating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <action.icon className="w-3.5 h-3.5" />
+            )}
+
+            {updating
+              ? 'Updating...'
+              : action.label}
+
+          </button>
+          {currentStatus === 'PENDING' && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={updating}
+              className={`flex items-center justify-center gap-1 rounded-xl transition-all font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 disabled:opacity-50 ${compact ? 'px-2 py-2 text-xs' : 'px-3 py-2.5 text-sm'}`}
+            >
+              <X className="w-3.5 h-3.5" />
+              Cancel
+            </button>
           )}
-
-          {updating
-            ? 'Updating...'
-            : action.label}
-
-        </button>
+        </div>
       )}
 
     </div>

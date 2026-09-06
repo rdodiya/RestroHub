@@ -79,6 +79,9 @@ const SecurityCard = () => {
           className={`${inputClass} ${error ? 'border-red-300' : 'border-gray-200'}`}
           placeholder="••••••••"
           required
+          aria-required="true"
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={error ? `err-${field}` : undefined}
         />
         <button
           type="button"
@@ -89,7 +92,7 @@ const SecurityCard = () => {
         </button>
       </div>
       {error && (
-        <p className="mt-1 flex items-center gap-1 text-xs text-red-600">
+        <p id={`err-${field}`} className="mt-1 flex items-center gap-1 text-xs text-red-600">
           <AlertCircle className="h-3 w-3" /> {error}
         </p>
       )}

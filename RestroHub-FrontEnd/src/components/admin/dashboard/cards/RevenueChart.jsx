@@ -12,6 +12,7 @@ import {
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import toast from 'react-hot-toast';
 
 // Helper to safely fetch branchId
 const getBranchId = async () => {
@@ -157,6 +158,7 @@ const RevenueChart = () => {
 
     } catch (err) {
       console.error('Failed to fetch real-time revenue:', err);
+      toast.error('Failed to fetch revenue');
       setError('Failed to load real-time revenue');
       setData([]);
     } finally {

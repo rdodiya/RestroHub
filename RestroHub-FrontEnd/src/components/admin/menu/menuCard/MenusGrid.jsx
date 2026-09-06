@@ -1043,6 +1043,7 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
       setMenus(Array.isArray(menuList) ? menuList : []);
     } catch (err) {
       console.error('Failed to fetch menus:', err.response?.data || err);
+      toast.error('Failed to fetch menus');
       setError('Failed to load menus');
       setMenus([]);
     } finally {

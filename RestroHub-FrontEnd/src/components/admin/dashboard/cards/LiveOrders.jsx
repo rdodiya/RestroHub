@@ -12,6 +12,7 @@ import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import OrderCard from '../../orders/orderComponents/OrderCard';
+import toast from 'react-hot-toast';
 
 // Format ISO createdAt into readable time ago string
 const formatTimeAgo = (iso) => {
@@ -108,6 +109,7 @@ const LiveOrders = () => {
       setOrders(transformed);
     } catch (err) {
       console.error('Failed to fetch live orders:', err);
+      toast.error('Failed to fetch orders');
       setError('Failed to load orders');
       setOrders([]);
     } finally {

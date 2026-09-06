@@ -81,6 +81,29 @@ const Register = () => {
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [roles, setRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
+  const [rolesError, setRolesError] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [showVerificationScreen, setShowVerificationScreen] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setRolesLoading(true);
+      setRolesError("");
+      try {
+        const res = await api.get("/api/v1/roles/active");
+        setRoles(res.data?.data || []);
+      } catch {
+        setRolesError("Unable to load roles. Please try again.");
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -98,8 +121,9 @@ const Register = () => {
         const res = await api.post("/public/api/v1/auth/register", registerData);
 
         if (res.data.success) {
-          toast.success("Registration successful! Please login.");
-          navigate("/login");
+          setRegisteredEmail(values.email);
+          setShowVerificationScreen(true);
+          toast.success("Registration successful! Please check your email.");
         } else {
           toast.error(res.data.message || "Registration failed");
         }
@@ -111,12 +135,65 @@ const Register = () => {
     },
   });
 
+  const handleResendVerification = async () => {
+    setIsResending(true);
+    try {
+      await api.post("/public/api/v1/auth/resend-verification", { email: registeredEmail });
+      toast.success("Verification email resent! Please check your inbox.");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to resend verification email.");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   const inputClass = (field) =>
     `w-full rounded-lg border ${
       formik.touched[field] && formik.errors[field]
         ? "border-red-500 focus:ring-red-500"
         : "border-gray-300 focus:ring-blue-500 dark:border-gray-600"
     } bg-transparent py-4 pl-6 pr-12 text-gray-800 placeholder-gray-400 outline-none transition focus:border-transparent focus:ring-2 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`;
+
+  const toggleRole = (roleId) => {
+    const nextRoleIds = formik.values.roleIds.includes(roleId)
+      ? formik.values.roleIds.filter((id) => id !== roleId)
+      : [...formik.values.roleIds, roleId];
+
+    formik.setFieldValue("roleIds", nextRoleIds);
+  };
+
+  if (showVerificationScreen) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10 dark:bg-gray-900 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white p-10 shadow-xl dark:border-gray-700 dark:bg-gray-800 text-center">
+          <div className="mb-6 flex justify-center">
+            <span className="text-6xl">📧</span>
+          </div>
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">Check your email</h2>
+          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+            We sent a verification link to
+          </p>
+          <p className="mb-6 font-medium text-blue-600 dark:text-blue-400">{registeredEmail}</p>
+          <p className="mb-8 text-sm text-gray-500 dark:text-gray-400">
+            Didn&apos;t receive the email? Check your spam folder or resend it.
+          </p>
+          <button
+            onClick={handleResendVerification}
+            disabled={isResending}
+            className="mb-4 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-600"
+          >
+            {isResending ? <><SpinnerIcon /> Resending…</> : "Resend Verification Email"}
+          </button>
+          <Link
+            to="/login"
+            className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+          >
+            Back to Sign In
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10 dark:bg-gray-900 sm:px-6 lg:px-8">

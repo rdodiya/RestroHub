@@ -43,6 +43,7 @@ const Menus = () => {
       setAllBranches(Array.isArray(branchList) ? branchList : []);
     } catch (err) {
       console.error('Failed to fetch branches:', err.response?.data || err);
+      toast.error('Failed to fetch branches');
       setAllBranches([]);
     }
   };

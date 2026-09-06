@@ -57,5 +57,8 @@
     "responsive"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "overrides": {
+    "websocket-driver": "^0.7.5"
+  }
 }

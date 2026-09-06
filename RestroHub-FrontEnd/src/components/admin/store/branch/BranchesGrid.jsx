@@ -43,6 +43,7 @@ const BranchesGrid = forwardRef(({ onEdit, onCountChange, restaurantId }, ref) =
       onCountChange?.(branchList.length);
     } catch (err) {
       console.error('Fetch failed:', err);
+      toast.error('Fetch failed');
       setError('Failed to load branches');
       setBranches([]);
       onCountChange?.(0);

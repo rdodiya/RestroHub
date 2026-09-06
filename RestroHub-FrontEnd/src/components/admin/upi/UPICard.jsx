@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import {
   CreditCard,
   Check,
@@ -25,6 +26,7 @@ const UPICard = ({ link, onCopy, onSetDefault, onDelete, onTest, copiedId }) => 
       await onSetDefault(link.id);
     } catch (err) {
       console.error('Failed to set default:', err);
+      toast.error('Failed to set default UPI link');
     } finally {
       setSettingDefault(false);
     }
@@ -37,6 +39,7 @@ const UPICard = ({ link, onCopy, onSetDefault, onDelete, onTest, copiedId }) => 
       await onDelete(link.id);
     } catch (err) {
       console.error('Failed to delete:', err);
+      toast.error('Failed to delete UPI link');
     } finally {
       setDeleting(false);
     }

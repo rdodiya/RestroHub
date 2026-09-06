@@ -26,11 +26,11 @@ const PASSWORD_REGEX =
 
 const resetPasswordSchema = Yup.object({
   newPassword: Yup.string()
+    .required("New password is required")
     .matches(
-      PASSWORD_REGEX,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?`~]).{8,}$/,
       "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
-    )
-    .required("New password is required"),
+    ),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
     .required("Confirm password is required"),

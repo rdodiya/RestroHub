@@ -9,7 +9,6 @@ import {
   Facebook,
 } from 'lucide-react';
 import api from '../../../../services/common/api';
-
 import toast from 'react-hot-toast';
 
 const RestaurantInfoCard = ({ profile, onSave }) => {

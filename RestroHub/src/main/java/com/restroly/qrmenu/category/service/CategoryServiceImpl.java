@@ -110,6 +110,29 @@ public class CategoryServiceImpl implements CategoryService {
 		categoryRepository.save(existingCategory);
 	}
 
+	/* =======================
+       RESTORE SOFT-DELETED CATEGORY
+     ======================= */
+	@Override
+	@Transactional
+	public CategoryResponseDTO restoreCategory(Long id) {
+		log.debug("Restoring category with ID: {}", id);
+		Category existingCategory = categoryRepository.findById(id)
+				.orElseThrow(() ->
+						new ResourceNotFoundException("Category", "id", id));
+
+		if (Boolean.FALSE.equals(existingCategory.getIsDelete())) {
+			log.warn("Category with ID: {} is already active", id);
+			return CategoryResponseDTO.fromEntity(existingCategory);
+		}
+
+		existingCategory.setIsDelete(false);
+		existingCategory.setUpdatedDate(LocalDateTime.now());
+		Category restored = categoryRepository.save(existingCategory);
+		log.info("Category with ID: {} restored successfully", id);
+		return CategoryResponseDTO.fromEntity(restored);
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public Page<CategoryResponseDTO> getActiveCategories(Pageable pageable) {

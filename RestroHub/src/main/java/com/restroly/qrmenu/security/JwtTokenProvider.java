@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtTokenProvider {
 
+    private static final String INSECURE_DEFAULT_SECRET =
+            "your-256-bit-secret-key-here-change-in-production";
+
     @Value("${security.jwt.secret}")
     private String jwtSecret;
 
@@ -35,6 +38,14 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+            throw new IllegalStateException(
+                    "JWT secret must be configured via the JWT_SECRET environment variable.");
+        }
+        if (INSECURE_DEFAULT_SECRET.equals(jwtSecret)) {
+            throw new IllegalStateException(
+                    "JWT secret is using the insecure default value. Set JWT_SECRET to a secure random key.");
+        }
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 

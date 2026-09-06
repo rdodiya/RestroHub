@@ -3,6 +3,7 @@ import { RefreshCw, AlertCircle, CreditCard } from 'lucide-react';
 import UPICard from './UPICard';
 import AdminSkeleton from '../AdminSkeleton';
 import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 // Helper to safely extract list from response
 const extractList = (resData) => {
@@ -37,6 +38,7 @@ const UPIGrid = ({ branchId, refreshKey, onTest, onCountChange }) => {
       onCountChange?.(list.length);
     } catch (err) {
       console.error('Failed to fetch UPI links:', err.response?.data || err);
+      toast.error('Failed to load UPI links');
       setError('Failed to load UPI links from server');
       setUpiLinks([]);
       onCountChange?.(0);

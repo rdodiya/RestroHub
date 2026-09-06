@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { X, Upload, Loader2, Camera, Trash2 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import profileService from '../../../../services/user/profileService';
-
 import toast from 'react-hot-toast';
 
 const ProfileImageModal = ({ isOpen, onClose, currentImage, onSave }) => {

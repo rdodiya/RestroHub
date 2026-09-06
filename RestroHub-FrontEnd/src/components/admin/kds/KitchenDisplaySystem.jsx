@@ -3,7 +3,7 @@ import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import api from '@services/common/api';
 import KanbanBoard from './KanbanBoard';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const KitchenDisplaySystem = () => {
   const [orders, setOrders] = useState([]);
@@ -54,6 +54,7 @@ const KitchenDisplaySystem = () => {
       oscillator.stop(audioContextRef.current.currentTime + 1);
     } catch (e) {
       console.error("Audio playback failed", e);
+      toast.error("Audio playback failed");
     }
   };
 
@@ -92,6 +93,7 @@ const KitchenDisplaySystem = () => {
         });
       }, (error) => {
         console.error('WebSocket error:', error);
+        toast.error('WebSocket error');
         setIsConnected(false);
         setTimeout(connectWebSocket, 5000);
       });
