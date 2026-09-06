@@ -1,11 +1,11 @@
 # Graph Report - RestroHub  (2026-09-07)
 
 ## Corpus Check
-- 335 files · ~156,893 words
+- 335 files · ~156,981 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2366 nodes · 6097 edges · 130 communities (109 shown, 21 thin omitted)
+- 2366 nodes · 6097 edges · 133 communities (113 shown, 20 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 409 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -53,7 +53,7 @@
 - Branch
 - User
 - SubscriptionServiceImpl
-- Register.jsx
+- MenuResponseDTO
 - BranchResponseDTO
 - Restaurant
 - ApiResponse
@@ -94,7 +94,7 @@
 - Section
 - RestaurantApplication
 - ForgotPassword.jsx
-- authStorage.js
+- auth.js
 - org.springframework.stereotype.Component
 - io.swagger.v3.oas.annotations.responses.ApiResponses
 - 📋 Development Workflow
@@ -104,11 +104,12 @@
 - MenusGrid.jsx
 - UserRoleManagement.jsx
 - SiteConfig
-- ServiceRequestDTO
+- io.swagger.v3.oas.annotations.media.Schema
 - 📝 Pull Requests
 - ApiService.js
 - PaymentStatus
 - ✨ Features
+- WhatsappOrderNotificationServiceImpl.java
 - OrderItem
 - lombok.Builder
 - 🤝 Contributing
@@ -129,6 +130,7 @@
 - eslint.config.js
 - three
 - AuthControllerTest.java
+- RefreshTokenRequest
 - TableResponseDTO
 - CategoryResponseDTO
 - ThemeDTO
@@ -162,18 +164,18 @@
 ## Import Cycles
 - None detected.
 
-## Communities (130 total, 21 thin omitted)
+## Communities (133 total, 20 thin omitted)
 
 ### Community 0 - "lombok.AllArgsConstructor"
-Cohesion: 0.10
-Nodes (30): com.fasterxml.jackson.annotation.JsonInclude, io.swagger.v3.oas.annotations.media.Schema, lombok.AllArgsConstructor, lombok.Data, lombok.NoArgsConstructor, ForgotPasswordRequest, GoogleAuthRequest, ResetPasswordRequest (+22 more)
+Cohesion: 0.14
+Nodes (22): lombok.AllArgsConstructor, lombok.Data, lombok.NoArgsConstructor, ForgotPasswordRequest, GoogleAuthRequest, ResetPasswordRequest, VerifyResetCodeRequest, AddressDTO (+14 more)
 
 ### Community 1 - "PaymentServiceImplTest"
 Cohesion: 0.15
 Nodes (4): org.junit.jupiter.api.BeforeEach, org.junit.jupiter.api.extension.ExtendWith, Override, PaymentServiceImplTest
 
 ### Community 2 - "FoodServiceImpl"
-Cohesion: 0.17
+Cohesion: 0.16
 Nodes (5): org.springframework.cache.annotation.Cacheable, org.springframework.cache.annotation.CacheEvict, FoodMapper, FoodServiceImpl, Override
 
 ### Community 3 - "SecurityConfig.java"
@@ -185,8 +187,8 @@ Cohesion: 0.12
 Nodes (25): jakarta.servlet.http.HttpServletRequest, jakarta.validation.ConstraintViolation, jakarta.validation.ConstraintViolationException, org.springframework.dao.DataIntegrityViolationException, org.springframework.http.converter.HttpMessageNotReadableException, org.springframework.security.access.AccessDeniedException, org.springframework.security.authentication.BadCredentialsException, org.springframework.security.core.AuthenticationException (+17 more)
 
 ### Community 5 - "OrderController.java"
-Cohesion: 0.11
-Nodes (12): org.springframework.web.bind.annotation.CrossOrigin, org.springframework.web.bind.annotation.DeleteMapping, org.springframework.web.bind.annotation.GetMapping, org.springframework.web.bind.annotation.PutMapping, org.springframework.web.bind.annotation.RequestMapping, org.springframework.web.bind.annotation.RestController, HomeController, DashboardNotificationController (+4 more)
+Cohesion: 0.15
+Nodes (11): org.springframework.web.bind.annotation.CrossOrigin, org.springframework.web.bind.annotation.DeleteMapping, org.springframework.web.bind.annotation.GetMapping, org.springframework.web.bind.annotation.PutMapping, org.springframework.web.bind.annotation.RequestMapping, org.springframework.web.bind.annotation.RestController, HomeController, DashboardNotificationController (+3 more)
 
 ### Community 7 - "io.swagger.v3.oas.annotations.tags.Tag"
 Cohesion: 0.08
@@ -205,7 +207,7 @@ Cohesion: 0.07
 Nodes (21): jakarta.annotation.PostConstruct, jakarta.servlet.FilterChain, jakarta.servlet.http.HttpServletResponse, javax.crypto.SecretKey, org.springframework.http.HttpStatus, org.springframework.security.authentication.AuthenticationManager, org.springframework.security.core.Authentication, org.springframework.security.core.userdetails.UserDetails (+13 more)
 
 ### Community 11 - "Food"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (13): org.hibernate.annotations.SQLDelete, org.hibernate.annotations.SQLRestriction, Food, AllArgsConstructor, Builder, Entity, EqualsAndHashCode, Getter (+5 more)
 
 ### Community 12 - "Category"
@@ -217,7 +219,7 @@ Cohesion: 0.05
 Nodes (41): 🎯 About, 🙏 Acknowledgments, 📊 Additional Features, 🔄 Aggregator Integration, Aggregator Sync, 🌍 AI Menu Translation, AI Menu Translation, ☕ Backend Setup (Java / Spring Boot) (+33 more)
 
 ### Community 14 - "react"
-Cohesion: 0.06
+Cohesion: 0.07
 Nodes (5): react, KanbanBoard(), OrderCard(), styles, ThemeContext
 
 ### Community 17 - "OrderBuilder"
@@ -233,8 +235,8 @@ Cohesion: 0.08
 Nodes (22): org.springframework.web.multipart.MultipartFile, PageResponseDTO, FoodController, DeleteMapping, GetMapping, PatchMapping, PostMapping, PutMapping (+14 more)
 
 ### Community 20 - "Profile.jsx"
-Cohesion: 0.14
-Nodes (14): Header(), TODO: Replace hardcoded branchId with actual branch from auth context, formatGender(), getNames(), PersonalInfoCard(), ProfileHeader(), ProfileImageModal(), ProfileSidebar() (+6 more)
+Cohesion: 0.10
+Nodes (19): Header(), TODO: Replace hardcoded branchId with actual branch from auth context, formatGender(), getNames(), PersonalInfoCard(), ProfileHeader(), ProfileImageModal(), ProfileSidebar() (+11 more)
 
 ### Community 21 - "ThemeSelector.jsx"
 Cohesion: 0.09
@@ -258,7 +260,7 @@ Nodes (27): formik, @headlessui/react, lenis, lucide-react, react, react-hot-toa
 
 ### Community 27 - "OrderResponse"
 Cohesion: 0.08
-Nodes (7): org.springframework.beans.factory.annotation.Autowired, org.springframework.boot.web.client.RestTemplateBuilder, org.springframework.scheduling.annotation.Async, org.springframework.web.bind.annotation.PatchMapping, OrderResponse, WhatsappOrderNotificationServiceImpl, WhatsappOrderNotificationService
+Nodes (4): org.springframework.scheduling.annotation.Async, org.springframework.web.bind.annotation.PatchMapping, OrderResponse, OrderService
 
 ### Community 28 - "RoleResponse"
 Cohesion: 0.09
@@ -273,8 +275,8 @@ Cohesion: 0.11
 Nodes (5): Address, AddressRepository, BranchMapper, AddressDTO, MenuDTO
 
 ### Community 31 - "MenuController"
-Cohesion: 0.15
-Nodes (6): GetMapping, PatchMapping, RequestMapping, RestController, MenuController, MenuService
+Cohesion: 0.12
+Nodes (8): DeleteMapping, GetMapping, PatchMapping, RequestMapping, ResponseStatus, RestController, MenuController, MenuService
 
 ### Community 32 - "PaymentService"
 Cohesion: 0.33
@@ -296,17 +298,21 @@ Nodes (8): org.springframework.web.bind.annotation.ResponseStatus, Branch, Branc
 Cohesion: 0.06
 Nodes (15): UserResponse, AllArgsConstructor, Builder, Entity, Getter, NoArgsConstructor, PrePersist, PreUpdate (+7 more)
 
+### Community 38 - "MenuResponseDTO"
+Cohesion: 0.22
+Nodes (7): com.fasterxml.jackson.annotation.JsonInclude, MenuRequestDTO, AddressDTO, BranchDTO, CategoryDTO, FoodDTO, MenuResponseDTO
+
 ### Community 39 - "BranchResponseDTO"
-Cohesion: 0.12
-Nodes (12): BranchController, DeleteMapping, GetMapping, PatchMapping, PostMapping, PutMapping, RequestMapping, ResponseStatus (+4 more)
+Cohesion: 0.15
+Nodes (10): BranchController, GetMapping, PatchMapping, PostMapping, PutMapping, RequestMapping, RestController, BranchRequestDTO (+2 more)
 
 ### Community 40 - "Restaurant"
 Cohesion: 0.07
 Nodes (29): org.mapstruct.Mapper, org.springframework.boot.CommandLineRunner, org.springframework.jdbc.core.JdbcTemplate, DatabaseInitializer, Override, AllArgsConstructor, Builder, Entity (+21 more)
 
 ### Community 41 - "ApiResponse"
-Cohesion: 0.10
-Nodes (20): io.swagger.v3.oas.annotations.parameters.RequestBody, org.springframework.web.bind.annotation.PostMapping, AuthController, AuthResponse, AllArgsConstructor, Builder, Data, NoArgsConstructor (+12 more)
+Cohesion: 0.12
+Nodes (15): io.swagger.v3.oas.annotations.parameters.RequestBody, org.springframework.web.bind.annotation.PostMapping, AuthController, AuthResponse, AllArgsConstructor, Builder, Data, NoArgsConstructor (+7 more)
 
 ### Community 43 - "🤝 Contributing to Restroly"
 Cohesion: 0.11
@@ -333,12 +339,12 @@ Cohesion: 0.22
 Nodes (5): org.springframework.web.servlet.mvc.method.annotation.SseEmitter, AbstractSseNotificationService, Override, SseEmitter, SseGenericNotificationService
 
 ### Community 49 - "routes/index.jsx"
-Cohesion: 0.08
-Nodes (15): App(), root, AdminLayout(), CustomerLayout(), PublicLayout(), App(), Landing(), Login() (+7 more)
+Cohesion: 0.06
+Nodes (17): App(), root, AdminLayout(), CustomerLayout(), PublicLayout(), App(), Landing(), Login() (+9 more)
 
 ### Community 50 - "SiteConfigDTO"
-Cohesion: 0.19
-Nodes (9): GetMapping, PatchMapping, RequestMapping, RestController, PublicSiteController, SectionDTO, SiteConfigDTO, UpdateSiteConfigRequest (+1 more)
+Cohesion: 0.22
+Nodes (8): GetMapping, PatchMapping, RequestMapping, RestController, PublicSiteController, SiteConfigDTO, UpdateSiteConfigRequest, SiteConfigService
 
 ### Community 51 - "🤝 Contributing to RestroHub"
 Cohesion: 0.12
@@ -353,8 +359,8 @@ Cohesion: 0.13
 Nodes (10): OrderStatus, BILLED, CANCELLED, COMPLETED, CONFIRMED, PENDING, PREPARING, READY (+2 more)
 
 ### Community 54 - "org.springframework.data.domain.Pageable"
-Cohesion: 0.14
-Nodes (5): org.springframework.data.domain.Page, org.springframework.data.domain.Pageable, org.springframework.data.jpa.repository.Modifying, org.springframework.data.jpa.repository.Query, FoodRepository
+Cohesion: 0.16
+Nodes (3): org.springframework.data.domain.Page, org.springframework.data.domain.Pageable, FoodRepository
 
 ### Community 55 - "Tables.jsx"
 Cohesion: 0.19
@@ -385,8 +391,8 @@ Cohesion: 0.14
 Nodes (10): AllArgsConstructor, Builder, Entity, Getter, NoArgsConstructor, PrePersist, PreUpdate, Setter (+2 more)
 
 ### Community 62 - "org.springframework.data.jpa.repository.JpaRepository"
-Cohesion: 0.16
-Nodes (9): org.springframework.data.jpa.repository.JpaRepository, org.springframework.stereotype.Repository, PasswordResetTokenRepository, CategoryRepository, ServiceRequestRepository, OrderItemRepository, PaymentVerificationRepository, UpiLinkRepository (+1 more)
+Cohesion: 0.14
+Nodes (11): org.springframework.data.jpa.repository.JpaRepository, org.springframework.data.jpa.repository.Modifying, org.springframework.data.jpa.repository.Query, org.springframework.stereotype.Repository, PasswordResetTokenRepository, CategoryRepository, ServiceRequestRepository, OrderItemRepository (+3 more)
 
 ### Community 63 - "package.json"
 Cohesion: 0.15
@@ -448,9 +454,9 @@ Nodes (7): org.springframework.boot.autoconfigure.domain.EntityScan, org.springf
 Cohesion: 0.20
 Nodes (5): ForgotPassword(), forgotPasswordSchema, getApiMessage(), resetPasswordSchema, verifyCodeSchema
 
-### Community 79 - "authStorage.js"
-Cohesion: 0.14
-Nodes (18): Sidebar(), emptyFeatureForm, emptyPlanForm, pickData(), SubscriptionManagement(), AUTH_KEYS, getAccessToken(), getAuthItem() (+10 more)
+### Community 79 - "auth.js"
+Cohesion: 0.24
+Nodes (13): Sidebar(), emptyFeatureForm, emptyPlanForm, pickData(), SubscriptionManagement(), getStoredRoles(), ADMIN_ACCESS_ROLES, FULL_ADMIN_ROLES (+5 more)
 
 ### Community 80 - "org.springframework.stereotype.Component"
 Cohesion: 0.33
@@ -488,9 +494,9 @@ Nodes (4): INITIAL_ASSIGNMENTS, MOCK_RESTAURANTS, MOCK_ROLES, MOCK_USERS
 Cohesion: 0.22
 Nodes (8): AllArgsConstructor, Builder, Entity, Getter, NoArgsConstructor, Setter, Table, SiteConfig
 
-### Community 89 - "ServiceRequestDTO"
-Cohesion: 0.33
-Nodes (5): AllArgsConstructor, Builder, Data, NoArgsConstructor, ServiceRequestDTO
+### Community 89 - "io.swagger.v3.oas.annotations.media.Schema"
+Cohesion: 0.16
+Nodes (7): io.swagger.v3.oas.annotations.media.Schema, FoodRequestDTO, AllArgsConstructor, Builder, Data, NoArgsConstructor, ServiceRequestDTO
 
 ### Community 90 - "📝 Pull Requests"
 Cohesion: 0.40
@@ -503,6 +509,10 @@ Nodes (4): PaymentStatus, CANCELLED, PENDING, SUCCESS
 ### Community 93 - "✨ Features"
 Cohesion: 0.40
 Nodes (5): 🚀 Advanced Features (In Development), 📱 Core Features, ✅ Feature Checklist, ✨ Features, 🗺️ Roadmap
+
+### Community 94 - "WhatsappOrderNotificationServiceImpl.java"
+Cohesion: 0.29
+Nodes (4): org.springframework.beans.factory.annotation.Autowired, org.springframework.boot.web.client.RestTemplateBuilder, WhatsappOrderNotificationServiceImpl, WhatsappOrderNotificationService
 
 ### Community 95 - "OrderItem"
 Cohesion: 0.12
@@ -536,6 +546,10 @@ Nodes (3): getRelativeTime(), mapToNotification(), useWebSocketNotifications()
 Cohesion: 0.83
 Nodes (3): gradlew script, die(), warn()
 
+### Community 117 - "RefreshTokenRequest"
+Cohesion: 0.33
+Nodes (5): AllArgsConstructor, Builder, Data, NoArgsConstructor, RefreshTokenRequest
+
 ### Community 127 - "TableResponseDTO"
 Cohesion: 0.17
 Nodes (11): DeleteMapping, GetMapping, PostMapping, PutMapping, RequestMapping, ResponseStatus, RestController, TableController (+3 more)
@@ -559,21 +573,21 @@ Nodes (4): SiteConfigRepository, Override, SuppressWarnings, SiteConfigServiceIm
 ## Knowledge Gaps
 - **271 isolated node(s):** `browserGlobals`, `name`, `version`, `description`, `type` (+266 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Branch` connect `Branch` to `lombok.Builder`, `lombok.AllArgsConstructor`, `Menu`, `lombok.extern.slf4j.Slf4j`, `Restaurant`, `Order`, `Category`, `Tables`, `org.springframework.transaction.annotation.Transactional`, `CreateOrderRequest`, `OrderBuilder`, `MenuServiceImpl`, `OrderStatus`, `org.springframework.data.domain.Pageable`, `org.junit.jupiter.api.Test`, `Address`?**
+- **Why does `Branch` connect `Branch` to `lombok.Builder`, `lombok.AllArgsConstructor`, `Menu`, `lombok.extern.slf4j.Slf4j`, `Restaurant`, `Order`, `Category`, `Tables`, `org.springframework.transaction.annotation.Transactional`, `CreateOrderRequest`, `OrderBuilder`, `MenuServiceImpl`, `OrderStatus`, `org.springframework.data.domain.Pageable`, `org.junit.jupiter.api.Test`, `org.springframework.data.jpa.repository.JpaRepository`, `Address`?**
   _High betweenness centrality (0.032) - this node is a cross-community bridge._
-- **Why does `react` connect `react` to `Orders.jsx`, `QRDisplay.jsx`, `UPILinks.jsx`, `useWebSocketNotifications.js`, `Register.jsx`, `Branches.jsx`, `AdminSkeleton.jsx`, `ForgotPassword.jsx`, `authStorage.js`, `routes/index.jsx`, `Profile.jsx`, `ThemeSelector.jsx`, `MenusGrid.jsx`, `UserRoleManagement.jsx`, `Tables.jsx`, `Menus.jsx`, `package.json`?**
+- **Why does `react` connect `react` to `Orders.jsx`, `QRDisplay.jsx`, `ContactSection.jsx`, `UPILinks.jsx`, `useWebSocketNotifications.js`, `Branches.jsx`, `AdminSkeleton.jsx`, `ForgotPassword.jsx`, `auth.js`, `routes/index.jsx`, `Profile.jsx`, `ThemeSelector.jsx`, `MenusGrid.jsx`, `UserRoleManagement.jsx`, `Tables.jsx`, `Menus.jsx`, `package.json`?**
   _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **Why does `ResourceNotFoundException` connect `Branch` to `CategoryResponseDTO`, `lombok.extern.slf4j.Slf4j`, `FoodServiceImpl`, `ApiErrorResponse`, `OrderController.java`, `SiteConfigServiceImpl.java`, `SiteConfigServiceImpl`, `Restaurant`, `User`, `AuthServiceImpl.java`, `UpiLinkResponseDTO`, `TableServiceImpl`, `org.springframework.transaction.annotation.Transactional`, `CreateOrderRequest`, `OrderServiceImpl`, `MenuServiceImpl`, `org.junit.jupiter.api.Test`, `Address`?**
   _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **What connects `browserGlobals`, `name`, `version` to the rest of the system?**
   _271 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `lombok.AllArgsConstructor` be split into smaller, more focused modules?**
-  _Cohesion score 0.10116550116550116 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1404040404040404 - nodes in this community are weakly interconnected._
 - **Should `SecurityConfig.java` be split into smaller, more focused modules?**
   _Cohesion score 0.06487434248977206 - nodes in this community are weakly interconnected._
 - **Should `ApiErrorResponse` be split into smaller, more focused modules?**

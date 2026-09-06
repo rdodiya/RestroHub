@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Dialog } from '@headlessui/react';
 import { X, Loader2, CreditCard, Info, AlertCircle } from 'lucide-react';
 import api from '@services/common/api';
 import toast from 'react-hot-toast';

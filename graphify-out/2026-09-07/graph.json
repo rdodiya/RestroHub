@@ -134,97 +134,6 @@
       "norm_label": "categoryrequestdto"
     },
     {
-      "label": "FoodRequestDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/dto/FoodRequestDTO.java",
-      "source_location": "L12",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_dto_foodrequestdto_foodrequestdto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "foodrequestdto"
-    },
-    {
-      "label": "MenuRequestDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuRequestDTO.java",
-      "source_location": "L12",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menurequestdto_menurequestdto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "menurequestdto"
-    },
-    {
-      "label": "AddressDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
-      "source_location": "L68",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_addressdto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "addressdto"
-    },
-    {
-      "label": "BranchDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
-      "source_location": "L49",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_branchdto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "branchdto"
-    },
-    {
-      "label": "CategoryDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
-      "source_location": "L83",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_categorydto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "categorydto"
-    },
-    {
-      "label": "FoodDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
-      "source_location": "L102",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_fooddto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "fooddto"
-    },
-    {
-      "label": "MenuResponseDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
-      "source_location": "L14",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_menuresponsedto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "menuresponsedto"
-    },
-    {
       "label": "FeatureMappingRequest",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/subscription/dto/FeatureMappingRequest.java",
@@ -262,6 +171,19 @@
       "community": 0,
       "community_name": "lombok.AllArgsConstructor",
       "norm_label": "imageuploaddto"
+    },
+    {
+      "label": "SectionDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/template/dto/SectionDTO.java",
+      "source_location": "L18",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_template_dto_sectiondto_sectiondto",
+      "community": 0,
+      "community_name": "lombok.AllArgsConstructor",
+      "norm_label": "sectiondto"
     },
     {
       "label": "ChangePasswordRequestDTO",
@@ -483,6 +405,19 @@
       "community": 116,
       "community_name": "AuthControllerTest.java",
       "norm_label": "authcontrollertest"
+    },
+    {
+      "label": "RefreshTokenRequest",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/dto/RefreshTokenRequest.java",
+      "source_location": "L7",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_refreshtokenrequest",
+      "community": 117,
+      "community_name": "RefreshTokenRequest",
+      "norm_label": "refreshtokenrequest"
     },
     {
       "label": "Category",
@@ -979,30 +914,17 @@
       "norm_label": "orderresponse"
     },
     {
-      "label": "WhatsappOrderNotificationServiceImpl",
+      "label": "OrderService",
       "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappOrderNotificationServiceImpl.java",
-      "source_location": "L16",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
+      "source_location": "L9",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappordernotificationserviceimpl_whatsappordernotificationserviceimpl",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice",
       "community": 27,
       "community_name": "OrderResponse",
-      "norm_label": "whatsappordernotificationserviceimpl"
-    },
-    {
-      "label": "WhatsappOrderNotificationService",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
-      "source_location": "L5",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice_whatsappordernotificationservice",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": "whatsappordernotificationservice"
+      "norm_label": "orderservice"
     },
     {
       "label": "RoleResponse",
@@ -1447,6 +1369,84 @@
       "norm_label": "subscriptionserviceimpl"
     },
     {
+      "label": "MenuRequestDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuRequestDTO.java",
+      "source_location": "L12",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menurequestdto_menurequestdto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "menurequestdto"
+    },
+    {
+      "label": "AddressDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
+      "source_location": "L68",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_addressdto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "addressdto"
+    },
+    {
+      "label": "BranchDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
+      "source_location": "L49",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_branchdto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "branchdto"
+    },
+    {
+      "label": "CategoryDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
+      "source_location": "L83",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_categorydto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "categorydto"
+    },
+    {
+      "label": "FoodDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
+      "source_location": "L102",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_fooddto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "fooddto"
+    },
+    {
+      "label": "MenuResponseDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
+      "source_location": "L14",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto_menuresponsedto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "menuresponsedto"
+    },
+    {
       "label": "BranchController",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java",
@@ -1653,19 +1653,6 @@
       "community": 41,
       "community_name": "ApiResponse",
       "norm_label": "authresponse"
-    },
-    {
-      "label": "RefreshTokenRequest",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/dto/RefreshTokenRequest.java",
-      "source_location": "L7",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_refreshtokenrequest",
-      "community": 41,
-      "community_name": "ApiResponse",
-      "norm_label": "refreshtokenrequest"
     },
     {
       "label": "AuthService",
@@ -1941,19 +1928,6 @@
       "norm_label": "ordercontroller"
     },
     {
-      "label": "OrderService",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
-      "source_location": "L9",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": "orderservice"
-    },
-    {
       "label": "UpiLinkController",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/payment/controller/UpiLinkController.java",
@@ -1991,19 +1965,6 @@
       "community": 50,
       "community_name": "SiteConfigDTO",
       "norm_label": "publicsitecontroller"
-    },
-    {
-      "label": "SectionDTO",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/template/dto/SectionDTO.java",
-      "source_location": "L18",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_template_dto_sectiondto_sectiondto",
-      "community": 50,
-      "community_name": "SiteConfigDTO",
-      "norm_label": "sectiondto"
     },
     {
       "label": "SiteConfigDTO",
@@ -2747,6 +2708,19 @@
       "norm_label": "siteconfig"
     },
     {
+      "label": "FoodRequestDTO",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/dto/FoodRequestDTO.java",
+      "source_location": "L12",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_dto_foodrequestdto_foodrequestdto",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "foodrequestdto"
+    },
+    {
       "label": "ServiceRequestDTO",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/notification/dto/ServiceRequestDTO.java",
@@ -2756,7 +2730,7 @@
       "_origin": "ast",
       "id": "restrohub_src_main_java_com_restroly_qrmenu_notification_dto_servicerequestdto_servicerequestdto",
       "community": 89,
-      "community_name": "ServiceRequestDTO",
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
       "norm_label": "servicerequestdto"
     },
     {
@@ -2797,6 +2771,32 @@
       "community": 92,
       "community_name": "PaymentStatus",
       "norm_label": "paymentstatus"
+    },
+    {
+      "label": "WhatsappOrderNotificationServiceImpl",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappOrderNotificationServiceImpl.java",
+      "source_location": "L16",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappordernotificationserviceimpl_whatsappordernotificationserviceimpl",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": "whatsappordernotificationserviceimpl"
+    },
+    {
+      "label": "WhatsappOrderNotificationService",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
+      "source_location": "L5",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice_whatsappordernotificationservice",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": "whatsappordernotificationservice"
     },
     {
       "label": "OrderItemBuilder",
@@ -2888,30 +2888,6 @@
       "community": 96,
       "community_name": "lombok.Builder",
       "norm_label": "upilink"
-    },
-    {
-      "label": ".createMenu()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
-      "source_location": "L13",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_createmenu",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": ".createmenu()"
-    },
-    {
-      "label": ".updateMenu()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
-      "source_location": "L25",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_updatemenu",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": ".updatemenu()"
     },
     {
       "label": ".updateUserProfile()",
@@ -3562,6 +3538,18 @@
       "norm_label": ".onupdate()"
     },
     {
+      "label": ".findByFoodIdInAndIsDeleteFalse()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
+      "source_location": "L23",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository_foodrepository_findbyfoodidinandisdeletefalse",
+      "community": 11,
+      "community_name": "Food",
+      "norm_label": ".findbyfoodidinandisdeletefalse()"
+    },
+    {
       "label": ".findByNameIgnoreCase()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
@@ -4078,18 +4066,6 @@
       "norm_label": ".getactivecategories()"
     },
     {
-      "label": ".getAllCategories()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/category/service/CategoryService.java",
-      "source_location": "L15",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_category_service_categoryservice_categoryservice_getallcategories",
-      "community": 128,
-      "community_name": "CategoryResponseDTO",
-      "norm_label": ".getallcategories()"
-    },
-    {
       "label": ".getCategoryById()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/category/service/CategoryService.java",
@@ -4184,6 +4160,54 @@
       "community": 128,
       "community_name": "CategoryResponseDTO",
       "norm_label": ".from()"
+    },
+    {
+      "label": "ContactSection()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
+      "source_location": "L29",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_components_customer_contactsection_contactsection",
+      "community": 131,
+      "community_name": "ContactSection.jsx",
+      "norm_label": "contactsection()"
+    },
+    {
+      "label": "HoursIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
+      "source_location": "L17",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_components_customer_contactsection_hoursicon",
+      "community": 131,
+      "community_name": "ContactSection.jsx",
+      "norm_label": "hoursicon()"
+    },
+    {
+      "label": "LocationIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
+      "source_location": "L10",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_components_customer_contactsection_locationicon",
+      "community": 131,
+      "community_name": "ContactSection.jsx",
+      "norm_label": "locationicon()"
+    },
+    {
+      "label": "PhoneIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
+      "source_location": "L23",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_components_customer_contactsection_phoneicon",
+      "community": 131,
+      "community_name": "ContactSection.jsx",
+      "norm_label": "phoneicon()"
     },
     {
       "label": ".uploadBase64()",
@@ -4340,54 +4364,6 @@
       "community": 14,
       "community_name": "react",
       "norm_label": "aboutsection()"
-    },
-    {
-      "label": "ContactSection()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
-      "source_location": "L29",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_components_customer_contactsection_contactsection",
-      "community": 14,
-      "community_name": "react",
-      "norm_label": "contactsection()"
-    },
-    {
-      "label": "HoursIcon()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
-      "source_location": "L17",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_components_customer_contactsection_hoursicon",
-      "community": 14,
-      "community_name": "react",
-      "norm_label": "hoursicon()"
-    },
-    {
-      "label": "LocationIcon()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
-      "source_location": "L10",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_components_customer_contactsection_locationicon",
-      "community": 14,
-      "community_name": "react",
-      "norm_label": "locationicon()"
-    },
-    {
-      "label": "PhoneIcon()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
-      "source_location": "L23",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_components_customer_contactsection_phoneicon",
-      "community": 14,
-      "community_name": "react",
-      "norm_label": "phoneicon()"
     },
     {
       "label": "Footer()",
@@ -5818,6 +5794,18 @@
       "norm_label": ".existsbynameignorecaseandcategory_categoryidandfoodidnot()"
     },
     {
+      "label": ".findAllCategories()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
+      "source_location": "L115",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository_foodrepository_findallcategories",
+      "community": 2,
+      "community_name": "FoodServiceImpl",
+      "norm_label": ".findallcategories()"
+    },
+    {
       "label": ".createFood()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/service/FoodServiceImpl.java",
@@ -6128,6 +6116,90 @@
       "community": 20,
       "community_name": "Profile.jsx",
       "norm_label": "clearauthsession()"
+    },
+    {
+      "label": "clearRememberedUsername()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L32",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_clearrememberedusername",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "clearrememberedusername()"
+    },
+    {
+      "label": "getAccessToken()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L9",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_getaccesstoken",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "getaccesstoken()"
+    },
+    {
+      "label": "getAuthItem()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L6",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_getauthitem",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "getauthitem()"
+    },
+    {
+      "label": "getRememberedUsername()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L24",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_getrememberedusername",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "getrememberedusername()"
+    },
+    {
+      "label": "getStorage()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L4",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_getstorage",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "getstorage()"
+    },
+    {
+      "label": "setRememberedUsername()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L27",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_setrememberedusername",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "setrememberedusername()"
+    },
+    {
+      "label": "storeAuthSession()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L36",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_storeauthsession",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "storeauthsession()"
     },
     {
       "label": "fileToBase64()",
@@ -6682,6 +6754,42 @@
       "norm_label": ".createorder()"
     },
     {
+      "label": ".getActiveOrders()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
+      "source_location": "L84",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_controller_ordercontroller_ordercontroller_getactiveorders",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".getactiveorders()"
+    },
+    {
+      "label": ".getOrder()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
+      "source_location": "L74",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_controller_ordercontroller_ordercontroller_getorder",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".getorder()"
+    },
+    {
+      "label": ".getOrdersByBranch()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
+      "source_location": "L79",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_controller_ordercontroller_ordercontroller_getordersbybranch",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".getordersbybranch()"
+    },
+    {
       "label": ".updateOrderStatus()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
@@ -6982,6 +7090,66 @@
       "norm_label": ".cancelorder()"
     },
     {
+      "label": ".createOrder()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
+      "source_location": "L11",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_createorder",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".createorder()"
+    },
+    {
+      "label": ".getActiveOrdersByBranch()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
+      "source_location": "L17",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_getactiveordersbybranch",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".getactiveordersbybranch()"
+    },
+    {
+      "label": ".getOrderById()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
+      "source_location": "L13",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_getorderbyid",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".getorderbyid()"
+    },
+    {
+      "label": ".getOrdersByBranch()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_getordersbybranch",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".getordersbybranch()"
+    },
+    {
+      "label": ".markAllActiveOrdersReady()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
+      "source_location": "L23",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_markallactiveordersready",
+      "community": 27,
+      "community_name": "OrderResponse",
+      "norm_label": ".markallactiveordersready()"
+    },
+    {
       "label": ".updateOrderStatus()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
@@ -7030,18 +7198,6 @@
       "norm_label": ".sendorderstatusupdate()"
     },
     {
-      "label": ".WhatsappOrderNotificationServiceImpl()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappOrderNotificationServiceImpl.java",
-      "source_location": "L19",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappordernotificationserviceimpl_whatsappordernotificationserviceimpl_whatsappordernotificationserviceimpl",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": ".whatsappordernotificationserviceimpl()"
-    },
-    {
       "label": ".formatPhoneNumber()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappServiceImpl.java",
@@ -7064,42 +7220,6 @@
       "community": 27,
       "community_name": "OrderResponse",
       "norm_label": ".sendtemplatemessage()"
-    },
-    {
-      "label": ".WhatsappServiceImpl()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappServiceImpl.java",
-      "source_location": "L37",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappserviceimpl_whatsappserviceimpl_whatsappserviceimpl",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": ".whatsappserviceimpl()"
-    },
-    {
-      "label": ".sendOrderConfirmation()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
-      "source_location": "L6",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice_whatsappordernotificationservice_sendorderconfirmation",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": ".sendorderconfirmation()"
-    },
-    {
-      "label": ".sendOrderStatusUpdate()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
-      "source_location": "L7",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice_whatsappordernotificationservice_sendorderstatusupdate",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": ".sendorderstatusupdate()"
     },
     {
       "label": ".RoleInitializer()",
@@ -8218,6 +8338,18 @@
       "norm_label": ".countmenusbybranch()"
     },
     {
+      "label": ".deleteMenu()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/controller/MenuController.java",
+      "source_location": "L239",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_menucontroller_deletemenu",
+      "community": 31,
+      "community_name": "MenuController",
+      "norm_label": ".deletemenu()"
+    },
+    {
       "label": ".getMenuById()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/controller/MenuController.java",
@@ -8252,6 +8384,18 @@
       "community": 31,
       "community_name": "MenuController",
       "norm_label": ".getmenusbydate()"
+    },
+    {
+      "label": ".hardDeleteMenu()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/controller/MenuController.java",
+      "source_location": "L263",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_menucontroller_harddeletemenu",
+      "community": 31,
+      "community_name": "MenuController",
+      "norm_label": ".harddeletemenu()"
     },
     {
       "label": ".restoreMenu()",
@@ -8302,6 +8446,18 @@
       "norm_label": ".countmenusbybranch()"
     },
     {
+      "label": ".deleteMenu()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
+      "source_location": "L28",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_deletemenu",
+      "community": 31,
+      "community_name": "MenuController",
+      "norm_label": ".deletemenu()"
+    },
+    {
       "label": ".existsByName()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
@@ -8348,6 +8504,18 @@
       "community": 31,
       "community_name": "MenuController",
       "norm_label": ".getmenusbydate()"
+    },
+    {
+      "label": ".hardDeleteMenu()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
+      "source_location": "L30",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_harddeletemenu",
+      "community": 31,
+      "community_name": "MenuController",
+      "norm_label": ".harddeletemenu()"
     },
     {
       "label": ".restoreMenu()",
@@ -9370,88 +9538,28 @@
       "norm_label": ".updateplan()"
     },
     {
-      "label": "EmailIcon()",
+      "label": ".createMenu()",
       "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L20",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
+      "source_location": "L13",
       "_callable": true,
       "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_emailicon",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_createmenu",
       "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "emailicon()"
+      "community_name": "MenuResponseDTO",
+      "norm_label": ".createmenu()"
     },
     {
-      "label": "EyeIcon()",
+      "label": ".updateMenu()",
       "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L26",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
+      "source_location": "L25",
       "_callable": true,
       "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_eyeicon",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_updatemenu",
       "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "eyeicon()"
-    },
-    {
-      "label": "EyeOffIcon()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L33",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_eyeofficon",
-      "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "eyeofficon()"
-    },
-    {
-      "label": "Illustration()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L48",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_illustration",
-      "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "illustration()"
-    },
-    {
-      "label": "Register()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L79",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_register",
-      "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "register()"
-    },
-    {
-      "label": "SpinnerIcon()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L39",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_spinnericon",
-      "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "spinnericon()"
-    },
-    {
-      "label": "UserIcon()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_usericon",
-      "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "usericon()"
+      "community_name": "MenuResponseDTO",
+      "norm_label": ".updatemenu()"
     },
     {
       "label": ".checkNameExists()",
@@ -9490,18 +9598,6 @@
       "norm_label": ".createbranch()"
     },
     {
-      "label": ".deleteBranch()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java",
-      "source_location": "L233",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_branchcontroller_deletebranch",
-      "community": 39,
-      "community_name": "BranchResponseDTO",
-      "norm_label": ".deletebranch()"
-    },
-    {
       "label": ".getAllBranches()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java",
@@ -9536,18 +9632,6 @@
       "community": 39,
       "community_name": "BranchResponseDTO",
       "norm_label": ".getbranchesbyrestaurant()"
-    },
-    {
-      "label": ".hardDeleteBranch()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java",
-      "source_location": "L257",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_branchcontroller_harddeletebranch",
-      "community": 39,
-      "community_name": "BranchResponseDTO",
-      "norm_label": ".harddeletebranch()"
     },
     {
       "label": ".restoreBranch()",
@@ -9610,18 +9694,6 @@
       "norm_label": ".createbranch()"
     },
     {
-      "label": ".deleteBranch()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/service/BranchService.java",
-      "source_location": "L25",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_service_branchservice_branchservice_deletebranch",
-      "community": 39,
-      "community_name": "BranchResponseDTO",
-      "norm_label": ".deletebranch()"
-    },
-    {
       "label": ".existsByName()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/service/BranchService.java",
@@ -9668,18 +9740,6 @@
       "community": 39,
       "community_name": "BranchResponseDTO",
       "norm_label": ".getbranchesbyrestaurantid()"
-    },
-    {
-      "label": ".hardDeleteBranch()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/service/BranchService.java",
-      "source_location": "L27",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_service_branchservice_branchservice_harddeletebranch",
-      "community": 39,
-      "community_name": "BranchResponseDTO",
-      "norm_label": ".harddeletebranch()"
     },
     {
       "label": ".restoreBranch()",
@@ -10412,18 +10472,6 @@
       "community": 41,
       "community_name": "ApiResponse",
       "norm_label": ".success()"
-    },
-    {
-      "label": ".forceCloseConnection()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/notifications/controller/DashboardNotificationController.java",
-      "source_location": "L38",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_notifications_controller_dashboardnotificationcontroller_dashboardnotificationcontroller_forcecloseconnection",
-      "community": 41,
-      "community_name": "ApiResponse",
-      "norm_label": ".forcecloseconnection()"
     },
     {
       "label": ".findByBranch_BranchId()",
@@ -11614,6 +11662,90 @@
       "norm_label": "refundpolicy()"
     },
     {
+      "label": "EmailIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L20",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_emailicon",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "emailicon()"
+    },
+    {
+      "label": "EyeIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L26",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_eyeicon",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "eyeicon()"
+    },
+    {
+      "label": "EyeOffIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L33",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_eyeofficon",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "eyeofficon()"
+    },
+    {
+      "label": "Illustration()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L48",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_illustration",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "illustration()"
+    },
+    {
+      "label": "Register()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L79",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_register",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "register()"
+    },
+    {
+      "label": "SpinnerIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L39",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_spinnericon",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "spinnericon()"
+    },
+    {
+      "label": "UserIcon()",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_usericon",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "usericon()"
+    },
+    {
       "label": "AppRoutes()",
       "file_type": "code",
       "source_file": "RestroHub-FrontEnd/src/routes/index.jsx",
@@ -11674,6 +11806,18 @@
       "norm_label": ".publicapi()"
     },
     {
+      "label": ".forceCloseConnection()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/notifications/controller/DashboardNotificationController.java",
+      "source_location": "L38",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_notifications_controller_dashboardnotificationcontroller_dashboardnotificationcontroller_forcecloseconnection",
+      "community": 5,
+      "community_name": "OrderController.java",
+      "norm_label": ".forcecloseconnection()"
+    },
+    {
       "label": ".subscribeToBranch()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/notifications/controller/DashboardNotificationController.java",
@@ -11686,42 +11830,6 @@
       "norm_label": ".subscribetobranch()"
     },
     {
-      "label": ".getActiveOrders()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
-      "source_location": "L84",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_controller_ordercontroller_ordercontroller_getactiveorders",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".getactiveorders()"
-    },
-    {
-      "label": ".getOrder()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
-      "source_location": "L74",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_controller_ordercontroller_ordercontroller_getorder",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".getorder()"
-    },
-    {
-      "label": ".getOrdersByBranch()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
-      "source_location": "L79",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_controller_ordercontroller_ordercontroller_getordersbybranch",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".getordersbybranch()"
-    },
-    {
       "label": ".markAllReady()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java",
@@ -11732,66 +11840,6 @@
       "community": 5,
       "community_name": "OrderController.java",
       "norm_label": ".markallready()"
-    },
-    {
-      "label": ".createOrder()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
-      "source_location": "L11",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_createorder",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".createorder()"
-    },
-    {
-      "label": ".getActiveOrdersByBranch()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
-      "source_location": "L17",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_getactiveordersbybranch",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".getactiveordersbybranch()"
-    },
-    {
-      "label": ".getOrderById()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
-      "source_location": "L13",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_getorderbyid",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".getorderbyid()"
-    },
-    {
-      "label": ".getOrdersByBranch()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
-      "source_location": "L15",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_getordersbybranch",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".getordersbybranch()"
-    },
-    {
-      "label": ".markAllActiveOrdersReady()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
-      "source_location": "L23",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice_orderservice_markallactiveordersready",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": ".markallactiveordersready()"
     },
     {
       "label": ".deleteUpiLink()",
@@ -12298,18 +12346,6 @@
       "norm_label": ".setstatus()"
     },
     {
-      "label": ".invalidateAllTokensForUser()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/repository/PasswordResetTokenRepository.java",
-      "source_location": "L27",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_repository_passwordresettokenrepository_passwordresettokenrepository_invalidatealltokensforuser",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": ".invalidatealltokensforuser()"
-    },
-    {
       "label": ".toSummaryDTOList()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/mapper/BranchMapper.java",
@@ -12382,6 +12418,18 @@
       "norm_label": ".findbyisdeletefalse()"
     },
     {
+      "label": ".getAllCategories()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/category/service/CategoryService.java",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_category_service_categoryservice_categoryservice_getallcategories",
+      "community": 54,
+      "community_name": "org.springframework.data.domain.Pageable",
+      "norm_label": ".getallcategories()"
+    },
+    {
       "label": ".getActiveCategories()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/category/service/CategoryServiceImpl.java",
@@ -12404,18 +12452,6 @@
       "community": 54,
       "community_name": "org.springframework.data.domain.Pageable",
       "norm_label": ".findallavailable()"
-    },
-    {
-      "label": ".findAllCategories()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
-      "source_location": "L115",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository_foodrepository_findallcategories",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": ".findallcategories()"
     },
     {
       "label": ".findAllVeg()",
@@ -12466,18 +12502,6 @@
       "norm_label": ".findbycategoryid()"
     },
     {
-      "label": ".findByFoodIdInAndIsDeleteFalse()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
-      "source_location": "L23",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository_foodrepository_findbyfoodidinandisdeletefalse",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": ".findbyfoodidinandisdeletefalse()"
-    },
-    {
       "label": ".findByIsAvailable()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
@@ -12512,18 +12536,6 @@
       "community": 54,
       "community_name": "org.springframework.data.domain.Pageable",
       "norm_label": ".searchfoods()"
-    },
-    {
-      "label": ".updateAvailability()",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
-      "source_location": "L153",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository_foodrepository_updateavailability",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": ".updateavailability()"
     },
     {
       "label": ".toSummaryDTOList()",
@@ -12968,6 +12980,30 @@
       "community": 62,
       "community_name": "org.springframework.data.jpa.repository.JpaRepository",
       "norm_label": ".findtopbyuser_emailandisotpverifiedfalseandisresetcompletedfalseorderbycreatedatdesc()"
+    },
+    {
+      "label": ".invalidateAllTokensForUser()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/repository/PasswordResetTokenRepository.java",
+      "source_location": "L27",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_repository_passwordresettokenrepository_passwordresettokenrepository_invalidatealltokensforuser",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": ".invalidatealltokensforuser()"
+    },
+    {
+      "label": ".updateAvailability()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
+      "source_location": "L153",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository_foodrepository_updateavailability",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": ".updateavailability()"
     },
     {
       "label": ".findByBranch_BranchId()",
@@ -13626,7 +13662,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_components_admin_sidebar_sidebar",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "sidebar()"
     },
     {
@@ -13638,7 +13674,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_components_admin_subscriptions_subscriptionmanagement_pickdata",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "pickdata()"
     },
     {
@@ -13650,68 +13686,8 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_components_admin_subscriptions_subscriptionmanagement_subscriptionmanagement",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "subscriptionmanagement()"
-    },
-    {
-      "label": "clearRememberedUsername()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L32",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_clearrememberedusername",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "clearrememberedusername()"
-    },
-    {
-      "label": "getAccessToken()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L9",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_getaccesstoken",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "getaccesstoken()"
-    },
-    {
-      "label": "getAuthItem()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L6",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_getauthitem",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "getauthitem()"
-    },
-    {
-      "label": "getRememberedUsername()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L24",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_getrememberedusername",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "getrememberedusername()"
-    },
-    {
-      "label": "getStorage()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L4",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_getstorage",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "getstorage()"
     },
     {
       "label": "getStoredRoles()",
@@ -13722,32 +13698,8 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_services_common_authstorage_getstoredroles",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "getstoredroles()"
-    },
-    {
-      "label": "setRememberedUsername()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L27",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_setrememberedusername",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "setrememberedusername()"
-    },
-    {
-      "label": "storeAuthSession()",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L36",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_storeauthsession",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "storeauthsession()"
     },
     {
       "label": "getDefaultAdminPath()",
@@ -13758,7 +13710,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth_getdefaultadminpath",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "getdefaultadminpath()"
     },
     {
@@ -13770,7 +13722,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth_hasanyrole",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "hasanyrole()"
     },
     {
@@ -13782,7 +13734,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth_normalizerole",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "normalizerole()"
     },
     {
@@ -13794,7 +13746,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth_readstoredroles",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "readstoredroles()"
     },
     {
@@ -14206,52 +14158,52 @@
       "norm_label": ".maptodto()"
     },
     {
-      "label": ".deleteMenu()",
+      "label": ".deleteBranch()",
       "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/controller/MenuController.java",
-      "source_location": "L239",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java",
+      "source_location": "L233",
       "_callable": true,
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_menucontroller_deletemenu",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_branchcontroller_deletebranch",
       "community": 81,
       "community_name": "io.swagger.v3.oas.annotations.responses.ApiResponses",
-      "norm_label": ".deletemenu()"
+      "norm_label": ".deletebranch()"
     },
     {
-      "label": ".hardDeleteMenu()",
+      "label": ".hardDeleteBranch()",
       "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/controller/MenuController.java",
-      "source_location": "L263",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java",
+      "source_location": "L257",
       "_callable": true,
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_menucontroller_harddeletemenu",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_branchcontroller_harddeletebranch",
       "community": 81,
       "community_name": "io.swagger.v3.oas.annotations.responses.ApiResponses",
-      "norm_label": ".harddeletemenu()"
+      "norm_label": ".harddeletebranch()"
     },
     {
-      "label": ".deleteMenu()",
+      "label": ".deleteBranch()",
       "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
-      "source_location": "L28",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/service/BranchService.java",
+      "source_location": "L25",
       "_callable": true,
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_deletemenu",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_service_branchservice_branchservice_deletebranch",
       "community": 81,
       "community_name": "io.swagger.v3.oas.annotations.responses.ApiResponses",
-      "norm_label": ".deletemenu()"
+      "norm_label": ".deletebranch()"
     },
     {
-      "label": ".hardDeleteMenu()",
+      "label": ".hardDeleteBranch()",
       "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
-      "source_location": "L30",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/service/BranchService.java",
+      "source_location": "L27",
       "_callable": true,
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice_menuservice_harddeletemenu",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_service_branchservice_branchservice_harddeletebranch",
       "community": 81,
       "community_name": "io.swagger.v3.oas.annotations.responses.ApiResponses",
-      "norm_label": ".harddeletemenu()"
+      "norm_label": ".harddeletebranch()"
     },
     {
       "label": ".acknowledgeRequest()",
@@ -14554,6 +14506,54 @@
       "norm_label": "request()"
     },
     {
+      "label": ".WhatsappOrderNotificationServiceImpl()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappOrderNotificationServiceImpl.java",
+      "source_location": "L19",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappordernotificationserviceimpl_whatsappordernotificationserviceimpl_whatsappordernotificationserviceimpl",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": ".whatsappordernotificationserviceimpl()"
+    },
+    {
+      "label": ".WhatsappServiceImpl()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappServiceImpl.java",
+      "source_location": "L37",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappserviceimpl_whatsappserviceimpl_whatsappserviceimpl",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": ".whatsappserviceimpl()"
+    },
+    {
+      "label": ".sendOrderConfirmation()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
+      "source_location": "L6",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice_whatsappordernotificationservice_sendorderconfirmation",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": ".sendorderconfirmation()"
+    },
+    {
+      "label": ".sendOrderStatusUpdate()",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
+      "source_location": "L7",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice_whatsappordernotificationservice_sendorderstatusupdate",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": ".sendorderstatusupdate()"
+    },
+    {
       "label": ".addOrderItems()",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/builder/OrderBuilder.java",
@@ -14710,28 +14710,6 @@
       "norm_label": ".onupdate()"
     },
     {
-      "label": "com.fasterxml.jackson.annotation.JsonInclude",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "com_fasterxml_jackson_annotation_jsoninclude",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "com.fasterxml.jackson.annotation.jsoninclude"
-    },
-    {
-      "label": "io.swagger.v3.oas.annotations.media.Schema",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "io_swagger_v3_oas_annotations_media_schema",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "io.swagger.v3.oas.annotations.media.schema"
-    },
-    {
       "label": "lombok.AllArgsConstructor",
       "file_type": "code",
       "source_file": "",
@@ -14763,17 +14741,6 @@
       "community": 0,
       "community_name": "lombok.AllArgsConstructor",
       "norm_label": "lombok.noargsconstructor"
-    },
-    {
-      "label": "AuthResponse.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/dto/AuthResponse.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_authresponse",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "authresponse.java"
     },
     {
       "label": "ForgotPasswordRequest.java",
@@ -14842,17 +14809,6 @@
       "norm_label": "branchrequestdto.java"
     },
     {
-      "label": "BranchResponseDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/dto/BranchResponseDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_dto_branchresponsedto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "branchresponsedto.java"
-    },
-    {
       "label": "CategoryRequestDTO.java",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/category/dto/CategoryRequestDTO.java",
@@ -14862,72 +14818,6 @@
       "community": 0,
       "community_name": "lombok.AllArgsConstructor",
       "norm_label": "categoryrequestdto.java"
-    },
-    {
-      "label": "PageResponseDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/common/generic/PageResponseDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_common_generic_pageresponsedto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "pageresponsedto.java"
-    },
-    {
-      "label": "ApiErrorResponse.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/exception/ApiErrorResponse.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_exception_apierrorresponse",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "apierrorresponse.java"
-    },
-    {
-      "label": "FoodRequestDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/dto/FoodRequestDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_dto_foodrequestdto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "foodrequestdto.java"
-    },
-    {
-      "label": "MenuRequestDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuRequestDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menurequestdto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "menurequestdto.java"
-    },
-    {
-      "label": "MenuResponseDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "menuresponsedto.java"
-    },
-    {
-      "label": "MenuService.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "menuservice.java"
     },
     {
       "label": "CreateOrderRequest.java",
@@ -15007,28 +14897,6 @@
       "norm_label": "subscriptionfeaturerequest.java"
     },
     {
-      "label": "TableRequestDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/table/dto/TableRequestDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_table_dto_tablerequestdto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "tablerequestdto.java"
-    },
-    {
-      "label": "TableResponseDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/table/dto/TableResponseDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_table_dto_tableresponsedto",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "tableresponsedto.java"
-    },
-    {
       "label": "ImageUploadDTO.java",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/template/dto/ImageUploadDTO.java",
@@ -15038,6 +14906,17 @@
       "community": 0,
       "community_name": "lombok.AllArgsConstructor",
       "norm_label": "imageuploaddto.java"
+    },
+    {
+      "label": "SectionDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/template/dto/SectionDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_template_dto_sectiondto",
+      "community": 0,
+      "community_name": "lombok.AllArgsConstructor",
+      "norm_label": "sectiondto.java"
     },
     {
       "label": "ChangePasswordRequestDTO.java",
@@ -15060,17 +14939,6 @@
       "community": 0,
       "community_name": "lombok.AllArgsConstructor",
       "norm_label": "rolerequest.java"
-    },
-    {
-      "label": "RoleResponse.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/user/dto/RoleResponse.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_user_dto_roleresponse",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "roleresponse.java"
     },
     {
       "label": "UserProfileRequestDTO.java",
@@ -15104,17 +14972,6 @@
       "community": 0,
       "community_name": "lombok.AllArgsConstructor",
       "norm_label": "userrequest.java"
-    },
-    {
-      "label": "UserResponse.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/user/dto/UserResponse.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_user_dto_userresponse",
-      "community": 0,
-      "community_name": "lombok.AllArgsConstructor",
-      "norm_label": "userresponse.java"
     },
     {
       "label": "UserService.java",
@@ -15879,6 +15736,61 @@
       "community": 116,
       "community_name": "AuthControllerTest.java",
       "norm_label": "authcontrollertest.java"
+    },
+    {
+      "label": "RefreshTokenRequest.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/dto/RefreshTokenRequest.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest",
+      "community": 117,
+      "community_name": "RefreshTokenRequest",
+      "norm_label": "refreshtokenrequest.java"
+    },
+    {
+      "label": "AllArgsConstructor",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_allargsconstructor",
+      "community": 117,
+      "community_name": "RefreshTokenRequest",
+      "norm_label": "allargsconstructor"
+    },
+    {
+      "label": "Builder",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_builder",
+      "community": 117,
+      "community_name": "RefreshTokenRequest",
+      "norm_label": "builder"
+    },
+    {
+      "label": "Data",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_data",
+      "community": 117,
+      "community_name": "RefreshTokenRequest",
+      "norm_label": "data"
+    },
+    {
+      "label": "NoArgsConstructor",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_noargsconstructor",
+      "community": 117,
+      "community_name": "RefreshTokenRequest",
+      "norm_label": "noargsconstructor"
     },
     {
       "label": "build.gradle",
@@ -17014,6 +16926,17 @@
       "norm_label": "siteconfigserviceimpl.java"
     },
     {
+      "label": "ContactSection.jsx",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_components_customer_contactsection",
+      "community": 131,
+      "community_name": "ContactSection.jsx",
+      "norm_label": "contactsection.jsx"
+    },
+    {
       "label": "Override",
       "file_type": "code",
       "source_file": "",
@@ -17078,17 +17001,6 @@
       "community": 14,
       "community_name": "react",
       "norm_label": "aboutsection.jsx"
-    },
-    {
-      "label": "ContactSection.jsx",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/components/customer/ContactSection.jsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_components_customer_contactsection",
-      "community": 14,
-      "community_name": "react",
-      "norm_label": "contactsection.jsx"
     },
     {
       "label": "Footer.jsx",
@@ -17639,6 +17551,28 @@
       "community": 20,
       "community_name": "Profile.jsx",
       "norm_label": "api"
+    },
+    {
+      "label": "authStorage.js",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "authstorage.js"
+    },
+    {
+      "label": "AUTH_KEYS",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_services_common_authstorage_auth_keys",
+      "community": 20,
+      "community_name": "Profile.jsx",
+      "norm_label": "auth_keys"
     },
     {
       "label": "profileService.js",
@@ -18972,28 +18906,6 @@
       "norm_label": "yup"
     },
     {
-      "label": "org.springframework.beans.factory.annotation.Autowired",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "org_springframework_beans_factory_annotation_autowired",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": "org.springframework.beans.factory.annotation.autowired"
-    },
-    {
-      "label": "org.springframework.boot.web.client.RestTemplateBuilder",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "org_springframework_boot_web_client_resttemplatebuilder",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": "org.springframework.boot.web.client.resttemplatebuilder"
-    },
-    {
       "label": "org.springframework.scheduling.annotation.Async",
       "file_type": "code",
       "source_file": "",
@@ -19016,26 +18928,15 @@
       "norm_label": "org.springframework.web.bind.annotation.patchmapping"
     },
     {
-      "label": "WhatsappOrderNotificationServiceImpl.java",
+      "label": "OrderService.java",
       "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappOrderNotificationServiceImpl.java",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappordernotificationserviceimpl",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice",
       "community": 27,
       "community_name": "OrderResponse",
-      "norm_label": "whatsappordernotificationserviceimpl.java"
-    },
-    {
-      "label": "WhatsappOrderNotificationService.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice",
-      "community": 27,
-      "community_name": "OrderResponse",
-      "norm_label": "whatsappordernotificationservice.java"
+      "norm_label": "orderservice.java"
     },
     {
       "label": "org.slf4j.Logger",
@@ -19720,6 +19621,17 @@
       "norm_label": "menudto"
     },
     {
+      "label": "DeleteMapping",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_java_deletemapping",
+      "community": 31,
+      "community_name": "MenuController",
+      "norm_label": "deletemapping"
+    },
+    {
       "label": "GetMapping",
       "file_type": "code",
       "source_file": "",
@@ -19751,6 +19663,17 @@
       "community": 31,
       "community_name": "MenuController",
       "norm_label": "requestmapping"
+    },
+    {
+      "label": "ResponseStatus",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_java_responsestatus",
+      "community": 31,
+      "community_name": "MenuController",
+      "norm_label": "responsestatus"
     },
     {
       "label": "RestController",
@@ -20457,37 +20380,81 @@
       "norm_label": "override"
     },
     {
-      "label": "Register.jsx",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register",
-      "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "register.jsx"
-    },
-    {
-      "label": "validationSchema",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
-      "source_location": "L66",
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_pages_public_register_validationschema",
-      "community": 38,
-      "community_name": "Register.jsx",
-      "norm_label": "validationschema"
-    },
-    {
-      "label": "DeleteMapping",
+      "label": "com.fasterxml.jackson.annotation.JsonInclude",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_java_deletemapping",
-      "community": 39,
-      "community_name": "BranchResponseDTO",
-      "norm_label": "deletemapping"
+      "id": "com_fasterxml_jackson_annotation_jsoninclude",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "com.fasterxml.jackson.annotation.jsoninclude"
+    },
+    {
+      "label": "BranchResponseDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/dto/BranchResponseDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_dto_branchresponsedto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "branchresponsedto.java"
+    },
+    {
+      "label": "MenuRequestDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuRequestDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menurequestdto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "menurequestdto.java"
+    },
+    {
+      "label": "MenuResponseDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/dto/MenuResponseDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_dto_menuresponsedto",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "menuresponsedto.java"
+    },
+    {
+      "label": "MenuService.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/service/MenuService.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_service_menuservice",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "menuservice.java"
+    },
+    {
+      "label": "RoleResponse.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/user/dto/RoleResponse.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_user_dto_roleresponse",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "roleresponse.java"
+    },
+    {
+      "label": "UserResponse.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/user/dto/UserResponse.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_user_dto_userresponse",
+      "community": 38,
+      "community_name": "MenuResponseDTO",
+      "norm_label": "userresponse.java"
     },
     {
       "label": "GetMapping",
@@ -20543,17 +20510,6 @@
       "community": 39,
       "community_name": "BranchResponseDTO",
       "norm_label": "requestmapping"
-    },
-    {
-      "label": "ResponseStatus",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_java_responsestatus",
-      "community": 39,
-      "community_name": "BranchResponseDTO",
-      "norm_label": "responsestatus"
     },
     {
       "label": "RestController",
@@ -21244,61 +21200,6 @@
       "source_location": "",
       "_origin": "ast",
       "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_authresponse_java_noargsconstructor",
-      "community": 41,
-      "community_name": "ApiResponse",
-      "norm_label": "noargsconstructor"
-    },
-    {
-      "label": "RefreshTokenRequest.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/dto/RefreshTokenRequest.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest",
-      "community": 41,
-      "community_name": "ApiResponse",
-      "norm_label": "refreshtokenrequest.java"
-    },
-    {
-      "label": "AllArgsConstructor",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_allargsconstructor",
-      "community": 41,
-      "community_name": "ApiResponse",
-      "norm_label": "allargsconstructor"
-    },
-    {
-      "label": "Builder",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_builder",
-      "community": 41,
-      "community_name": "ApiResponse",
-      "norm_label": "builder"
-    },
-    {
-      "label": "Data",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_data",
-      "community": 41,
-      "community_name": "ApiResponse",
-      "norm_label": "data"
-    },
-    {
-      "label": "NoArgsConstructor",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_refreshtokenrequest_java_noargsconstructor",
       "community": 41,
       "community_name": "ApiResponse",
       "norm_label": "noargsconstructor"
@@ -22228,6 +22129,28 @@
       "norm_label": "refundpolicy.jsx"
     },
     {
+      "label": "Register.jsx",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "register.jsx"
+    },
+    {
+      "label": "validationSchema",
+      "file_type": "code",
+      "source_file": "RestroHub-FrontEnd/src/pages/public/Register.jsx",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "restrohub_frontend_src_pages_public_register_validationschema",
+      "community": 49,
+      "community_name": "routes/index.jsx",
+      "norm_label": "validationschema"
+    },
+    {
       "label": "routes/index.jsx",
       "file_type": "code",
       "source_file": "RestroHub-FrontEnd/src/routes/index.jsx",
@@ -22349,17 +22272,6 @@
       "norm_label": "ordercontroller.java"
     },
     {
-      "label": "OrderService.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/order/service/OrderService.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_order_service_orderservice",
-      "community": 5,
-      "community_name": "OrderController.java",
-      "norm_label": "orderservice.java"
-    },
-    {
       "label": "UpiLinkController.java",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/payment/controller/UpiLinkController.java",
@@ -22424,17 +22336,6 @@
       "community": 50,
       "community_name": "SiteConfigDTO",
       "norm_label": "restcontroller"
-    },
-    {
-      "label": "SectionDTO.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/template/dto/SectionDTO.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_template_dto_sectiondto",
-      "community": 50,
-      "community_name": "SiteConfigDTO",
-      "norm_label": "sectiondto.java"
     },
     {
       "label": "SiteConfigDTO.java",
@@ -22822,39 +22723,6 @@
       "norm_label": "org.springframework.data.domain.pageable"
     },
     {
-      "label": "org.springframework.data.jpa.repository.Modifying",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "org_springframework_data_jpa_repository_modifying",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": "org.springframework.data.jpa.repository.modifying"
-    },
-    {
-      "label": "org.springframework.data.jpa.repository.Query",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "org_springframework_data_jpa_repository_query",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": "org.springframework.data.jpa.repository.query"
-    },
-    {
-      "label": "BranchRepository.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/repository/BranchRepository.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_repository_branchrepository",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": "branchrepository.java"
-    },
-    {
       "label": "CategoryService.java",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/category/service/CategoryService.java",
@@ -22864,39 +22732,6 @@
       "community": 54,
       "community_name": "org.springframework.data.domain.Pageable",
       "norm_label": "categoryservice.java"
-    },
-    {
-      "label": "FoodRepository.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": "foodrepository.java"
-    },
-    {
-      "label": "MenuRepository.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/repository/MenuRepository.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_repository_menurepository",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": "menurepository.java"
-    },
-    {
-      "label": "UserRepository.java",
-      "file_type": "code",
-      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/user/repository/UserRepository.java",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_user_repository_userrepository",
-      "community": 54,
-      "community_name": "org.springframework.data.domain.Pageable",
-      "norm_label": "userrepository.java"
     },
     {
       "label": "TableCard.jsx",
@@ -23724,6 +23559,28 @@
       "norm_label": "org.springframework.data.jpa.repository.jparepository"
     },
     {
+      "label": "org.springframework.data.jpa.repository.Modifying",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "org_springframework_data_jpa_repository_modifying",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": "org.springframework.data.jpa.repository.modifying"
+    },
+    {
+      "label": "org.springframework.data.jpa.repository.Query",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "org_springframework_data_jpa_repository_query",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": "org.springframework.data.jpa.repository.query"
+    },
+    {
       "label": "org.springframework.stereotype.Repository",
       "file_type": "code",
       "source_file": "",
@@ -23757,6 +23614,17 @@
       "norm_label": "passwordresettokenrepository.java"
     },
     {
+      "label": "BranchRepository.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/branch/repository/BranchRepository.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_repository_branchrepository",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": "branchrepository.java"
+    },
+    {
       "label": "CategoryRepository.java",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/category/repository/CategoryRepository.java",
@@ -23766,6 +23634,28 @@
       "community": 62,
       "community_name": "org.springframework.data.jpa.repository.JpaRepository",
       "norm_label": "categoryrepository.java"
+    },
+    {
+      "label": "FoodRepository.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/repository/FoodRepository.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_repository_foodrepository",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": "foodrepository.java"
+    },
+    {
+      "label": "MenuRepository.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/menu/repository/MenuRepository.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_repository_menurepository",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": "menurepository.java"
     },
     {
       "label": "ServiceRequestRepository.java",
@@ -23876,6 +23766,17 @@
       "community": 62,
       "community_name": "org.springframework.data.jpa.repository.JpaRepository",
       "norm_label": "rolerepository.java"
+    },
+    {
+      "label": "UserRepository.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/user/repository/UserRepository.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_user_repository_userrepository",
+      "community": 62,
+      "community_name": "org.springframework.data.jpa.repository.JpaRepository",
+      "norm_label": "userrepository.java"
     },
     {
       "label": "package.json",
@@ -25700,7 +25601,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_components_admin_sidebar",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "sidebar.jsx"
     },
     {
@@ -25711,7 +25612,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_components_admin_subscriptions_subscriptionmanagement",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "subscriptionmanagement.jsx"
     },
     {
@@ -25722,7 +25623,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_components_admin_subscriptions_subscriptionmanagement_emptyfeatureform",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "emptyfeatureform"
     },
     {
@@ -25733,30 +25634,8 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_components_admin_subscriptions_subscriptionmanagement_emptyplanform",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "emptyplanform"
-    },
-    {
-      "label": "authStorage.js",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "authstorage.js"
-    },
-    {
-      "label": "AUTH_KEYS",
-      "file_type": "code",
-      "source_file": "RestroHub-FrontEnd/src/services/common/authStorage.js",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "restrohub_frontend_src_services_common_authstorage_auth_keys",
-      "community": 79,
-      "community_name": "authStorage.js",
-      "norm_label": "auth_keys"
     },
     {
       "label": "auth.js",
@@ -25766,7 +25645,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "auth.js"
     },
     {
@@ -25777,7 +25656,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth_admin_access_roles",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "admin_access_roles"
     },
     {
@@ -25788,7 +25667,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth_full_admin_roles",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "full_admin_roles"
     },
     {
@@ -25799,7 +25678,7 @@
       "_origin": "ast",
       "id": "restrohub_frontend_src_utils_auth_limited_admin_roles",
       "community": 79,
-      "community_name": "authStorage.js",
+      "community_name": "auth.js",
       "norm_label": "limited_admin_roles"
     },
     {
@@ -26105,7 +25984,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_java_deletemapping",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_java_deletemapping",
       "community": 81,
       "community_name": "io.swagger.v3.oas.annotations.responses.ApiResponses",
       "norm_label": "deletemapping"
@@ -26116,7 +25995,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "restrohub_src_main_java_com_restroly_qrmenu_menu_controller_menucontroller_java_responsestatus",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_branch_controller_branchcontroller_java_responsestatus",
       "community": 81,
       "community_name": "io.swagger.v3.oas.annotations.responses.ApiResponses",
       "norm_label": "responsestatus"
@@ -26694,6 +26573,61 @@
       "norm_label": "table"
     },
     {
+      "label": "io.swagger.v3.oas.annotations.media.Schema",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "io_swagger_v3_oas_annotations_media_schema",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "io.swagger.v3.oas.annotations.media.schema"
+    },
+    {
+      "label": "AuthResponse.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/auth/dto/AuthResponse.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_auth_dto_authresponse",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "authresponse.java"
+    },
+    {
+      "label": "PageResponseDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/common/generic/PageResponseDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_common_generic_pageresponsedto",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "pageresponsedto.java"
+    },
+    {
+      "label": "ApiErrorResponse.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/exception/ApiErrorResponse.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_exception_apierrorresponse",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "apierrorresponse.java"
+    },
+    {
+      "label": "FoodRequestDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/food/dto/FoodRequestDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_food_dto_foodrequestdto",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "foodrequestdto.java"
+    },
+    {
       "label": "ServiceRequestDTO.java",
       "file_type": "code",
       "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/notification/dto/ServiceRequestDTO.java",
@@ -26701,7 +26635,7 @@
       "_origin": "ast",
       "id": "restrohub_src_main_java_com_restroly_qrmenu_notification_dto_servicerequestdto",
       "community": 89,
-      "community_name": "ServiceRequestDTO",
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
       "norm_label": "servicerequestdto.java"
     },
     {
@@ -26712,7 +26646,7 @@
       "_origin": "ast",
       "id": "restrohub_src_main_java_com_restroly_qrmenu_notification_dto_servicerequestdto_java_allargsconstructor",
       "community": 89,
-      "community_name": "ServiceRequestDTO",
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
       "norm_label": "allargsconstructor"
     },
     {
@@ -26723,7 +26657,7 @@
       "_origin": "ast",
       "id": "restrohub_src_main_java_com_restroly_qrmenu_notification_dto_servicerequestdto_java_builder",
       "community": 89,
-      "community_name": "ServiceRequestDTO",
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
       "norm_label": "builder"
     },
     {
@@ -26734,7 +26668,7 @@
       "_origin": "ast",
       "id": "restrohub_src_main_java_com_restroly_qrmenu_notification_dto_servicerequestdto_java_data",
       "community": 89,
-      "community_name": "ServiceRequestDTO",
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
       "norm_label": "data"
     },
     {
@@ -26745,8 +26679,30 @@
       "_origin": "ast",
       "id": "restrohub_src_main_java_com_restroly_qrmenu_notification_dto_servicerequestdto_java_noargsconstructor",
       "community": 89,
-      "community_name": "ServiceRequestDTO",
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
       "norm_label": "noargsconstructor"
+    },
+    {
+      "label": "TableRequestDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/table/dto/TableRequestDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_table_dto_tablerequestdto",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "tablerequestdto.java"
+    },
+    {
+      "label": "TableResponseDTO.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/table/dto/TableResponseDTO.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_table_dto_tableresponsedto",
+      "community": 89,
+      "community_name": "io.swagger.v3.oas.annotations.media.Schema",
+      "norm_label": "tableresponsedto.java"
     },
     {
       "label": "Override",
@@ -27066,6 +27022,50 @@
       "community": 93,
       "community_name": "\u2728 Features",
       "norm_label": "\ud83d\uddfa\ufe0f roadmap"
+    },
+    {
+      "label": "org.springframework.beans.factory.annotation.Autowired",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "org_springframework_beans_factory_annotation_autowired",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": "org.springframework.beans.factory.annotation.autowired"
+    },
+    {
+      "label": "org.springframework.boot.web.client.RestTemplateBuilder",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "org_springframework_boot_web_client_resttemplatebuilder",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": "org.springframework.boot.web.client.resttemplatebuilder"
+    },
+    {
+      "label": "WhatsappOrderNotificationServiceImpl.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/impl/WhatsappOrderNotificationServiceImpl.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_impl_whatsappordernotificationserviceimpl",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": "whatsappordernotificationserviceimpl.java"
+    },
+    {
+      "label": "WhatsappOrderNotificationService.java",
+      "file_type": "code",
+      "source_file": "RestroHub/src/main/java/com/restroly/qrmenu/whatsapp/service/WhatsappOrderNotificationService.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "restrohub_src_main_java_com_restroly_qrmenu_whatsapp_service_whatsappordernotificationservice",
+      "community": 94,
+      "community_name": "WhatsappOrderNotificationServiceImpl.java",
+      "norm_label": "whatsappordernotificationservice.java"
     },
     {
       "label": "OrderItemBuilder.java",
@@ -43309,7 +43309,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "RestroHub-FrontEnd/src/components/admin/orders/orderComponents/OrderCard.jsx",
-      "source_location": "L331",
+      "source_location": "L332",
       "weight": 1.0,
       "_origin": "ast",
       "source": "restrohub_frontend_src_components_admin_orders_ordercomponents_ordercard_ordercard",
