@@ -52,6 +52,27 @@ public class User {
     @Column(name = "user_profile")
     private byte[] userProfile; // BLOB for storing profile image bytes
 
+    @Column(name = "date_of_birth")
+    private String dateOfBirth;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "pincode")
+    private String pincode;
+
+    @Column(name = "bio", length = 500)
+    private String bio;
+
     // NEW: User-Role-Restaurant relationship
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

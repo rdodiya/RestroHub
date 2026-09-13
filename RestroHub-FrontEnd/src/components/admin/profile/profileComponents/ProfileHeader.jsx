@@ -74,10 +74,10 @@ const ProfileHeader = ({ profile, onEditAvatar }) => {
 
             {/* Quick Info Tags */}
             <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
-              {profile.location && (
+              {(profile.location || profile.city) && (
                 <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                   <MapPin className="h-3 w-3" />
-                  {profile.location}
+                  {profile.location || `${profile.city}${profile.state ? ', ' + profile.state : ''}`}
                 </span>
               )}
               {profile.email && (

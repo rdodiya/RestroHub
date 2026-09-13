@@ -30,7 +30,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.restroly.qrmenu.common.util.ApiConstants.SECURE_API_VERSION;
@@ -147,6 +149,27 @@ public class MenuController {
 
         log.debug("REST request to get menus for branch ID: {}", branchId);
         List<MenuResponseDTO> response = menuService.getMenusByBranchId(branchId);
+        return ResponseEntity.ok(response);
+    }
+
+    // ========== GET BY DATE & BRANCH ==========
+    @GetMapping(value = "/date", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Get menus by date and branch",
+            description = "Retrieves active menus scheduled for a specific date with optional branch filter"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved datewise menus")
+    })
+    public ResponseEntity<List<MenuResponseDTO>> getMenusByDate(
+            @Parameter(description = "Date (YYYY-MM-DD), defaults to today if omitted")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+
+            @Parameter(description = "Optional Branch ID filter")
+            @RequestParam(required = false) Long branchId) {
+
+        log.debug("REST request to get menus for date: {}, branch: {}", date, branchId);
+        List<MenuResponseDTO> response = menuService.getMenusByDate(date, branchId);
         return ResponseEntity.ok(response);
     }
 

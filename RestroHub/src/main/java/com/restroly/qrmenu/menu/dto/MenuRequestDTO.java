@@ -27,4 +27,10 @@ public class MenuRequestDTO {
     private List<Long> categoryIds;
 
     private Boolean isDeleted;
+
+    private java.time.LocalDate startDate;
+
+    private java.time.LocalDate endDate;
+
+    private String dayOfWeek;
 }

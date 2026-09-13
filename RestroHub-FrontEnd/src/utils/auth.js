@@ -1,6 +1,8 @@
+import { getStoredRoles } from '../services/common/authStorage';
+
 export const ADMIN_ACCESS_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STAFF'];
 export const FULL_ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN'];
-export const LIMITED_ADMIN_ROLES = ['MANAGER', 'STAFF'];
+export const LIMITED_ADMIN_ROLES = ['MANAGER', 'STAFF', 'ADMIN'];
 
 export const normalizeRole = (role) => {
   const roleName = typeof role === 'string' ? role : role?.authority || role?.name || '';
@@ -9,8 +11,7 @@ export const normalizeRole = (role) => {
 
 export const readStoredRoles = () => {
   try {
-    const rolesStr = localStorage.getItem('roles');
-    const roles = rolesStr ? JSON.parse(rolesStr) : [];
+    const roles = getStoredRoles();
     return Array.isArray(roles) ? roles.map(normalizeRole).filter(Boolean) : [];
   } catch {
     console.error('Failed to parse roles');

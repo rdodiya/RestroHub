@@ -90,19 +90,22 @@ public class PaymentServiceImpl implements PaymentService {
             String upiId,
             String description) {
 
-        String formattedAmount = String.format(Locale.US, "%.2f", amount);
+        String safeUpiId = (upiId != null && !upiId.isBlank()) ? upiId.trim() : "payee@upi";
+        String safePayerName = (upiPayerName != null && !upiPayerName.isBlank()) ? upiPayerName.trim() : "RestroHub";
+        String safeDescription = (description != null && !description.isBlank()) ? description.trim() : "RestroHub payment";
+        String formattedAmount = String.format(Locale.US, "%.2f", amount != null ? amount : BigDecimal.ZERO);
 
         String transactionRef = (orderId != null && orderId > 0)
                 ? ("ORD" + orderId)
                 : ("PAY" + System.currentTimeMillis());
 
         return baseUrl
-                + "?pa=" + URLEncoder.encode(upiId.trim(), StandardCharsets.UTF_8)
-                + "&pn=" + URLEncoder.encode(upiPayerName.trim(), StandardCharsets.UTF_8)
+                + "?pa=" + URLEncoder.encode(safeUpiId, StandardCharsets.UTF_8)
+                + "&pn=" + URLEncoder.encode(safePayerName, StandardCharsets.UTF_8)
                 + "&am=" + formattedAmount.trim()
                 + "&cu=INR"
                 + "&tr=" + URLEncoder.encode(transactionRef.trim(), StandardCharsets.UTF_8)
-                + "&tn=" + URLEncoder.encode(description.trim(), StandardCharsets.UTF_8);
+                + "&tn=" + URLEncoder.encode(safeDescription, StandardCharsets.UTF_8);
     }
 
     public void markPaymentAsVerified(String paymentId, String transactionId) {

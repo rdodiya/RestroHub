@@ -134,6 +134,28 @@ public class OrderServiceImpl implements OrderService {
 		return orderMapper.toResponse(canceledOrder);
 	}
 
+	@Override
+	public int markAllActiveOrdersReady(Long branchId) {
+		log.debug("Marking all active orders as READY for branchId: {}", branchId);
+		// Active kitchen statuses that need preparation
+		List<OrderStatus> targetStatuses = Arrays.asList(OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.PREPARING);
+		List<Order> orders = orderRepository.findActiveOrdersByBranch(branchId, targetStatuses);
+
+		int updatedCount = 0;
+		for (Order order : orders) {
+			order.setStatus(OrderStatus.READY);
+			Order updatedOrder = orderRepository.save(order);
+			try {
+				notificationService.notifyOrderStatusChange(updatedOrder);
+			} catch (Exception ex) {
+				log.warn("Could not send status notification for order {}: {}", order.getOrderId(), ex.getMessage());
+			}
+			updatedCount++;
+		}
+		log.info("Successfully marked {} orders as READY for branch {}", updatedCount, branchId);
+		return updatedCount;
+	}
+
 	private Order findOrderById(Long orderId) {
 		log.debug("Finding order by ID: {}", orderId);
 		return orderRepository.findById(orderId)
