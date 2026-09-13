@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import TablesHeader from './TablesHeader';
 import TablesStatusLegend from './TablesStatusLegend';
@@ -14,6 +14,26 @@ const Tables = () => {
   const [showQR, setShowQR] = useState(false);
   const [allTables, setAllTables] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [restaurantSlug, setRestaurantSlug] = useState('1');
+
+  useEffect(() => {
+    const fetchSlug = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+      try {
+        const response = await fetch('http://localhost:8181/restroly/secure/api/v1/users/fetchRestaurantId', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const json = await response.json();
+          if (json.data) setRestaurantSlug(String(json.data));
+        }
+      } catch (err) {
+        console.warn('Could not fetch restaurant slug:', err);
+      }
+    };
+    fetchSlug();
+  }, []);
 
   const openQR = (table) => { setSelectedTable(table); setShowQR(true); };
   const closeQR = () => { setShowQR(false); setSelectedTable(null); };
@@ -51,6 +71,7 @@ const Tables = () => {
         onClose={closeQR}
         table={selectedTable}
         branchId={branchId}
+        restaurantSlug={restaurantSlug}
       />
     </div>
   );

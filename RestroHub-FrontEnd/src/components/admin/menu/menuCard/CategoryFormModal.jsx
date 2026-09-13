@@ -3,7 +3,6 @@ import { Dialog } from "@headlessui/react";
 import { X, Loader2, Tag, Type, FileText  } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@services/common/api";
-import toast from 'react-hot-toast';
 
 const CategoryFormModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -46,7 +45,7 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
       toast.success("Category created successfully");
       onClose();
-      setFormData({ name: "", descriphttps://github.com/rdodiya/RestroHub/pull/257/conflict?name=RestroHub-FrontEnd%252Fsrc%252Fcomponents%252Fadmin%252Fmenu%252FmenuCard%252FCategoryFormModal.jsx&ancestor_oid=e1effa26321446557e877f621f5a836e4462e374&base_oid=21fe20e492eba46a402f4bf6eb5e4c4ddcdfd8fd&head_oid=5aa3e0a0370cd6be146a3889d91b2850eb44f76dtion: "" });
+      setFormData({ name: "", description: "" });
 
     } catch (err) {
       console.error("Category create failed:", err.response?.data || err);
