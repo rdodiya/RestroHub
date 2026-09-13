@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private static final String INSECURE_DEFAULT_SECRET =
-            "your-256-bit-secret-key-here-change-in-production";
+            "your-256-bit-secret-key-here-change-in-production.";
 
     @Value("${security.jwt.secret}")
     private String jwtSecret;

@@ -4,22 +4,79 @@ import { Dialog } from '@headlessui/react';
 import QRCode from 'react-qr-code';
 import toast from 'react-hot-toast';
 
-const TableQRModal = ({ isOpen, onClose, table, branchId }) => {
+const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }) => {
   const [downloading, setDownloading] = useState(false);
 
   if (!table) return null;
 
-  const qrUrl = `${window.location.origin}/Restrohub/RajkotDhaba/${branchId}?tableId=${table.id}&table=${table.number}`;
+  const targetSlug = restaurantSlug || '1';
+  const qrUrl = `${window.location.origin}/Restrohub/${targetSlug}/${branchId}?tableId=${table.id}&table=${table.number}&restaurantId=${targetSlug}`;
 
   const handleDownload = async () => {
     try {
       setDownloading(true);
-      await new Promise((r) => setTimeout(r, 500));
-      console.log('Download QR:', table.number);
+      const svg = document.getElementById('qr-code-svg');
+      if (!svg) {
+        throw new Error('QR element not found');
+      }
+
+      // Convert SVG to PNG image on canvas
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const padding = 40;
+        const size = 600;
+        canvas.width = size + padding * 2;
+        canvas.height = size + padding * 2 + 80;
+
+        const ctx = canvas.getContext('2d');
+        // Fill white background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Header Table label
+        ctx.fillStyle = '#111827';
+        ctx.font = 'bold 36px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Table ${table.number}`, canvas.width / 2, 50);
+
+        // Draw QR code
+        ctx.drawImage(img, padding, 70, size, size);
+
+        // Subtitle
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '22px sans-serif';
+        ctx.fillText('Scan to view menu & place order', canvas.width / 2, size + 100);
+
+        URL.revokeObjectURL(url);
+
+        // Trigger download
+        const pngUrl = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.href = pngUrl;
+        downloadLink.download = `table-${table.number}-qr.png`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        toast.success(`Table ${table.number} QR downloaded`);
+        setDownloading(false);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        toast.error('Failed to generate image');
+        setDownloading(false);
+      };
+
+      img.src = url;
     } catch (err) {
       console.error('Download failed:', err);
       toast.error('Download failed');
-    } finally {
       setDownloading(false);
     }
   };
@@ -107,7 +164,7 @@ const TableQRModal = ({ isOpen, onClose, table, branchId }) => {
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Download
+              Download PNG
             </button>
           </div>
         </Dialog.Panel>

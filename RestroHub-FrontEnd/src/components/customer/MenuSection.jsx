@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSiteData } from '@context/SiteContext.jsx';
+import { useCustomerOrder } from '@context/CustomerOrderContext.jsx';
+import { Plus, ShoppingBag } from 'lucide-react';
 
 // ============================================
 // MENU SECTION COMPONENT
@@ -17,7 +19,7 @@ const VegDot = ({ isVeg, size = 'sm' }) => (
     </span>
 );
 
-const FoodDetailModal = ({ item, onClose }) => {
+const FoodDetailModal = ({ item, onClose, onAddToCart }) => {
     // Close on Escape key
     useEffect(() => {
         const handleKey = (e) => {
@@ -78,9 +80,24 @@ const FoodDetailModal = ({ item, onClose }) => {
                         )}
                     </div>
 
-                    <p className="food-modal-price font-heading">
-                        {item.price === 'varies' ? item.price : `$${Number(item.price).toFixed(2)}`}
-                    </p>
+                    <div className="flex items-center justify-between mt-4">
+                        <p className="food-modal-price font-heading">
+                            {item.price === 'varies' ? item.price : `₹${Number(item.price).toFixed(2)}`}
+                        </p>
+                        {!isUnavailable && onAddToCart && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onAddToCart(item);
+                                    onClose();
+                                }}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold text-sm shadow transition"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Add to Order
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,6 +106,7 @@ const FoodDetailModal = ({ item, onClose }) => {
 
 const MenuSection = () => {
     const { siteData } = useSiteData();
+    const { addToCart, totalItemsCount, totalAmount, setIsCartOpen, tableInfo } = useCustomerOrder();
     const [activeCategory, setActiveCategory] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
 
@@ -124,6 +142,7 @@ const MenuSection = () => {
             if (foundCategory && Array.isArray(foundCategory.foods)) {
                 return foundCategory.foods.map((f) => ({
                     id: f.foodId ?? f.id,
+                    foodId: f.foodId ?? f.id,
                     name: f.name,
                     description: f.description,
                     image: f.imageUrl || f.image,
@@ -139,7 +158,7 @@ const MenuSection = () => {
     const items = getItemsForActiveCategory();
 
     return (
-        <section id="how-it-works" className="menu section">
+        <section id="how-it-works" className="menu section relative">
             <div className="container">
                 {/* Header */}
                 <div className="menu-header">
@@ -163,15 +182,16 @@ const MenuSection = () => {
                 {/* Menu Items */}
                 <div className="menu-grid">
                     {items.map((item, index) => (
-                        <button
+                        <div
                             key={item.id ?? index}
-                            type="button"
-                            onClick={() => openItem(item)}
                             className={`menu-item fade-in ${item.isAvailable === false ? 'unavailable' : ''}`}
                             style={{ animationDelay: `${index * 0.1}s` }}
                         >
                             {item.image && (
-                                <div className="menu-item-image">
+                                <div
+                                    className="menu-item-image cursor-pointer"
+                                    onClick={() => openItem(item)}
+                                >
                                     <img src={item.image} alt={item.name} loading="lazy" />
                                     {item.isAvailable === false && (
                                         <span className="sold-out-badge">Sold Out</span>
@@ -180,7 +200,10 @@ const MenuSection = () => {
                             )}
 
                             <div className="menu-item-body">
-                                <div className="menu-item-content">
+                                <div
+                                    className="menu-item-content cursor-pointer"
+                                    onClick={() => openItem(item)}
+                                >
                                     <div className="menu-item-name-row">
                                         <VegDot isVeg={item.isVeg} />
                                         <h3 className="menu-item-name font-heading">{item.name}</h3>
@@ -189,11 +212,26 @@ const MenuSection = () => {
                                         <p className="menu-item-description">{item.description}</p>
                                     )}
                                 </div>
-                                <p className="menu-item-price font-heading">
-                                    {item.price === 'varies' ? item.price : `$${Number(item.price).toFixed(2)}`}
-                                </p>
+                                <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                    <p className="menu-item-price font-heading">
+                                        {item.price === 'varies' ? item.price : `₹${Number(item.price).toFixed(2)}`}
+                                    </p>
+                                    {item.isAvailable !== false && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                addToCart(item);
+                                            }}
+                                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-xs transition"
+                                        >
+                                            <Plus className="w-3.5 h-3.5" />
+                                            Add
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </button>
+                        </div>
                     ))}
 
                     {items.length === 0 && (
@@ -211,7 +249,44 @@ const MenuSection = () => {
 
             {/* Food Detail Modal */}
             {selectedItem && (
-                <FoodDetailModal item={selectedItem} onClose={closeItem} />
+                <FoodDetailModal
+                    item={selectedItem}
+                    onClose={closeItem}
+                    onAddToCart={addToCart}
+                />
+            )}
+
+            {/* Floating Table Order Bar */}
+            {totalItemsCount > 0 && (
+                <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-lg">
+                    <button
+                        onClick={() => setIsCartOpen(true)}
+                        className="w-full bg-gradient-to-r from-orange-600 to-amber-600 text-white px-5 py-3.5 rounded-2xl shadow-xl hover:shadow-2xl flex items-center justify-between transition-transform transform active:scale-98"
+                    >
+                        <div className="flex items-center gap-2.5">
+                            <div className="bg-white/20 p-2 rounded-xl">
+                                <ShoppingBag className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="text-left">
+                                <span className="font-bold text-sm block leading-tight">
+                                    {totalItemsCount} item{totalItemsCount > 1 ? 's' : ''} added
+                                </span>
+                                {tableInfo?.tableNumber && (
+                                    <span className="text-xs text-orange-100 font-medium">
+                                        For Table #{tableInfo.tableNumber}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <span className="font-bold text-base">₹{totalAmount.toFixed(2)}</span>
+                            <span className="bg-white text-orange-700 text-xs font-extrabold px-3 py-1.5 rounded-xl uppercase tracking-wider">
+                                View Order →
+                            </span>
+                        </div>
+                    </button>
+                </div>
             )}
 
             <style>{`
