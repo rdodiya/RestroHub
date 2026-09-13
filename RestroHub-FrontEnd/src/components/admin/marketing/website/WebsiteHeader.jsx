@@ -10,10 +10,12 @@
 
 import { useState } from 'react';
 import { Save, Globe, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useAdminTheme } from '@context/AdminThemeContext';
 
 const WebsiteHeader = ({ onSave }) => {
   const [status, setStatus] = useState('idle'); // idle | saving | success | error
   const [errorMsg, setErrorMsg] = useState('');
+  const { isDark } = useAdminTheme();
 
   const handleSave = async () => {
     try {
@@ -31,10 +33,18 @@ const WebsiteHeader = ({ onSave }) => {
   };
 
   const btnStyle = {
-    idle:    'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
-    saving:  'bg-blue-50 text-blue-400 border-blue-100 cursor-not-allowed opacity-60',
-    success: 'bg-green-50 text-green-700 border-green-200',
-    error:   'bg-red-50 text-red-700 border-red-200',
+    idle: isDark
+      ? 'bg-blue-600/20 text-blue-400 border-blue-500/30 hover:bg-blue-600/30'
+      : 'bg-blue-600 text-white border-transparent hover:bg-blue-700 shadow-sm',
+    saving: isDark
+      ? 'bg-blue-900/30 text-blue-400 border-blue-800 cursor-not-allowed opacity-60'
+      : 'bg-blue-400 text-white border-transparent cursor-not-allowed opacity-75',
+    success: isDark
+      ? 'bg-green-900/30 text-green-400 border-green-700/50'
+      : 'bg-green-600 text-white border-transparent',
+    error: isDark
+      ? 'bg-red-900/30 text-red-400 border-red-700/50'
+      : 'bg-red-600 text-white border-transparent',
   };
 
   return (
@@ -42,17 +52,19 @@ const WebsiteHeader = ({ onSave }) => {
       {/* Left */}
       <div>
         <div className="flex items-center gap-2">
-          <Globe className="hidden h-6 w-6 text-blue-600 sm:block" />
-          <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+          <div className={`p-2 rounded-xl ${isDark ? 'bg-blue-900/40 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+            <Globe className="h-5 w-5" />
+          </div>
+          <h2 className={`text-xl font-bold sm:text-2xl ${isDark ? 'text-white' : 'text-gray-900'}`}>
             Website Customization
           </h2>
         </div>
-        <p className="mt-1 text-sm text-gray-500">
-          Choose templates and color themes for your restaurant website
+        <p className={`mt-1.5 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          Configure colors, typography, brand sections, and view your live restaurant website.
         </p>
         {status === 'error' && (
-          <p className="mt-1 flex items-center gap-1 text-xs text-red-600">
-            <AlertCircle className="h-3.5 w-3.5" />
+          <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-500">
+            <AlertCircle className="h-4 w-4 shrink-0" />
             {errorMsg}
           </p>
         )}
@@ -64,9 +76,9 @@ const WebsiteHeader = ({ onSave }) => {
         disabled={status === 'saving'}
         className={`
           inline-flex w-full items-center justify-center gap-2
-          rounded-lg px-5 py-2.5
-          text-sm font-medium
-          border transition-colors
+          rounded-xl px-5 py-2.5
+          text-sm font-semibold
+          border transition-all duration-200
           disabled:opacity-50
           sm:w-auto
           ${btnStyle[status]}
@@ -75,12 +87,12 @@ const WebsiteHeader = ({ onSave }) => {
         {status === 'saving' ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Saving…
+            Saving Changes…
           </>
         ) : status === 'success' ? (
           <>
             <CheckCircle className="h-4 w-4" />
-            Saved!
+            Saved Successfully!
           </>
         ) : status === 'error' ? (
           <>

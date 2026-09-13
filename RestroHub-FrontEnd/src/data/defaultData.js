@@ -24,7 +24,7 @@ export const defaultSiteData = {
     fullName: "Spice Route Indian Restaurant",
     tagline: "Authentic Indian Cuisine",
     established: "Est. 2018",
-    logo: "https://cdn.restroly.com/logo.png"
+    logo: ""
   },
 
   // ==========================================
@@ -91,107 +91,66 @@ export const defaultSiteData = {
   },
 
   // ==========================================
-  // Menu (Backend Menu DTO)
+  // Menu
   // ==========================================
   menu: {
     menuId: 1,
-
+    title: "Our Menu",
+    subtitle: "Explore our delicious dishes",
     menuName: "Main Menu",
-
     menuDesc: "Explore our delicious dishes.",
-
     categoryCount: 2,
-
-    categories: [
-      {
-        categoryId: 1,
-
-        name: "Starters",
-
-        description: "Delicious starters",
-
-        foodCount: 2,
-
-        foods: [
-          {
-            foodId: 1,
-
-            name: "Paneer Tikka",
-
-            description: "Marinated cottage cheese grilled to perfection.",
-
-            price: 250,
-
-            imageUrl:
-              "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398",
-
-            isAvailable: true,
-
-            isVeg: true
-          },
-          {
-            foodId: 2,
-
-            name: "Veg Spring Roll",
-
-            description: "Crispy spring rolls with vegetables.",
-
-            price: 180,
-
-            imageUrl:
-              "https://images.unsplash.com/photo-1544025162-d76694265947",
-
-            isAvailable: true,
-
-            isVeg: true
-          }
-        ]
-      },
-      {
-        categoryId: 2,
-
-        name: "Main Course",
-
-        description: "Authentic Indian dishes",
-
-        foodCount: 2,
-
-        foods: [
-          {
-            foodId: 3,
-
-            name: "Butter Chicken",
-
-            description: "Creamy tomato gravy with grilled chicken.",
-
-            price: 380,
-
-            imageUrl:
-              "https://images.unsplash.com/photo-1604908176997-43179b8c5b7c",
-
-            isAvailable: true,
-
-            isVeg: false
-          },
-          {
-            foodId: 4,
-
-            name: "Dal Makhani",
-
-            description: "Slow cooked black lentils.",
-
-            price: 220,
-
-            imageUrl:
-              "https://images.unsplash.com/photo-1546833999-b9f581a1996d",
-
-            isAvailable: true,
-
-            isVeg: true
-          }
-        ]
-      }
-    ]
+    categories: ["Starters", "Main Course"],
+    items: {
+      "Starters": [
+        {
+          id: 1,
+          foodId: 1,
+          name: "Paneer Tikka",
+          description: "Marinated cottage cheese grilled to perfection.",
+          price: 250,
+          image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398",
+          imageUrl: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398",
+          isAvailable: true,
+          isVeg: true
+        },
+        {
+          id: 2,
+          foodId: 2,
+          name: "Veg Spring Roll",
+          description: "Crispy spring rolls with vegetables.",
+          price: 180,
+          image: "https://images.unsplash.com/photo-1544025162-d76694265947",
+          imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947",
+          isAvailable: true,
+          isVeg: true
+        }
+      ],
+      "Main Course": [
+        {
+          id: 3,
+          foodId: 3,
+          name: "Butter Chicken",
+          description: "Creamy tomato gravy with grilled chicken.",
+          price: 380,
+          image: "https://images.unsplash.com/photo-1604908176997-43179b8c5b7c",
+          imageUrl: "https://images.unsplash.com/photo-1604908176997-43179b8c5b7c",
+          isAvailable: true,
+          isVeg: false
+        },
+        {
+          id: 4,
+          foodId: 4,
+          name: "Dal Makhani",
+          description: "Slow cooked black lentils.",
+          price: 220,
+          image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d",
+          imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d",
+          isAvailable: true,
+          isVeg: true
+        }
+      ]
+    }
   },
 
   // ==========================================

@@ -1,15 +1,11 @@
 package com.restroly.qrmenu.user.service;
 
 import com.restroly.qrmenu.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.user.dto.*;
 import com.restroly.qrmenu.user.entity.UserRoleRestaurant;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
-import com.restroly.qrmenu.user.dto.RoleResponse;
-import com.restroly.qrmenu.user.dto.UserProfileRequestDTO;
-import com.restroly.qrmenu.user.dto.UserProfileResponseDTO;
-import com.restroly.qrmenu.user.dto.UserRequest;
-import com.restroly.qrmenu.user.dto.UserResponse;
 import com.restroly.qrmenu.restaurant.entity.Restaurant;
 import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
 import com.restroly.qrmenu.user.entity.Role;
@@ -359,34 +355,74 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-@Override
-public UserProfileResponseDTO getCurrentUserProfile() {
+    @Override
+    @Transactional(readOnly = true)
+    public UserProfileResponseDTO getCurrentUserProfile() {
 
-    Authentication authentication =
-            SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-    String email = authentication.getName();
+        String email = authentication.getName();
 
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() ->
-                new UserNotFoundException(
-                    "User not found with email: " + email));
+        User user = userRepository.findByEmailWithUserRoleRestaurants(email)
+                .orElseGet(() -> userRepository.findByEmail(email)
+                        .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email)));
 
-    return UserProfileResponseDTO.builder()
-            .userId(user.getUserId())
-            .name(user.getName())
-            .email(user.getEmail())
-            .phoneNumber(user.getPhoneNumber())
-            .profileImage(encodeProfileImage(user.getUserProfile()))
-            .build();
-}
+        String roleName = "Restaurant Owner";
+        Long restaurantId = null;
+        String restaurantName = null;
+        String restaurantDesc = null;
+        String branches = "1";
 
-private String encodeProfileImage(byte[] imageBytes) {
-    if (imageBytes == null || imageBytes.length == 0) {
-        return null;
+        if (user.getUserRoleRestaurants() != null && !user.getUserRoleRestaurants().isEmpty()) {
+            UserRoleRestaurant urr = user.getUserRoleRestaurants().iterator().next();
+            if (urr.getRole() != null && urr.getRole().getName() != null) {
+                roleName = urr.getRole().getName().replace("ROLE_", "").replace("_", " ");
+            }
+            if (urr.getRestaurant() != null) {
+                Restaurant r = urr.getRestaurant();
+                restaurantId = r.getRestId();
+                restaurantName = r.getName();
+                restaurantDesc = r.getDescription();
+                if (r.getBranches() != null) {
+                    branches = String.valueOf(r.getBranches().size());
+                }
+            }
+        }
+
+        String joinedDate = "Jan 2024";
+        if (user.getCreatedAt() != null) {
+            joinedDate = user.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("MMM yyyy"));
+        }
+
+        return UserProfileResponseDTO.builder()
+                .userId(user.getUserId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .profileImage(encodeProfileImage(user.getUserProfile()))
+                .role(roleName)
+                .restaurantId(restaurantId)
+                .restaurantName(restaurantName)
+                .restaurantDescription(restaurantDesc)
+                .branches(branches)
+                .joinedDate(joinedDate)
+                .dateOfBirth(user.getDateOfBirth())
+                .gender(user.getGender())
+                .address(user.getAddress())
+                .city(user.getCity())
+                .state(user.getState())
+                .pincode(user.getPincode())
+                .bio(user.getBio())
+                .build();
     }
-    return Base64.getEncoder().encodeToString(imageBytes);
-}
+
+    private String encodeProfileImage(byte[] imageBytes) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return null;
+        }
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
 
     @Override
     @Transactional
@@ -398,22 +434,44 @@ private String encodeProfileImage(byte[] imageBytes) {
         String email = authentication.getName();
 
         User user = userRepository.findByEmailWithUserRoleRestaurants(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found with email: " + email));
+                .orElseGet(() -> userRepository.findByEmail(email)
+                        .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email)));
 
         log.info("Updating profile for user: {}", email);
         log.info("Incoming request: {}", request);
 
         // Update name
         if (request.getName() != null && !request.getName().isBlank()) {
-            user.setName(request.getName());
+            user.setName(request.getName().trim());
         }
 
         // Update phone
         if (request.getPhoneNumber() != null &&
                 !request.getPhoneNumber().isBlank()) {
-            user.setPhoneNumber(request.getPhoneNumber());
+            user.setPhoneNumber(request.getPhoneNumber().trim());
+        }
+
+        // Update personal fields
+        if (request.getDateOfBirth() != null) {
+            user.setDateOfBirth(request.getDateOfBirth().trim());
+        }
+        if (request.getGender() != null) {
+            user.setGender(request.getGender().trim());
+        }
+        if (request.getAddress() != null) {
+            user.setAddress(request.getAddress().trim());
+        }
+        if (request.getCity() != null) {
+            user.setCity(request.getCity().trim());
+        }
+        if (request.getState() != null) {
+            user.setState(request.getState().trim());
+        }
+        if (request.getPincode() != null) {
+            user.setPincode(request.getPincode().trim());
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio().trim());
         }
 
         // Update profile image
@@ -431,17 +489,36 @@ private String encodeProfileImage(byte[] imageBytes) {
                     "User email became null during profile update");
         }
 
-        // Validate role assignments
-        if (user.getUserRoleRestaurants() == null ||
-                user.getUserRoleRestaurants().isEmpty()) {
-
-            throw new IllegalStateException(
-                    "User role assignments became empty during profile update");
-        }
-
         User updatedUser = userRepository.save(user);
 
         log.info("Profile updated successfully for user: {}", email);
+
+        String roleName = "Restaurant Owner";
+        Long restaurantId = null;
+        String restaurantName = null;
+        String restaurantDesc = null;
+        String branches = "1";
+
+        if (updatedUser.getUserRoleRestaurants() != null && !updatedUser.getUserRoleRestaurants().isEmpty()) {
+            UserRoleRestaurant urr = updatedUser.getUserRoleRestaurants().iterator().next();
+            if (urr.getRole() != null && urr.getRole().getName() != null) {
+                roleName = urr.getRole().getName().replace("ROLE_", "").replace("_", " ");
+            }
+            if (urr.getRestaurant() != null) {
+                Restaurant r = urr.getRestaurant();
+                restaurantId = r.getRestId();
+                restaurantName = r.getName();
+                restaurantDesc = r.getDescription();
+                if (r.getBranches() != null) {
+                    branches = String.valueOf(r.getBranches().size());
+                }
+            }
+        }
+
+        String joinedDate = "Jan 2024";
+        if (updatedUser.getCreatedAt() != null) {
+            joinedDate = updatedUser.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("MMM yyyy"));
+        }
 
         return UserProfileResponseDTO.builder()
                 .userId(updatedUser.getUserId())
@@ -449,7 +526,41 @@ private String encodeProfileImage(byte[] imageBytes) {
                 .email(updatedUser.getEmail())
                 .phoneNumber(updatedUser.getPhoneNumber())
                 .profileImage(encodeProfileImage(updatedUser.getUserProfile()))
+                .role(roleName)
+                .restaurantId(restaurantId)
+                .restaurantName(restaurantName)
+                .restaurantDescription(restaurantDesc)
+                .branches(branches)
+                .joinedDate(joinedDate)
+                .dateOfBirth(updatedUser.getDateOfBirth())
+                .gender(updatedUser.getGender())
+                .address(updatedUser.getAddress())
+                .city(updatedUser.getCity())
+                .state(updatedUser.getState())
+                .pincode(updatedUser.getPincode())
+                .bio(updatedUser.getBio())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequestDTO request) {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found with email: " + email));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        log.info("Password changed successfully for user: {}", email);
     }
 
     @Override

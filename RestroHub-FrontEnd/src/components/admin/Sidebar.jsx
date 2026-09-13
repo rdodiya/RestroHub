@@ -27,8 +27,8 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const sidebarRef = useRef(null);
   const { isDark } = useAdminTheme();
   const roles = readStoredRoles();
-  const limitedAdminRoles = ['MANAGER', 'STAFF'];
-  const superAdminOnly = ['SUPER_ADMIN'];
+  const limitedAdminRoles = ['ADMIN', 'MANAGER', 'STAFF'];
+  const superAdminOnly = ['ADMIN'];
   const allAdminRoles = [...FULL_ADMIN_ROLES, ...limitedAdminRoles];
 
   const [expandedMenus, setExpandedMenus] = useState({
@@ -139,7 +139,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const SidebarLink = ({ item }) => {
     const Icon = item.icon;
 
-    return (
+    return (     
       <li>
         <NavLink
           to={item.path}

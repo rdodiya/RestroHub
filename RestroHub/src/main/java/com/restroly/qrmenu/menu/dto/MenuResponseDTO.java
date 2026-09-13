@@ -31,6 +31,12 @@ public class MenuResponseDTO {
 
     private Date updatedDate;
 
+    private java.time.LocalDate startDate;
+
+    private java.time.LocalDate endDate;
+
+    private String dayOfWeek;
+
     private BranchDTO branch;
 
     private List<CategoryDTO> categories;

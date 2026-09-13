@@ -26,6 +26,9 @@ public class MenuMapper {
                 .menuName(dto.getMenuName())
                 .menuDesc(dto.getMenuDesc())
                 .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .dayOfWeek(dto.getDayOfWeek())
                 .branch(branch)
                 .categories(categories != null ? categories : new ArrayList<>())
                 .createdDate(new Date(System.currentTimeMillis()))
@@ -44,6 +47,9 @@ public class MenuMapper {
                 .isDeleted(menu.isDeleted())
                 .createdDate(menu.getCreatedDate())
                 .updatedDate(menu.getUpdatedDate())
+                .startDate(menu.getStartDate())
+                .endDate(menu.getEndDate())
+                .dayOfWeek(menu.getDayOfWeek())
                 .branch(toBranchDTO(menu.getBranch()))
                 .categories(toCategoryDTOList(menu.getCategories()))
                 .categoryCount(menu.getCategories() != null ? menu.getCategories().size() : 0)
@@ -60,6 +66,9 @@ public class MenuMapper {
                 .menuDesc(menu.getMenuDesc())
                 .isDeleted(menu.isDeleted())
                 .createdDate(menu.getCreatedDate())
+                .startDate(menu.getStartDate())
+                .endDate(menu.getEndDate())
+                .dayOfWeek(menu.getDayOfWeek())
                 .branch(toBranchDTO(menu.getBranch()))
                 .categories(toCategoryDTOList(menu.getCategories()))
                 .categoryCount(menu.getCategories() != null ? menu.getCategories().size() : 0)
@@ -89,6 +98,10 @@ public class MenuMapper {
         menu.setMenuName(dto.getMenuName());
         menu.setMenuDesc(dto.getMenuDesc());
         menu.setUpdatedDate(new Date(System.currentTimeMillis()));
+
+        menu.setStartDate(dto.getStartDate());
+        menu.setEndDate(dto.getEndDate());
+        menu.setDayOfWeek(dto.getDayOfWeek());
 
         if (dto.getIsDeleted() != null) {
             menu.setDeleted(dto.getIsDeleted());

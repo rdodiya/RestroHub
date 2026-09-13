@@ -21,11 +21,11 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <QuickActions />
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <LiveOrders />
-        <RevenueChart />
-      </div>
+      {/* Revenue Analytics */}
+      <RevenueChart />
+
+      {/* Live Orders Feed */}
+      <LiveOrders />
     </div>
   );
 };
