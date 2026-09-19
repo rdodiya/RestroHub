@@ -154,7 +154,8 @@ export const CustomerOrderProvider = ({ children }) => {
         })),
       };
 
-      const res = await fetch('http://localhost:8181/restroly/public/api/v1/orders', {
+      const backendHost = window.location.hostname || 'localhost';
+      const res = await fetch(`http://${backendHost}:8181/restroly/public/api/v1/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

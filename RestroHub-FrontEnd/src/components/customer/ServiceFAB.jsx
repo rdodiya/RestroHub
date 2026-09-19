@@ -6,7 +6,8 @@ import { useParams, useSearchParams } from 'react-router-dom';
 // Call Waiter / Request Bill from the customer menu
 // ============================================
 
-const API_BASE_URL = 'http://localhost:8181/restroly';
+const defaultHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+const API_BASE_URL = `http://${defaultHost}:8181/restroly`;
 
 const ServiceFAB = () => {
     const { branchId } = useParams();

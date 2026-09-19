@@ -99,7 +99,7 @@ const SubscriptionManagement = () => {
     );
   }, [features, featureSearch]);
 
-  if (!hasAnyRole(roles, ['SUPER_ADMIN'])) {
+  if (!hasAnyRole(roles, ['SUPER_ADMIN', 'ADMIN'])) {
     return <Navigate to="/admin/dashboard" replace />;
   }
 

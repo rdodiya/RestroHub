@@ -47,7 +47,7 @@ const OrderCardSkeleton = () => (
 // ============================================
 // MAIN COMPONENT
 // ============================================
-const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange, refreshTrigger }) => {
+const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange, refreshTrigger, onViewDetails }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -189,6 +189,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange, refreshTrigger 
             key={order.orderId}
             order={order}
             onStatusUpdate={handleStatusUpdate}
+            onViewDetails={onViewDetails}
           />
         ))}
       </div>

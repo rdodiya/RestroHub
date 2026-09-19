@@ -20,6 +20,7 @@ import OrdersHeader from './orderComponents/OrdersHeader';
 import OrderFilters from './orderComponents/OrderFilters';
 import StatusLegend from './orderComponents/StatusLegend';
 import OrdersGrid from './orderComponents/OrdersGrid';
+import OrderDetailsModal from './orderComponents/OrderDetailsModal';
 import api from '@services/common/api';
 
 const initialOrderState = {
@@ -49,6 +50,21 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [orders, setOrders] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Selected Order Modal State
+  const [selectedOrder, setSelectedOrder] = useState(() => location.state?.selectedOrder || null);
+
+  // If redirected with orderId in state or query param
+  useEffect(() => {
+    if (location.state?.selectedOrder) {
+      setSelectedOrder(location.state.selectedOrder);
+    } else if (location.state?.orderId && orders.length > 0) {
+      const match = orders.find(
+        (o) => String(o.orderId) === String(location.state.orderId)
+      );
+      if (match) setSelectedOrder(match);
+    }
+  }, [location.state, orders]);
 
   // Controls whether the Create Order modal/drawer is open
   const [showCreateOrder, setShowCreateOrder] = useState(() => Boolean(location.state?.openCreateOrder));
@@ -839,6 +855,20 @@ const Orders = () => {
         searchQuery={searchQuery}
         onOrdersChange={setOrders}
         refreshTrigger={refreshKey}
+        onViewDetails={(order) => setSelectedOrder(order)}
+      />
+
+      {/* Order Details Modal */}
+      <OrderDetailsModal
+        order={selectedOrder}
+        isOpen={Boolean(selectedOrder)}
+        onClose={() => setSelectedOrder(null)}
+        onStatusUpdate={(orderId, nextStatus) => {
+          setSelectedOrder((prev) =>
+            prev && prev.orderId === orderId ? { ...prev, status: nextStatus } : prev
+          );
+          setRefreshKey((k) => k + 1);
+        }}
       />
     </div>
   );

@@ -175,7 +175,7 @@ const actionConfig = {
 // ORDER CARD
 // ------------------------------------
 
-const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
+const OrderCard = ({ order, onStatusUpdate, compact = false, onViewDetails }) => {
   const [updating, setUpdating] = useState(false);
 
   const currentStatus = order?.status?.toUpperCase() || 'PENDING';
@@ -258,7 +258,12 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
   // ------------------------------------
 
   return (
-    <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-100 transition-all ${compact ? 'p-3.5' : 'p-5'}`}>
+    <div
+      onClick={() => onViewDetails?.(order)}
+      className={`bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all ${
+        onViewDetails ? 'cursor-pointer' : ''
+      } ${compact ? 'p-3.5' : 'p-5'}`}
+    >
 
       {/* Header */}
       <div className={`flex items-start justify-between ${compact ? 'mb-2.5' : 'mb-4'}`}>
@@ -297,9 +302,14 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
 
         </div>
 
-        {/* More Button */}
+        {/* View Details / More Button */}
         <button
           type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails?.(order);
+          }}
+          title="View Order Details"
           className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600"
         >
           <MoreVertical className="w-4 h-4" />
@@ -376,10 +386,13 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
 
       {/* Action Button */}
       {action && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
-            onClick={handleAction}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAction();
+            }}
             disabled={updating}
             className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl transition-all font-semibold disabled:opacity-50 ${compact ? 'px-2.5 py-2 text-xs' : 'px-4 py-2.5 text-sm'} ${action.bg} ${action.text} ${action.hoverBg} ${action.border}`}
           >
@@ -398,7 +411,10 @@ const OrderCard = ({ order, onStatusUpdate, compact = false }) => {
           {currentStatus === 'PENDING' && (
             <button
               type="button"
-              onClick={handleCancel}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCancel();
+              }}
               disabled={updating}
               className={`flex items-center justify-center gap-1 rounded-xl transition-all font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 disabled:opacity-50 ${compact ? 'px-2 py-2 text-xs' : 'px-3 py-2.5 text-sm'}`}
             >

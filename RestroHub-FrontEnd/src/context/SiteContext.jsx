@@ -36,9 +36,8 @@ import { defaultSiteData } from '@data/defaultData.js';
 import { getAccessToken } from '@services/common/authStorage';
 import api from '@services/common/api';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8181/restroly';
+const defaultHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://${defaultHost}:8181/restroly`;
 const API_BASE = `${BASE_URL}/public/api/v1`;
 const STORAGE_KEY = 'website-theme-config';
 

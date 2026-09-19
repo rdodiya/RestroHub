@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@context/ThemeContext';
+import DemoVideoModal from '@components/public/DemoVideoModal';
 import {
   UtensilsCrossed,
   QrCode,
@@ -24,6 +25,7 @@ import {
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   // show scroll top 
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -521,7 +523,7 @@ const [contactForm, setContactForm] = useState({
               </Link>
               <button
                 type="button"
-                onClick={handleWatchDemoClick}
+                onClick={() => setIsDemoModalOpen(true)}
                 className="group inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-blue-300/40 transition-all hover:scale-105 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 sm:text-lg"
               >
                 <Play className="h-5 w-5 fill-white text-white transition-transform group-hover:scale-110" />
@@ -1008,6 +1010,12 @@ const [contactForm, setContactForm] = useState({
           </div>
         </div>
       </footer>
+
+      {/* Product Demo Video Modal */}
+      <DemoVideoModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+      />
     </div>
   );
 };

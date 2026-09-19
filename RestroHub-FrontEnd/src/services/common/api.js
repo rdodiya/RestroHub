@@ -25,7 +25,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    // 401 Unauthorized: token expired or invalid, session should be cleared
+    if (error.response?.status === 401) {
       if (!error.config?.url?.includes("/public/")) {
         clearAuthSession();
         window.location.href = "/login";
