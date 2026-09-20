@@ -1,7 +1,7 @@
 // src/pages/public/Register.jsx
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
@@ -77,33 +77,12 @@ const validationSchema = Yup.object({
 });
 
 const Register = () => {
-  const navigate = useNavigate();
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [roles, setRoles] = useState([]);
-  const [rolesLoading, setRolesLoading] = useState(false);
-  const [rolesError, setRolesError] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [showVerificationScreen, setShowVerificationScreen] = useState(false);
   const [isResending, setIsResending] = useState(false);
-
-  useEffect(() => {
-    const fetchRoles = async () => {
-      setRolesLoading(true);
-      setRolesError("");
-      try {
-        const res = await api.get("/api/v1/roles/active");
-        setRoles(res.data?.data || []);
-      } catch {
-        setRolesError("Unable to load roles. Please try again.");
-      } finally {
-        setRolesLoading(false);
-      }
-    };
-
-    fetchRoles();
-  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -153,14 +132,6 @@ const Register = () => {
         ? "border-red-500 focus:ring-red-500"
         : "border-gray-300 focus:ring-blue-500 dark:border-gray-600"
     } bg-transparent py-4 pl-6 pr-12 text-gray-800 placeholder-gray-400 outline-none transition focus:border-transparent focus:ring-2 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`;
-
-  const toggleRole = (roleId) => {
-    const nextRoleIds = formik.values.roleIds.includes(roleId)
-      ? formik.values.roleIds.filter((id) => id !== roleId)
-      : [...formik.values.roleIds, roleId];
-
-    formik.setFieldValue("roleIds", nextRoleIds);
-  };
 
   if (showVerificationScreen) {
     return (
