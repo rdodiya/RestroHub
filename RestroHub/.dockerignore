@@ -1,0 +1,9 @@
+.gradle
+build
+!gradle/wrapper/gradle-wrapper.jar
+*.class
+.idea
+.vscode
+*.iml
+.git
+.gitignore

@@ -1,0 +1,85 @@
+# Restroly / RestroHub — full stack (PostgreSQL + Spring Boot API + React/Nginx)
+#
+#   cp .env.example .env     # then set JWT_SECRET and Google client ID
+#   docker compose up -d --build
+#
+# Frontend:  http://localhost:3000
+# API:       http://localhost:8181/restroly/api/v1
+# Swagger:   http://localhost:8181/restroly/swagger-ui.html
+# Health:    http://localhost:8181/restroly/actuator/health
+
+name: restrohub
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: restrohub-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-RestroHub_DB}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres} # change for anything beyond local dev
+    volumes:
+      - restrohub-pgdata:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432" # remove this mapping in production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./RestroHub
+      dockerfile: Dockerfile
+    image: restrohub-backend:latest
+    container_name: restrohub-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-RestroHub_DB}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-postgres}
+      # README-documented names (harmless if the app reads the SPRING_* ones)
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (openssl rand -hex 32)}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      SPRING_FLYWAY_ENABLED: ${SPRING_FLYWAY_ENABLED:-true}
+      JAVA_OPTS: ${JAVA_OPTS:--XX:MaxRAMPercentage=75}
+    ports:
+      - "${BACKEND_PORT:-8181}:8181"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8181/restroly/actuator/health | grep -q UP"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ./RestroHub-FrontEnd
+      dockerfile: Dockerfile
+      args:
+        # Vite bakes VITE_* values in at build time. This URL is called by the
+        # visitor's BROWSER, so it must be reachable from outside Docker.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8181/restroly}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    image: restrohub-frontend:latest
+    container_name: restrohub-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+
+volumes:
+  restrohub-pgdata:

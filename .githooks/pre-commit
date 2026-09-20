@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Pre-commit quality gate for RestroHub (backend + frontend).
+# Enable once per clone:  git config core.hooksPath .githooks
+# (Frontend `npm install` does this automatically via the `prepare` script.)
+# Bypass in an emergency:  git commit --no-verify
+set -uo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+STAGED="$(git diff --cached --name-only --diff-filter=ACMR)"
+[ -z "$STAGED" ] && exit 0
+
+fail() { echo "❌ $1"; exit 1; }
+
+# 1) Never commit env files / secrets
+if echo "$STAGED" | grep -E '(^|/)\.env(\.[^/]+)?$' | grep -v '\.env\.example$' | grep -q .; then
+  fail "A .env file is staged. Remove it: git reset HEAD <file> (only .env.example may be committed)."
+fi
+
+# 2) Java: Spotless format check
+if echo "$STAGED" | grep -qE '^RestroHub/.*\.java$'; then
+  echo "▶ Java: spotlessCheck"
+  ( cd "$ROOT/RestroHub" && ./gradlew spotlessCheck --quiet ) \
+    || fail "Java formatting failed. Fix with: cd RestroHub && ./gradlew spotlessApply  (then git add)"
+fi
+
+# 3) Frontend: ESLint + Prettier on staged files only (auto-fixes and re-stages)
+if echo "$STAGED" | grep -qE '^RestroHub-FrontEnd/.*\.(js|jsx|mjs|cjs|css|json|md|html)$'; then
+  echo "▶ Frontend: lint-staged (ESLint + Prettier)"
+  [ -d "$ROOT/RestroHub-FrontEnd/node_modules" ] \
+    || fail "Run 'npm install' in RestroHub-FrontEnd first."
+  ( cd "$ROOT/RestroHub-FrontEnd" && npx --no-install lint-staged ) \
+    || fail "ESLint/Prettier found problems. Fix them and commit again."
+fi
+
+echo "✅ Pre-commit checks passed"
