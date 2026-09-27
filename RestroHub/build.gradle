@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.6'  // Use 3.4.1 stable version , 3.2.x is the latest fully supported version by Springdoc, Security, JPA, Actuator, etc.
     id 'io.spring.dependency-management' version '1.1.7'
     id 'war'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 group = 'com.restroly'
@@ -46,6 +47,8 @@ dependencies {
     
     // Database
     runtimeOnly 'org.postgresql:postgresql:42.7.2'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
 
     // Lombok - ORDER MATTERS!
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -97,6 +100,17 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-//tasks.withType<Test> {
-//	useJUnitPlatform()
-//}
+spotless {
+    // Only files changed vs. the base branch are checked, so the existing code
+    // base is NOT reformatted all at once. Requires the branch to exist locally
+    // (git fetch origin gssoc_develop). In CI use fetch-depth: 0.
+    ratchetFrom 'origin/gssoc_develop'
+
+    java {
+        target 'src/**/*.java'
+        googleJavaFormat('1.22.0')
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}

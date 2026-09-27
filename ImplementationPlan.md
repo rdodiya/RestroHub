@@ -1,259 +1,176 @@
 # Implementation Plan
 
-## Restroly (RestroHub) — Digital Menu & Restaurant Management Platform
+## Restroly (RestroHub) — Digital Menu, Order & Multi-Tenant Restaurant Management Platform
 
-> Based on the project `ReadMe.md` (branch `gssoc_develop`), and aligned with `PRD.md` and `TechStack.md`. Items marked *(assumption)* are inferred and should be confirmed by maintainers. Effort sizes: **S** = under 1 day, **M** = 1-3 days, **L** = 3-7 days, **XL** = over 1 week.
-
----
-
-## 1. Objectives
-
-1. Stabilize and harden the shipped MVP (QR menu, menu CRUD, UPI links, website, dashboard, auth, analytics, templates).
-2. Deliver in-progress and near-term items: multi-branch, real-time order updates, onboarding and empty-state UX.
-3. Introduce monetization: subscription tiers and plan-based RBAC.
-4. Build ecosystem integrations: WhatsApp, aggregator sync, AI translation.
-5. Keep the project contributor-friendly (GSSoC): small, well-scoped, labelled issues.
-
----
-
-## 2. Current State Baseline
-
-| Area | Status |
+| Field | Value |
 |---|---|
-| Backend | Java 21, Spring Boot, Gradle, PostgreSQL; controller/service/repository layering; Swagger and Actuator |
-| Frontend | React 18, Vite, Tailwind, React Router, Axios, Context API |
-| Auth | JWT + Google OAuth |
-| Features live | QR menu, menu management, UPI links, restaurant website, order dashboard, analytics, templates |
-| In progress | Multi-branch support |
-| Planned | Real-time orders, subscription tiers, Redis caching |
-| Known gaps | Frontend ↔ backend integration incomplete in places; UPI service and analytics dashboard are open contribution areas; no documented test suite or CI *(assumption)* |
+| **Product** | Restroly (RestroHub) |
+| **Repository** | [`rdodiya/RestroHub`]() |
+| **Owner / Lead** | Raj Dodiya |
+| **Status** | Active Development (GSSoC 2026, branch `gssoc_develop`) |
+| **Source of Truth** | `project-flow.txt`, Codebase Analysis (`RestroHub` & `RestroHub-FrontEnd`), and PRD v2.0 |
+| **Doc Version** | 2.0 (Realignment with Real Codebase & Active @Todo Backlog) |
+
+> **Effort Sizing:**
+> - **S** (Small): $< 1$ day
+> - **M** (Medium): $1 - 3$ days
+> - **L** (Large): $3 - 5$ days
+> - **XL** (Extra Large): $> 1$ week
 
 ---
 
-## 3. Phased Roadmap
+## 1. Executive Objectives
+
+1. **Resolve Explicit Project-Flow Backlog (@Todo items)**:
+   - Implement subdomain dynamic routing (`<restaurantname>.restroly.in`).
+   - Add branch selection dropdown in the second top header of the Admin panel.
+   - Complete Order History backend API with date-range filtering, status sorting, and pagination.
+   - Wire backend API endpoints to the Admin Dashboard analytical graphs and metric cards.
+   - Enforce Free subscription tier restriction limiting restaurants to 2 default marketing templates.
+   - Apply granular permission guards for `Manager/User` (hide financial/UPI data) and `Staff` (order status updates only).
+2. **Harden Multi-Tenant Production Architecture**:
+   - Maintain clean multi-tenancy across Restaurants $\rightarrow$ Branches $\rightarrow$ Menus, Orders, Tables, and Subscriptions.
+   - Implement robust real-time transport (WebSocket / SSE) for live incoming orders and table waiter assistance calls.
+3. **Elevate Contributor Experience (GSSoC 2026)**:
+   - Provide well-scoped, modular tasks categorized by difficulty (`good-first-issue`, `intermediate`, `advanced`) across frontend, backend, and fullstack.
+
+---
+
+## 2. Current State Baseline & Gap Analysis
+
+An exhaustive review of the existing repository confirms that significant functionality is already built and working in both backend (`RestroHub`) and frontend (`RestroHub-FrontEnd`). The table below outlines the current status:
+
+| Module / Feature | Backend Implementation | Frontend Implementation | Current Integration Status |
+|---|---|---|---|
+| **Authentication & Profile** | [`AuthController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/auth/controller/AuthController.java) (JWT + Google OAuth 2.0) | `Login.jsx`, `Register.jsx`, `Profile.jsx` | **Done** — Auth flow and token storage operational |
+| **Super Admin RBAC** | [`RoleController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/user/controller/RoleController.java), [`UserController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/user/controller/UserController.java) | `UserRoleManagement.jsx` (Link User + Restaurant + Branch + Role) | **Done** — AdminRoute guarded; **@Todo**: Fine-tune `Manager/User` and `Staff` limits |
+| **Subscription Plans & Features** | [`SuperAdminSubscriptionController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/subscription/controller/SuperAdminSubscriptionController.java), [`RestaurantSubscriptionController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/subscription/controller/RestaurantSubscriptionController.java) | `SubscriptionManagement.jsx` | **Done** — SuperAdmin CRUD for plans and feature assignments |
+| **Multi-Branch Management** | [`BranchController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java) | `Branches.jsx`, `BranchCard.jsx`, `BranchFormModal.jsx` | **Done** — CRUD works; **@Todo**: Header branch switcher dropdown |
+| **Table & QR Code Management** | [`TableController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/table/controller/TableController.java) | `Tables.jsx`, `TableQRModal.jsx`, `TableCard.jsx` | **Done** — Table CRUD and scannable QR generation with download |
+| **Menu, Categories & Foods** | [`MenuController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/menu/controller/MenuController.java), [`CategoryController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/category/controller/CategoryController.java), [`FoodController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/food/controller/FoodController.java) | `Menus.jsx`, `FoodItemsGrid.jsx`, `BulkActions.jsx` | **Done** — Full CRUD, item availability toggles |
+| **Excel Bulk Menu Import/Export** | [`ExcelFeatureController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/excel/controller/ExcelFeatureController.java) (Apache POI) | `BulkActions.jsx` (Import/Export buttons) | **Done** — Spreadsheet bulk operations functional |
+| **Direct UPI Deeplinks** | [`UpiLinkController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/payment/controller/UpiLinkController.java) (`upi-deeplink-builder`) | `UPILinks.jsx`, `UPIFormModal.jsx`, `UPITestModal.jsx` | **Done** — VPA setup and test modal operational |
+| **WhatsApp Order Notifications** | `WhatsappService.java`, `WhatsappOrderNotificationServiceImpl.java` | Triggered automatically on order placement and Ready state | **Done** — Meta Cloud API integration built |
+| **Public Site & Digital Menu** | [`PublicSiteController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/template/controller/PublicSiteController.java) | `RestaurantMenu.jsx`, `HeroSection.jsx`, `MenuSection.jsx` | **Done** via path; **@Todo**: Subdomain dynamic routing (`<name>.restroly.in`) |
+| **Customer Ordering & Cart** | [`PublicOrderController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/order/controller/PublicOrderController.java) | `CustomerOrderDrawer.jsx`, `TableBanner.jsx`, `ServiceFAB.jsx` | **Done** — Guest checkout (Name + Phone), Table vs Counter QR (`0`) |
+| **Live Orders & KDS** | [`OrderController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java) | `Orders.jsx`, `OrderCard.jsx`, `KitchenDisplaySystem.jsx` | **Done** — Daily live orders and KDS; **@Todo**: Order History API & filters |
+| **Waiter Assistance Notifications** | [`ServiceRequestController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/notification/controller/ServiceRequestController.java), [`DashboardNotificationController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/notifications/controller/DashboardNotificationController.java) | Notification Bell in Admin Header, `ServiceFAB.jsx` | **Done** — Service requests logged and displayed |
+| **Website Customizer** | Template and section persistence | `WebsiteWrapper.jsx`, `ThemeSelector.jsx`, `WebsitePreview.jsx` | **Done** — Theme and sections; **@Todo**: Restrict Free tier to 2 templates |
+| **Analytics Dashboard** | [`DashboardController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/admin/dashboard/controller/DashboardController.java) | `Dashboard.jsx` (Recharts / Stat Cards) | **@Todo** — Connect frontend chart components to backend endpoints |
+
+---
+
+## 3. Phased Implementation Roadmap
 
 ```
-Phase 0        Phase 1          Phase 2            Phase 3           Phase 4
-Foundation  →  Core Hardening → Growth Features → Monetization   →  Ecosystem
-(2 wks)        (3-4 wks)        (4-5 wks)          (4 wks)           (ongoing)
-```
-
----
-
-## Phase 0 — Foundation & Developer Experience (about 2 weeks)
-
-**Goal:** make the repo safe and easy to change.
-
-| # | Task | Size | Deliverable / Acceptance |
-|---|---|---|---|
-| 0.1 | Fix README inconsistencies (duplicate prerequisites, broken code fences, `READMe.md` vs `ReadMe.md`) | S | Clean README that renders correctly |
-| 0.2 | Add `.env.example` for frontend and `application-dev.properties` template for backend | S | New contributor runs both apps following README only |
-| 0.3 | Add `docker-compose.yml` (Postgres + backend + frontend) if missing or broken | M | `docker-compose up` yields working stack |
-| 0.4 | Set up CI (GitHub Actions): `./gradlew build` and `npm run build` on every PR | M | PRs blocked on failing builds |
-| 0.5 | Add lint/format: Checkstyle or Spotless (Java), ESLint + Prettier (JS) | M | Lint job in CI |
-| 0.6 | Add PR template, issue templates (bug, feature, good-first-issue), CODEOWNERS | S | Templates appear on GitHub |
-| 0.7 | Add DB migration tool (Flyway) and baseline schema | M | Schema versioned; `ddl-auto` not used in prod |
-| 0.8 | Label and triage the open issues (difficulty, area, phase) | S | Every issue labelled |
-
-**Exit criteria:** fresh clone to running app in under 15 minutes; CI green on `gssoc_develop`.
-
----
-
-## Phase 1 — Core Hardening (3-4 weeks)
-
-**Goal:** the MVP is reliable, secure and fully wired end to end.
-
-### 1A. Backend
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 1.1 | Audit and finalize REST contract for Menus, Categories, Foods, Orders; publish accurate OpenAPI | M | Swagger matches behavior |
-| 1.2 | Global exception handler + consistent error schema | M | All errors return `{code, message, details}` |
-| 1.3 | Bean validation on all DTOs | M | Invalid input returns 400 with field errors |
-| 1.4 | Security review: secured routes under `/secure/**`, ownership checks (owner can touch only own restaurant data) | L | Tests prove cross-tenant access is denied |
-| 1.5 | CORS driven by `CORS_ALLOWED_ORIGINS` for dev and prod | S | No wildcard in prod |
-| 1.6 | Refresh-token flow and expired-JWT handling | M | Expired token returns 401; refresh works |
-| 1.7 | Unit tests (services) and integration tests (controllers + Testcontainers Postgres) | L | 70%+ coverage on service layer *(target)* |
-| 1.8 | Pagination and sorting for list endpoints | M | `page`, `size`, `sort` supported |
-
-### 1B. Frontend
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 1.9 | Complete frontend ↔ backend integration for menus, categories, foods, orders | L | No mock data left in production paths |
-| 1.10 | Axios interceptors: attach JWT, handle 401/refresh, global error toast | M | Consistent auth handling |
-| 1.11 | Responsive pass on public menu, website and admin dashboard | M | Verified at 360px, 768px, 1280px |
-| 1.12 | Empty states, loading skeletons, error boundaries | M | Every list/page has all three states |
-| 1.13 | Onboarding wizard (restaurant profile → first category → first item → QR) | L | New owner reaches live menu in under 15 minutes |
-| 1.14 | Frontend tests: Vitest + React Testing Library for critical flows | M | Login, menu CRUD, checkout covered |
-
-### 1C. Payments (UPI)
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 1.15 | `PaymentService` generating UPI URI (`upi://pay?pa=...&am=...&tn=...`) and QR | M | Opens GPay/PhonePe/Paytm/BHIM on mobile |
-| 1.16 | Restaurant UPI ID setting with validation | S | Invalid VPA rejected |
-| 1.17 | Payment status model: `PENDING`, `PAID_CLAIMED`, `CONFIRMED`, `FAILED` with owner manual confirmation | M | Owner can confirm payment on dashboard |
-
-**Exit criteria:** an owner can register via Google, build a menu, print a QR; a diner can order and pay via UPI; owner sees and confirms the order. Build, lint and tests are green.
-
----
-
-## Phase 2 — Growth Features (4-5 weeks)
-
-### 2A. Real-time order updates
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 2.1 | Decision record: polling vs SSE vs WebSocket (recommend SSE or STOMP over WebSocket) | S | ADR merged |
-| 2.2 | Backend event publishing on order create/status change | M | Events emitted per restaurant channel |
-| 2.3 | Frontend live order board with sound/visual alert | M | New order appears in under 2 seconds |
-| 2.4 | Polling fallback | S | Works if socket drops |
-
-### 2B. Multi-branch support
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 2.5 | Data model: `Restaurant` 1—N `Branch`; menus, orders, QR codes scoped to branch | L | Migration + entity changes |
-| 2.6 | Branch CRUD APIs + authorization (owner all, manager one branch) | L | RBAC tests pass |
-| 2.7 | Branch switcher in admin UI; per-branch QR and website slug | M | Independent menus per branch |
-| 2.8 | Optional menu cloning between branches | M | One-click copy |
-
-### 2C. Analytics dashboard
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 2.9 | Aggregation endpoints: orders/day, revenue/day, top items, peak hours | M | Date-range filter |
-| 2.10 | Dashboard charts (Recharts or Chart.js *(assumption)*) | M | Branch and date filters |
-| 2.11 | Cache aggregate queries with Redis | M | Cache hit ratio observable |
-
-### 2D. Templates & language
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 2.12 | Formalize template system (theme tokens: colors, fonts, layout) | M | Cafe, Dhaba, Fine Dining themes selectable |
-| 2.13 | i18n framework on frontend (react-i18next) and per-language menu fields on backend | L | English + Hindi + Gujarati to start |
-
-**Exit criteria:** live order board, multi-branch working end to end, analytics with filters, three templates, initial multi-language.
-
----
-
-## Phase 3 — Monetization (about 4 weeks)
-
-| # | Task | Size | Acceptance |
-|---|---|---|---|
-| 3.1 | Define plans (e.g., Free / Pro / Enterprise) and feature matrix; store in config/DB | S | Product sign-off |
-| 3.2 | `Subscription` entity, plan limits (branches, items, analytics depth, templates) | L | Limits enforced server-side |
-| 3.3 | Plan-based RBAC and feature flags (backend guard + frontend gating) | L | Locked features show upgrade prompt |
-| 3.4 | Billing integration (Razorpay recommended for India *(assumption)*), webhooks, invoices | XL | Successful checkout activates plan |
-| 3.5 | Trial, upgrade, downgrade, cancellation flows | L | State machine with tests |
-| 3.6 | Admin (platform) console for tenants and plans | L | Platform admin can view/adjust subscriptions |
-
-**Exit criteria:** paid plan can be purchased, enforced and cancelled without manual intervention.
-
----
-
-## Phase 4 — Ecosystem (ongoing)
-
-| # | Task | Size | Notes |
-|---|---|---|---|
-| 4.1 | WhatsApp Business API notifications (order received, ready, payment link) | L | Requires Meta approval and template messages |
-| 4.2 | AI menu translation (25+ languages) with human-review step | L | LLM-backed service, cache results |
-| 4.3 | Zomato/Swiggy aggregator sync | XL | Validate partner API access before committing |
-| 4.4 | Public SEO improvements for restaurant websites (meta, sitemap, structured data) | M | Better discoverability |
-| 4.5 | PWA/offline menu | M | Menu opens on poor networks |
-
----
-
-## 4. Cross-Cutting Workstreams
-
-| Stream | Ongoing activities |
-|---|---|
-| **Security** | Dependency scanning (Dependabot), secret scanning, OWASP top-10 review each phase, rate limiting on auth and order endpoints |
-| **Quality** | Coverage gates in CI, contract tests for API, regression checklist per release |
-| **Performance** | Index review, N+1 query checks, image optimization, Lighthouse budget for public pages |
-| **Observability** | Structured logs, Actuator metrics, error tracking (e.g., Sentry *(assumption)*) |
-| **Documentation** | Keep README, Swagger, `PRD.md`, `TechStack.md` in sync; ADRs in `/docs/adr` |
-| **Community** | Weekly issue triage, "good first issue" pipeline, contributor recognition |
-
----
-
-## 5. Suggested Milestones & Timeline
-
-| Milestone | Target | Contents |
-|---|---|---|
-| **M0 — Ready to Contribute** | Week 2 | Phase 0 complete |
-| **M1 — MVP Hardened** | Week 6 | Phase 1 complete |
-| **M2 — v1.0 Public Release** | Week 11 | Phase 2 complete |
-| **M3 — Monetization Beta** | Week 15 | Phase 3 complete |
-| **M4 — Ecosystem** | Week 16+ | Phase 4 items as capacity allows |
-
-Timeline assumes a small team plus GSSoC contributors; adjust after the first sprint's velocity is known.
-
----
-
-## 6. Suggested Sprint Breakdown (2-week sprints)
-
-| Sprint | Focus |
-|---|---|
-| S1 | Phase 0 |
-| S2 | Backend hardening 1.1-1.6 |
-| S3 | Frontend integration 1.9-1.12, tests 1.7/1.14 |
-| S4 | UPI + onboarding 1.13, 1.15-1.17 |
-| S5 | Real-time orders 2.1-2.4, analytics 2.9-2.11 |
-| S6 | Multi-branch 2.5-2.8 |
-| S7 | Templates + i18n 2.12-2.13, release prep for v1.0 |
-| S8-S9 | Subscriptions and billing 3.1-3.6 |
-| S10+ | Ecosystem items |
-
----
-
-## 7. Definition of Done
-
-A task is done when:
-- [ ] Code merged to `gssoc_develop` via reviewed PR
-- [ ] `./gradlew build` and `npm run build` pass; lint clean
-- [ ] Unit/integration tests added or updated
-- [ ] Swagger/OpenAPI and docs updated
-- [ ] No secrets or `.env` committed
-- [ ] Verified on mobile viewport (for UI work)
-- [ ] Acceptance criteria demonstrated in the PR description
-
----
-
-## 8. Risks & Mitigations
-
-| Risk | Impact | Mitigation |
-|---|---|---|
-| UPI deep links give no payment confirmation | Wrong order state | Manual owner confirmation in v1; PSP webhook later |
-| Multi-branch retrofits tenant scoping into existing data | Data leaks or migration bugs | Flyway migration, tenant-scoped repositories, cross-tenant tests |
-| Aggregator APIs are partner-only | Roadmap blocked | Validate access early; keep as stretch |
-| WhatsApp approval delays | Slipped notifications | Start template approval in Phase 2 |
-| Contributor churn / inconsistent quality | Tech debt | CI gates, style guide, CODEOWNERS, PR checklist |
-| Scope creep | Delays | Phase gates; changes go through PRD update |
-
----
-
-## 9. Dependencies Map
-
-```
-Flyway + CI (0.x)
-   └─► API contract & tests (1.1-1.8)
-          ├─► Frontend integration (1.9-1.14)
-          │      └─► Onboarding (1.13)
-          ├─► UPI service (1.15-1.17)
-          └─► Multi-branch (2.5-2.8) ─► Analytics per branch (2.9-2.10)
-                                     └─► Subscriptions limits (3.2-3.3) ─► Billing (3.4)
-Real-time orders (2.1-2.4) ─► WhatsApp notifications (4.1)
-i18n (2.13) ─► AI translation (4.2)
+Phase 1 (Immediate)           Phase 2 (Hardening)          Phase 3 (Expansion)
+High-Priority @Todo Backlog → Real-Time & Infra Hardening → Advanced Growth & Integrations
+(Sprints 1 - 2, 3 wks)        (Sprints 3 - 4, 3 wks)       (Sprint 5+, Ongoing)
 ```
 
 ---
 
-## 10. Immediate Next Steps (first 7 days)
+## Phase 1 — High-Priority @Todo Backlog & Core Wiring (Sprints 1 - 2)
 
-1. Fix README formatting issues and add `.env.example` files.
-2. Add the CI workflow (backend + frontend builds).
-3. Label all open issues by phase and difficulty.
-4. Write the ADR for real-time transport and the payment-status model.
-5. Break Phase 1 into GitHub issues with acceptance criteria and assign "good first issue" tags where applicable.
+**Primary Focus:** Close all outstanding functional gaps explicitly documented in `project-flow.txt`.
+
+### 1.1 Sprint 1: Admin Panel Navigation, Branch Context & Analytics Wiring
+
+| # | Task | Component / File | Size | Acceptance Criteria |
+|---|---|---|---|---|
+| **1.1** | **Admin Header Branch Switcher Dropdown (`@Todo-2`)** | `AdminLayout.jsx`, `BranchContext.jsx` | M | Persistent branch selector dropdown in the top second header. Switching branch updates active branch ID in global context and filters Tables, Live Orders, KDS, and Menus accordingly. Defaults to first branch or "All Branches". |
+| **1.2** | **Dashboard Analytics Backend API Integration (`@Todo-4`)** | [`DashboardController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/admin/dashboard/controller/DashboardController.java), `Dashboard.jsx` | M | Connect `Dashboard.jsx` to `/api/v1/admin/dashboard/stats`, `/trends`, and `/top-items`. Replace all dummy data. Display real metrics: Today's Revenue, Today's Orders, Average Order Value (AOV), and Active Tables scoped by active branch. |
+| **1.3** | **Order History Backend API & Frontend Filter View (`@Todo-3`)** | [`OrderController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java), `Orders.jsx`, `OrderHistoryModal.jsx` | L | Implement paginated endpoint `GET /api/v1/orders/history?branchId=&startDate=&endDate=&status=&phone=&page=&size=`. In `Orders.jsx`, add "Order History" view with date range pickers, status filters, phone search, and pagination. |
+| **1.4** | **Free Tier Marketing Template Limiter (`@Todo-5`)** | `WebsiteWrapper.jsx`, `ThemeSelector.jsx`, `RestaurantSubscriptionService` | S | Check active subscription plan for restaurant. If plan is Free, restrict template selection to the 2 default templates (e.g. Classic Cafe & Modern Dhaba). Display upgrade badge on premium templates. |
+
+### 1.2 Sprint 2: Dynamic Subdomain Routing & Granular RBAC Guards
+
+| # | Task | Component / File | Size | Acceptance Criteria |
+|---|---|---|---|---|
+| **1.5** | **Dynamic Subdomain Resolution (`@Todo-1`)** | [`PublicSiteController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/template/controller/PublicSiteController.java), `AppRoutes.jsx`, `SiteContext.jsx` | L | Configure backend to resolve restaurant site config using `Host` header (e.g. `royalbites.restroly.in`) or fallback path parameter. Frontend inspects hostname to extract restaurant slug and fetch dynamic site without manual URL entry. |
+| **1.6** | **Granular Role Enforcement (`@Todo-6`)** | `SecurityConfig.java`, `ProtectedRoute.jsx`, `Sidebar.jsx` | M | - Users with `Manager/User` role have operational read-only access and are barred from accessing `/admin/upi-links`, dashboard revenue figures, and financial reports.<br>- Users with `Staff` role are restricted to viewing and transitioning live orders on `Orders.jsx` and `KitchenDisplaySystem.jsx`. Cannot edit menus or settings. |
+| **1.7** | **Counter QR Code Dedicated Generation (`table_number = 0`)** | `Tables.jsx`, `TableQRModal.jsx` | S | Provide a dedicated "Generate Counter / Takeaway QR" button on Tables page that outputs a downloadable QR code encoding `table_number = 0` for restaurant counter stands and business cards. |
+
+---
+
+## Phase 2 — Real-Time Infrastructure & Production Hardening (Sprints 3 - 4)
+
+**Primary Focus:** Real-time push updates for orders and kitchen operations, database migration versioning, and test coverage.
+
+### 2.1 Sprint 3: Real-Time Transport (WebSocket / SSE)
+
+| # | Task | Component / File | Size | Acceptance Criteria |
+|---|---|---|---|---|
+| **2.1** | **WebSocket / STOMP Broker Configuration** | `WebSocketConfig.java`, `OrderEventPublisher.java` | L | Configure Spring WebSocket STOMP broker. Publish events on topic `/topic/restaurant/{restaurantId}/branch/{branchId}/orders` whenever an order is created or status is updated. |
+| **2.2** | **Frontend Real-Time Order & Notification Subscription** | `Orders.jsx`, `KitchenDisplaySystem.jsx`, `AdminLayout.jsx` | M | Subscribe to WebSocket STOMP topic using SockJS / `@stomp/stompjs`. Instant order card injection and audio chime without manual polling. Fallback to 15s polling if socket disconnects. |
+| **2.3** | **Live Table Service Request Push** | `ServiceRequestController.java`, `AdminHeader.jsx` | S | Push waiter assistance calls directly to header notification bell in real time. Bell badge count increments immediately with sound alert. |
+
+### 2.2 Sprint 4: Database Versioning, CI & Reliability
+
+| # | Task | Component / File | Size | Acceptance Criteria |
+|---|---|---|---|---|
+| **2.4** | **Flyway Database Migrations** | `src/main/resources/db/migration/` | M | Baseline Flyway migration scripts (`V1__initial_schema.sql`, `V2__subscriptions_and_roles.sql`) for PostgreSQL. Remove `spring.jpa.hibernate.ddl-auto=update` from production configuration. |
+| **2.5** | **Automated CI/CD Pipeline (GitHub Actions)** | `.github/workflows/ci.yml` | M | Workflow triggered on PRs targeting `gssoc_develop`. Runs `./gradlew test` (backend) and `npm run test` + `npm run build` (frontend). Blocks merge on failure. |
+| **2.6** | **Backend Integration Tests with Testcontainers** | `src/test/java/...` | L | Integration tests verifying multi-tenant isolation, order status lifecycle transitions, and UPI deep-link generation using Testcontainers with PostgreSQL. |
+| **2.7** | **Error Boundaries & Mobile Viewport Polish** | `ErrorBoundary.jsx`, `RestaurantMenu.jsx` | M | Add React Error Boundaries around complex components. Verify public menu and ordering drawer on mobile viewports (320px, 375px, 414px). |
+
+---
+
+## Phase 3 — Advanced Ecosystem & Growth Features (Sprint 5+, Ongoing)
+
+**Primary Focus:** AI translation, multi-language localization, offline resiliency, and external aggregator integrations.
+
+| # | Task | Component / File | Size | Notes |
+|---|---|---|---|---|
+| **3.1** | **Multi-Language Menu Localization (i18n)** | `RestaurantMenu.jsx`, `LanguageContext.jsx` | M | Support English, Hindi, Gujarati, Marathi, and Tamil menu labels. Dynamic translation of category names and dish descriptions. |
+| **3.2** | **Redis Caching Layer for Public Sites** | `PublicSiteService.java`, Redis CacheManager | M | Cache site configuration, categories, and active menus in Redis with cache invalidation on admin catalog updates. |
+| **3.3** | **PWA Support for Public Digital Menu** | `vite-plugin-pwa`, `manifest.json` | M | Offline-capable caching of restaurant branding and menu items for smooth browsing on slow or spotty 2G/3G mobile networks. |
+| **3.4** | **Automated Subscription Billing (Razorpay)** | `SubscriptionBillingService.java` | L | Razorpay subscription integration for automatic plan renewals, invoices, and automated plan tier upgrades. |
+| **3.5** | **Food Aggregator Sync (Zomato / Swiggy)** | `AggregatorSyncService.java` | XL | Explore webhook and catalog sync APIs for bi-directional menu and order synchronization. |
+
+---
+
+## 4. Definition of Done (DoD)
+
+A task or pull request is considered **Done** and ready for merge into `gssoc_develop` only when:
+- [ ] **Functional Verification**: The feature adheres strictly to `PRD.md` and fulfills all specified acceptance criteria.
+- [ ] **Multi-Tenant Safety**: Queries are strictly scoped to the tenant/branch; cross-tenant data leakage is prevented.
+- [ ] **Role Protection**: Endpoints and UI components enforce appropriate role authorization (`Super Admin`, `Admin`, `Manager`, `Manager/User`, `Staff`).
+- [ ] **Automated Builds & Lints**: Backend `./gradlew build` and frontend `npm run build` pass with zero errors.
+- [ ] **Code Hygiene**: Clean, documented code following Google Java Style and idiomatic React conventions; no unused imports or dead code.
+- [ ] **Security Standards**: No hardcoded API keys, secrets, or `.env` files are committed.
+- [ ] **Responsive Design**: Diner-facing and staff-facing screens render properly across mobile, tablet, and desktop viewports.
+- [ ] **Documentation**: OpenAPI Swagger annotations updated; relevant markdown documentation updated.
+
+---
+
+## 5. Contributor Workstream Guide (GSSoC 2026)
+
+To accelerate community contributions, backlog tasks are tagged by skill area and difficulty:
+
+```
+[good-first-issue]    Difficulty: Easy        Duration: 1-2 days
+[intermediate]        Difficulty: Medium      Duration: 2-4 days
+[advanced]            Difficulty: Hard        Duration: 4-7 days
+```
+
+| Area | Issue Title | Tag | Scope |
+|---|---|---|---|
+| **Frontend** | Branch Selector Dropdown in Admin Header (`@Todo-2`) | `[good-first-issue]` | Add dropdown to `AdminLayout.jsx`, update `BranchContext.jsx` |
+| **Frontend** | Free Tier Template Limiting Badge & Gating (`@Todo-5`) | `[good-first-issue]` | Update `ThemeSelector.jsx` with plan check and locked badges |
+| **Frontend** | Counter QR Code Download Button (`table_number = 0`) | `[good-first-issue]` | Add quick action in `Tables.jsx` |
+| **Fullstack** | Order History View with Date & Status Filters (`@Todo-3`) | `[intermediate]` | Backend JPA query + Frontend Modal/Table in `Orders.jsx` |
+| **Fullstack** | Dashboard Analytics API Integration (`@Todo-4`) | `[intermediate]` | Wire `DashboardController.java` to `Dashboard.jsx` charts |
+| **Backend** | Granular RBAC Pre-Authorize Filters (`@Todo-6`) | `[intermediate]` | Annotate controllers for `Manager/User` and `Staff` |
+| **Backend** | Dynamic Subdomain Host Header Resolution (`@Todo-1`) | `[advanced]` | Subdomain extraction in Spring Boot filter/controller |
+| **Fullstack** | Real-Time WebSocket Order Board & Sound Alerts | `[advanced]` | Spring WebSocket STOMP + SockJS frontend listener |
+
+---
+
+## 6. Summary of Immediate Action Items (First 7 Days)
+
+1. **Deploy Header Branch Selector Dropdown (`@Todo-2`)** in `AdminLayout.jsx` to unlock clean multi-branch operations for all other views.
+2. **Wire Dashboard Analytics API (`@Todo-4`)** to connect existing `DashboardController.java` endpoints to `Dashboard.jsx`.
+3. **Build Order History API and Frontend Filter Tab (`@Todo-3`)** in `OrderController.java` and `Orders.jsx`.
+4. **Implement Free Tier Template Enforcement (`@Todo-5`)** in `WebsiteWrapper.jsx` and `ThemeSelector.jsx`.
+5. **Implement Subdomain Resolution Logic (`@Todo-1`)** in `PublicSiteController.java` and frontend router.
