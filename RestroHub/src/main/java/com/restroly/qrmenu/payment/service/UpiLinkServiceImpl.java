@@ -54,11 +54,15 @@ public class UpiLinkServiceImpl implements UpiLinkService {
         boolean shouldBeDefault = Boolean.TRUE.equals(requestDTO.getIsDefault()) || existingLinks.isEmpty();
 
         if (shouldBeDefault && !existingLinks.isEmpty()) {
+            java.util.List<UpiLink> linksToUpdate = new java.util.ArrayList<>();
             for (UpiLink existing : existingLinks) {
                 if (Boolean.TRUE.equals(existing.getIsDefault())) {
                     existing.setIsDefault(false);
-                    upiLinkRepository.save(existing);
+                    linksToUpdate.add(existing);
                 }
+            }
+            if (!linksToUpdate.isEmpty()) {
+                upiLinkRepository.saveAll(linksToUpdate);
             }
         }
 
@@ -92,9 +96,16 @@ public class UpiLinkServiceImpl implements UpiLinkService {
 
         // Unset all other defaults for this branch
         List<UpiLink> branchLinks = upiLinkRepository.findByBranch_BranchIdAndIsActiveTrueOrderByIsDefaultDescCreatedDateDesc(branch.getBranchId());
+        java.util.List<UpiLink> linksToUpdate = new java.util.ArrayList<>();
         for (UpiLink link : branchLinks) {
-            link.setIsDefault(link.getId().equals(linkId));
-            upiLinkRepository.save(link);
+            boolean shouldBeDefaultLink = link.getId().equals(linkId);
+            if (!Boolean.valueOf(shouldBeDefaultLink).equals(link.getIsDefault())) {
+                link.setIsDefault(shouldBeDefaultLink);
+                linksToUpdate.add(link);
+            }
+        }
+        if (!linksToUpdate.isEmpty()) {
+            upiLinkRepository.saveAll(linksToUpdate);
         }
 
         // Update branch active UPI ID
