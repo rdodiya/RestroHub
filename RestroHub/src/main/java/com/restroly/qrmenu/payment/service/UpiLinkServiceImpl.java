@@ -54,11 +54,15 @@ public class UpiLinkServiceImpl implements UpiLinkService {
         boolean shouldBeDefault = Boolean.TRUE.equals(requestDTO.getIsDefault()) || existingLinks.isEmpty();
 
         if (shouldBeDefault && !existingLinks.isEmpty()) {
+            List<UpiLink> linksToUpdate = new java.util.ArrayList<>();
             for (UpiLink existing : existingLinks) {
                 if (Boolean.TRUE.equals(existing.getIsDefault())) {
                     existing.setIsDefault(false);
-                    upiLinkRepository.save(existing);
+                    linksToUpdate.add(existing);
                 }
+            }
+            if (!linksToUpdate.isEmpty()) {
+                upiLinkRepository.saveAll(linksToUpdate);
             }
         }
 
@@ -94,8 +98,8 @@ public class UpiLinkServiceImpl implements UpiLinkService {
         List<UpiLink> branchLinks = upiLinkRepository.findByBranch_BranchIdAndIsActiveTrueOrderByIsDefaultDescCreatedDateDesc(branch.getBranchId());
         for (UpiLink link : branchLinks) {
             link.setIsDefault(link.getId().equals(linkId));
-            upiLinkRepository.save(link);
         }
+        upiLinkRepository.saveAll(branchLinks);
 
         // Update branch active UPI ID
         branch.setBranchUpiId(targetLink.getUpiId());
