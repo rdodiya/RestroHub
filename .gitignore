@@ -77,7 +77,6 @@ out/
 # Local Logs
 **/logs/
 
-AGENTS.md
 CODE_CHANGES.md
 .opencode/opencode.json
 .opencode/plugins/graphify.js
