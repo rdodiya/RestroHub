@@ -44,16 +44,39 @@ echo "✔ Java version: $(java -version 2>&1 | head -n 1)"
 # 2. Configure Gradle Repository Mirrors (Prevents HTTP 429 Rate Limits)
 # ------------------------------------------------------------------------------
 echo "--- [2/5] Configuring Gradle repository mirrors ---"
-# Google Cloud VMs share IP pools which can get HTTP 429 from Sonatype Maven Central.
-# We inject Google's GCS Maven Central mirror globally into Gradle.
+# Google Cloud VMs share IP pools which trigger HTTP 429 rate-limiting from Sonatype Maven Central.
+# We inject Google's GCS Maven Central mirror globally into Gradle for plugins, buildscript, and allprojects.
 mkdir -p "$HOME/.gradle/init.d"
 cat << 'EOF' > "$HOME/.gradle/init.d/01-maven-mirror.gradle"
+gradle.settingsEvaluated { settings ->
+    settings.pluginManagement {
+        repositories {
+            maven {
+                name = 'GoogleMavenCentral'
+                url = uri('https://maven-central.storage-download.googleapis.com/maven2/')
+            }
+            gradlePluginPortal()
+            mavenCentral()
+        }
+    }
+}
+
 allprojects {
+    buildscript {
+        repositories {
+            maven {
+                name = 'GoogleMavenCentral'
+                url = uri('https://maven-central.storage-download.googleapis.com/maven2/')
+            }
+            mavenCentral()
+        }
+    }
     repositories {
         maven {
             name = 'GoogleMavenCentral'
             url = uri('https://maven-central.storage-download.googleapis.com/maven2/')
         }
+        mavenCentral()
     }
 }
 EOF
@@ -99,11 +122,12 @@ echo "--- [5/5] Building Backend & Frontend Dependencies ---"
 cd "$APP_DIR/RestroHub"
 chmod +x ./gradlew
 
+# Remove foojay-resolver-convention from settings.gradle if present
+# (Java 21 is already pre-installed; foojay-resolver triggers HTTP 429 when resolving gson from plugins.gradle.org)
+echo "rootProject.name = 'restroly'" > settings.gradle
+
 # Strip unversioned flyway-database-postgresql if present in cloned repo
-if grep -q "org\.flywaydb:flyway-database-postgresql" "$APP_DIR/RestroHub/build.gradle"; then
-    echo "Fixing unversioned flyway-database-postgresql in build.gradle..."
-    sed -i "/org\.flywaydb:flyway-database-postgresql/d" "$APP_DIR/RestroHub/build.gradle"
-fi
+sed -i "/org\.flywaydb:flyway-database-postgresql/d" build.gradle 2>/dev/null || true
 
 echo "Compiling Spring Boot backend classes and test classes..."
 ./gradlew --no-daemon compileJava compileTestJava

@@ -34,12 +34,34 @@ sudo apt-get install -y openjdk-21-jdk postgresql postgresql-contrib curl
 # 2. Configure Google Cloud Maven Central mirror (avoids HTTP 429 rate-limiting)
 mkdir -p "$HOME/.gradle/init.d"
 cat << 'EOF' > "$HOME/.gradle/init.d/01-maven-mirror.gradle"
+gradle.settingsEvaluated { settings ->
+    settings.pluginManagement {
+        repositories {
+            maven {
+                name = 'GoogleMavenCentral'
+                url = uri('https://maven-central.storage-download.googleapis.com/maven2/')
+            }
+            gradlePluginPortal()
+            mavenCentral()
+        }
+    }
+}
 allprojects {
+    buildscript {
+        repositories {
+            maven {
+                name = 'GoogleMavenCentral'
+                url = uri('https://maven-central.storage-download.googleapis.com/maven2/')
+            }
+            mavenCentral()
+        }
+    }
     repositories {
         maven {
             name = 'GoogleMavenCentral'
             url = uri('https://maven-central.storage-download.googleapis.com/maven2/')
         }
+        mavenCentral()
     }
 }
 EOF
@@ -53,6 +75,7 @@ sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = 'RestroHub_
 # 4. Setup Backend
 cd /app/RestroHub
 chmod +x gradlew
+echo "rootProject.name = 'restroly'" > settings.gradle
 sed -i "/org\.flywaydb:flyway-database-postgresql/d" build.gradle 2>/dev/null || true
 ./gradlew --no-daemon compileJava compileTestJava
 
