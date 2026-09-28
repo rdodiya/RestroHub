@@ -177,10 +177,11 @@ const Login = () => {
         const result = res.data;
 
         if (result.success) {
-          const { accessToken, refreshToken, roles } = result.data;
+          const { accessToken, refreshToken, roles, branchIds } = result.data;
+          const branchId = Array.isArray(branchIds) && branchIds.length > 0 ? branchIds[0] : (result.data.branchId || null);
 
           storeAuthSession(
-            { accessToken, refreshToken, roles },
+            { accessToken, refreshToken, roles, branchId },
             values.rememberMe
           );
 
@@ -229,10 +230,11 @@ const handleGoogleLogin = async (credentialResponse) => {
     const result = res.data;
 
     if (result.success) {
-      const { accessToken, refreshToken, roles } = result.data;
+      const { accessToken, refreshToken, roles, branchIds } = result.data;
+      const branchId = Array.isArray(branchIds) && branchIds.length > 0 ? branchIds[0] : (result.data.branchId || null);
 
       storeAuthSession(
-        { accessToken, refreshToken, roles },
+        { accessToken, refreshToken, roles, branchId },
         formik.values.rememberMe
       );
 

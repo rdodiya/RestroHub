@@ -1,4 +1,4 @@
-const AUTH_KEYS = ["accessToken", "refreshToken", "roles"];
+const AUTH_KEYS = ["accessToken", "refreshToken", "roles", "branchId"];
 const REMEMBERED_USERNAME_KEY = "rememberedUsername";
 
 const getStorage = (rememberMe) => (rememberMe ? localStorage : sessionStorage);
@@ -7,6 +7,7 @@ export const getAuthItem = (key) =>
   localStorage.getItem(key) || sessionStorage.getItem(key);
 
 export const getAccessToken = () => getAuthItem("accessToken");
+export const getBranchId = () => getAuthItem("branchId");
 
 export const getStoredRoles = () => {
   const rolesStr = getAuthItem("roles");
@@ -33,13 +34,18 @@ export const clearRememberedUsername = () => {
   localStorage.removeItem(REMEMBERED_USERNAME_KEY);
 };
 
-export const storeAuthSession = ({ accessToken, refreshToken, roles }, rememberMe) => {
+export const storeAuthSession = ({ accessToken, refreshToken, roles, branchId }, rememberMe) => {
   clearAuthSession();
 
   const storage = getStorage(rememberMe);
   storage.setItem("accessToken", accessToken);
   storage.setItem("refreshToken", refreshToken);
   storage.setItem("roles", JSON.stringify(roles || []));
+  if (branchId) {
+    storage.setItem("branchId", branchId);
+    // Backward compatibility for components that hardcode it
+    localStorage.setItem("selectedBranchId", branchId);
+  }
 };
 
 export const clearAuthSession = () => {
@@ -47,4 +53,6 @@ export const clearAuthSession = () => {
     localStorage.removeItem(key);
     sessionStorage.removeItem(key);
   });
+  localStorage.removeItem("selectedBranchId");
+  sessionStorage.removeItem("selectedBranchId");
 };
