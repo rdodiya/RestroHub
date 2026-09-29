@@ -19,6 +19,24 @@ fi
 # 2) Java: Spotless format check
 if echo "$STAGED" | grep -qE '^RestroHub/.*\.java$'; then
   echo "▶ Java: spotlessCheck"
+  # Ensure JAVA_HOME is Java 21 or 17 (and not Java 11)
+  NEED_JAVA=true
+  if [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/java" -o -x "$JAVA_HOME/bin/java.exe" ]; then
+    JH_VER=$("$JAVA_HOME/bin/java" -version 2>&1 | awk -F '"' '/version/ {print $2}' | cut -d'.' -f1)
+    if [ "$JH_VER" = "21" ] || [ "$JH_VER" = "17" ]; then
+      NEED_JAVA=false
+    fi
+  fi
+
+  if [ "$NEED_JAVA" = true ]; then
+    for cand in "D:/Software/jdk-21.0.4" "/d/Software/jdk-21.0.4" "C:/Program Files/Java/jdk-21" "/c/Program Files/Java/jdk-21" "D:/Software/jdk-17.0.12" "/d/Software/jdk-17.0.12" "C:/Program Files/Java/jdk-17" "/c/Program Files/Java/jdk-17"; do
+      if [ -d "$cand" ] && [ -f "$cand/bin/java" -o -f "$cand/bin/java.exe" ]; then
+        export JAVA_HOME="$cand"
+        export PATH="$cand/bin:$PATH"
+        break
+      fi
+    done
+  fi
   ( cd "$ROOT/RestroHub" && ./gradlew spotlessCheck --quiet ) \
     || fail "Java formatting failed. Fix with: cd RestroHub && ./gradlew spotlessApply  (then git add)"
 fi

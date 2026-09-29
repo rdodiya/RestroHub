@@ -1,4 +1,4 @@
-# agent.md
+# AGENTS.md
 
 This file provides guidance and environment instructions to Google's Jules and other AI coding agents when working with code in this repository.
 
@@ -92,7 +92,7 @@ npm run build
 
 ### Backend (`/app/RestroHub` or `./RestroHub`)
 ```bash
-# Compile and build classes
+# Compile and build (skip tests for quick check)
 ./gradlew compileJava compileTestJava
 
 # Run test suite
