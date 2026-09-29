@@ -36,23 +36,19 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
     profileImage: null
   });
 
-  // Fix: Add missing logout handler to prevent React crashes
   const handleLogout = async () => {
-  try {
-    await api.post('/public/api/v1/auth/logout');  //handles logout on backend and invalidates refresh token
-  } catch (error) {
-    console.error('Logout API failed:', error);  //catches errors if API call breaks
-    toast.error('Logout API failed');
-  } finally {
-    clearAuthSession();
-
-    if (api?.defaults?.headers?.common?.Authorization) {  //cleans up axios default auth header if it exists
-      delete api.defaults.headers.common.Authorization;
+    try {
+      await api.post('/public/api/v1/auth/logout');
+    } catch (error) {
+      console.error('Logout API failed:', error);
+      toast.error('Logout API failed');
+    } finally {
+      clearAuthSession();
+      // Use window.location.href to fully clear React state/memory
+      // and prevent trailing async crashes on unmounted components
+      window.location.href = '/login';
     }
-
-    navigate('/login', { replace: true });
-  }
-};
+  };
 
   // Close dropdowns on outside click
   useEffect(() => {
