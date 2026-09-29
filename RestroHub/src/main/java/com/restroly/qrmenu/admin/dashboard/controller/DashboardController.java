@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/secure/api/v1/dashboard")
-@CrossOrigin(origins = "*") // adjust for production
+
 public class DashboardController {
 
     @Autowired
