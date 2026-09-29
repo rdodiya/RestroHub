@@ -19,7 +19,7 @@ import profileService from '../../services/user/profileService';
 import useWebSocketNotifications from '@hooks/useWebSocketNotifications';
 import api from '../../services/common/api';
 import toast from 'react-hot-toast';
-import { clearAuthSession } from '../../services/common/authStorage';
+import { clearAuthSession, getBranchId } from '../../services/common/authStorage';
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -87,8 +87,8 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   }, []);
 
   // Live service request notifications via WebSocket
-  // TODO: Replace hardcoded branchId with actual branch from auth context
-  const { notifications, unreadCount, completeRequest } = useWebSocketNotifications(1);
+  const branchId = getBranchId() || localStorage.getItem('selectedBranchId') || 1;
+  const { notifications, unreadCount, completeRequest } = useWebSocketNotifications(branchId);
 
   // Shared class helpers
   const iconBtn = `inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
