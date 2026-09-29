@@ -144,11 +144,15 @@ public class OrderServiceImpl implements OrderService {
 		int updatedCount = 0;
 		for (Order order : orders) {
 			order.setStatus(OrderStatus.READY);
-			Order updatedOrder = orderRepository.save(order);
+		}
+
+		List<Order> updatedOrders = orderRepository.saveAll(orders);
+
+		for (Order updatedOrder : updatedOrders) {
 			try {
 				notificationService.notifyOrderStatusChange(updatedOrder);
 			} catch (Exception ex) {
-				log.warn("Could not send status notification for order {}: {}", order.getOrderId(), ex.getMessage());
+				log.warn("Could not send status notification for order {}: {}", updatedOrder.getOrderId(), ex.getMessage());
 			}
 			updatedCount++;
 		}
