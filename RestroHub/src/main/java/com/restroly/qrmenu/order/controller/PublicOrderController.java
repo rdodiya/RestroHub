@@ -21,7 +21,7 @@ import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
 
 @RestController
 @RequestMapping(PUBLIC_API_VERSION + "/orders")
-@CrossOrigin(origins = "*")
+
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Public Order API", description = "Public APIs for table customers to place dine-in orders")

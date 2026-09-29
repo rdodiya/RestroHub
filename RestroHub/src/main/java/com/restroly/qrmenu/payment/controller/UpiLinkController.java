@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +31,7 @@ import static com.restroly.qrmenu.common.util.ApiConstants.SECURE_API_VERSION;
 
 @RestController
 @RequestMapping(SECURE_API_VERSION + "/upi-links")
-@CrossOrigin(origins = "*")
+
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "UPI Links", description = "Endpoints for managing branch UPI payment accounts")
