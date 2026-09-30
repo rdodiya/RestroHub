@@ -11,6 +11,7 @@ import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import toast from 'react-hot-toast';
+import { useBranch } from '@context/BranchContext';
 
 // ============================================
 // STAT CARD (Private to this file)
@@ -88,6 +89,7 @@ const StatCardSkeleton = () => {
 // MAIN COMPONENT (Exported)
 // ============================================
 const StatsSection = () => {
+  const { selectedBranchId } = useBranch();
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -143,14 +145,15 @@ const StatsSection = () => {
   // ------------------------------------
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [selectedBranchId]);
 
   const fetchStats = async () => {
   try {
     setLoading(true);
     setError(null);
 
-    const response = await api.get("/secure/api/v1/dashboard/statistics");
+    const branchToFetch = selectedBranchId === 'all' ? 1 : selectedBranchId; // fallback if needed
+    const response = await api.get(`/secure/api/v1/dashboard/statistics/${branchToFetch}`);
 
 
     const apiStats = response.data.map(stat => ({

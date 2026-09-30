@@ -13,24 +13,7 @@ import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import toast from 'react-hot-toast';
-
-// Helper to safely fetch branchId
-const getBranchId = async () => {
-  try {
-    const res = await api.get('/secure/api/v1/users/fetchRestaurantId');
-    const data = res.data || {};
-    return (
-      data.branchId ||
-      data.restaurantId ||
-      data.data?.branchId ||
-      data.data?.restaurantId ||
-      localStorage.getItem('selectedBranchId') ||
-      1
-    );
-  } catch {
-    return localStorage.getItem('selectedBranchId') || 1;
-  }
-};
+import { useBranch } from '@context/BranchContext';
 
 // ============================================
 // MAIN COMPONENT (Exported)
@@ -42,6 +25,7 @@ const RevenueChart = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isDark } = useAdminTheme();
+  const { selectedBranchId } = useBranch();
 
   // ------------------------------------
   // FETCH REAL-TIME REVENUE
@@ -61,15 +45,15 @@ const RevenueChart = () => {
       window.removeEventListener('restrohub:order-updated', handleOrderUpdated);
       clearInterval(interval);
     };
-  }, [timeRange]);
+  }, [timeRange, selectedBranchId]);
 
   const fetchRevenue = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const branchId = await getBranchId();
-      const response = await api.get(`/secure/api/v1/orders/branch/${branchId}`);
+      const branchToFetch = selectedBranchId === 'all' ? 1 : selectedBranchId;
+      const response = await api.get(`/secure/api/v1/orders/branch/${branchToFetch}`);
       const orders = Array.isArray(response.data) ? response.data : [];
 
       // Filter non-cancelled orders
