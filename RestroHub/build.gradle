@@ -61,16 +61,16 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"  // ADD THIS
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-
+    
     // MapStruct
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-
+    
     // QR Code Generation
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.google.zxing:javase:3.5.2'
 
     implementation 'com.cloudinary:cloudinary-http44:1.39.0'
-
+    
     // Testing
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
