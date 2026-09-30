@@ -48,7 +48,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-tomcat'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    
+
     // Database
     runtimeOnly 'org.postgresql:postgresql:42.7.2'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -56,7 +56,7 @@ dependencies {
 
     // Lombok - ORDER MATTERS!
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    
+
     // Annotation Processors - ORDER MATTERS!
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"  // ADD THIS
