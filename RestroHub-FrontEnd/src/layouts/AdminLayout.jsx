@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '@components/admin/Sidebar';
 import Header from '@components/admin/Header';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import { BranchProvider } from '@context/BranchContext';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -10,9 +11,10 @@ const AdminLayout = () => {
   const { isDark } = useAdminTheme();
 
   return (
-    <div className={`flex h-screen overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <Sidebar
-        open={sidebarOpen}
+    <BranchProvider>
+      <div className={`flex h-screen overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <Sidebar
+          open={sidebarOpen}
         setOpen={setSidebarOpen}
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
@@ -25,13 +27,14 @@ const AdminLayout = () => {
           onCollapseToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
 
-        <main className={`admin-content flex-1 overflow-y-auto overflow-x-hidden ${isDark ? 'bg-gray-900' : ''}`}>
-          <div className="mx-auto max-w-screen-2xl p-4 sm:p-5 lg:p-6 2xl:p-8">
-            <Outlet />
-          </div>
-        </main>
+          <main className={`admin-content flex-1 overflow-y-auto overflow-x-hidden ${isDark ? 'bg-gray-900' : ''}`}>
+            <div className="mx-auto max-w-screen-2xl p-4 sm:p-5 lg:p-6 2xl:p-8">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </BranchProvider>
   );
 };
 

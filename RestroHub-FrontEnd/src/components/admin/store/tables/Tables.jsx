@@ -45,6 +45,7 @@ const Tables = () => {
       <TablesHeader
         branchId={branchId}
         onAddTable={() => setIsAddOpen(true)}
+        onGenerateCounterQR={() => openQR({ id: 0, number: '0' })}
         totalTables={allTables.filter((table) => table.isActive !== false).length}
       />
 

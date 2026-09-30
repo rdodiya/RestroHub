@@ -1,47 +1,51 @@
 package com.restroly.qrmenu.template.controller;
 
+import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
+
 import com.restroly.qrmenu.template.dto.SiteConfigDTO;
 import com.restroly.qrmenu.template.dto.UpdateSiteConfigRequest;
-import com.restroly.qrmenu.template.entity.SectionType;
 import com.restroly.qrmenu.template.service.SiteConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
-
-import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
 
 @RestController
-@RequestMapping(PUBLIC_API_VERSION +"/sites")
+@RequestMapping(PUBLIC_API_VERSION + "/sites")
 @RequiredArgsConstructor
 @Tag(name = "Public Site API", description = "Public APIs for fetching site data")
 public class PublicSiteController {
 
-    private final SiteConfigService siteConfigService;
+  private final SiteConfigService siteConfigService;
 
-    @GetMapping("/{siteId}/config")
-    @Operation(summary = "Get public site configuration with all sections")
-    public ResponseEntity<SiteConfigDTO> getSiteConfig(
-            @Parameter(description = "Site ID") @PathVariable String siteId) {
-        SiteConfigDTO config = siteConfigService.getPublicSiteConfig(siteId);
-        return ResponseEntity.ok(config);
+  @GetMapping("/{siteId}/config")
+  @Operation(summary = "Get public site configuration with all sections")
+  public ResponseEntity<SiteConfigDTO> getSiteConfig(
+      @Parameter(description = "Site ID") @PathVariable String siteId, HttpServletRequest request) {
+
+    String resolvedSiteId = siteId;
+    if ("resolve".equalsIgnoreCase(siteId) || siteId == null || siteId.trim().isEmpty()) {
+      String host = request.getServerName();
+      if (host != null && host.contains(".")) {
+        resolvedSiteId = host.split("\\.")[0];
+      } else {
+        resolvedSiteId = host;
+      }
     }
 
-    @PatchMapping("/{siteId}/config")
-    public ResponseEntity<SiteConfigDTO> updateSiteConfig(
-            @PathVariable String siteId,
-            @RequestBody UpdateSiteConfigRequest request) {
+    SiteConfigDTO config = siteConfigService.getPublicSiteConfig(resolvedSiteId);
+    return ResponseEntity.ok(config);
+  }
 
-        return ResponseEntity.ok(
-                siteConfigService.updateSiteConfig(siteId, request));
-    }
+  @PatchMapping("/{siteId}/config")
+  public ResponseEntity<SiteConfigDTO> updateSiteConfig(
+      @PathVariable String siteId, @RequestBody UpdateSiteConfigRequest request) {
 
+    return ResponseEntity.ok(siteConfigService.updateSiteConfig(siteId, request));
+  }
 }
 /*
 {

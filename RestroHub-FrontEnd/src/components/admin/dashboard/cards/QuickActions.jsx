@@ -14,6 +14,7 @@ import {
 import toast from 'react-hot-toast';
 import api from "@services/common/api";
 import { useAdminTheme } from '@context/AdminThemeContext';
+import { useBranch } from '@context/BranchContext';
 
 
 // ============================================
@@ -35,24 +36,6 @@ const ActionButton = ({ label, icon: Icon, bgColor, hoverColor, onClick, loading
   </button>
 );
 
-// Helper to safely fetch branchId
-const getBranchId = async () => {
-  try {
-    const res = await api.get('/secure/api/v1/users/fetchRestaurantId');
-    const data = res.data || {};
-    return (
-      data.branchId ||
-      data.restaurantId ||
-      data.data?.branchId ||
-      data.data?.restaurantId ||
-      localStorage.getItem('selectedBranchId') ||
-      1
-    );
-  } catch {
-    return localStorage.getItem('selectedBranchId') || 1;
-  }
-};
-
 // ============================================
 // MAIN COMPONENT (Exported)
 // ============================================
@@ -60,6 +43,7 @@ const QuickActions = () => {
   const navigate = useNavigate();
   const [loadingAction, setLoadingAction] = useState(null);
   const { isDark } = useAdminTheme();
+  const { selectedBranchId } = useBranch();
 
   // WhatsApp Broadcast Modal State
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
@@ -91,9 +75,9 @@ const QuickActions = () => {
   const handleMarkAllReady = async () => {
     try {
       setLoadingAction('mark-ready');
-      const branchId = await getBranchId();
+      const branchToUse = selectedBranchId === 'all' ? 1 : selectedBranchId;
 
-      const response = await api.put(`/secure/api/v1/orders/branch/${branchId}/mark-all-ready`);
+      const response = await api.put(`/secure/api/v1/orders/branch/${branchToUse}/mark-all-ready`);
       const data = response.data || {};
       const count = data.count ?? 0;
 
@@ -142,9 +126,9 @@ const QuickActions = () => {
         }
       } else {
         // Collect active branch customer count
-        const branchId = await getBranchId();
+        const branchToUse = selectedBranchId === 'all' ? 1 : selectedBranchId;
         try {
-          const res = await api.get(`/secure/api/v1/orders/branch/${branchId}/active`);
+          const res = await api.get(`/secure/api/v1/orders/branch/${branchToUse}/active`);
           const orders = Array.isArray(res.data) ? res.data : [];
           const phones = new Set(orders.map(o => o.customerPhone).filter(Boolean));
           recipientCount = Math.max(phones.size, 1);
@@ -173,9 +157,9 @@ const QuickActions = () => {
   const handleExportReport = async () => {
     try {
       setLoadingAction('export');
-      const branchId = await getBranchId();
+      const branchToUse = selectedBranchId === 'all' ? 1 : selectedBranchId;
 
-      const response = await api.get(`/secure/api/v1/orders/branch/${branchId}`);
+      const response = await api.get(`/secure/api/v1/orders/branch/${branchToUse}`);
       const orders = Array.isArray(response.data) ? response.data : [];
 
       if (orders.length === 0) {

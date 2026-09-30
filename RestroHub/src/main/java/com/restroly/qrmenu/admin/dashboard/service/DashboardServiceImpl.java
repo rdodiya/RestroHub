@@ -1,81 +1,63 @@
 package com.restroly.qrmenu.admin.dashboard.service;
 
-
 import com.restroly.qrmenu.admin.dashboard.dto.DashboardStatDTO;
 import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.order.repository.OrderRepository;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
-    private final OrderRepository orderRepository;
+  private final OrderRepository orderRepository;
 
-    @Override
-    public List<DashboardStatDTO> getDashboardStats() {
+  @Override
+  public List<DashboardStatDTO> getDashboardStats(Long branchId) {
 
-        // Today's Date Range
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.atTime(23, 59, 59);
+    // Today's Date Range
+    LocalDate today = LocalDate.now();
+    LocalDateTime startOfDay = today.atStartOfDay();
+    LocalDateTime endOfDay = today.atTime(23, 59, 59);
 
-        // Today's Revenue
-        BigDecimal todayRevenue = orderRepository.getTodayRevenue(startOfDay, endOfDay);
+    BigDecimal todayRevenue;
+    long liveOrders;
 
-        @SuppressWarnings("deprecation") NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
-        String formattedRevenue = formatter.format(todayRevenue);
+    // Live Orders (Active statuses)
+    List<OrderStatus> activeStatuses =
+        List.of(OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.PREPARING);
 
-        // Live Orders (Active statuses)
-        List<OrderStatus> activeStatuses = List.of(
-                OrderStatus.PENDING,
-                OrderStatus.CONFIRMED,
-                OrderStatus.PREPARING
-        );
-
-        long liveOrders = orderRepository.countByStatusIn(activeStatuses);
-
-        return List.of(
-                new DashboardStatDTO(
-                        "Today's Revenue",
-                        formattedRevenue,
-                        null,
-                        null,
-                        null,
-                        "revenue",
-                        "green",
-                        null,
-                        null
-                ),
-                new DashboardStatDTO(
-                        "Live Orders",
-                        String.valueOf(liveOrders),
-                        null,
-                        null,
-                        "active",
-                        "orders",
-                        "orange",
-                        true,
-                        null
-                )
-        );
+    if (branchId == null || branchId == 0) {
+      // "all" branches case
+      todayRevenue = orderRepository.getTodayRevenue(startOfDay, endOfDay);
+      liveOrders = orderRepository.countByStatusIn(activeStatuses);
+    } else {
+      todayRevenue = orderRepository.getTodayRevenueByBranch(branchId, startOfDay, endOfDay);
+      liveOrders = orderRepository.countByBranchBranchIdAndStatusIn(branchId, activeStatuses);
     }
 
-    // @Override
-    // public SseEmitter switchOnNotificationsForBranch(Long branchId) {
-    //     if(branchRepository.existsById(branchId)){
-    //         return notificationService.subscribe(branchId);
-    //     }
-    //     throw new IllegalArgumentException("Branch not found with ID: " + branchId);
-    // }
+    @SuppressWarnings("deprecation")
+    NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+    String formattedRevenue = formatter.format(todayRevenue);
 
+    return List.of(
+        new DashboardStatDTO(
+            "Today's Revenue", formattedRevenue, null, null, null, "revenue", "green", null, null),
+        new DashboardStatDTO(
+            "Live Orders",
+            String.valueOf(liveOrders),
+            null,
+            null,
+            "active",
+            "orders",
+            "orange",
+            true,
+            null));
+  }
 }
