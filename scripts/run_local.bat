@@ -8,7 +8,7 @@ echo            🍽️  RESTROLY LOCAL ENVIRONMENT RUNNER
 echo ============================================================
 
 set "ROOT_DIR=%~dp0"
-set "ROOT_DIR=%ROOT_DIR:~0,-1%"
+for %%I in ("%ROOT_DIR%..") do set "ROOT_DIR=%%~fI"
 set "ENV_FILE=%ROOT_DIR%\.env.local"
 set "FRONTEND_ENV=%ROOT_DIR%\RestroHub-FrontEnd\.env"
 

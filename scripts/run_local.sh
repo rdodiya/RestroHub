@@ -8,7 +8,7 @@
 set -e
 
 # Project root directory
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="$ROOT_DIR/.env.local"
 FRONTEND_ENV="$ROOT_DIR/RestroHub-FrontEnd/.env"
 
