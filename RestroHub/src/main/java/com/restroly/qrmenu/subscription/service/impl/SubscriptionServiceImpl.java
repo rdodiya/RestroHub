@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,17 +89,31 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     private void saveFeatureMappings(SubscriptionPlan plan, List<FeatureMappingRequest> features) {
+        List<Long> featureIds = features.stream()
+                .map(FeatureMappingRequest::getFeatureId)
+                .collect(Collectors.toList());
+
+        List<SubscriptionFeature> featureEntities = featureRepository.findAllById(featureIds);
+        Map<Long, SubscriptionFeature> featureMap = featureEntities.stream()
+                .collect(Collectors.toMap(SubscriptionFeature::getId, f -> f));
+
+        List<PlanFeatureMapping> mappingsToSave = new ArrayList<>();
+
         for (FeatureMappingRequest fmr : features) {
-            SubscriptionFeature feature = featureRepository.findById(fmr.getFeatureId())
-                    .orElseThrow(() -> new RuntimeException("Feature not found with id: " + fmr.getFeatureId()));
-            
+            SubscriptionFeature feature = featureMap.get(fmr.getFeatureId());
+            if (feature == null) {
+                throw new RuntimeException("Feature not found with id: " + fmr.getFeatureId());
+            }
+
             PlanFeatureMapping mapping = PlanFeatureMapping.builder()
                     .plan(plan)
                     .feature(feature)
                     .featureValue(fmr.getFeatureValue())
                     .build();
-            mappingRepository.save(mapping);
+            mappingsToSave.add(mapping);
         }
+
+        mappingRepository.saveAll(mappingsToSave);
     }
 
     @Override
