@@ -9,13 +9,12 @@ import {
   Loader2,
   X,
   MessageSquare,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from "@services/common/api";
+import api from '@services/common/api';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import { useBranch } from '@context/BranchContext';
-
 
 // ============================================
 // ACTION BUTTON (Private to this file)
@@ -27,11 +26,7 @@ const ActionButton = ({ label, icon: Icon, bgColor, hoverColor, onClick, loading
     disabled={isLoading}
     className={`flex items-center gap-2 px-4 py-2.5 text-white rounded-xl transition-all font-medium shadow-sm hover:shadow active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${bgColor} ${hoverColor}`}
   >
-    {isLoading ? (
-      <Loader2 className="w-4 h-4 animate-spin" />
-    ) : (
-      <Icon className="w-4 h-4" />
-    )}
+    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Icon className="w-4 h-4" />}
     <span>{label}</span>
   </button>
 );
@@ -43,12 +38,12 @@ const QuickActions = () => {
   const navigate = useNavigate();
   const [loadingAction, setLoadingAction] = useState(null);
   const { isDark } = useAdminTheme();
-  const { selectedBranchId } = useBranch();
+  const { effectiveBranchId } = useBranch();
 
   // WhatsApp Broadcast Modal State
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState(
-    "Special Offer today at Restroly! Enjoy 20% off on all main courses. Show this message at your table to redeem."
+    'Special Offer today at Restroly! Enjoy 20% off on all main courses. Show this message at your table to redeem.'
   );
   const [targetAudience, setTargetAudience] = useState('active'); // 'active' | 'custom'
   const [customPhone, setCustomPhone] = useState('');
@@ -75,7 +70,8 @@ const QuickActions = () => {
   const handleMarkAllReady = async () => {
     try {
       setLoadingAction('mark-ready');
-      const branchToUse = selectedBranchId === 'all' ? 1 : selectedBranchId;
+      const branchToUse = effectiveBranchId;
+      if (!branchToUse) return;
 
       const response = await api.put(`/secure/api/v1/orders/branch/${branchToUse}/mark-all-ready`);
       const data = response.data || {};
@@ -126,11 +122,11 @@ const QuickActions = () => {
         }
       } else {
         // Collect active branch customer count
-        const branchToUse = selectedBranchId === 'all' ? 1 : selectedBranchId;
+        const branchToUse = effectiveBranchId;
         try {
           const res = await api.get(`/secure/api/v1/orders/branch/${branchToUse}/active`);
           const orders = Array.isArray(res.data) ? res.data : [];
-          const phones = new Set(orders.map(o => o.customerPhone).filter(Boolean));
+          const phones = new Set(orders.map((o) => o.customerPhone).filter(Boolean));
           recipientCount = Math.max(phones.size, 1);
         } catch {
           recipientCount = 1;
@@ -142,7 +138,7 @@ const QuickActions = () => {
 
       toast.success(`Broadcast announcement sent to ${recipientCount} customer(s)!`, {
         icon: '📢',
-        duration: 4000
+        duration: 4000,
       });
       setIsBroadcastOpen(false);
     } catch (err) {
@@ -157,7 +153,8 @@ const QuickActions = () => {
   const handleExportReport = async () => {
     try {
       setLoadingAction('export');
-      const branchToUse = selectedBranchId === 'all' ? 1 : selectedBranchId;
+      const branchToUse = effectiveBranchId;
+      if (!branchToUse) return;
 
       const response = await api.get(`/secure/api/v1/orders/branch/${branchToUse}`);
       const orders = Array.isArray(response.data) ? response.data : [];
@@ -177,20 +174,15 @@ const QuickActions = () => {
         'Status',
         'Total Items',
         'Items Summary',
-        'Total Amount (INR)'
+        'Total Amount (INR)',
       ];
 
       const rows = orders.map((o) => {
-        const dateStr = o.createdAt
-          ? new Date(o.createdAt).toLocaleString('en-IN')
-          : '';
+        const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleString('en-IN') : '';
         const itemsSummary = (o.items || [])
           .map((i) => `${i.foodName || 'Item'} x${i.quantity || 1}`)
           .join('; ');
-        const totalItems = (o.items || []).reduce(
-          (sum, i) => sum + (Number(i.quantity) || 1),
-          0
-        );
+        const totalItems = (o.items || []).reduce((sum, i) => sum + (Number(i.quantity) || 1), 0);
 
         return [
           `"${o.orderId || ''}"`,
@@ -201,7 +193,7 @@ const QuickActions = () => {
           `"${o.status || 'PENDING'}"`,
           `"${totalItems}"`,
           `"${itemsSummary.replace(/"/g, '""')}"`,
-          `"${o.totalAmount || 0}"`
+          `"${o.totalAmount || 0}"`,
         ].join(',');
       });
 
@@ -278,7 +270,9 @@ const QuickActions = () => {
   // ------------------------------------
   return (
     <>
-      <div className={`rounded-2xl p-6 shadow-sm border transition-colors ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      <div
+        className={`rounded-2xl p-6 shadow-sm border transition-colors ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>
             Quick Actions
@@ -290,11 +284,7 @@ const QuickActions = () => {
 
         <div className="flex flex-wrap gap-3">
           {actions.map((action) => (
-            <ActionButton
-              key={action.id}
-              {...action}
-              loading={loadingAction === action.id}
-            />
+            <ActionButton key={action.id} {...action} loading={loadingAction === action.id} />
           ))}
         </div>
       </div>
@@ -304,7 +294,9 @@ const QuickActions = () => {
       {/* ============================================ */}
       {isBroadcastOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className={`w-full max-w-lg rounded-2xl p-6 shadow-2xl border transition-all ${isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-800'}`}>
+          <div
+            className={`w-full max-w-lg rounded-2xl p-6 shadow-2xl border transition-all ${isDark ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-800'}`}
+          >
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2.5">
@@ -406,7 +398,7 @@ const QuickActions = () => {
                     type="button"
                     onClick={() =>
                       setBroadcastMessage(
-                        "🎉 Special 20% discount on all Desserts and Beverages today! Ask your server for details."
+                        '🎉 Special 20% discount on all Desserts and Beverages today! Ask your server for details.'
                       )
                     }
                     className="rounded-lg bg-gray-100 dark:bg-gray-700 px-2.5 py-1 text-[11px] font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"

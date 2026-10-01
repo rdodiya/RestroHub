@@ -8,6 +8,7 @@ import com.restroly.qrmenu.order.dto.OrderResponse;
 import com.restroly.qrmenu.order.dto.UpdateOrderStatusRequest;
 import com.restroly.qrmenu.order.service.OrderService;
 import com.restroly.qrmenu.payment.service.PaymentService;
+import com.restroly.qrmenu.security.AccessGuard;
 import com.restroly.qrmenu.whatsapp.service.WhatsappOrderNotificationService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -39,8 +40,11 @@ public class OrderController {
   private final WhatsappOrderNotificationService whatsapp;
   private final PaymentService paymentService;
   private final OrderService orderService;
+  private final AccessGuard access;
 
   @PostMapping
+  @PreAuthorize(
+      "@access.can('ORDER_STATUS_UPDATE') and @access.branch(#request.branchId) and (#request.tableId == null or @access.table(#request.tableId))")
   public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
     OrderResponse response = orderService.createOrder(request);
 
@@ -74,37 +78,29 @@ public class OrderController {
           ex.getMessage());
     }
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(redact(response));
   }
 
   @GetMapping("/{orderId}")
-  @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF', 'RESTAURANT_OWNER')")
+  @PreAuthorize("@access.can('OPERATIONS_READ') and @access.order(#orderId)")
   public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId) {
-    return ResponseEntity.ok(orderService.getOrderById(orderId));
+    return ResponseEntity.ok(redact(orderService.getOrderById(orderId)));
   }
 
   @GetMapping("/branch/{branchId}")
-  @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF', 'RESTAURANT_OWNER')")
+  @PreAuthorize("@access.can('OPERATIONS_READ') and @access.branch(#branchId)")
   public ResponseEntity<List<OrderResponse>> getOrdersByBranch(@PathVariable Long branchId) {
-    if (branchId == null || branchId == 0) {
-      // Simplified fallback for all branches to avoid frontend crash, though properly filtering all
-      // branches per restaurant requires more logic
-      return ResponseEntity.ok(orderService.getOrdersByBranch(1L));
-    }
-    return ResponseEntity.ok(orderService.getOrdersByBranch(branchId));
+    return ResponseEntity.ok(redact(orderService.getOrdersByBranch(branchId)));
   }
 
   @GetMapping("/branch/{branchId}/active")
-  @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF', 'RESTAURANT_OWNER')")
+  @PreAuthorize("@access.can('OPERATIONS_READ') and @access.branch(#branchId)")
   public ResponseEntity<List<OrderResponse>> getActiveOrders(@PathVariable Long branchId) {
-    if (branchId == null || branchId == 0) {
-      return ResponseEntity.ok(orderService.getActiveOrdersByBranch(1L));
-    }
-    return ResponseEntity.ok(orderService.getActiveOrdersByBranch(branchId));
+    return ResponseEntity.ok(redact(orderService.getActiveOrdersByBranch(branchId)));
   }
 
   @GetMapping("/history")
-  @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF', 'RESTAURANT_OWNER')")
+  @PreAuthorize("@access.can('OPERATIONS_READ') and @access.branch(#branchId)")
   public ResponseEntity<Page<OrderResponse>> getOrderHistory(
       @RequestParam Long branchId,
       @RequestParam(required = false) String startDate,
@@ -112,12 +108,14 @@ public class OrderController {
       @RequestParam(required = false) OrderStatus status,
       @RequestParam(required = false) String phone,
       Pageable pageable) {
-    return ResponseEntity.ok(
-        orderService.getOrderHistory(branchId, startDate, endDate, status, phone, pageable));
+    Page<OrderResponse> page =
+        orderService.getOrderHistory(branchId, startDate, endDate, status, phone, pageable);
+    page.getContent().forEach(this::redact);
+    return ResponseEntity.ok(page);
   }
 
   @PatchMapping("/{orderId}/status")
-  @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
+  @PreAuthorize("@access.can('ORDER_STATUS_UPDATE') and @access.order(#orderId)")
   public ResponseEntity<OrderResponse> updateOrderStatus(
       @PathVariable Long orderId, @Valid @RequestBody UpdateOrderStatusRequest request) {
     OrderResponse response = orderService.updateOrderStatus(orderId, request.getStatus());
@@ -129,11 +127,11 @@ public class OrderController {
     } catch (Exception ex) {
       log.warn("Could not send WhatsApp status update for order {}: {}", orderId, ex.getMessage());
     }
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(redact(response));
   }
 
   @PostMapping("/{orderId}/cancel")
-  @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
+  @PreAuthorize("@access.can('ORDER_STATUS_UPDATE') and @access.order(#orderId)")
   public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
     OrderResponse response = orderService.cancelOrder(orderId);
     try {
@@ -148,11 +146,10 @@ public class OrderController {
   }
 
   @PutMapping("/branch/{branchId}/mark-all-ready")
-  @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
+  @PreAuthorize("@access.can('ORDER_STATUS_UPDATE') and @access.branch(#branchId)")
   public ResponseEntity<java.util.Map<String, Object>> markAllReady(@PathVariable Long branchId) {
     log.info("Request received to mark all preparing orders as READY for branchId: {}", branchId);
-    int count =
-        orderService.markAllActiveOrdersReady(branchId == null || branchId == 0 ? 1L : branchId);
+    int count = orderService.markAllActiveOrdersReady(branchId);
     return ResponseEntity.ok(
         java.util.Map.of(
             "success",
@@ -163,5 +160,15 @@ public class OrderController {
             count > 0
                 ? count + " order(s) marked as ready"
                 : "No pending or preparing orders to mark as ready"));
+  }
+
+  /** Manager/User and Staff never receive amounts or payment links (PHASE1 §6.1). */
+  private OrderResponse redact(OrderResponse order) {
+    return access.can("VIEW_FINANCIALS") ? order : order.withoutFinancials();
+  }
+
+  private List<OrderResponse> redact(List<OrderResponse> orders) {
+    orders.forEach(this::redact);
+    return orders;
   }
 }

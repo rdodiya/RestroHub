@@ -79,13 +79,15 @@ Cross-cutting packages:
 
 Configuration: `application.properties` → `application-dev.properties` (default, via `SPRING_PROFILES_ACTIVE`) / `application-prod.properties` / `application-test.properties`. Server port `8181`, context path `/restroly`.
 
-Schema: Flyway migrations in `src/main/resources/db/migration` (`V1__baseline.sql`). Dev uses `ddl-auto=update`, prod uses `validate` — so any entity change must ship with a new `V<n>__*.sql` migration or prod will fail to start.
+Schema: Flyway migrations in `src/main/resources/db/migration` (`V1__baseline.sql`). Dev uses `ddl-auto=update`, prod uses `validate` — so any entity change must ship with a new `V<n>__*.sql` migration or prod will fail to start. V1 is still a placeholder (`SELECT 1`), so new migrations must not add foreign keys to Hibernate-created tables.
 
 Routes: public endpoints under `/api/v1/**`; owner/admin endpoints under `/secure/api/**`. In `SecurityConfig`, POST/PUT/PATCH/DELETE on `/secure/api/**` require role `ADMIN`, `MANAGER` or `RESTAURANT_OWNER`.
 
+Authorization: every secured endpoint uses `@PreAuthorize("@access.can('<PERMISSION>') and @access.branch(#branchId)")`. `security/AccessGuard` (bean `access`) does tenant checks (`restaurant`, `branch`, `order`, `menu`, `table`, `upiLink`, `serviceRequest`, `site`) and `security/Permission` is the only role → permission map. Don't add `hasRole(...)` lists. Role names may be stored as `ROLE_X` or `X` (`AppRole.authority` normalizes them). Sensitive actions (role changes, plan changes, UPI VPA changes) call `audit/service/AuditLogService.record(...)`. Category and Food have no tenant owner yet (role checks only).
+
 Real-time: STOMP over WebSocket, endpoint `/ws`, broker prefix `/topic`, app prefix `/app` (frontend uses `@stomp/stompjs` + `sockjs-client`, e.g. live order dashboard).
 
-Tests: JUnit 5 under `src/test/java/com/restroly/qrmenu/...`, mostly service-level unit tests. `application-test.properties` points to H2 but H2 is not a Gradle dependency, so Spring context tests need a real PostgreSQL.
+Tests: JUnit 5 under `src/test/java/com/restroly/qrmenu/...`, mostly service-level unit tests. `application-test.properties` points to H2 but H2 is not a Gradle dependency, so Spring context tests need a real PostgreSQL. Web-layer security tests use `@WebMvcTest` + `@Import({SecurityConfig.class, AccessGuard.class})` (see `OrderControllerTenantIsolationTest`).
 
 Environment variables (never hard-code or commit values): `DB_USERNAME`, `DB_PASSWORD`, `SPRING_DATASOURCE_URL`, `JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION`, `GOOGLE_OAUTH_CLIENT_ID`, `CORS_ALLOWED_ORIGINS`.
 
@@ -138,3 +140,13 @@ All HTTP calls go through `services/common/api.js` / `ApiService.js`, never ad-h
 - Compute money/order totals on the server; never trust client-supplied amounts. Use `BigDecimal` for money.
 - Before finishing a change, run the relevant build (`./gradlew build` and/or `npm run build`), and update `ReadMe.md`/Swagger if behavior or setup changed.
 - Contributors are responsible for AI-generated code: explain assumptions and untested areas in the PR description.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

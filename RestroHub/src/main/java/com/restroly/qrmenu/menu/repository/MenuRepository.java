@@ -1,6 +1,8 @@
 package com.restroly.qrmenu.menu.repository;
 
 import com.restroly.qrmenu.menu.entity.Menu;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,57 +10,61 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
-    // ========== FIND ALL (Non-Deleted) ==========
-    List<Menu> findByIsDeletedFalse();
+  // ========== FIND ALL (Non-Deleted) ==========
+  List<Menu> findByIsDeletedFalse();
 
-    Page<Menu> findByIsDeletedFalse(Pageable pageable);
+  Page<Menu> findByIsDeletedFalse(Pageable pageable);
 
-    // ========== FIND BY ID (Non-Deleted) ==========
-    Optional<Menu> findByMenuIdAndIsDeletedFalse(Long menuId);
+  Page<Menu> findByBranch_Restaurant_RestIdInAndIsDeletedFalse(
+      java.util.Collection<Long> restIds, Pageable pageable);
 
-    // ========== FIND BY BRANCH ==========
-    List<Menu> findByBranch_BranchIdAndIsDeletedFalse(Long branchId);
+  // ========== FIND BY ID (Non-Deleted) ==========
+  Optional<Menu> findByMenuIdAndIsDeletedFalse(Long menuId);
 
-    Optional<Menu> findByBranch_BranchId(Long branchId);
+  // ========== FIND BY BRANCH ==========
+  List<Menu> findByBranch_BranchIdAndIsDeletedFalse(Long branchId);
 
-    // ========== EXISTS ==========
-    boolean existsByMenuNameAndBranch_BranchId(String menuName, Long branchId);
+  Optional<Menu> findByBranch_BranchId(Long branchId);
 
-    boolean existsByMenuNameAndBranch_BranchIdAndMenuIdNot(String menuName, Long branchId, Long menuId);
+  // ========== EXISTS ==========
+  boolean existsByMenuNameAndBranch_BranchId(String menuName, Long branchId);
 
-    // ========== SEARCH ==========
-    @Query("SELECT m FROM Menu m WHERE m.isDeleted = false AND " +
-            "(:keyword IS NULL OR LOWER(m.menuName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(m.menuDesc) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<Menu> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+  boolean existsByMenuNameAndBranch_BranchIdAndMenuIdNot(
+      String menuName, Long branchId, Long menuId);
 
-    @Query("SELECT m FROM Menu m WHERE m.isDeleted = false AND " +
-            "m.branch.branchId = :branchId AND " +
-            "(:keyword IS NULL OR LOWER(m.menuName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(m.menuDesc) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<Menu> searchByKeywordAndBranch(@Param("keyword") String keyword,
-                                        @Param("branchId") Long branchId,
-                                        Pageable pageable);
+  // ========== SEARCH ==========
+  @Query(
+      "SELECT m FROM Menu m WHERE m.isDeleted = false AND "
+          + "(:keyword IS NULL OR LOWER(m.menuName) LIKE LOWER(CONCAT('%', :keyword, '%')) "
+          + "OR LOWER(m.menuDesc) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+  Page<Menu> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
-    // ========== COUNT ==========
-    long countByIsDeletedFalse();
+  @Query(
+      "SELECT m FROM Menu m WHERE m.isDeleted = false AND "
+          + "m.branch.branchId = :branchId AND "
+          + "(:keyword IS NULL OR LOWER(m.menuName) LIKE LOWER(CONCAT('%', :keyword, '%')) "
+          + "OR LOWER(m.menuDesc) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+  Page<Menu> searchByKeywordAndBranch(
+      @Param("keyword") String keyword, @Param("branchId") Long branchId, Pageable pageable);
 
-    long countByBranch_BranchIdAndIsDeletedFalse(Long branchId);
+  // ========== COUNT ==========
+  long countByIsDeletedFalse();
 
-    // ========== FIND BY CATEGORY ==========
-    @Query("SELECT m FROM Menu m JOIN m.categories c WHERE c.categoryId = :categoryId AND m.isDeleted = false")
-    List<Menu> findByCategoryId(@Param("categoryId") Long categoryId);
+  long countByBranch_BranchIdAndIsDeletedFalse(Long branchId);
 
-    // ========== FIND BY DATE & BRANCH ==========
-    @Query("SELECT m FROM Menu m WHERE m.isDeleted = false AND " +
-            "(:branchId IS NULL OR m.branch.branchId = :branchId) AND " +
-            "(:date IS NULL OR ((m.startDate IS NULL OR m.startDate <= :date) AND (m.endDate IS NULL OR m.endDate >= :date)))")
-    List<Menu> findActiveMenusByDateAndBranch(@Param("date") java.time.LocalDate date,
-                                              @Param("branchId") Long branchId);
+  // ========== FIND BY CATEGORY ==========
+  @Query(
+      "SELECT m FROM Menu m JOIN m.categories c WHERE c.categoryId = :categoryId AND m.isDeleted = false")
+  List<Menu> findByCategoryId(@Param("categoryId") Long categoryId);
+
+  // ========== FIND BY DATE & BRANCH ==========
+  @Query(
+      "SELECT m FROM Menu m WHERE m.isDeleted = false AND "
+          + "(:branchId IS NULL OR m.branch.branchId = :branchId) AND "
+          + "(:date IS NULL OR ((m.startDate IS NULL OR m.startDate <= :date) AND (m.endDate IS NULL OR m.endDate >= :date)))")
+  List<Menu> findActiveMenusByDateAndBranch(
+      @Param("date") java.time.LocalDate date, @Param("branchId") Long branchId);
 }

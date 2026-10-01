@@ -104,6 +104,24 @@ Restroly enforces strict multi-tenant Role-Based Access Control across Diners, R
 > [!IMPORTANT]
 > **Owner's Explicit Directive:** The exact division between **Manager**, **Manager/User**, and **Staff** is under active discussion ("we need to think on staff and Manager/User roles for once"). In the backend, role checks must be enforced via Spring Security `@PreAuthorize` annotations on every endpoint, not just hidden in the frontend sidebar (`AdminRoute`).
 
+### 2.3 Implemented Backend Permission Model (Phase 1 default — pending owner sign-off)
+
+Phase 1 (§6.1) implements the matrix above as a **default** model on the backend. All role → permission rules live in one place, `security/Permission.java`, so the owner's final decision is a one-file change. Every secured endpoint checks a permission **and** tenant ownership via `@PreAuthorize("@access.can('…') and @access.branch(#branchId)")` (`security/AccessGuard.java`).
+
+| Permission | Super Admin | Restaurant Admin / Owner | Manager | Manager/User | Staff |
+|---|---|---|---|---|---|
+| `PLATFORM_ADMIN` — plans, features, users, role linking, roles CRUD, restaurant delete, all-tenant stats | ✅ | — | — | — | — |
+| `RESTAURANT_SETTINGS` — restaurant profile, branches, UPI VPA, subscription view, website config | ✅ | ✅ | — | — | — |
+| `MENU_WRITE` — menus, categories, foods, tables, Excel import | ✅ | ✅ | ✅ | — | — |
+| `OPERATIONS_READ` — menus, tables, orders, KDS, service requests | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `ORDER_STATUS_UPDATE` — status changes, cancel, mark-all-ready, staff-created orders, service-request ack | ✅ | ✅ | ✅ | — | ✅ |
+| `VIEW_FINANCIALS` — order amounts, payment links, dashboard revenue, UPI links, Excel export | ✅ | ✅ | ✅ | — | — |
+
+- **Tenant isolation:** a user can only reach restaurants they are linked to through `UserRoleRestaurant`, and the branches, menus, tables, orders, UPI links and service requests of those restaurants. Cross-tenant requests return `403`. Super Admin reaches every tenant.
+- **Financial fields are removed server-side:** for roles without `VIEW_FINANCIALS`, order responses omit `totalAmount`, `paymentLink`, `unitPrice` and `subtotal`. Hiding them in the UI alone is not enough.
+- **Branch access** is currently derived from restaurant membership: a Manager linked to a restaurant can reach all of its branches. Per-branch assignment is an open question (§8).
+- **Role names** may be stored as `ROLE_ADMIN` or `ADMIN`; both map to the same authority. `MANAGER_USER` is the expected name for the Manager/User role.
+
 ---
 
 ## 3. End-to-End System & User Flows
@@ -344,8 +362,9 @@ The following 6 concrete items represent the active technical backlog from `proj
 
 The following questions were flagged directly by the project owner or surfaced during codebase analysis:
 
-1. **Permission Scope for `Manager` vs. `Manager/User` *(owner flagged)*:**
+1. **Permission Scope for `Manager` vs. `Manager/User` *(owner flagged)* — Resolved (default model implemented, pending final owner sign-off):**
    - Which sections beyond "excludes payments" are read-only vs. editable for `Manager` and `Manager/User`? Does `Manager/User` ever have write access, or is it strictly read-only?
+   - *Phase 1 default (§2.3):* Manager runs operations and edits menus/tables and sees financials, but has no restaurant settings, UPI VPA, billing or plan access. Manager/User is strictly read-only with no financial fields. Staff reads operations and moves order statuses only. Change `security/Permission.java` to adjust.
 2. **WhatsApp Payment Link Resend Rules:**
    - What is the exact trigger for resending the WhatsApp payment link — on order success only, on transition to `Ready` if unpaid, or on demand via an admin button?
 3. **Subdomain Architecture:**
@@ -356,6 +375,14 @@ The following questions were flagged directly by the project owner or surfaced d
    - Beyond limiting to 2 templates, what specific limits apply to Free vs. Paid tiers (e.g. maximum branches, tables, monthly orders, WhatsApp notifications)?
 6. **Order History Filter Minimum Spec:**
    - Are date range, status, customer phone, and table number sufficient, or are payment status and order value filters required?
+7. **Category & Food ownership *(surfaced in Phase 1 §6.1 audit — blocks full tenant isolation)*:**
+   - `Category` and `Food` have no restaurant or branch owner; they are linked to restaurants only through the many-to-many Menu ↔ Category table, so one category can be shared across tenants. Category/Food endpoints are role-checked only, not tenant-scoped. **Proposal:** add a `restaurant_id` column to both, with a migration that backfills it from the existing menu links and flags categories shared across restaurants for manual review. Needs owner confirmation that categories are per-restaurant, not a shared global catalogue.
+8. **Per-branch Manager assignment *(Phase 1 §6.1)*:**
+   - Today a Manager linked to a restaurant can reach every branch of it. Should Managers, Manager/Users and Staff be restricted to specific branches? That would need a user ↔ branch assignment table.
+9. **Restaurant-level user management *(Phase 1 §6.1)*:**
+   - `/secure/api/v1/users/**` admin endpoints listed every user on the platform; they are now Super Admin only. Should Restaurant Admins manage their own staff accounts? That needs restaurant-scoped user endpoints.
+10. **"All branches" dashboard view *(Phase 1 §6.1)*:**
+    - The admin UI previously sent hardcoded branch `1` for "All branches", which showed another restaurant's data. It now uses the user's first branch until a restaurant-wide aggregate endpoint exists (planned with §6.4 dashboard work).
 
 ---
 

@@ -7,9 +7,9 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
-import api from "@services/common/api";
+import api from '@services/common/api';
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import toast from 'react-hot-toast';
@@ -25,7 +25,7 @@ const RevenueChart = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isDark } = useAdminTheme();
-  const { selectedBranchId } = useBranch();
+  const { effectiveBranchId } = useBranch();
 
   // ------------------------------------
   // FETCH REAL-TIME REVENUE
@@ -45,21 +45,20 @@ const RevenueChart = () => {
       window.removeEventListener('restrohub:order-updated', handleOrderUpdated);
       clearInterval(interval);
     };
-  }, [timeRange, selectedBranchId]);
+  }, [timeRange, effectiveBranchId]);
 
   const fetchRevenue = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const branchToFetch = selectedBranchId === 'all' ? 1 : selectedBranchId;
+      const branchToFetch = effectiveBranchId;
+      if (!branchToFetch) return;
       const response = await api.get(`/secure/api/v1/orders/branch/${branchToFetch}`);
       const orders = Array.isArray(response.data) ? response.data : [];
 
       // Filter non-cancelled orders
-      const validOrders = orders.filter(
-        (o) => o.status !== 'CANCELLED'
-      );
+      const validOrders = orders.filter((o) => o.status !== 'CANCELLED');
 
       const now = new Date();
 
@@ -89,18 +88,15 @@ const RevenueChart = () => {
             sumToday += amount;
             const hour = orderDate.getHours();
 
-            const slot = hourlySlots.find(
-              (s) => hour >= s.startHour && hour < s.endHour
-            );
+            const slot = hourlySlots.find((s) => hour >= s.startHour && hour < s.endHour);
             if (slot) {
               slot.revenue += amount;
             }
           }
         });
 
-        setData(hourlySlots.map(s => ({ day: s.label, revenue: Math.round(s.revenue) })));
+        setData(hourlySlots.map((s) => ({ day: s.label, revenue: Math.round(s.revenue) })));
         setTotalRevenue(sumToday);
-
       } else {
         // Daily breakdown for past 7 or 30 days
         const numDays = Number(timeRange) || 30;
@@ -112,9 +108,10 @@ const RevenueChart = () => {
           d.setDate(d.getDate() - i);
           const dateKey = d.toISOString().split('T')[0];
           // Formatted label: e.g. "Sep 02" or day number
-          const label = numDays === 7
-            ? d.toLocaleDateString('en-US', { weekday: 'short' })
-            : `${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'short' })}`;
+          const label =
+            numDays === 7
+              ? d.toLocaleDateString('en-US', { weekday: 'short' })
+              : `${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'short' })}`;
 
           dateMap.set(dateKey, { day: label, revenue: 0 });
         }
@@ -131,15 +128,14 @@ const RevenueChart = () => {
           }
         });
 
-        const chartPoints = Array.from(dateMap.values()).map(p => ({
+        const chartPoints = Array.from(dateMap.values()).map((p) => ({
           ...p,
-          revenue: Math.round(p.revenue)
+          revenue: Math.round(p.revenue),
         }));
 
         setData(chartPoints);
         setTotalRevenue(total);
       }
-
     } catch (err) {
       console.error('Failed to fetch real-time revenue:', err);
       toast.error('Failed to fetch revenue');
@@ -154,12 +150,16 @@ const RevenueChart = () => {
   // RENDER
   // ------------------------------------
   return (
-    <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+    <div
+      className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+    >
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h2 className={`text-lg font-semibold truncate ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>
+            <h2
+              className={`text-lg font-semibold truncate ${isDark ? 'text-gray-100' : 'text-gray-800'}`}
+            >
               Revenue Trend
             </h2>
             <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700 shrink-0">
@@ -168,13 +168,16 @@ const RevenueChart = () => {
             </span>
           </div>
           <p className={`text-xs mt-0.5 truncate ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-            Total: <span className="font-bold text-orange-600">₹{totalRevenue.toLocaleString()}</span>
+            Total:{' '}
+            <span className="font-bold text-orange-600">₹{totalRevenue.toLocaleString()}</span>
           </p>
         </div>
 
         {/* Time range selector & Refresh */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className={`flex rounded-xl p-0.5 border text-xs font-semibold ${isDark ? 'bg-gray-700/60 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>
+          <div
+            className={`flex rounded-xl p-0.5 border text-xs font-semibold ${isDark ? 'bg-gray-700/60 border-gray-600' : 'bg-gray-100 border-gray-200'}`}
+          >
             {[
               { id: 'today', label: 'Today' },
               { id: '7', label: '7D' },
@@ -187,7 +190,9 @@ const RevenueChart = () => {
                 className={`px-2.5 py-1 rounded-lg transition-all text-xs ${
                   timeRange === tab.id
                     ? 'bg-orange-500 text-white shadow-xs'
-                    : isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                    : isDark
+                      ? 'text-gray-300 hover:text-white'
+                      : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {tab.label}
@@ -238,7 +243,12 @@ const RevenueChart = () => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#f0f0f0'} />
-              <XAxis dataKey="day" stroke={isDark ? '#6b7280' : '#9ca3af'} fontSize={12} tickLine={false} />
+              <XAxis
+                dataKey="day"
+                stroke={isDark ? '#6b7280' : '#9ca3af'}
+                fontSize={12}
+                tickLine={false}
+              />
               <YAxis
                 stroke={isDark ? '#6b7280' : '#9ca3af'}
                 fontSize={12}
