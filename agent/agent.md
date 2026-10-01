@@ -25,7 +25,7 @@ In Jules, the repository is automatically cloned into `/app`.
 - **Build Tools**: Gradle wrapper (`RestroHub/gradlew`)
 
 ### Quick Setup Script
-Execute `./setup_jules.sh` from the repository root, or run:
+Execute `./scripts/setup_jules.sh` from the repository root, or run:
 ```bash
 # 1. System packages
 sudo apt-get update -y

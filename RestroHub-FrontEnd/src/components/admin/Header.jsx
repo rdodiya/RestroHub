@@ -20,6 +20,7 @@ import useWebSocketNotifications from '@hooks/useWebSocketNotifications';
 import api from '../../services/common/api';
 import toast from 'react-hot-toast';
 import { clearAuthSession } from '../../services/common/authStorage';
+import { useBranch } from '@context/BranchContext';
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -84,7 +85,8 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
 
   // Live service request notifications via WebSocket
   // TODO: Replace hardcoded branchId with actual branch from auth context
-  const { notifications, unreadCount, completeRequest } = useWebSocketNotifications(1);
+  const { branches, selectedBranchId, handleBranchChange } = useBranch();
+  const { notifications, unreadCount, completeRequest } = useWebSocketNotifications(selectedBranchId === 'all' ? 1 : selectedBranchId);
 
   // Shared class helpers
   const iconBtn = `inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
@@ -164,6 +166,26 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
           >
             <Search className="h-5 w-5" />
           </button>
+
+          {/* Branch Selector */}
+          <div className="hidden sm:block ml-4">
+            <select
+              value={selectedBranchId}
+              onChange={(e) => handleBranchChange(e.target.value)}
+              className={`rounded-lg border px-3 py-1.5 text-sm outline-none transition-colors ${
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-gray-200 focus:border-blue-500'
+                  : 'border-gray-200 bg-gray-50 text-gray-700 focus:border-blue-300'
+              }`}
+            >
+              <option value="all">All Branches</option>
+              {branches.map(branch => (
+                <option key={branch.branchId} value={branch.branchId}>
+                  {branch.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* ============================= */}

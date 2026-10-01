@@ -10,7 +10,14 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
   if (!table) return null;
 
   const targetSlug = restaurantSlug || '1';
-  const qrUrl = `${window.location.origin}/Restrohub/${targetSlug}/${branchId}?tableId=${table.id}&table=${table.number}&restaurantId=${targetSlug}`;
+  const isCounter = table.number === '0' || table.number === 0;
+
+  let qrUrl = `${window.location.origin}/Restrohub/${targetSlug}/${branchId}?restaurantId=${targetSlug}`;
+  if (isCounter) {
+    qrUrl += `&tableNumber=0`;
+  } else {
+    qrUrl += `&tableId=${table.id}&table=${table.number}`;
+  }
 
   const handleDownload = async () => {
     try {
@@ -42,7 +49,7 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
         ctx.fillStyle = '#111827';
         ctx.font = 'bold 36px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`Table ${table.number}`, canvas.width / 2, 50);
+        ctx.fillText(isCounter ? 'Counter / Takeaway' : `Table ${table.number}`, canvas.width / 2, 50);
 
         // Draw QR code
         ctx.drawImage(img, padding, 70, size, size);
@@ -58,12 +65,12 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
         const pngUrl = canvas.toDataURL('image/png');
         const downloadLink = document.createElement('a');
         downloadLink.href = pngUrl;
-        downloadLink.download = `table-${table.number}-qr.png`;
+        downloadLink.download = isCounter ? 'counter-qr.png' : `table-${table.number}-qr.png`;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
 
-        toast.success(`Table ${table.number} QR downloaded`);
+        toast.success(isCounter ? 'Counter QR downloaded' : `Table ${table.number} QR downloaded`);
         setDownloading(false);
       };
 
@@ -94,7 +101,7 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <Dialog.Title className="text-lg font-bold text-gray-900">
-              Table {table.number} - QR Code
+              {isCounter ? 'Counter - QR Code' : `Table ${table.number} - QR Code`}
             </Dialog.Title>
             <button
               onClick={onClose}

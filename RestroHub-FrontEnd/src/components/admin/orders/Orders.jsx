@@ -20,6 +20,8 @@ import OrdersHeader from './orderComponents/OrdersHeader';
 import OrderFilters from './orderComponents/OrderFilters';
 import StatusLegend from './orderComponents/StatusLegend';
 import OrdersGrid from './orderComponents/OrdersGrid';
+import OrderHistoryModal from './OrderHistoryModal';
+import { useBranch } from '@context/BranchContext';
 import api from '@services/common/api';
 
 const initialOrderState = {
@@ -45,6 +47,8 @@ const extractList = (resData) => {
 
 const Orders = () => {
   const location = useLocation();
+  const { selectedBranchId } = useBranch();
+  const branchToUse = selectedBranchId === 'all' ? 1 : selectedBranchId;
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [orders, setOrders] = useState([]);
@@ -52,6 +56,7 @@ const Orders = () => {
 
   // Controls whether the Create Order modal/drawer is open
   const [showCreateOrder, setShowCreateOrder] = useState(() => Boolean(location.state?.openCreateOrder));
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -335,16 +340,25 @@ const Orders = () => {
           />
         </div>
         {!showCreateOrder && (
-          <button
-            onClick={() => {
-              setShowCreateOrder(true);
-              setErrorMessage('');
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-all active:scale-[0.98]"
-          >
-            <Plus className="h-4 w-4" />
-            Create New Order
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsHistoryOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-all active:scale-[0.98]"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Order History
+            </button>
+            <button
+              onClick={() => {
+                setShowCreateOrder(true);
+                setErrorMessage('');
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-all active:scale-[0.98]"
+            >
+              <Plus className="h-4 w-4" />
+              Create New Order
+            </button>
+          </div>
         )}
       </div>
 
@@ -839,6 +853,13 @@ const Orders = () => {
         searchQuery={searchQuery}
         onOrdersChange={setOrders}
         refreshTrigger={refreshKey}
+      />
+
+      {/* History Modal */}
+      <OrderHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        branchId={branchToUse}
       />
     </div>
   );

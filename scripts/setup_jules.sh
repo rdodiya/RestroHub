@@ -12,6 +12,8 @@ set -e
 APP_DIR="${APP_DIR:-/app}"
 if [ ! -d "$APP_DIR/RestroHub" ] && [ -d "./RestroHub" ]; then
     APP_DIR="$(pwd)"
+elif [ ! -d "$APP_DIR/RestroHub" ]; then
+    APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 fi
 
 echo "============================================================"
