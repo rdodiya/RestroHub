@@ -13,13 +13,16 @@ import {
   CheckCircle2,
   Table2,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 import OrdersHeader from './orderComponents/OrdersHeader';
 import OrderFilters from './orderComponents/OrderFilters';
 import StatusLegend from './orderComponents/StatusLegend';
 import OrdersGrid from './orderComponents/OrdersGrid';
+import OrderHistoryModal from './OrderHistoryModal';
+import { useBranch } from '@context/BranchContext';
+import useOrderStream from '@hooks/useOrderStream';
 import api from '@services/common/api';
 
 const initialOrderState = {
@@ -29,7 +32,7 @@ const initialOrderState = {
   customerName: '',
   customerPhone: '',
   specialInstructions: '',
-  selectedItems: []
+  selectedItems: [],
 };
 
 // Safe helper to extract arrays from paginated or wrapped responses
@@ -45,13 +48,19 @@ const extractList = (resData) => {
 
 const Orders = () => {
   const location = useLocation();
+  const { effectiveBranchId } = useBranch();
+  const branchToUse = effectiveBranchId;
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [orders, setOrders] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  useOrderStream(() => setRefreshKey((k) => k + 1));
 
   // Controls whether the Create Order modal/drawer is open
-  const [showCreateOrder, setShowCreateOrder] = useState(() => Boolean(location.state?.openCreateOrder));
+  const [showCreateOrder, setShowCreateOrder] = useState(() =>
+    Boolean(location.state?.openCreateOrder)
+  );
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -83,7 +92,7 @@ const Orders = () => {
       if (branchId) {
         setNewOrder((prev) => ({
           ...prev,
-          branchId
+          branchId,
         }));
         fetchTables(branchId);
       }
@@ -111,7 +120,7 @@ const Orders = () => {
       setLoadingFoods(true);
       const [foodsRes, catsRes] = await Promise.allSettled([
         api.get('/secure/api/v1/foods', { params: { page: 0, size: 200 } }),
-        api.get('/secure/api/v1/categories/getallcategories', { params: { page: 0, size: 100 } })
+        api.get('/secure/api/v1/categories/getallcategories', { params: { page: 0, size: 100 } }),
       ]);
 
       if (foodsRes.status === 'fulfilled') {
@@ -139,7 +148,7 @@ const Orders = () => {
     { id: 'PREPARING', label: 'Preparing' },
     { id: 'READY', label: 'Ready' },
     { id: 'BILLED', label: 'Billed' },
-    { id: 'CANCELLED', label: 'Cancelled' }
+    { id: 'CANCELLED', label: 'Cancelled' },
   ];
 
   // Filtered food list based on category and search
@@ -173,15 +182,13 @@ const Orders = () => {
     const fPrice = Number(food.price) || 0;
 
     setNewOrder((prev) => {
-      const existingIndex = prev.selectedItems.findIndex(
-        (item) => item.foodId === fId
-      );
+      const existingIndex = prev.selectedItems.findIndex((item) => item.foodId === fId);
 
       if (existingIndex > -1) {
         const updated = [...prev.selectedItems];
         updated[existingIndex] = {
           ...updated[existingIndex],
-          quantity: updated[existingIndex].quantity + 1
+          quantity: updated[existingIndex].quantity + 1,
         };
         return { ...prev, selectedItems: updated };
       }
@@ -195,9 +202,9 @@ const Orders = () => {
             foodName: fName,
             price: fPrice,
             quantity: 1,
-            specialRequest: ''
-          }
-        ]
+            specialRequest: '',
+          },
+        ],
       };
     });
   };
@@ -223,30 +230,27 @@ const Orders = () => {
       ...prev,
       selectedItems: prev.selectedItems.map((item) =>
         item.foodId === foodId ? { ...item, specialRequest: note } : item
-      )
+      ),
     }));
   };
 
   const handleItemRemove = (foodId) => {
     setNewOrder((prev) => ({
       ...prev,
-      selectedItems: prev.selectedItems.filter((item) => item.foodId !== foodId)
+      selectedItems: prev.selectedItems.filter((item) => item.foodId !== foodId),
     }));
   };
 
   const handleCancel = () => {
     setNewOrder((prev) => ({
       ...initialOrderState,
-      branchId: prev.branchId
+      branchId: prev.branchId,
     }));
     setShowCreateOrder(false);
     setErrorMessage('');
   };
 
-  const totalItemsCount = newOrder.selectedItems.reduce(
-    (acc, item) => acc + item.quantity,
-    0
-  );
+  const totalItemsCount = newOrder.selectedItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const totalAmount = newOrder.selectedItems.reduce(
     (acc, item) => acc + (item.price || 0) * item.quantity,
@@ -258,8 +262,7 @@ const Orders = () => {
     setErrorMessage('');
 
     const resolvedTableId =
-      newOrder.tableId ||
-      (newOrder.tableNumber ? Number(newOrder.tableNumber) : null);
+      newOrder.tableId || (newOrder.tableNumber ? Number(newOrder.tableNumber) : null);
 
     if (!newOrder.branchId) {
       setErrorMessage('Branch information is missing. Please refresh.');
@@ -293,8 +296,8 @@ const Orders = () => {
         items: newOrder.selectedItems.map((item) => ({
           foodId: Number(item.foodId),
           quantity: Number(item.quantity) || 1,
-          specialRequest: item.specialRequest?.trim() || ''
-        }))
+          specialRequest: item.specialRequest?.trim() || '',
+        })),
       };
 
       const response = await api.post('/secure/api/v1/orders', requestPayload);
@@ -307,7 +310,7 @@ const Orders = () => {
       // Reset form
       setNewOrder((prev) => ({
         ...initialOrderState,
-        branchId: prev.branchId
+        branchId: prev.branchId,
       }));
 
       setShowCreateOrder(false);
@@ -317,7 +320,7 @@ const Orders = () => {
       console.error('Failed to create order:', err.response?.data || err);
       setErrorMessage(
         err.response?.data?.message ||
-        'Failed to create order. Please check the values and try again.'
+          'Failed to create order. Please check the values and try again.'
       );
     } finally {
       setIsSubmitting(false);
@@ -329,22 +332,28 @@ const Orders = () => {
       {/* Header with Title, Search & Create Order Button */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">
-          <OrdersHeader
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
+          <OrdersHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
         </div>
         {!showCreateOrder && (
-          <button
-            onClick={() => {
-              setShowCreateOrder(true);
-              setErrorMessage('');
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-all active:scale-[0.98]"
-          >
-            <Plus className="h-4 w-4" />
-            Create New Order
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsHistoryOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-all active:scale-[0.98]"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Order History
+            </button>
+            <button
+              onClick={() => {
+                setShowCreateOrder(true);
+                setErrorMessage('');
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-all active:scale-[0.98]"
+            >
+              <Plus className="h-4 w-4" />
+              Create New Order
+            </button>
+          </div>
         )}
       </div>
 
@@ -368,9 +377,7 @@ const Orders = () => {
                 <ShoppingBag className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900">
-                  Create New POS Order
-                </h3>
+                <h3 className="text-base font-bold text-gray-900">Create New POS Order</h3>
                 <p className="text-xs text-gray-500">
                   Select table, pick items from menu, and send directly to kitchen (KDS)
                 </p>
@@ -434,27 +441,28 @@ const Orders = () => {
                 >
                   All Items
                 </button>
-                {Array.isArray(categories) && categories.map((cat) => {
-                  const catName = cat?.name || cat?.categoryName || (typeof cat === 'string' ? cat : '');
-                  if (!catName) return null;
-                  const isSelected =
-                    String(selectedCategory).toLowerCase() ===
-                    String(catName).toLowerCase();
-                  return (
-                    <button
-                      key={cat?.categoryId || cat?.id || catName}
-                      type="button"
-                      onClick={() => setSelectedCategory(catName)}
-                      className={`rounded-lg px-3 py-1.5 font-medium whitespace-nowrap transition-colors ${
-                        isSelected
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {catName}
-                    </button>
-                  );
-                })}
+                {Array.isArray(categories) &&
+                  categories.map((cat) => {
+                    const catName =
+                      cat?.name || cat?.categoryName || (typeof cat === 'string' ? cat : '');
+                    if (!catName) return null;
+                    const isSelected =
+                      String(selectedCategory).toLowerCase() === String(catName).toLowerCase();
+                    return (
+                      <button
+                        key={cat?.categoryId || cat?.id || catName}
+                        type="button"
+                        onClick={() => setSelectedCategory(catName)}
+                        className={`rounded-lg px-3 py-1.5 font-medium whitespace-nowrap transition-colors ${
+                          isSelected
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {catName}
+                      </button>
+                    );
+                  })}
               </div>
 
               {/* Food Items Grid */}
@@ -501,9 +509,7 @@ const Orders = () => {
                             </p>
                           </div>
                           <div className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
-                            <span className="font-bold text-gray-900">
-                              ₹{fPrice.toFixed(2)}
-                            </span>
+                            <span className="font-bold text-gray-900">₹{fPrice.toFixed(2)}</span>
                             {food.categoryName && (
                               <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-600">
                                 {food.categoryName}
@@ -572,7 +578,9 @@ const Orders = () => {
                         setNewOrder((prev) => ({
                           ...prev,
                           tableId: val,
-                          tableNumber: selectedT ? (selectedT.tableNumber || selectedT.name || val) : val
+                          tableNumber: selectedT
+                            ? selectedT.tableNumber || selectedT.name || val
+                            : val,
                         }));
                       }}
                       className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm text-gray-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
@@ -598,7 +606,7 @@ const Orders = () => {
                         setNewOrder((prev) => ({
                           ...prev,
                           tableNumber: e.target.value,
-                          tableId: e.target.value
+                          tableId: e.target.value,
                         }))
                       }
                       placeholder="e.g. 1, 2, 3"
@@ -622,7 +630,7 @@ const Orders = () => {
                         onChange={(e) =>
                           setNewOrder((prev) => ({
                             ...prev,
-                            customerName: e.target.value
+                            customerName: e.target.value,
                           }))
                         }
                         placeholder="John Doe"
@@ -644,7 +652,7 @@ const Orders = () => {
                         onChange={(e) =>
                           setNewOrder((prev) => ({
                             ...prev,
-                            customerPhone: e.target.value
+                            customerPhone: e.target.value,
                           }))
                         }
                         placeholder="9876543210"
@@ -665,7 +673,7 @@ const Orders = () => {
                     onChange={(e) =>
                       setNewOrder((prev) => ({
                         ...prev,
-                        specialInstructions: e.target.value
+                        specialInstructions: e.target.value,
                       }))
                     }
                     placeholder="e.g. Serve all items together, less spicy"
@@ -680,9 +688,7 @@ const Orders = () => {
                     {newOrder.selectedItems.length > 0 && (
                       <button
                         type="button"
-                        onClick={() =>
-                          setNewOrder((prev) => ({ ...prev, selectedItems: [] }))
-                        }
+                        onClick={() => setNewOrder((prev) => ({ ...prev, selectedItems: [] }))}
                         className="text-[11px] text-red-500 hover:underline"
                       >
                         Clear Cart
@@ -704,9 +710,7 @@ const Orders = () => {
                           className="rounded-lg border border-gray-200 bg-white p-2.5 text-xs shadow-2xs space-y-1.5"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-gray-900">
-                              {item.foodName}
-                            </span>
+                            <span className="font-semibold text-gray-900">{item.foodName}</span>
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-gray-900">
                                 ₹{((item.price || 0) * item.quantity).toFixed(2)}
@@ -727,10 +731,7 @@ const Orders = () => {
                               type="text"
                               value={item.specialRequest}
                               onChange={(e) =>
-                                handleSpecialRequestChange(
-                                  item.foodId,
-                                  e.target.value
-                                )
+                                handleSpecialRequestChange(item.foodId, e.target.value)
                               }
                               placeholder="Add special request (e.g. extra cheese)"
                               className="flex-1 rounded border border-gray-100 bg-gray-50 px-2 py-1 text-[11px] text-gray-700 outline-none focus:bg-white focus:border-blue-300"
@@ -738,9 +739,7 @@ const Orders = () => {
                             <div className="flex items-center gap-1 rounded border border-gray-200 bg-gray-50 p-0.5">
                               <button
                                 type="button"
-                                onClick={() =>
-                                  handleQuantityChange(item.foodId, -1)
-                                }
+                                onClick={() => handleQuantityChange(item.foodId, -1)}
                                 className="flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:bg-white"
                               >
                                 <Minus className="h-2.5 w-2.5" />
@@ -750,9 +749,7 @@ const Orders = () => {
                               </span>
                               <button
                                 type="button"
-                                onClick={() =>
-                                  handleQuantityChange(item.foodId, 1)
-                                }
+                                onClick={() => handleQuantityChange(item.foodId, 1)}
                                 className="flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:bg-white"
                               >
                                 <Plus className="h-2.5 w-2.5" />
@@ -839,6 +836,14 @@ const Orders = () => {
         searchQuery={searchQuery}
         onOrdersChange={setOrders}
         refreshTrigger={refreshKey}
+        branchId={branchToUse}
+      />
+
+      {/* History Modal */}
+      <OrderHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        branchId={branchToUse}
       />
     </div>
   );

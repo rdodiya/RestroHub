@@ -1,8 +1,8 @@
-import { Palette, Type, Layers, ToggleLeft } from 'lucide-react';
-import { useState } from 'react';
+import { Palette, Type, ToggleLeft, Layout, Lock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import api from '@services/common/api';
 import { useSiteData } from '../../../../context/SiteContext';
 import defaultSiteData from '../../../../data/defaultData';
-
 
 // ============================================
 // Field group config — mirrors the Theme entity 1:1
@@ -39,6 +39,15 @@ const COLOR_FIELDS = {
     { key: 'borderSecondary', label: 'Secondary Border' },
   ],
 };
+
+// Free plan may only use the default templates (backend SiteConfigServiceImpl.DEFAULT_TEMPLATES).
+// ponytail: premium keys are placeholders until the backend exposes a template list endpoint.
+const TEMPLATES = [
+  { key: 'modern_v2', name: 'Modern', premium: false },
+  { key: 'luxury_v1', name: 'Luxury', premium: false },
+  { key: 'classic_v1', name: 'Classic', premium: true },
+  { key: 'vibrant_v1', name: 'Vibrant', premium: true },
+];
 
 const FONT_HEADING_OPTIONS = [
   'Inter, sans-serif',
@@ -117,9 +126,13 @@ const SelectField = ({ label, value, onChange, options }) => (
   <div>
     <label className={labelClass}>{label}</label>
     <select value={value || ''} onChange={(e) => onChange(e.target.value)} className={inputClass}>
-      <option value="" disabled>Choose a font…</option>
+      <option value="" disabled>
+        Choose a font…
+      </option>
       {options.map((opt) => (
-        <option key={opt} value={opt}>{opt}</option>
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
       ))}
     </select>
   </div>
@@ -138,18 +151,23 @@ const ToggleField = ({ label, description, checked, onChange }) => (
     }}
     className={`
       flex cursor-pointer items-center justify-between gap-3 rounded-xl border p-3.5 transition-all duration-200 select-none
-      ${checked
-        ? 'border-blue-200 bg-blue-50/50 shadow-xs'
-        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/60'
+      ${
+        checked
+          ? 'border-blue-200 bg-blue-50/50 shadow-xs'
+          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/60'
       }
     `}
   >
     <div className="min-w-0 flex-1">
-      <p className={`text-xs font-semibold sm:text-sm transition-colors ${checked ? 'text-blue-900' : 'text-gray-800'}`}>
+      <p
+        className={`text-xs font-semibold sm:text-sm transition-colors ${checked ? 'text-blue-900' : 'text-gray-800'}`}
+      >
         {label}
       </p>
       {description && (
-        <p className={`mt-0.5 text-[11px] sm:text-xs transition-colors ${checked ? 'text-blue-700/80' : 'text-gray-500'}`}>
+        <p
+          className={`mt-0.5 text-[11px] sm:text-xs transition-colors ${checked ? 'text-blue-700/80' : 'text-gray-500'}`}
+        >
           {description}
         </p>
       )}
@@ -171,14 +189,30 @@ const ToggleField = ({ label, description, checked, onChange }) => (
 );
 
 const ThemeSelector = () => {
-  const { siteData, updateTheme } = useSiteData();
+  const { siteData, updateTheme, updateTemplate } = useSiteData();
+  const [isFreePlan, setIsFreePlan] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: me } = await api.get('/secure/api/v1/users/fetchRestaurantId');
+        if (!me?.restaurantId) return;
+        const { data: sub } = await api.get(
+          `/secure/api/v1/restaurant/${me.restaurantId}/subscription`
+        );
+        setIsFreePlan(!!sub?.plan?.name?.toLowerCase().includes('free'));
+      } catch (err) {
+        console.warn('Failed to fetch subscription for template restrictions', err);
+      }
+    })();
+  }, []);
 
   const theme = siteData?.theme ?? {};
 
   const updateField = (field, value) => {
     updateTheme({
       ...theme,
-      [field]: value
+      [field]: value,
     });
   };
 
@@ -194,7 +228,9 @@ const ThemeSelector = () => {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-900 sm:text-base">Theme Editor</h3>
-            <p className="text-xs text-gray-500 sm:text-sm">Edit every color, font, and setting for this theme</p>
+            <p className="text-xs text-gray-500 sm:text-sm">
+              Edit every color, font, and setting for this theme
+            </p>
           </div>
         </div>
       </div>
@@ -203,7 +239,6 @@ const ThemeSelector = () => {
       {/* BODY (SCROLLABLE)             */}
       {/* ============================= */}
       <div className="flex-1 overflow-y-auto space-y-8 px-4 py-5 sm:px-6 sm:py-6">
-
         {/* Identity */}
         {/* <div>
           <SectionHeader icon={Layers} title="Theme Identity" />
@@ -237,13 +272,41 @@ const ThemeSelector = () => {
           </div>
         </div> */}
 
+        {/* Template */}
+        <div>
+          <SectionHeader icon={Layout} title="Template" subtitle="Layout of your public website" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {TEMPLATES.map((t) => {
+              const locked = isFreePlan && t.premium;
+              const selected = siteData?.templateKey === t.key;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  disabled={locked}
+                  aria-pressed={selected}
+                  onClick={() => updateTemplate(t.key)}
+                  className={`flex min-w-0 flex-col items-start gap-1 rounded-xl border-2 p-3 text-left text-sm font-medium transition-all ${
+                    selected
+                      ? 'border-blue-300 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 text-gray-800'
+                  } ${locked ? 'cursor-not-allowed opacity-60' : 'hover:border-gray-300'}`}
+                >
+                  <span className="truncate">{t.name}</span>
+                  {locked && (
+                    <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-700">
+                      <Lock className="h-3 w-3" /> Upgrade
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Primary Colors */}
         <div className="border-t border-gray-100 pt-6">
-          <SectionHeader
-            icon={Palette}
-            title="Primary Colors"
-            subtitle="Brand & accent colors"
-          />
+          <SectionHeader icon={Palette} title="Primary Colors" subtitle="Brand & accent colors" />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {COLOR_FIELDS.primary.map((field) => (
@@ -317,24 +380,24 @@ const ThemeSelector = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <SelectField
               label="Body Font"
-              value={theme.fontPrimary ?? ""}
+              value={theme.fontPrimary ?? ''}
               options={FONT_BODY_OPTIONS}
-              onChange={(value) => updateField("fontPrimary", value)}
+              onChange={(value) => updateField('fontPrimary', value)}
             />
 
             <SelectField
               label="Heading Font"
-              value={theme.fontHeading ?? ""}
+              value={theme.fontHeading ?? ''}
               options={FONT_HEADING_OPTIONS}
-              onChange={(value) => updateField("fontHeading", value)}
+              onChange={(value) => updateField('fontHeading', value)}
             />
           </div>
 
           <div className="mt-4 max-w-xs">
             <TextField
               label="Base Font Size"
-              value={theme.fontSizeBase ?? ""}
-              onChange={(value) => updateField("fontSizeBase", value)}
+              value={theme.fontSizeBase ?? ''}
+              onChange={(value) => updateField('fontSizeBase', value)}
               placeholder="16px"
             />
           </div>
@@ -349,25 +412,24 @@ const ThemeSelector = () => {
               label="Active"
               description="Available for use"
               checked={theme.isActive ?? false}
-              onChange={(checked) => updateField("isActive", checked)}
+              onChange={(checked) => updateField('isActive', checked)}
             />
 
             <ToggleField
               label="Default"
               description="Used when none selected"
               checked={theme.isDefault ?? false}
-              onChange={(checked) => updateField("isDefault", checked)}
+              onChange={(checked) => updateField('isDefault', checked)}
             />
 
             <ToggleField
               label="Dark Mode"
               description="Enable dark mode"
               checked={theme.isDarkMode ?? false}
-              onChange={(checked) => updateField("isDarkMode", checked)}
+              onChange={(checked) => updateField('isDarkMode', checked)}
             />
           </div>
         </div>
-
       </div>
     </div>
   );

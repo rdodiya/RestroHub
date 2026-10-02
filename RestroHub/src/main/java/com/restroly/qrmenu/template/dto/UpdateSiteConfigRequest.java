@@ -1,11 +1,10 @@
 package com.restroly.qrmenu.template.dto;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,8 +12,12 @@ import java.util.List;
 @Builder
 public class UpdateSiteConfigRequest {
 
-    private ThemeDTO theme;
+  /**
+   * Optional template switch; non-default templates need the CUSTOM_WEBSITE_TEMPLATES plan feature.
+   */
+  private String templateKey;
 
-    private List<SectionDTO> sections;
+  private ThemeDTO theme;
 
+  private List<SectionDTO> sections;
 }

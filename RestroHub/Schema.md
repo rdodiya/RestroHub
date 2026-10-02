@@ -1083,3 +1083,37 @@ All entities use `GenerationType.IDENTITY` corresponding to PostgreSQL `BIGSERIA
 | `t_food_master` | `idx_food_available` | `isAvailable` | Fast filtering of active menu items |
 | `t_food_master` | `idx_food_category` | `category_id` | Optimized category joins and dish listing by category |
 | `themes` | `idx_theme_key` | `theme_key` | Rapid lookup of design theme tokens by key |
+
+---
+
+## Audit Log (Phase 1 §6.1)
+
+### `t_audit_log` — `AuditLogEntry` (`com.restroly.qrmenu.audit.entity`)
+
+Append-only record of sensitive actions. It has no foreign keys on purpose: entries must outlive the users and restaurants they mention. Written by `AuditLogService.record(...)` inside the caller's transaction, so an entry exists only when the action itself committed.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | `BIGSERIAL` | PK | |
+| `actor_user_id` | `BIGINT` | yes | `t_usr_master.user_id` of the acting user (no FK) |
+| `actor_email` | `VARCHAR(255)` | yes | Acting user's login email |
+| `action` | `VARCHAR(64)` | no | `AuditAction`: `ROLE_ASSIGNED`, `ROLE_REMOVED`, `SUBSCRIPTION_CHANGED`, `UPI_VPA_CHANGED` (later milestones add suspension and payment-verification actions) |
+| `target_type` | `VARCHAR(64)` | no | `USER`, `RESTAURANT`, `UPI_LINK`, … |
+| `target_id` | `VARCHAR(64)` | yes | ID of the affected row |
+| `restaurant_id` | `BIGINT` | yes | Tenant, or null for platform-level actions |
+| `metadata` | `TEXT` | yes | JSON details (e.g. `roleIds`, `planId`, `change`) |
+| `created_at` | `TIMESTAMP` | no | Set on insert |
+
+Indexes: `idx_audit_log_restaurant_created (restaurant_id, created_at)`, `idx_audit_log_target (target_type, target_id)`.
+
+---
+
+## Flyway Migration History
+
+Migrations live in `RestroHub/src/main/resources/db/migration/`. Never edit a merged migration; add a new `V{n}__description.sql`.
+
+| Version | File | Description |
+|---|---|---|
+| V1 | `V1__baseline.sql` | **Placeholder** baseline (`SELECT 1`). Existing tables are still created by Hibernate in dev (`ddl-auto=update`). Replace it with a real `pg_dump --schema-only` before relying on prod `ddl-auto=validate`. Until then, new migrations must not add foreign keys to Hibernate-created tables. |
+| V2 | `V2__create_audit_log.sql` | Creates `t_audit_log` and its two indexes (Phase 1 §6.1). |
+

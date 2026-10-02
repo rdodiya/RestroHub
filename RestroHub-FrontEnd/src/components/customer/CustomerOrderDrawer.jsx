@@ -42,7 +42,12 @@ const CustomerOrderDrawer = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Your order"
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
@@ -84,7 +89,10 @@ const CustomerOrderDrawer = () => {
                 </h3>
                 <p className="text-sm text-gray-600">
                   Your order has been sent to the kitchen. It will be served at{' '}
-                  <span className="font-semibold text-gray-900">Table #{tableInfo?.tableNumber}</span>.
+                  <span className="font-semibold text-gray-900">
+                    Table #{tableInfo?.tableNumber}
+                  </span>
+                  .
                 </p>
 
                 {placedOrder.paymentLink && (
@@ -133,7 +141,7 @@ const CustomerOrderDrawer = () => {
                       className="p-3 border border-gray-200 rounded-xl bg-white shadow-xs space-y-2"
                     >
                       <div className="flex justify-between items-start">
-                        <div className="flex-1 pr-2">
+                        <div className="min-w-0 flex-1 break-words pr-2">
                           <h4 className="font-semibold text-sm text-gray-900 leading-snug">
                             {entry.item.name}
                           </h4>
@@ -175,7 +183,11 @@ const CustomerOrderDrawer = () => {
                 </div>
 
                 {/* Customer Details Form */}
-                <form id="customer-order-form" onSubmit={handleSubmit} className="space-y-3 border-t border-gray-100 pt-4">
+                <form
+                  id="customer-order-form"
+                  onSubmit={handleSubmit}
+                  className="space-y-3 border-t border-gray-100 pt-4"
+                >
                   <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500">
                     Contact Details (Optional)
                   </h4>
@@ -225,9 +237,7 @@ const CustomerOrderDrawer = () => {
             <div className="p-4 border-t border-gray-200 bg-white space-y-3">
               <div className="flex justify-between items-center text-sm font-semibold text-gray-900">
                 <span>Subtotal ({totalItemsCount} items)</span>
-                <span className="text-lg text-orange-600 font-bold">
-                  ₹{totalAmount.toFixed(2)}
-                </span>
+                <span className="text-lg text-orange-600 font-bold">₹{totalAmount.toFixed(2)}</span>
               </div>
               <button
                 type="submit"

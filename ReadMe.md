@@ -382,10 +382,9 @@ RestroHub/
 │   ├── tailwind.config.js
 │   └── vite.config.js
 │
-├── PRD.md                                    # Master Product Requirements Document v2.0
-├── ImplementationPlan.md                     # Roadmap, Sprint Plan & Contributor Guide
-├── Schema.md                                 # Database Schema & Entity Relationships
-├── frontend-design.md                        # Frontend Design System & Typography
+├── agent/                                    # PRD, ImplementationPlan, Schema, Rules, TechStack, frontend-design (planning & AI-agent docs)
+├── scripts/                                  # run_local.sh/.bat (local runner), setup_jules.sh
+├── AGENTS.md / CLAUDE.md                     # AI agent instructions (must stay at root)
 ├── CONTRIBUTING.md                           # Contribution guidelines
 ├── LICENSE                                   # MIT License
 └── ReadMe.md                                 # Main Project Readme
