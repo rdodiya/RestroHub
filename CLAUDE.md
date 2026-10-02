@@ -61,6 +61,8 @@ git config core.hooksPath .githooks     # enable pre-commit hook (frontend `npm 
 
 `scripts/run_local.sh` / `scripts/run_local.bat` start both apps locally.
 
+Local test data (dev only, never in `db/migration`): start the backend once so the tables exist, then run `psql -U postgres -d RestroHub_DB -f scripts/db/01_seed_users.sql` (one login per role: `superadmin|admin.a|owner.a|manager.a|manageruser.a|staff.a|customer.a|admin.b@restroly.test`, password `Test@1234`) and `scripts/db/02_seed_demo_data.sql` (two tenants: Spice Route with 2 branches on the Pro plan, Ocean Grill with 1 branch on the Free plan). Both scripts are safe to re-run. `scripts/setup_jules.sh` runs both automatically; set `SEED_DEMO_DATA=false` to skip.
+
 ### Verify a running backend
 
 - API base: `http://localhost:8181/restroly/api/v1`

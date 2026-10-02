@@ -24,131 +24,55 @@ const RevenueChart = () => {
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hidden, setHidden] = useState(false);
   const { isDark } = useAdminTheme();
   const { effectiveBranchId } = useBranch();
 
-  // ------------------------------------
-  // FETCH REAL-TIME REVENUE
-  // ------------------------------------
   useEffect(() => {
     fetchRevenue();
-
-    // Re-fetch on global order updates or polling every 30s
-    const handleOrderUpdated = () => {
-      fetchRevenue();
-    };
-
+    const handleOrderUpdated = () => fetchRevenue();
     window.addEventListener('restrohub:order-updated', handleOrderUpdated);
     const interval = setInterval(fetchRevenue, 30000);
-
     return () => {
       window.removeEventListener('restrohub:order-updated', handleOrderUpdated);
       clearInterval(interval);
     };
   }, [timeRange, effectiveBranchId]);
 
+  // GET /secure/api/v1/dashboard/trends?branchId&range -> [{ label, value }] (gross order value)
   const fetchRevenue = async () => {
+    if (!effectiveBranchId) return;
     try {
       setLoading(true);
       setError(null);
-
-      const branchToFetch = effectiveBranchId;
-      if (!branchToFetch) return;
-      const response = await api.get(`/secure/api/v1/orders/branch/${branchToFetch}`);
-      const orders = Array.isArray(response.data) ? response.data : [];
-
-      // Filter non-cancelled orders
-      const validOrders = orders.filter((o) => o.status !== 'CANCELLED');
-
-      const now = new Date();
-
-      if (timeRange === 'today') {
-        // Group by 2-hour slots for today (00:00 - 23:59)
-        const hourlySlots = [
-          { label: '08:00', startHour: 8, endHour: 10, revenue: 0 },
-          { label: '10:00', startHour: 10, endHour: 12, revenue: 0 },
-          { label: '12:00', startHour: 12, endHour: 14, revenue: 0 },
-          { label: '14:00', startHour: 14, endHour: 16, revenue: 0 },
-          { label: '16:00', startHour: 16, endHour: 18, revenue: 0 },
-          { label: '18:00', startHour: 18, endHour: 20, revenue: 0 },
-          { label: '20:00', startHour: 20, endHour: 22, revenue: 0 },
-          { label: '22:00', startHour: 22, endHour: 24, revenue: 0 },
-        ];
-
-        let sumToday = 0;
-        const todayDateStr = now.toISOString().split('T')[0];
-
-        validOrders.forEach((o) => {
-          if (!o.createdAt) return;
-          const orderDate = new Date(o.createdAt);
-          const orderDateStr = orderDate.toISOString().split('T')[0];
-
-          if (orderDateStr === todayDateStr) {
-            const amount = Number(o.totalAmount) || 0;
-            sumToday += amount;
-            const hour = orderDate.getHours();
-
-            const slot = hourlySlots.find((s) => hour >= s.startHour && hour < s.endHour);
-            if (slot) {
-              slot.revenue += amount;
-            }
-          }
-        });
-
-        setData(hourlySlots.map((s) => ({ day: s.label, revenue: Math.round(s.revenue) })));
-        setTotalRevenue(sumToday);
-      } else {
-        // Daily breakdown for past 7 or 30 days
-        const numDays = Number(timeRange) || 30;
-        const dateMap = new Map();
-
-        // Initialize array of dates
-        for (let i = numDays - 1; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const dateKey = d.toISOString().split('T')[0];
-          // Formatted label: e.g. "Sep 02" or day number
-          const label =
-            numDays === 7
-              ? d.toLocaleDateString('en-US', { weekday: 'short' })
-              : `${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'short' })}`;
-
-          dateMap.set(dateKey, { day: label, revenue: 0 });
-        }
-
-        let total = 0;
-        validOrders.forEach((o) => {
-          if (!o.createdAt) return;
-          const orderDateStr = new Date(o.createdAt).toISOString().split('T')[0];
-          if (dateMap.has(orderDateStr)) {
-            const amount = Number(o.totalAmount) || 0;
-            const entry = dateMap.get(orderDateStr);
-            entry.revenue += amount;
-            total += amount;
-          }
-        });
-
-        const chartPoints = Array.from(dateMap.values()).map((p) => ({
-          ...p,
-          revenue: Math.round(p.revenue),
-        }));
-
-        setData(chartPoints);
-        setTotalRevenue(total);
-      }
+      const response = await api.get('/secure/api/v1/dashboard/trends', {
+        params: {
+          branchId: effectiveBranchId,
+          days: timeRange === 'today' ? 1 : Number(timeRange),
+        },
+      });
+      const points = (Array.isArray(response.data) ? response.data : []).map((p) => ({
+        day: p.label ?? p.date,
+        revenue: Math.round(Number(p.value ?? p.grossOrderValue) || 0),
+      }));
+      setData(points);
+      setTotalRevenue(points.reduce((sum, p) => sum + p.revenue, 0));
     } catch (err) {
-      console.error('Failed to fetch real-time revenue:', err);
-      toast.error('Failed to fetch revenue');
-      setError('Failed to load real-time revenue');
+      // 403 = role has no financial view: hide the card
+      if (err.response?.status === 403) setHidden(true);
+      else {
+        console.error('Failed to fetch trends:', err);
+        toast.error('Failed to fetch trends');
+        setError('Failed to load order value trend');
+      }
       setData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // ------------------------------------
-  // RENDER
-  // ------------------------------------
+  if (hidden) return null;
+
   return (
     <div
       className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
@@ -160,7 +84,7 @@ const RevenueChart = () => {
             <h2
               className={`text-lg font-semibold truncate ${isDark ? 'text-gray-100' : 'text-gray-800'}`}
             >
-              Revenue Trend
+              Gross Order Value Trend
             </h2>
             <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -231,7 +155,7 @@ const RevenueChart = () => {
         ) : data.length === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
             <Calendar className="w-8 h-8 mb-2 opacity-50" />
-            <p className="text-sm">No revenue recorded for this period</p>
+            <p className="text-sm">No orders for this period</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -256,7 +180,7 @@ const RevenueChart = () => {
                 tickFormatter={(v) => (v >= 1000 ? `₹${(v / 1000).toFixed(0)}k` : `₹${v}`)}
               />
               <Tooltip
-                formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Revenue']}
+                formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Gross Order Value']}
                 contentStyle={{
                   borderRadius: '12px',
                   border: 'none',

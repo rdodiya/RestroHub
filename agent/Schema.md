@@ -1116,4 +1116,9 @@ Migrations live in `RestroHub/src/main/resources/db/migration/`. Never edit a me
 |---|---|---|
 | V1 | `V1__baseline.sql` | **Placeholder** baseline (`SELECT 1`). Existing tables are still created by Hibernate in dev (`ddl-auto=update`). Replace it with a real `pg_dump --schema-only` before relying on prod `ddl-auto=validate`. Until then, new migrations must not add foreign keys to Hibernate-created tables. |
 | V2 | `V2__create_audit_log.sql` | Creates `t_audit_log` and its two indexes (Phase 1 §6.1). |
+| V3 | `V3__baseline_core_schema.sql` | Real baseline of all core tables (restaurants, branches, tables, users/roles, menus, categories, foods, orders/items, payments, UPI links, service requests, subscriptions, themes, site config, sections), derived from the entities. Every statement is `IF NOT EXISTS` and there are **no foreign keys**, so it is safe on databases Hibernate already created and gives prod `ddl-auto=validate` its tables. |
+| V4 | `V4__order_payment_status_and_source.sql` | Adds `payment_status` (default `UNPAID`) and `order_source` to `t_order_master` plus index `idx_order_branch_created (branch_id, created_at)`. |
 
+### Entity changes since V2
+
+- `Order` (`T_order_master`): `payment_status` (`OrderPaymentStatus`: `UNPAID`, `LINK_SENT`, `VERIFIED_BY_STAFF`; default `UNPAID`) and `order_source` (`OrderSource`: `TABLE_QR`, `COUNTER_QR` for table number 0, `STAFF`), both `EnumType.STRING`.

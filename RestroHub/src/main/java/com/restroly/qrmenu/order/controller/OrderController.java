@@ -2,6 +2,8 @@ package com.restroly.qrmenu.order.controller;
 
 import static com.restroly.qrmenu.common.util.ApiConstants.*;
 
+import com.restroly.qrmenu.common.enums.OrderPaymentStatus;
+import com.restroly.qrmenu.common.enums.OrderSource;
 import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.order.dto.CreateOrderRequest;
 import com.restroly.qrmenu.order.dto.OrderResponse;
@@ -46,7 +48,7 @@ public class OrderController {
   @PreAuthorize(
       "@access.can('ORDER_STATUS_UPDATE') and @access.branch(#request.branchId) and (#request.tableId == null or @access.table(#request.tableId))")
   public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
-    OrderResponse response = orderService.createOrder(request);
+    OrderResponse response = orderService.createOrder(request, OrderSource.STAFF);
 
     // Safely generate payment link only if UPI ID is present
     try {
@@ -107,9 +109,21 @@ public class OrderController {
       @RequestParam(required = false) String endDate,
       @RequestParam(required = false) OrderStatus status,
       @RequestParam(required = false) String phone,
+      @RequestParam(required = false) OrderPaymentStatus paymentStatus,
+      @RequestParam(required = false) Integer tableNumber,
+      @RequestParam(required = false) OrderSource orderSource,
       Pageable pageable) {
     Page<OrderResponse> page =
-        orderService.getOrderHistory(branchId, startDate, endDate, status, phone, pageable);
+        orderService.getOrderHistory(
+            branchId,
+            startDate,
+            endDate,
+            status,
+            phone,
+            paymentStatus,
+            tableNumber,
+            orderSource,
+            pageable);
     page.getContent().forEach(this::redact);
     return ResponseEntity.ok(page);
   }

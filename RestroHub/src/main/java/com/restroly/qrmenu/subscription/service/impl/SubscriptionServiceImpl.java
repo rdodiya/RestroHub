@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @lombok.RequiredArgsConstructor
+@Transactional(readOnly = true) // reads map lazy plan features; writes override with @Transactional
 public class SubscriptionServiceImpl implements SubscriptionService {
 
   @Value("${subscription.status.active}")
@@ -205,22 +206,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
   @Override
   public boolean isFeatureEnabled(Long restaurantId, String featureKey) {
-    Optional<RestaurantSubscription> activeSub =
-        restaurantSubscriptionRepository.findActiveSubscriptionByRestaurantId(restaurantId);
-    if (activeSub.isEmpty()) {
-      return false;
-    }
+    return getFeatureValue(restaurantId, featureKey)
+        .map(val -> !val.equalsIgnoreCase("false") && !val.equals("0"))
+        .orElse(false);
+  }
 
-    SubscriptionPlan plan = activeSub.get().getPlan();
-    List<PlanFeatureMapping> mappings = mappingRepository.findByPlanId(plan.getId());
-
-    for (PlanFeatureMapping mapping : mappings) {
-      if (mapping.getFeature().getFeatureKey().equals(featureKey)) {
-        String val = mapping.getFeatureValue();
-        return val != null && !val.equalsIgnoreCase("false") && !val.equals("0");
-      }
-    }
-    return false;
+  @Override
+  public Optional<String> getFeatureValue(Long restaurantId, String featureKey) {
+    return restaurantSubscriptionRepository
+        .findActiveSubscriptionByRestaurantId(restaurantId)
+        .flatMap(
+            sub ->
+                mappingRepository.findByPlanId(sub.getPlan().getId()).stream()
+                    .filter(m -> m.getFeature().getFeatureKey().equals(featureKey))
+                    .map(PlanFeatureMapping::getFeatureValue)
+                    .filter(java.util.Objects::nonNull)
+                    .findFirst());
   }
 
   private SubscriptionPlanDto mapToDto(SubscriptionPlan plan) {

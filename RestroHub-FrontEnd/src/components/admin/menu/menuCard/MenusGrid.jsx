@@ -1,5 +1,6 @@
 // MenusGrid.jsx
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useBranch } from '@context/BranchContext';
 import {
   Search,
   RefreshCw,
@@ -34,7 +35,7 @@ import {
   CalendarRange,
 } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
-import api from "@services/common/api";
+import api from '@services/common/api';
 import AdminSkeleton from '../../AdminSkeleton';
 import toast from 'react-hot-toast';
 
@@ -55,14 +56,70 @@ const cardGradients = [
 const getCardGradient = (id) => cardGradients[(id || 0) % cardGradients.length];
 
 const categoryStyleSets = [
-  { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500', light: 'bg-blue-100', accent: 'from-blue-500 to-blue-600' },
-  { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', dot: 'bg-purple-500', light: 'bg-purple-100', accent: 'from-purple-500 to-purple-600' },
-  { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', dot: 'bg-emerald-500', light: 'bg-emerald-100', accent: 'from-emerald-500 to-emerald-600' },
-  { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', dot: 'bg-orange-500', light: 'bg-orange-100', accent: 'from-orange-500 to-orange-600' },
-  { bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-200', dot: 'bg-pink-500', light: 'bg-pink-100', accent: 'from-pink-500 to-pink-600' },
-  { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200', dot: 'bg-teal-500', light: 'bg-teal-100', accent: 'from-teal-500 to-teal-600' },
-  { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', dot: 'bg-amber-500', light: 'bg-amber-100', accent: 'from-amber-500 to-amber-600' },
-  { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200', dot: 'bg-indigo-500', light: 'bg-indigo-100', accent: 'from-indigo-500 to-indigo-600' },
+  {
+    bg: 'bg-blue-50',
+    text: 'text-blue-700',
+    border: 'border-blue-200',
+    dot: 'bg-blue-500',
+    light: 'bg-blue-100',
+    accent: 'from-blue-500 to-blue-600',
+  },
+  {
+    bg: 'bg-purple-50',
+    text: 'text-purple-700',
+    border: 'border-purple-200',
+    dot: 'bg-purple-500',
+    light: 'bg-purple-100',
+    accent: 'from-purple-500 to-purple-600',
+  },
+  {
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-700',
+    border: 'border-emerald-200',
+    dot: 'bg-emerald-500',
+    light: 'bg-emerald-100',
+    accent: 'from-emerald-500 to-emerald-600',
+  },
+  {
+    bg: 'bg-orange-50',
+    text: 'text-orange-700',
+    border: 'border-orange-200',
+    dot: 'bg-orange-500',
+    light: 'bg-orange-100',
+    accent: 'from-orange-500 to-orange-600',
+  },
+  {
+    bg: 'bg-pink-50',
+    text: 'text-pink-700',
+    border: 'border-pink-200',
+    dot: 'bg-pink-500',
+    light: 'bg-pink-100',
+    accent: 'from-pink-500 to-pink-600',
+  },
+  {
+    bg: 'bg-teal-50',
+    text: 'text-teal-700',
+    border: 'border-teal-200',
+    dot: 'bg-teal-500',
+    light: 'bg-teal-100',
+    accent: 'from-teal-500 to-teal-600',
+  },
+  {
+    bg: 'bg-amber-50',
+    text: 'text-amber-700',
+    border: 'border-amber-200',
+    dot: 'bg-amber-500',
+    light: 'bg-amber-100',
+    accent: 'from-amber-500 to-amber-600',
+  },
+  {
+    bg: 'bg-indigo-50',
+    text: 'text-indigo-700',
+    border: 'border-indigo-200',
+    dot: 'bg-indigo-500',
+    light: 'bg-indigo-100',
+    accent: 'from-indigo-500 to-indigo-600',
+  },
 ];
 
 const getCategoryStyle = (index) => categoryStyleSets[index % categoryStyleSets.length];
@@ -97,8 +154,10 @@ const FoodItemRow = ({ food, isLast }) => {
       `}
     >
       {/* Food Image or Placeholder */}
-      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0
-                      bg-gray-100 border border-gray-200">
+      <div
+        className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0
+                      bg-gray-100 border border-gray-200"
+      >
         {food.imageUrl ? (
           <img
             src={food.imageUrl}
@@ -129,8 +188,10 @@ const FoodItemRow = ({ food, isLast }) => {
                 {food.name}
               </h4>
               {!food.isAvailable && (
-                <span className="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold
-                                 rounded-full uppercase tracking-wider shrink-0">
+                <span
+                  className="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold
+                                 rounded-full uppercase tracking-wider shrink-0"
+                >
                   Unavailable
                 </span>
               )}
@@ -181,9 +242,11 @@ const FoodItemRow = ({ food, isLast }) => {
                 </p>
               </>
             ) : (
-              <p className={`text-lg font-bold ${
-                food.isAvailable ? 'text-gray-800' : 'text-gray-400'
-              }`}>
+              <p
+                className={`text-lg font-bold ${
+                  food.isAvailable ? 'text-gray-800' : 'text-gray-400'
+                }`}
+              >
                 ₹{Number(food.price).toFixed(0)}
               </p>
             )}
@@ -203,46 +266,46 @@ const CategoryMenuSection = ({ category, index, defaultExpanded = true }) => {
   const foodCount = category.foods?.length || category.foodCount || 0;
 
   return (
-    <div className={`rounded-2xl border overflow-hidden transition-all duration-300
-                     ${expanded ? `${style.border} shadow-sm` : 'border-gray-200'}`}>
+    <div
+      className={`rounded-2xl border overflow-hidden transition-all duration-300
+                     ${expanded ? `${style.border} shadow-sm` : 'border-gray-200'}`}
+    >
       {/* Category Header */}
       <button
         onClick={() => setExpanded(!expanded)}
         className={`
           w-full flex items-center justify-between px-5 py-4 text-left
           transition-all duration-300
-          ${expanded
-            ? `${style.bg} border-b ${style.border}`
-            : 'bg-white hover:bg-gray-50'
-          }
+          ${expanded ? `${style.bg} border-b ${style.border}` : 'bg-white hover:bg-gray-50'}
         `}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0
-                           ${expanded ? style.light : 'bg-gray-100'}`}>
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0
+                           ${expanded ? style.light : 'bg-gray-100'}`}
+          >
             <Tag className={`w-4 h-4 ${expanded ? style.text : 'text-gray-400'}`} />
           </div>
           <div className="min-w-0">
-            <h3 className={`font-bold text-sm sm:text-base truncate
-                           ${expanded ? style.text : 'text-gray-700'}`}>
+            <h3
+              className={`font-bold text-sm sm:text-base truncate
+                           ${expanded ? style.text : 'text-gray-700'}`}
+            >
               {category.name}
             </h3>
             {category.description && (
-              <p className="text-xs text-gray-400 truncate mt-0.5">
-                {category.description}
-              </p>
+              <p className="text-xs text-gray-400 truncate mt-0.5">{category.description}</p>
             )}
           </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0 ml-3">
-          <span className={`
+          <span
+            className={`
             px-2.5 py-1 text-xs font-bold rounded-full
-            ${expanded
-              ? `${style.light} ${style.text}`
-              : 'bg-gray-100 text-gray-500'
-            }
-          `}>
+            ${expanded ? `${style.light} ${style.text}` : 'bg-gray-100 text-gray-500'}
+          `}
+          >
             {foodCount} {foodCount === 1 ? 'item' : 'items'}
           </span>
           <ChevronDown
@@ -267,9 +330,7 @@ const CategoryMenuSection = ({ category, index, defaultExpanded = true }) => {
           ) : (
             <div className="py-8 text-center">
               <Coffee className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-              <p className="text-sm text-gray-400 italic">
-                No items in this category yet
-              </p>
+              <p className="text-sm text-gray-400 italic">No items in this category yet</p>
             </div>
           )}
         </div>
@@ -287,25 +348,29 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
   if (!menu) return null;
 
   const gradient = getCardGradient(menu.menuId);
-  const totalFoods = menu.totalFoodCount
-    || menu.categories?.reduce((sum, cat) => sum + (cat.foods?.length || 0), 0)
-    || 0;
-  const vegCount = menu.categories?.reduce(
-    (sum, cat) => sum + (cat.foods?.filter((f) => f.isVeg).length || 0), 0
-  ) || 0;
+  const totalFoods =
+    menu.totalFoodCount ||
+    menu.categories?.reduce((sum, cat) => sum + (cat.foods?.length || 0), 0) ||
+    0;
+  const vegCount =
+    menu.categories?.reduce(
+      (sum, cat) => sum + (cat.foods?.filter((f) => f.isVeg).length || 0),
+      0
+    ) || 0;
   const nonVegCount = totalFoods - vegCount;
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-gradient-to-br from-black/40 to-black/60 backdrop-blur-sm"
-           aria-hidden="true" />
+      <div
+        className="fixed inset-0 bg-gradient-to-br from-black/40 to-black/60 backdrop-blur-sm"
+        aria-hidden="true"
+      />
 
       <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-4">
         <Dialog.Panel
           className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-gray-100
                      max-h-[94vh] overflow-hidden flex flex-col"
         >
-
           {/* ========== HERO HEADER ========== */}
           <div className={`relative bg-gradient-to-r ${gradient} shrink-0 overflow-hidden`}>
             {/* Decorative Elements */}
@@ -314,11 +379,13 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
               <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-white/5" />
               <div className="absolute top-1/2 right-1/4 w-24 h-24 rounded-full bg-white/5" />
               {/* Pattern overlay */}
-              <div className="absolute inset-0 opacity-5"
-                   style={{
-                     backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                     backgroundSize: '24px 24px',
-                   }} />
+              <div
+                className="absolute inset-0 opacity-5"
+                style={{
+                  backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                  backgroundSize: '24px 24px',
+                }}
+              />
             </div>
 
             <div className="relative px-6 sm:px-8 pt-6 pb-5">
@@ -333,8 +400,10 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
 
               {/* Title Row */}
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center
-                                justify-center border border-white/20 shadow-lg shrink-0">
+                <div
+                  className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center
+                                justify-center border border-white/20 shadow-lg shrink-0"
+                >
                   <UtensilsCrossed className="w-7 h-7 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -342,21 +411,28 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                     {menu.menuName}
                   </Dialog.Title>
                   <div className="flex items-center gap-3 mt-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold
                                       rounded-full backdrop-blur-sm border
-                                      ${menu.isDeleted
-                                        ? 'bg-red-500/20 text-red-100 border-red-300/30'
-                                        : 'bg-green-500/20 text-green-100 border-green-300/30'
-                                      }`}>
-                      <span className={`w-2 h-2 rounded-full ${
-                        menu.isDeleted ? 'bg-red-300' : 'bg-green-300 animate-pulse'
-                      }`} />
+                                      ${
+                                        menu.isDeleted
+                                          ? 'bg-red-500/20 text-red-100 border-red-300/30'
+                                          : 'bg-green-500/20 text-green-100 border-green-300/30'
+                                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          menu.isDeleted ? 'bg-red-300' : 'bg-green-300 animate-pulse'
+                        }`}
+                      />
                       {menu.isDeleted ? 'Deleted' : 'Active'}
                     </span>
                     {menu.branch && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium
+                      <span
+                        className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium
                                        rounded-full bg-white/15 text-white/90 backdrop-blur-sm
-                                       border border-white/10">
+                                       border border-white/10"
+                      >
                         <MapPin className="w-3 h-3" />
                         {menu.branch.name}
                       </span>
@@ -373,8 +449,11 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                   { label: 'Veg', value: vegCount, icon: Leaf },
                   { label: 'Non-Veg', value: nonVegCount, icon: Drumstick },
                 ].map((stat, i) => (
-                  <div key={i} className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-2.5
-                                          border border-white/10 text-center">
+                  <div
+                    key={i}
+                    className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-2.5
+                                          border border-white/10 text-center"
+                  >
                     <stat.icon className="w-4 h-4 text-white/70 mx-auto mb-1" />
                     <p className="text-lg sm:text-xl font-bold text-white leading-none">
                       {stat.value}
@@ -399,9 +478,10 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                   className={`
                     flex items-center gap-1.5 px-4 py-2.5 text-xs sm:text-sm font-semibold
                     rounded-t-xl transition-all duration-200
-                    ${activeSection === tab.id
-                      ? 'bg-white text-gray-800 shadow-sm'
-                      : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
+                    ${
+                      activeSection === tab.id
+                        ? 'bg-white text-gray-800 shadow-sm'
+                        : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
                     }
                   `}
                 >
@@ -414,18 +494,16 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
 
           {/* ========== BODY ========== */}
           <div className="flex-1 overflow-y-auto">
-
             {/* ---- FULL MENU VIEW ---- */}
             {activeSection === 'menu' && (
               <div className="px-6 sm:px-8 py-6 space-y-4">
-
                 {menu.menuDesc && (
-                  <div className="p-4 bg-amber-50/50 rounded-xl border border-amber-100
-                                  flex items-start gap-3">
+                  <div
+                    className="p-4 bg-amber-50/50 rounded-xl border border-amber-100
+                                  flex items-start gap-3"
+                  >
                     <Sparkles className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                    <p className="text-sm text-amber-800 leading-relaxed italic">
-                      {menu.menuDesc}
-                    </p>
+                    <p className="text-sm text-amber-800 leading-relaxed italic">{menu.menuDesc}</p>
                   </div>
                 )}
 
@@ -460,8 +538,10 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                   </div>
                 ) : (
                   <div className="py-12 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center
-                                    justify-center mx-auto mb-4">
+                    <div
+                      className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center
+                                    justify-center mx-auto mb-4"
+                    >
                       <UtensilsCrossed className="w-8 h-8 text-gray-300" />
                     </div>
                     <p className="text-gray-500 font-medium mb-1">No categories yet</p>
@@ -476,7 +556,6 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
             {/* ---- DETAILS VIEW ---- */}
             {activeSection === 'info' && (
               <div className="px-6 sm:px-8 py-6 space-y-6">
-
                 {/* Description */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
@@ -508,11 +587,15 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                   </div>
                   <div className="ml-10">
                     {menu.branch ? (
-                      <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl
-                                      border border-green-100">
+                      <div
+                        className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl
+                                      border border-green-100"
+                      >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center
-                                          justify-center shrink-0">
+                          <div
+                            className="w-10 h-10 bg-green-100 rounded-xl flex items-center
+                                          justify-center shrink-0"
+                          >
                             <MapPin className="w-5 h-5 text-green-600" />
                           </div>
                           <div className="min-w-0">
@@ -526,16 +609,16 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                               </p>
                             )}
                             {menu.branch.phone && (
-                              <p className="text-xs text-gray-400 mt-0.5">
-                                📞 {menu.branch.phone}
-                              </p>
+                              <p className="text-xs text-gray-400 mt-0.5">📞 {menu.branch.phone}</p>
                             )}
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200
-                                      text-center">
+                      <div
+                        className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200
+                                      text-center"
+                      >
                         <MapPin className="w-5 h-5 text-gray-300 mx-auto mb-1" />
                         <p className="text-sm text-gray-400 italic">No branch assigned</p>
                       </div>
@@ -555,8 +638,10 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                       </h3>
                     </div>
                     {menu.categories && menu.categories.length > 0 && (
-                      <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold
-                                       rounded-full">
+                      <span
+                        className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold
+                                       rounded-full"
+                      >
                         {menu.categories.length} total
                       </span>
                     )}
@@ -588,8 +673,10 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                         })}
                       </div>
                     ) : (
-                      <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200
-                                      text-center">
+                      <div
+                        className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200
+                                      text-center"
+                      >
                         <Tag className="w-5 h-5 text-gray-300 mx-auto mb-1" />
                         <p className="text-sm text-gray-400 italic">No categories assigned</p>
                       </div>
@@ -615,12 +702,16 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                     <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
                       <p className="text-xs text-gray-400 font-medium mb-1">Status</p>
                       <div className="flex items-center gap-1.5">
-                        <span className={`w-2 h-2 rounded-full ${
-                          menu.isDeleted ? 'bg-red-500' : 'bg-green-500 animate-pulse'
-                        }`} />
-                        <p className={`text-sm font-bold ${
-                          menu.isDeleted ? 'text-red-600' : 'text-green-600'
-                        }`}>
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            menu.isDeleted ? 'bg-red-500' : 'bg-green-500 animate-pulse'
+                          }`}
+                        />
+                        <p
+                          className={`text-sm font-bold ${
+                            menu.isDeleted ? 'text-red-600' : 'text-green-600'
+                          }`}
+                        >
                           {menu.isDeleted ? 'Deleted' : 'Active'}
                         </p>
                       </div>
@@ -650,7 +741,9 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                   </div>
                   <div className="ml-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100">
-                      <p className="text-xs text-indigo-500 font-medium mb-1">Assigned Date Range</p>
+                      <p className="text-xs text-indigo-500 font-medium mb-1">
+                        Assigned Date Range
+                      </p>
                       <p className="text-sm font-bold text-indigo-900">
                         {menu.startDate || menu.endDate
                           ? `${menu.startDate || 'Start'} to ${menu.endDate || 'Ongoing'}`
@@ -658,10 +751,15 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
                       </p>
                     </div>
                     <div className="p-3 bg-purple-50/50 rounded-xl border border-purple-100">
-                      <p className="text-xs text-purple-500 font-medium mb-1">Active Days of Week</p>
+                      <p className="text-xs text-purple-500 font-medium mb-1">
+                        Active Days of Week
+                      </p>
                       <p className="text-sm font-bold text-purple-900">
                         {menu.dayOfWeek
-                          ? menu.dayOfWeek.split(',').map(d => d.trim()).join(', ')
+                          ? menu.dayOfWeek
+                              .split(',')
+                              .map((d) => d.trim())
+                              .join(', ')
                           : 'All 7 Days (Mon - Sun)'}
                       </p>
                     </div>
@@ -672,8 +770,10 @@ const MenuDetailModal = ({ isOpen, onClose, menu, onEdit, onDelete }) => {
           </div>
 
           {/* ========== FOOTER ========== */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 sm:px-8 py-4
-                          flex items-center justify-between shrink-0">
+          <div
+            className="sticky bottom-0 bg-white border-t border-gray-100 px-6 sm:px-8 py-4
+                          flex items-center justify-between shrink-0"
+          >
             <button
               onClick={onClose}
               className="px-5 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50
@@ -724,9 +824,10 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
   const gradient = getCardGradient(menu.menuId);
   const visibleCategories = menu.categories?.slice(0, 3) || [];
   const remainingCount = (menu.categories?.length || 0) - 3;
-  const totalFoods = menu.totalFoodCount
-    || menu.categories?.reduce((sum, cat) => sum + (cat.foods?.length || 0), 0)
-    || 0;
+  const totalFoods =
+    menu.totalFoodCount ||
+    menu.categories?.reduce((sum, cat) => sum + (cat.foods?.length || 0), 0) ||
+    0;
 
   return (
     <div
@@ -734,18 +835,20 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
         group relative bg-white rounded-2xl overflow-hidden
         transition-all duration-500 ease-out
         hover:shadow-2xl hover:shadow-gray-300/30 hover:-translate-y-1
-        ${menu.isDeleted
-          ? 'border-2 border-red-200 ring-1 ring-red-100'
-          : 'border border-gray-100 shadow-md shadow-gray-100/50'
+        ${
+          menu.isDeleted
+            ? 'border-2 border-red-200 ring-1 ring-red-100'
+            : 'border border-gray-100 shadow-md shadow-gray-100/50'
         }
       `}
     >
       {/* Gradient Top Bar */}
-      <div className={`h-2 bg-gradient-to-r ${gradient}
-                       ${menu.isDeleted ? 'opacity-30' : 'opacity-100'}`} />
+      <div
+        className={`h-2 bg-gradient-to-r ${gradient}
+                       ${menu.isDeleted ? 'opacity-30' : 'opacity-100'}`}
+      />
 
       <div className="p-5 sm:p-6">
-
         {/* Top: Icon + Name + Actions */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -754,9 +857,10 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
                 relative w-12 h-12 rounded-2xl flex items-center justify-center shrink-0
                 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3
                 shadow-lg
-                ${menu.isDeleted
-                  ? 'bg-red-100 shadow-red-200/50'
-                  : `bg-gradient-to-br ${gradient} shadow-blue-300/30`
+                ${
+                  menu.isDeleted
+                    ? 'bg-red-100 shadow-red-200/50'
+                    : `bg-gradient-to-br ${gradient} shadow-blue-300/30`
                 }
               `}
             >
@@ -766,16 +870,20 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
                             ${menu.isDeleted ? 'text-red-500' : 'text-white'}`}
               />
               {!menu.isDeleted && (
-                <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-400 rounded-full
-                                border-2 border-white shadow-sm">
+                <div
+                  className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-400 rounded-full
+                                border-2 border-white shadow-sm"
+                >
                   <div className="w-full h-full bg-green-400 rounded-full animate-ping opacity-50" />
                 </div>
               )}
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-gray-800 text-base leading-tight truncate
-                             group-hover:text-blue-700 transition-colors duration-300">
+              <h3
+                className="font-bold text-gray-800 text-base leading-tight truncate
+                             group-hover:text-blue-700 transition-colors duration-300"
+              >
                 {menu.menuName}
               </h3>
               {menu.branch ? (
@@ -809,7 +917,10 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
                 {menu.dayOfWeek && (
                   <span className="inline-flex items-center gap-1 text-[11px] font-medium text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
                     <Clock className="w-3 h-3 text-purple-500 shrink-0" />
-                    {menu.dayOfWeek.split(',').map(d => d.slice(0, 3)).join(', ')}
+                    {menu.dayOfWeek
+                      .split(',')
+                      .map((d) => d.slice(0, 3))
+                      .join(', ')}
                   </span>
                 )}
               </div>
@@ -821,15 +932,18 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
             <span
               className={`
                 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full
-                ${menu.isDeleted
-                  ? 'bg-red-100 text-red-600 ring-1 ring-red-200'
-                  : 'bg-green-100 text-green-700 ring-1 ring-green-200'
+                ${
+                  menu.isDeleted
+                    ? 'bg-red-100 text-red-600 ring-1 ring-red-200'
+                    : 'bg-green-100 text-green-700 ring-1 ring-green-200'
                 }
               `}
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${
-                menu.isDeleted ? 'bg-red-500' : 'bg-green-500 animate-pulse'
-              }`} />
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  menu.isDeleted ? 'bg-red-500' : 'bg-green-500 animate-pulse'
+                }`}
+              />
               {menu.isDeleted ? 'Deleted' : 'Active'}
             </span>
 
@@ -845,10 +959,15 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
               {showActions && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowActions(false)} />
-                  <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200
-                                  rounded-xl shadow-2xl py-1.5 min-w-[160px]">
+                  <div
+                    className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200
+                                  rounded-xl shadow-2xl py-1.5 min-w-[160px]"
+                  >
                     <button
-                      onClick={() => { setShowActions(false); onView(menu); }}
+                      onClick={() => {
+                        setShowActions(false);
+                        onView(menu);
+                      }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700
                                  hover:bg-blue-50 hover:text-blue-700 transition-colors"
                     >
@@ -856,7 +975,10 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
                       View Full Menu
                     </button>
                     <button
-                      onClick={() => { setShowActions(false); onEdit(menu); }}
+                      onClick={() => {
+                        setShowActions(false);
+                        onEdit(menu);
+                      }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700
                                  hover:bg-amber-50 hover:text-amber-700 transition-colors"
                     >
@@ -865,7 +987,10 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
                     </button>
                     <div className="h-px bg-gray-100 my-1" />
                     <button
-                      onClick={() => { setShowActions(false); onDelete(menu.menuId); }}
+                      onClick={() => {
+                        setShowActions(false);
+                        onDelete(menu.menuId);
+                      }}
                       disabled={deleting}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600
                                  hover:bg-red-50 transition-colors disabled:opacity-50"
@@ -882,12 +1007,12 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
 
         {/* Description */}
         {menu.menuDesc && (
-          <div className="mb-4 p-3 bg-gray-50/80 rounded-xl border border-gray-100/80
+          <div
+            className="mb-4 p-3 bg-gray-50/80 rounded-xl border border-gray-100/80
                           group-hover:bg-blue-50/30 group-hover:border-blue-100/50
-                          transition-colors duration-300">
-            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
-              {menu.menuDesc}
-            </p>
+                          transition-colors duration-300"
+          >
+            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{menu.menuDesc}</p>
           </div>
         )}
 
@@ -902,9 +1027,7 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
             <p className="text-[10px] text-green-500 font-medium">Items</p>
           </div>
           <div className="bg-purple-50/60 rounded-xl px-3 py-2 text-center border border-purple-100/50">
-            <p className="text-base font-bold text-purple-700">
-              #{menu.menuId}
-            </p>
+            <p className="text-base font-bold text-purple-700">#{menu.menuId}</p>
             <p className="text-[10px] text-purple-500 font-medium">Menu ID</p>
           </div>
         </div>
@@ -933,10 +1056,8 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                     {cat.name}
-                    {(cat.foodCount || cat.foods?.length) ? (
-                      <span className="opacity-60">
-                        ({cat.foodCount || cat.foods?.length})
-                      </span>
+                    {cat.foodCount || cat.foods?.length ? (
+                      <span className="opacity-60">({cat.foodCount || cat.foods?.length})</span>
                     ) : null}
                   </span>
                 );
@@ -961,8 +1082,10 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
       </div>
 
       {/* Card Footer */}
-      <div className="px-5 sm:px-6 py-3.5 bg-gradient-to-r from-gray-50 to-gray-50/50
-                      border-t border-gray-100 flex items-center justify-between">
+      <div
+        className="px-5 sm:px-6 py-3.5 bg-gradient-to-r from-gray-50 to-gray-50/50
+                      border-t border-gray-100 flex items-center justify-between"
+      >
         <button
           onClick={() => onView(menu)}
           className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold
@@ -999,8 +1122,10 @@ const MenuCard = ({ menu, onEdit, onDelete, onView, deleting }) => {
       </div>
 
       {/* Bottom Accent */}
-      <div className={`h-0.5 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-100
-                       transition-opacity duration-500`} />
+      <div
+        className={`h-0.5 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-100
+                       transition-opacity duration-500`}
+      />
     </div>
   );
 };
@@ -1020,14 +1145,16 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
   const [selectedDateFilter, setSelectedDateFilter] = useState(''); // '' means All, 'YYYY-MM-DD'
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
+  const { effectiveBranchId } = useBranch();
+
   useEffect(() => {
     fetchMenus();
-  }, []);
+  }, [effectiveBranchId]);
 
   useImperativeHandle(ref, () => ({
     refreshMenus() {
       fetchMenus();
-    }
+    },
   }));
 
   const fetchMenus = async () => {
@@ -1035,9 +1162,11 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
       setLoading(true);
       setError(null);
 
-      const response = await api.get('/secure/api/v1/menus', {
-        params: { page: 0, size: 50, sortBy: 'menuName', sortDirection: 'asc' }
-      });
+      if (!effectiveBranchId) {
+        setMenus([]);
+        return;
+      }
+      const response = await api.get(`/secure/api/v1/menus/branch/${effectiveBranchId}`);
 
       const menuList = response.data?.content || response.data || [];
       setMenus(Array.isArray(menuList) ? menuList : []);
@@ -1061,7 +1190,7 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
     } catch (err) {
       console.error('Failed to delete menu:', err.response?.data || err);
       toast.error(
-        err.response?.data?.message || 'Failed to delete menu'  // Fallback message
+        err.response?.data?.message || 'Failed to delete menu' // Fallback message
       );
     } finally {
       setDeletingId(null);
@@ -1094,9 +1223,17 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
 
     // Day of week check
     if (menu.dayOfWeek) {
-      const dayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+      const dayNames = [
+        'SUNDAY',
+        'MONDAY',
+        'TUESDAY',
+        'WEDNESDAY',
+        'THURSDAY',
+        'FRIDAY',
+        'SATURDAY',
+      ];
       const dayName = dayNames[checkDate.getDay()];
-      const activeDays = menu.dayOfWeek.split(',').map(d => d.trim().toUpperCase());
+      const activeDays = menu.dayOfWeek.split(',').map((d) => d.trim().toUpperCase());
       if (!activeDays.includes(dayName)) return false;
     }
 
@@ -1116,28 +1253,59 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
 
   return (
     <div className="space-y-5">
-
       {/* Stats */}
       {!loading && menus.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: 'Total Menus', value: menus.length, icon: UtensilsCrossed,
-              gradient: 'from-blue-500 to-indigo-500', bg: 'bg-blue-50', text: 'text-blue-700' },
-            { label: 'Active', value: menus.filter((m) => !m.isDeleted).length, icon: Sparkles,
-              gradient: 'from-green-500 to-emerald-500', bg: 'bg-green-50', text: 'text-green-700' },
-            { label: 'Total Items',
-              value: menus.reduce((sum, m) =>
-                sum + (m.totalFoodCount || m.categories?.reduce((s, c) =>
-                  s + (c.foods?.length || 0), 0) || 0), 0),
+            {
+              label: 'Total Menus',
+              value: menus.length,
+              icon: UtensilsCrossed,
+              gradient: 'from-blue-500 to-indigo-500',
+              bg: 'bg-blue-50',
+              text: 'text-blue-700',
+            },
+            {
+              label: 'Active',
+              value: menus.filter((m) => !m.isDeleted).length,
+              icon: Sparkles,
+              gradient: 'from-green-500 to-emerald-500',
+              bg: 'bg-green-50',
+              text: 'text-green-700',
+            },
+            {
+              label: 'Total Items',
+              value: menus.reduce(
+                (sum, m) =>
+                  sum +
+                  (m.totalFoodCount ||
+                    m.categories?.reduce((s, c) => s + (c.foods?.length || 0), 0) ||
+                    0),
+                0
+              ),
               icon: Coffee,
-              gradient: 'from-amber-500 to-orange-500', bg: 'bg-amber-50', text: 'text-amber-700' },
-            { label: 'With Branch', value: menus.filter((m) => m.branch).length, icon: Building2,
-              gradient: 'from-purple-500 to-violet-500', bg: 'bg-purple-50', text: 'text-purple-700' },
+              gradient: 'from-amber-500 to-orange-500',
+              bg: 'bg-amber-50',
+              text: 'text-amber-700',
+            },
+            {
+              label: 'With Branch',
+              value: menus.filter((m) => m.branch).length,
+              icon: Building2,
+              gradient: 'from-purple-500 to-violet-500',
+              bg: 'bg-purple-50',
+              text: 'text-purple-700',
+            },
           ].map((stat, idx) => (
-            <div key={idx} className="relative bg-white rounded-2xl border border-gray-100 shadow-sm
-                                      px-4 py-4 overflow-hidden group hover:shadow-md transition-all">
-              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}
-                               opacity-60 group-hover:opacity-100 transition-opacity`} />
+            <div
+              key={idx}
+              className="relative bg-white rounded-2xl border border-gray-100 shadow-sm
+                                      px-4 py-4 overflow-hidden group hover:shadow-md transition-all"
+            >
+              <div
+                className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}
+                               opacity-60 group-hover:opacity-100 transition-opacity`}
+              />
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-400 font-medium">{stat.label}</p>
@@ -1154,9 +1322,11 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
 
       {/* Search + Date Filter + Refresh */}
       <div className="flex flex-col md:flex-row gap-3">
-        <div className="flex-1 flex items-center gap-2 bg-white rounded-xl border border-gray-200
+        <div
+          className="flex-1 flex items-center gap-2 bg-white rounded-xl border border-gray-200
                         shadow-sm px-4 py-3 focus-within:border-blue-400 focus-within:ring-2
-                        focus-within:ring-blue-100 transition-all">
+                        focus-within:ring-blue-100 transition-all"
+        >
           <Search className="w-5 h-5 text-gray-400 shrink-0" />
           <input
             type="text"
@@ -1167,8 +1337,10 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
                        placeholder-gray-400 text-sm sm:text-base"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')}
-                    className="text-gray-400 hover:text-gray-600 text-sm font-medium shrink-0">
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-gray-400 hover:text-gray-600 text-sm font-medium shrink-0"
+            >
               Clear
             </button>
           )}
@@ -1182,7 +1354,7 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
               type="button"
               onClick={() => {
                 const todayStr = new Date().toISOString().split('T')[0];
-                setSelectedDateFilter(prev => prev === todayStr ? '' : todayStr);
+                setSelectedDateFilter((prev) => (prev === todayStr ? '' : todayStr));
               }}
               className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
                 selectedDateFilter === new Date().toISOString().split('T')[0]
@@ -1212,10 +1384,13 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
           </div>
         </div>
 
-        <button onClick={fetchMenus} disabled={loading}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-white border
+        <button
+          onClick={fetchMenus}
+          disabled={loading}
+          className="flex items-center justify-center gap-2 px-4 py-3 bg-white border
                            border-gray-200 rounded-xl hover:bg-gray-50 transition-colors
-                           text-gray-600 font-medium text-sm shadow-sm disabled:opacity-50 shrink-0">
+                           text-gray-600 font-medium text-sm shadow-sm disabled:opacity-50 shrink-0"
+        >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           <span className="sm:inline hidden">Refresh</span>
         </button>
@@ -1224,15 +1399,19 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
       {/* Content */}
       {loading ? (
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => <AdminSkeleton key={i} variant="menu-card" />)}
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <AdminSkeleton key={i} variant="menu-card" />
+          ))}
         </div>
       ) : error && menus.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 text-center p-8 sm:p-12 shadow-sm">
           <AlertCircle className="w-14 h-14 text-red-300 mx-auto mb-4" />
           <p className="text-red-600 font-semibold mb-2">{error}</p>
-          <button onClick={fetchMenus}
-                  className="flex items-center gap-2 mx-auto px-5 py-2.5 text-sm text-blue-700
-                             bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors font-semibold">
+          <button
+            onClick={fetchMenus}
+            className="flex items-center gap-2 mx-auto px-5 py-2.5 text-sm text-blue-700
+                             bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors font-semibold"
+          >
             <RefreshCw className="w-4 h-4" />
             Try Again
           </button>
@@ -1251,10 +1430,12 @@ const MenusGrid = forwardRef(({ onEditMenu, onCreateMenu }, ref) => {
               : 'Create your first menu to organize your food items.'}
           </p>
           {!searchQuery && (
-            <button onClick={onCreateMenu}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600
+            <button
+              onClick={onCreateMenu}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600
                                to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700
-                               transition-all font-semibold shadow-lg shadow-blue-600/25">
+                               transition-all font-semibold shadow-lg shadow-blue-600/25"
+            >
               <Plus className="w-5 h-5" />
               Create Your First Menu
             </button>

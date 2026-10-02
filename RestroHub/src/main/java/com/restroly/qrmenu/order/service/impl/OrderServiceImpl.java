@@ -3,6 +3,8 @@ package com.restroly.qrmenu.order.service.impl;
 
 import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
+import com.restroly.qrmenu.common.enums.OrderPaymentStatus;
+import com.restroly.qrmenu.common.enums.OrderSource;
 import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.food.entity.Food;
@@ -14,6 +16,7 @@ import com.restroly.qrmenu.order.dto.OrderResponse;
 import com.restroly.qrmenu.order.entity.Order;
 import com.restroly.qrmenu.order.mapper.OrderMapper;
 import com.restroly.qrmenu.order.repository.OrderRepository;
+import com.restroly.qrmenu.order.service.OrderEventPublisher;
 import com.restroly.qrmenu.order.service.OrderNotificationService;
 import com.restroly.qrmenu.order.service.OrderService;
 import com.restroly.qrmenu.table.entity.Tables;
@@ -44,12 +47,18 @@ public class OrderServiceImpl implements OrderService {
   @Autowired private TablesRepository tableRepository;
   @Autowired private FoodRepository foodRepository;
   @Autowired private OrderNotificationService notificationService;
+  @Autowired private OrderEventPublisher eventPublisher;
 
   @Autowired private OrderDirector orderDirector;
   @Autowired private OrderMapper orderMapper;
 
   @Override
   public OrderResponse createOrder(CreateOrderRequest request) {
+    return createOrder(request, null);
+  }
+
+  @Override
+  public OrderResponse createOrder(CreateOrderRequest request, OrderSource source) {
     log.debug(
         "Creating order for branch: {}, table: {}", request.getBranchId(), request.getTableId());
 
@@ -84,12 +93,20 @@ public class OrderServiceImpl implements OrderService {
     // Build order using Builder Pattern
     Order order = orderDirector.buildOrderFromRequest(request, branch, table, foods);
 
+    order.setOrderSource(
+        source != null
+            ? source
+            : Integer.valueOf(0).equals(table.getTableNumber())
+                ? OrderSource.COUNTER_QR
+                : OrderSource.TABLE_QR);
+
     // Save order
     Order savedOrder = orderRepository.save(order);
     log.info("Order created successfully with id: {}", savedOrder.getOrderId());
 
     // Send notification to admin
     notificationService.notifyNewOrder(savedOrder);
+    eventPublisher.orderCreated(savedOrder);
 
     // Storing paymentId in order for better utility
     savedOrder.setPaymentId(branch.getBranchUpiId());
@@ -136,6 +153,7 @@ public class OrderServiceImpl implements OrderService {
     order.setStatus(status);
     Order updatedOrder = orderRepository.save(order);
 
+    eventPublisher.orderStatusChanged(updatedOrder);
     // Notify about status change
     notificationService.notifyOrderStatusChange(updatedOrder);
     log.info("Order {} status updated to {}", orderId, status);
@@ -148,6 +166,7 @@ public class OrderServiceImpl implements OrderService {
     Order order = findOrderById(orderId);
     order.setStatus(OrderStatus.CANCELLED);
     Order canceledOrder = orderRepository.save(order);
+    eventPublisher.orderStatusChanged(canceledOrder);
     log.info("Order {} cancelled", orderId);
     return orderMapper.toResponse(canceledOrder);
   }
@@ -159,6 +178,9 @@ public class OrderServiceImpl implements OrderService {
       String endDate,
       OrderStatus status,
       String phone,
+      OrderPaymentStatus paymentStatus,
+      Integer tableNumber,
+      OrderSource orderSource,
       Pageable pageable) {
     log.debug("Fetching order history for branchId: {}", branchId);
 
@@ -173,6 +195,19 @@ public class OrderServiceImpl implements OrderService {
 
           if (phone != null && !phone.isBlank()) {
             predicates.add(criteriaBuilder.like(root.get("customerPhone"), "%" + phone + "%"));
+          }
+
+          if (paymentStatus != null) {
+            predicates.add(criteriaBuilder.equal(root.get("paymentStatus"), paymentStatus));
+          }
+
+          if (tableNumber != null) {
+            predicates.add(
+                criteriaBuilder.equal(root.get("table").get("tableNumber"), tableNumber));
+          }
+
+          if (orderSource != null) {
+            predicates.add(criteriaBuilder.equal(root.get("orderSource"), orderSource));
           }
 
           if (startDate != null && !startDate.isBlank() && endDate != null && !endDate.isBlank()) {
@@ -211,6 +246,7 @@ public class OrderServiceImpl implements OrderService {
     for (Order updatedOrder : updatedOrders) {
       try {
         notificationService.notifyOrderStatusChange(updatedOrder);
+        eventPublisher.orderStatusChanged(updatedOrder);
       } catch (Exception ex) {
         log.warn(
             "Could not send status notification for order {}: {}",

@@ -27,6 +27,8 @@ public class OrderResponse {
   private BigDecimal totalAmount;
   private String paymentLink;
   private OrderStatus status;
+  private com.restroly.qrmenu.common.enums.OrderPaymentStatus paymentStatus;
+  private com.restroly.qrmenu.common.enums.OrderSource orderSource;
   private LocalDateTime createdAt;
   private List<OrderItemResponse> items;
 

@@ -22,6 +22,7 @@ import StatusLegend from './orderComponents/StatusLegend';
 import OrdersGrid from './orderComponents/OrdersGrid';
 import OrderHistoryModal from './OrderHistoryModal';
 import { useBranch } from '@context/BranchContext';
+import useOrderStream from '@hooks/useOrderStream';
 import api from '@services/common/api';
 
 const initialOrderState = {
@@ -53,6 +54,7 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [orders, setOrders] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  useOrderStream(() => setRefreshKey((k) => k + 1));
 
   // Controls whether the Create Order modal/drawer is open
   const [showCreateOrder, setShowCreateOrder] = useState(() =>
@@ -834,6 +836,7 @@ const Orders = () => {
         searchQuery={searchQuery}
         onOrdersChange={setOrders}
         refreshTrigger={refreshKey}
+        branchId={branchToUse}
       />
 
       {/* History Modal */}

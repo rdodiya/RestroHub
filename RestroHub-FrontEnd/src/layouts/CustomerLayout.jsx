@@ -1,11 +1,14 @@
 // src/layouts/CustomerLayout.jsx
 import { Outlet } from 'react-router-dom';
+import ErrorBoundary from '@components/common/ErrorBoundary';
 
 const CustomerLayout = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Outlet />
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen overflow-x-hidden bg-gray-50">
+        <Outlet />
+      </div>
+    </ErrorBoundary>
   );
 };
 

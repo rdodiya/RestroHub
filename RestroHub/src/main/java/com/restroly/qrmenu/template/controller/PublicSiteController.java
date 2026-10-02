@@ -29,16 +29,38 @@ public class PublicSiteController {
 
     String resolvedSiteId = siteId;
     if ("resolve".equalsIgnoreCase(siteId) || siteId == null || siteId.trim().isEmpty()) {
-      String host = request.getServerName();
-      if (host != null && host.contains(".")) {
-        resolvedSiteId = host.split("\\.")[0];
-      } else {
-        resolvedSiteId = host;
+      resolvedSiteId = slugFromHost(request.getHeader("X-Forwarded-Host"), request.getServerName());
+      if (resolvedSiteId == null) {
+        throw new com.restroly.qrmenu.exception.ResourceNotFoundException(
+            "No site slug could be resolved from the request host");
       }
     }
 
     SiteConfigDTO config = siteConfigService.getPublicSiteConfig(resolvedSiteId);
     return ResponseEntity.ok(config);
+  }
+
+  /**
+   * Site slug from the first label of the request host. X-Forwarded-Host (first value) wins over
+   * the server name; the port and a leading "www." are ignored. Returns null for localhost and IP
+   * addresses, which carry no tenant slug.
+   */
+  static String slugFromHost(String forwardedHost, String serverName) {
+    String host = forwardedHost != null && !forwardedHost.isBlank() ? forwardedHost : serverName;
+    if (host == null) {
+      return null;
+    }
+    host = host.split(",")[0].trim().toLowerCase().replaceFirst(":\\d+$", "");
+    if (host.startsWith("www.")) {
+      host = host.substring(4);
+    }
+    if (host.isEmpty()
+        || host.equals("localhost")
+        || host.startsWith("[")
+        || host.matches("\\d+(\\.\\d+){3}")) {
+      return null;
+    }
+    return host.split("\\.")[0];
   }
 
   @PatchMapping("/{siteId}/config")

@@ -134,11 +134,22 @@ Do not skip step 5 — the acceptance criteria in this prompt assume you have th
 
 Work through the milestones in §6 in order. Each milestone maps to one or more P0/P1 items from `PERPLEXITY_ANALYSIS.md`'s priority list, cross-referenced against the existing `@Todo-1` through `@Todo-6` items in `PRD.md` §7 so you don't duplicate work.
 
-**Explicitly out of scope for this task** (leave these for later phases; do not start them even if you see related code):
-- Razorpay/automated subscription billing (P2/P3) — Phase 1 only needs *manual* plan activation (§6.5).
-- Aggregator sync (Zomato/Swiggy), full POS, inventory/purchasing, loyalty, AI translation (P3).
-- Menu variants/add-ons/combos, multi-language menu content (P2) — you may note these as follow-ups in `ImplementationPlan.md` but don't build them now.
-- WebSocket/SSE real-time transport — if `ImplementationPlan.md` §2.1 (Phase 2, Sprint 3) covers this already as a separate initiative, leave it there. Polling is an acceptable interim mechanism for anything Phase 1 needs to feel "live."
+**Scope for this task** : Work on below tasks id from Implementation Plan
+- Phase 1 
+   - Sprint 1: All tasks
+   - Sprint 2: All tasks
+
+- Phase 2
+   - Sprint 3: All tasks
+   - Sprint 4: All tasks exclude (2.5	Automated CI/CD Pipeline (GitHub Actions))
+
+Ans of Decisions I need from you :
+1. Category and Food have no restaurant owner. They link to restaurants only through menus, so they can be shared across tenants. For now they only have role checks, not tenant checks. My proposal is to add a restaurant_id column filled in from existing menu links. Should categories be per-restaurant? 
+Ans: The food items and categories will be common for all branches and for per-restaurant but it is possible that the food items and categories will be available for 1 branch but not for other this may be achieve by creating menu without that food items or categories -- my possible soln
+
+2. Per-branch Managers. Right now a Manager can reach every branch of their restaurant. Should they be limited to specific branches?
+- Yes manager can only reach the user has access of same like admin, admin cannnot see all branches superadmin should assign the branches to admin and manager
+3. Staff accounts. Restaurant admins can no longer use the user-management endpoints. Should they get their own endpoints to manage their staff? - no clear about the question which endpoints ?
 
 ---
 

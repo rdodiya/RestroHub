@@ -24,7 +24,7 @@ echo "Working directory: $APP_DIR"
 # ------------------------------------------------------------------------------
 # 1. System Packages: Java 21 & PostgreSQL
 # ------------------------------------------------------------------------------
-echo "--- [1/5] Installing system dependencies (Java 21, PostgreSQL) ---"
+echo "--- [1/6] Installing system dependencies (Java 21, PostgreSQL) ---"
 sudo apt-get update -y
 sudo apt-get install -y openjdk-21-jdk postgresql postgresql-contrib curl
 
@@ -45,7 +45,7 @@ echo "✔ Java version: $(java -version 2>&1 | head -n 1)"
 # ------------------------------------------------------------------------------
 # 2. Configure Gradle Repository Mirrors (Prevents HTTP 429 Rate Limits)
 # ------------------------------------------------------------------------------
-echo "--- [2/5] Configuring Gradle repository mirrors ---"
+echo "--- [2/6] Configuring Gradle repository mirrors ---"
 # Google Cloud VMs share IP pools which trigger HTTP 429 rate-limiting from Sonatype Maven Central.
 # We inject Google's GCS Maven Central mirror globally into Gradle for plugins, buildscript, and allprojects.
 mkdir -p "$HOME/.gradle/init.d"
@@ -87,7 +87,7 @@ echo "✔ Configured Google Cloud Maven Central mirror in ~/.gradle/init.d/01-ma
 # ------------------------------------------------------------------------------
 # 3. Node.js & npm (Ensure Node.js 18+ or 20 LTS)
 # ------------------------------------------------------------------------------
-echo "--- [3/5] Verifying Node.js environment ---"
+echo "--- [3/6] Verifying Node.js environment ---"
 NODE_VERSION=0
 if command -v node >/dev/null 2>&1; then
     NODE_VERSION=$(node -v | cut -d'.' -f1 | tr -d 'v')
@@ -105,7 +105,7 @@ echo "✔ npm version: $(npm -v)"
 # ------------------------------------------------------------------------------
 # 4. PostgreSQL Database Setup
 # ------------------------------------------------------------------------------
-echo "--- [4/5] Configuring PostgreSQL (RestroHub_DB) ---"
+echo "--- [4/6] Configuring PostgreSQL (RestroHub_DB) ---"
 sudo service postgresql start
 
 # Ensure user 'postgres' has password 'postgres'
@@ -120,7 +120,7 @@ echo "✔ PostgreSQL running and RestroHub_DB ready."
 # ------------------------------------------------------------------------------
 # 5. Backend (RestroHub) Dependencies & Test Build
 # ------------------------------------------------------------------------------
-echo "--- [5/5] Building Backend & Frontend Dependencies ---"
+echo "--- [5/6] Building Backend & Frontend Dependencies ---"
 cd "$APP_DIR/RestroHub"
 chmod +x ./gradlew
 
@@ -136,6 +136,56 @@ echo "Compiling Spring Boot backend classes and test classes..."
 
 echo "Running backend unit test suite..."
 ./gradlew --no-daemon test
+
+# ------------------------------------------------------------------------------
+# 6. Seed local test users + demo data (scripts/db/*.sql)
+# ------------------------------------------------------------------------------
+# Tables are created by Hibernate (ddl-auto=update) and Flyway on first start, so the
+# backend is started once, the seed scripts run, and the backend is stopped again.
+# Skip with SEED_DEMO_DATA=false. Test logins: <role>@restroly.test / Test@1234
+# (see scripts/db/01_seed_users.sql).
+echo "--- [6/6] Seeding test users and demo data ---"
+if [ "${SEED_DEMO_DATA:-true}" = "true" ]; then
+    export DB_USERNAME="${DB_USERNAME:-postgres}"
+    export DB_PASSWORD="${DB_PASSWORD:-postgres}"
+    export SPRING_DATASOURCE_URL="${SPRING_DATASOURCE_URL:-jdbc:postgresql://127.0.0.1:5432/RestroHub_DB}"
+    # Dev-only secret for this one boot; set JWT_SECRET yourself to reuse tokens.
+    export JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 48 2>/dev/null || echo local-dev-only-jwt-secret-change-me-0123456789abcdef0123456789abcdef)}"
+    SEED_PORT="${SEED_PORT:-8181}"
+
+    ./gradlew --no-daemon bootWar -x test
+    BOOT_WAR="$(ls build/libs/*.war | grep -v -- '-plain' | head -n 1)"
+    SEED_LOG=/tmp/restroly-seed-boot.log
+    SERVER_PORT="$SEED_PORT" java -jar "$BOOT_WAR" > "$SEED_LOG" 2>&1 &
+    BACKEND_PID=$!
+
+    # Wait for the startup log line, not /actuator/health: health reports DOWN locally
+    # when optional integrations (e.g. mail) are not configured.
+    echo "Waiting for backend to create the schema (log: $SEED_LOG)..."
+    READY=false
+    for _ in $(seq 1 60); do
+        if grep -q "Started RestaurantApplication" "$SEED_LOG"; then
+            READY=true; break
+        fi
+        if ! kill -0 "$BACKEND_PID" 2>/dev/null; then break; fi
+        sleep 3
+    done
+    kill "$BACKEND_PID" 2>/dev/null || true
+    wait "$BACKEND_PID" 2>/dev/null || true
+
+    if [ "$READY" = "true" ]; then
+        for SEED_SQL in "$APP_DIR/scripts/db/01_seed_users.sql" "$APP_DIR/scripts/db/02_seed_demo_data.sql"; do
+            echo "Running $(basename "$SEED_SQL")..."
+            PGPASSWORD="$DB_PASSWORD" psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U "$DB_USERNAME" -d RestroHub_DB -q -f "$SEED_SQL"
+        done
+        echo "✔ Seeded test users (password Test@1234) and demo data."
+    else
+        echo "⚠️  Backend did not become healthy; skipped seeding. Last log lines:"
+        tail -n 30 "$SEED_LOG" || true
+    fi
+else
+    echo "SEED_DEMO_DATA=false — skipping seed scripts."
+fi
 
 # ------------------------------------------------------------------------------
 # Frontend (RestroHub-FrontEnd) Dependencies & Build

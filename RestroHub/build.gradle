@@ -76,6 +76,9 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test';
     testImplementation 'org.springframework.security:spring-security-test';
+    // Integration tests against real PostgreSQL; skipped automatically when Docker is unavailable
+    testImplementation 'org.testcontainers:postgresql';
+    testImplementation 'org.testcontainers:junit-jupiter';
 
     //OpenAPI Documentation
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui

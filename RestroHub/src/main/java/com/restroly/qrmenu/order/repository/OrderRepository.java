@@ -68,4 +68,44 @@ public interface OrderRepository
 
   // Live Orders Count by Branch
   long countByBranchBranchIdAndStatusIn(Long branchId, List<OrderStatus> statuses);
+
+  // ---- Dashboard v2 (branch-scoped, cancelled orders excluded) ----
+
+  long countByBranchBranchIdAndCreatedAtBetweenAndStatusNot(
+      Long branchId, LocalDateTime start, LocalDateTime end, OrderStatus excluded);
+
+  @Query(
+      "SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.branch.branchId = :branchId "
+          + "AND o.createdAt BETWEEN :start AND :end AND o.status <> :excluded")
+  BigDecimal sumGrossValue(
+      @Param("branchId") Long branchId,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end,
+      @Param("excluded") OrderStatus excluded);
+
+  @Query(
+      "SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.branch.branchId = :branchId "
+          + "AND o.createdAt BETWEEN :start AND :end AND o.paymentStatus = "
+          + "com.restroly.qrmenu.common.enums.OrderPaymentStatus.VERIFIED_BY_STAFF")
+  BigDecimal sumVerifiedCollected(
+      @Param("branchId") Long branchId,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
+  @Query(
+      "SELECT COUNT(o) FROM Order o WHERE o.branch.branchId = :branchId "
+          + "AND o.createdAt BETWEEN :start AND :end AND o.status <> :excluded "
+          + "AND (o.paymentStatus IS NULL OR o.paymentStatus = "
+          + "com.restroly.qrmenu.common.enums.OrderPaymentStatus.UNPAID)")
+  long countUnpaid(
+      @Param("branchId") Long branchId,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end,
+      @Param("excluded") OrderStatus excluded);
+
+  @Query(
+      "SELECT COUNT(DISTINCT o.table.tableId) FROM Order o WHERE o.branch.branchId = :branchId "
+          + "AND o.status IN :statuses")
+  long countActiveTables(
+      @Param("branchId") Long branchId, @Param("statuses") List<OrderStatus> statuses);
 }

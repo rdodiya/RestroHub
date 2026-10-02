@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import {
   IndianRupee,
   ShoppingCart,
-  MessageSquare,
+  Clock,
+  Armchair,
   CreditCard,
+  Wallet,
   TrendingUp,
   TrendingDown,
 } from 'lucide-react';
@@ -110,100 +112,72 @@ const StatCardSkeleton = () => {
 // ============================================
 // MAIN COMPONENT (Exported)
 // ============================================
+const money = (v) => `₹${Number(v).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+
+// key = field in GET /secure/api/v1/dashboard/stats; fields the API omits (financials for
+// Manager/Staff) are not rendered.
+const CARDS = [
+  { key: 'todaysOrders', title: "Today's Orders", icon: ShoppingCart, color: 'orange' },
+  {
+    key: 'grossOrderValue',
+    title: 'Gross Order Value',
+    icon: IndianRupee,
+    color: 'green',
+    fmt: money,
+  },
+  {
+    key: 'averageOrderValue',
+    title: 'Average Order Value',
+    icon: IndianRupee,
+    color: 'blue',
+    fmt: money,
+  },
+  { key: 'pendingOrders', title: 'Pending', icon: Clock, color: 'red', pulse: true },
+  { key: 'activeTables', title: 'Active Tables', icon: Armchair, color: 'purple' },
+  { key: 'unpaidCount', title: 'Unpaid Orders', icon: CreditCard, color: 'orange' },
+  {
+    key: 'verifiedCollectedAmount',
+    title: 'Verified Collected',
+    icon: Wallet,
+    color: 'emerald',
+    fmt: money,
+  },
+];
+
 const StatsSection = () => {
   const { effectiveBranchId } = useBranch();
-  const [stats, setStats] = useState([]);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ------------------------------------
-  // FALLBACK DATA (used when API fails)
-  // ------------------------------------
-  const fallbackStats = [
-    {
-      title: "Today's Revenue",
-      value: '₹45,230',
-      change: '+24%',
-      positive: true,
-      icon: IndianRupee,
-      color: 'green',
-    },
-    {
-      title: 'Live Orders',
-      value: '12',
-      subtitle: 'active',
-      icon: ShoppingCart,
-      color: 'orange',
-      pulse: true,
-    },
-    {
-      title: 'WhatsApp Messages',
-      value: '156/1000',
-      progress: 15.6,
-      icon: MessageSquare,
-      color: 'emerald',
-    },
-    {
-      title: 'UPI Success',
-      value: '89%',
-      subtitle: '(78/89)',
-      icon: CreditCard,
-      color: 'purple',
-    },
-  ];
-
-  // ------------------------------------
-  // ICON MAPPING (API returns string, we need component)
-  // ------------------------------------
-  const iconMap = {
-    revenue: IndianRupee,
-    orders: ShoppingCart,
-    messages: MessageSquare,
-    payments: CreditCard,
-  };
-
-  // ------------------------------------
-  // FETCH DATA
-  // ------------------------------------
   useEffect(() => {
     fetchStats();
+    const handle = () => fetchStats();
+    window.addEventListener('restrohub:order-updated', handle);
+    const interval = setInterval(handle, 30000);
+    return () => {
+      window.removeEventListener('restrohub:order-updated', handle);
+      clearInterval(interval);
+    };
   }, [effectiveBranchId]);
 
   const fetchStats = async () => {
+    if (!effectiveBranchId) return;
     try {
-      setLoading(true);
       setError(null);
-
-      const branchToFetch = effectiveBranchId;
-      if (!branchToFetch) return;
-      const response = await api.get(`/secure/api/v1/dashboard/statistics/${branchToFetch}`);
-
-      const apiStats = response.data.map((stat) => ({
-        ...stat,
-        icon: iconMap[stat.iconKey] || IndianRupee,
-      }));
-
-      setStats(apiStats);
+      const response = await api.get('/secure/api/v1/dashboard/stats', {
+        params: { branchId: effectiveBranchId },
+      });
+      setStats(response.data || {});
     } catch (err) {
       console.error('Failed to fetch stats:', err);
       toast.error('Failed to fetch stats');
       setError('Failed to load stats');
-      setStats(fallbackStats);
     } finally {
       setLoading(false);
     }
   };
 
-  // ------------------------------------
-  // REFRESH (can be called from parent)
-  // ------------------------------------
-  const refresh = () => {
-    fetchStats();
-  };
-
-  // ------------------------------------
-  // RENDER
-  // ------------------------------------
   if (loading) {
     return (
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -214,11 +188,11 @@ const StatsSection = () => {
     );
   }
 
-  if (error && stats.length === 0) {
+  if (error && !stats) {
     return (
       <div className="bg-red-50 rounded-2xl p-6 border border-red-100 text-center">
         <p className="text-red-600 mb-2">{error}</p>
-        <button onClick={refresh} className="text-sm text-red-700 underline hover:no-underline">
+        <button onClick={fetchStats} className="text-sm text-red-700 underline hover:no-underline">
           Try Again
         </button>
       </div>
@@ -227,8 +201,8 @@ const StatsSection = () => {
 
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map((stat, index) => (
-        <StatCard key={index} {...stat} />
+      {CARDS.filter((c) => stats?.[c.key] != null).map(({ key, fmt, ...card }) => (
+        <StatCard key={key} {...card} value={fmt ? fmt(stats[key]) : stats[key]} />
       ))}
     </div>
   );
