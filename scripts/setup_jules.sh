@@ -24,7 +24,7 @@ echo "Working directory: $APP_DIR"
 # ------------------------------------------------------------------------------
 # 1. System Packages: Java 21 & PostgreSQL
 # ------------------------------------------------------------------------------
-echo "--- [1/6] Installing system dependencies (Java 21, PostgreSQL) ---"
+echo "--- [1/7] Installing system dependencies (Java 21, PostgreSQL) ---"
 sudo apt-get update -y
 sudo apt-get install -y openjdk-21-jdk postgresql postgresql-contrib curl
 
@@ -45,7 +45,7 @@ echo "✔ Java version: $(java -version 2>&1 | head -n 1)"
 # ------------------------------------------------------------------------------
 # 2. Configure Gradle Repository Mirrors (Prevents HTTP 429 Rate Limits)
 # ------------------------------------------------------------------------------
-echo "--- [2/6] Configuring Gradle repository mirrors ---"
+echo "--- [2/7] Configuring Gradle repository mirrors ---"
 # Google Cloud VMs share IP pools which trigger HTTP 429 rate-limiting from Sonatype Maven Central.
 # We inject Google's GCS Maven Central mirror globally into Gradle for plugins, buildscript, and allprojects.
 mkdir -p "$HOME/.gradle/init.d"
@@ -87,7 +87,7 @@ echo "✔ Configured Google Cloud Maven Central mirror in ~/.gradle/init.d/01-ma
 # ------------------------------------------------------------------------------
 # 3. Node.js & npm (Ensure Node.js 18+ or 20 LTS)
 # ------------------------------------------------------------------------------
-echo "--- [3/6] Verifying Node.js environment ---"
+echo "--- [3/7] Verifying Node.js environment ---"
 NODE_VERSION=0
 if command -v node >/dev/null 2>&1; then
     NODE_VERSION=$(node -v | cut -d'.' -f1 | tr -d 'v')
@@ -105,7 +105,7 @@ echo "✔ npm version: $(npm -v)"
 # ------------------------------------------------------------------------------
 # 4. PostgreSQL Database Setup
 # ------------------------------------------------------------------------------
-echo "--- [4/6] Configuring PostgreSQL (RestroHub_DB) ---"
+echo "--- [4/7] Configuring PostgreSQL (RestroHub_DB) ---"
 sudo service postgresql start
 
 # Ensure user 'postgres' has password 'postgres'
@@ -120,7 +120,7 @@ echo "✔ PostgreSQL running and RestroHub_DB ready."
 # ------------------------------------------------------------------------------
 # 5. Backend (RestroHub) Dependencies & Test Build
 # ------------------------------------------------------------------------------
-echo "--- [5/6] Building Backend & Frontend Dependencies ---"
+echo "--- [5/7] Building and testing backend ---"
 cd "$APP_DIR/RestroHub"
 chmod +x ./gradlew
 
@@ -144,7 +144,7 @@ echo "Running backend unit test suite..."
 # backend is started once, the seed scripts run, and the backend is stopped again.
 # Skip with SEED_DEMO_DATA=false. Test logins: <role>@restroly.test / Test@1234
 # (see scripts/db/01_seed_users.sql).
-echo "--- [6/6] Seeding test users and demo data ---"
+echo "--- [6/7] Seeding test users and demo data ---"
 if [ "${SEED_DEMO_DATA:-true}" = "true" ]; then
     export DB_USERNAME="${DB_USERNAME:-postgres}"
     export DB_PASSWORD="${DB_PASSWORD:-postgres}"
@@ -200,6 +200,7 @@ if [ ! -f ".env" ]; then
     fi
 fi
 
+echo "--- [7/7] Frontend dependencies and build ---"
 echo "Installing frontend npm packages..."
 npm install
 
