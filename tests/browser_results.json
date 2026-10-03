@@ -1,0 +1,72 @@
+[
+  {
+    "id": "SITE-01",
+    "status": "PASS",
+    "note": "Landing page loaded with title: Restroly - Digital Restaurant Ordering System"
+  },
+  {
+    "id": "RESP-01",
+    "status": "PASS",
+    "note": "Responsive viewports 320px-1280px captured without layout breakage"
+  },
+  {
+    "id": "AUTH-02",
+    "status": "PASS",
+    "note": "Bad credentials rejected cleanly"
+  },
+  {
+    "id": "AUTH-01",
+    "status": "PASS",
+    "note": "admin.a logged in successfully -> http://localhost:3000/admin/dashboard"
+  },
+  {
+    "id": "DASH-01",
+    "status": "PASS",
+    "note": "Admin dashboard displayed metrics cards & charts"
+  },
+  {
+    "id": "BR-01",
+    "status": "PASS",
+    "note": "Branch selector operational in Admin layout"
+  },
+  {
+    "id": "ORD-01",
+    "status": "PASS",
+    "note": "Admin live orders board loaded"
+  },
+  {
+    "id": "LIVE-02",
+    "status": "PASS",
+    "note": "Kitchen Display System loaded active tickets"
+  },
+  {
+    "id": "MENU-01",
+    "status": "PASS",
+    "note": "Menus page displayed dishes and categories"
+  },
+  {
+    "id": "TBL-01",
+    "status": "PASS",
+    "note": "Tables page rendered tables with QR triggers"
+  },
+  {
+    "id": "UPI-01",
+    "status": "PASS",
+    "note": "UPI configuration page loaded active VPAs"
+  },
+  {
+    "id": "SITE-02",
+    "status": "PASS",
+    "note": "Public digital menu rendered with dishes and table #1 banner"
+  },
+  {
+    "id": "SUB-01",
+    "status": "PASS",
+    "note": "SuperAdmin accessed subscription plans and feature mappings"
+  },
+  {
+    "id": "RBAC-01",
+    "status": "PASS",
+    "note": "SuperAdmin accessed User Role Management page"
+  }
+]
