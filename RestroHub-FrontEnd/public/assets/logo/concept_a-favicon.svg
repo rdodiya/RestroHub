@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><title>Restroly</title><g transform="translate(-90.5 -90.5) scale(1.707)">
+
+  <g id="symbol">
+    <!-- Main body of the 'R' with a true negative space hole -->
+    <!-- The outer path goes clockwise, the inner hole goes counter-clockwise -->
+    <!-- Outer bounds: 68 to 188, Y 56 to 200 -->
+    <path fill="#2E3C45" fill-rule="evenodd" d="
+      M68 56 H132 A48 48 0 0 1 180 104 V104 A48 48 0 0 1 132 152 H68 Z
+      M92 80 H132 A24 24 0 0 1 156 104 V104 A24 24 0 0 1 132 128 H92 Z" />
+
+    <!-- Stem of the 'R' - solid block -->
+    <rect x="68" y="56" width="32" height="144" rx="8" fill="#FF5722"/>
+
+    <!-- The leg of the 'R' branching out like a signal wave -->
+    <!-- Starts at 116, 152 -->
+    <path fill="#2E3C45" d="M116 152 L148 200 H188 L156 152 Z" />
+  </g>
+</g></svg>
