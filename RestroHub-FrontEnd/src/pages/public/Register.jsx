@@ -127,9 +127,6 @@ const Illustration = () => (
    ═══════════════════════════════════════════════════════ */
 
 const validationSchema = Yup.object({
-  restaurantName: Yup.string()
-    .min(2, 'Minimum 2 characters')
-    .required('Restaurant name is required'),
   firstName: Yup.string().min(2, 'Minimum 2 characters').required('First name is required'),
   lastName: Yup.string().min(2, 'Minimum 2 characters').required('Last name is required'),
   email: Yup.string().email('Invalid email format').required('Email is required'),
@@ -143,6 +140,9 @@ const validationSchema = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password'), null], 'Passwords must match')
     .required('Confirm password is required'),
+  restaurantName: Yup.string()
+    .min(2, 'Minimum 2 characters')
+    .required('Restaurant Name is required'),
 });
 
 const Register = () => {
@@ -155,12 +155,12 @@ const Register = () => {
 
   const formik = useFormik({
     initialValues: {
-      restaurantName: '',
       firstName: '',
       lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
+      restaurantName: '',
     },
     validationSchema,
     onSubmit: async (values) => {
