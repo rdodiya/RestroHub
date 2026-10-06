@@ -1,0 +1,99 @@
+Restroly Layman flow
+
+An application for small/med/big restaurants whose digital appereance is not present.
+
+So below is the features/flow we will provide in our restroly app.
+
+
+Normal User (customer of restaurant/normal people) Flow
+
+he/she open url/scan qr code from table or cash counter and an link of restaurant will open which contains basic sections like
+hero, description, contact , menu , add to cart option, language change dropdown
+this sections data will be recive from backend (spring boot api) and react will render the template dynamically.
+
+The link of restaurant will be like restaurantname.restroly.in as restroly.in is our domain and this dynamic config is need to perform @Todo
+
+Reference Api D:\projects\gssoc_develop_restrohub\RestroHub\src\main\java\com\restroly\qrmenu\template\controller\PublicSiteController.java
+
+Now user can see website and add items from menu to cart then all items will be visible in cart and user can order it before
+order user need to add mobile number and name and on successfully order placed user will get notification message on whatsapp with upi payment
+link on success order (using https://github.com/vivekkushwaha66/upi-deeplink-builder) in provided number if whatsapp features is enable to that restaurant and
+admin get App Notification of order and order details will be populated in Order section of admin panel.
+
+Order status will be updated to users when admin change order status from pending , preparing, Ready ,etc.. with payment link if payment is not done and order status is ready.
+
+Now if user scans qr from table then  the order placed will be shown for particular table in admin panel otherwise if qr is scan from counter then
+the table no will default 0. As counter table qr code can be used in restaurant cards also.
+
+Note: this upi link will directly open upi apps and payment done to admin upid provided in admin panel so we are not tracking it.
+we can change the message to sent once with upilink on order success or on order is Ready and food is ready.
+
+users feedback in website after success order - not think of this yet as we are not tracking the user's activity in website
+
+==========================================================================================================
+
+Admin User (Admin/Owner of restaurant) Flow :
+
+Admin will register and while registration user will fill details of admin user and restaurant details name.
+Once user register as a admin a email/AppNotification will be sent to superAdmin user (owner of restroly i.e. me)
+Super admin will link the user, restaurant, Branch, userRole
+(Admin, Manager, Manager/User(with Read Only admin's section like restaurant, menu, fooditems, category  exclude payments,other imp stuff),
+Staff (can update order and other read only)) -- we need to think on staff and Manager/User roles for once
+
+Once admin registed user is linked by superAdmin then admin user can access the
+FoodItems, Menu, Branch, Category, Website section, Payment section
+
+Menu - Can create/edit/delete Menu and add category in it , It also has import/export functionality through excel
+Menu -> FoodItems - Can create/edit/delete food items and also update status of availabilty as per UI
+Menu -> Category - Can create/edit/delete category and fooditems in each category as per UI
+Branch - Can add/edit/delete branchs whose access is given by superadmin to the login user and select active menu in it from availables menu
+and admin will see all data of specific branch in UI and one branch data at a time
+Manage Tables in Branch - Admin can add/edit/delete tables and a qr code will be generated of that tables and admin can download that qr codes and place it in each table
+
+
+Dropdown of branch will present in top 2nd header of admin panel - @Todo
+
+Orders - Create order and All today live order will shown with status (Pending,Preparing, Ready, Billed, Cancelled) in this section and admin can update the order status and also can cancel the order,
+this contains a history button that shows previous orders including today with filter and sorting option with pagination using backend api @Todo
+KDS(Kitchen Display System) - This section shows all live order to the staff and staff can update the order status and this section is based on
+KDS flag in admin currently but this flag can be update by superadmin for particular restaurant
+Order status will be in (Pending, Preparing,Ready)
+
+Marketing -> Website - This section will populate templates if user's subscription is free then default 2 template will be populated - @Todo
+and it contains website config like
+Theme Editor - done
+Edit every color, font, and setting for this theme
+Content & Section Editor - done
+Customize your brand identity, hero banner, about story, gallery, and contact information
+Preview website - done
+
+This template and color theme will used when and customer access restaurant website for that branch
+
+Payment - It contians the upid details which admin will provide and using this upid paymentlinks will be generated for that
+branch
+
+Dashboard - User will see some analytical graphs on dashboards and analytical numbers current UI shows but @Toda
+
+Notification - Notification bell on top admin panel will receive live notification of order from users and any requests also from
+any tables like
+
+
+Dark/Ligh Mode - Theme toggle at the top of admin table in header to toogle between Light and dark mode of restroly admin panel
+
+SUPER Admin :
+User Role Management:
+
+User registers normally , No role selection during registration
+A SuperAdmin assigns roles to users later
+Role assignment should be done for a specific restaurant
+
+Select User , Select Restaurant , Assign Role to User for that Restaurant
+Update/Remove assigned roles
+
+Subscription :
+SuperAdmin-only subscription management panel.
+Supports creating, editing, deleting, and searching subscription plans.
+Supports creating, editing, deleting, and searching subscription features.
+Supports assigning features to plans and assigning plans to restaurants.
+Adds current restaurant subscription lookup.
+Adds SuperAdmin-only sidebar visibility for subscription management.

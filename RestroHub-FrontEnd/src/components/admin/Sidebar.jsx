@@ -15,21 +15,17 @@ import {
   ChevronsLeft,
   ChevronsRight,
   ChefHat,
-Users,
+  Users,
   ShieldCheck,
 } from 'lucide-react';
 import { useAdminTheme } from '@context/AdminThemeContext';
-import { FULL_ADMIN_ROLES, hasAnyRole, readStoredRoles } from '../../utils/auth';
-import { isAdmin } from '@hooks/useAuth';
+import { canAccessPath, readStoredRoles } from '../../utils/auth';
 
 const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const location = useLocation();
   const sidebarRef = useRef(null);
   const { isDark } = useAdminTheme();
   const roles = readStoredRoles();
-  const limitedAdminRoles = ['ADMIN', 'MANAGER', 'STAFF'];
-  const superAdminOnly = ['ADMIN'];
-  const allAdminRoles = [...FULL_ADMIN_ROLES, ...limitedAdminRoles];
 
   const [expandedMenus, setExpandedMenus] = useState({
     store: false,
@@ -69,54 +65,48 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
     {
       label: 'Menu',
       items: [
-        { type: 'link', name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard, allowedRoles: FULL_ADMIN_ROLES },
-        { type: 'link', name: 'Kitchen Display', path: '/admin/kds', icon: ChefHat, allowedRoles: allAdminRoles },
-        { type: 'link', name: 'Menus', path: '/admin/menus', icon: UtensilsCrossed, allowedRoles: FULL_ADMIN_ROLES },
-        { type: 'link', name: 'Orders', path: '/admin/orders', icon: ShoppingCart, allowedRoles: allAdminRoles },
+        { type: 'link', name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+        { type: 'link', name: 'Kitchen Display', path: '/admin/kds', icon: ChefHat },
+        { type: 'link', name: 'Menus', path: '/admin/menus', icon: UtensilsCrossed },
+        { type: 'link', name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
       ],
     },
     {
       label: 'Management',
       items: [
-        ...(isAdmin() ? [{ type: 'link', name: 'User Roles', path: '/admin/role-management', icon: Users }] : []),
+        { type: 'link', name: 'User Roles', path: '/admin/role-management', icon: Users },
         {
           type: 'expandable',
           name: 'Store',
           icon: Store,
           menuKey: 'store',
-          allowedRoles: FULL_ADMIN_ROLES,
-          children: [
-            { name: 'Branches', path: '/admin/store/branches', icon: Building2, allowedRoles: FULL_ADMIN_ROLES },
-          ],
+          children: [{ name: 'Branches', path: '/admin/store/branches', icon: Building2 }],
         },
         {
           type: 'expandable',
           name: 'Marketing',
           icon: Megaphone,
           menuKey: 'marketing',
-          allowedRoles: FULL_ADMIN_ROLES,
           children: [
-            { name: 'Website', path: '/admin/marketing/website', icon: Globe, allowedRoles: FULL_ADMIN_ROLES },
-            //{ name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode, allowedRoles: FULL_ADMIN_ROLES },
+            { name: 'Website', path: '/admin/marketing/website', icon: Globe },
+            //{ name: 'QR Display', path: '/admin/marketing/qr-display', icon: QrCode },
           ],
         },
       ],
     },
     {
       label: 'Payments',
-      items: [
-        { type: 'link', name: 'UPI Links', path: '/admin/upi-links', icon: CreditCard, allowedRoles: FULL_ADMIN_ROLES },
-      ],
+      items: [{ type: 'link', name: 'UPI Links', path: '/admin/upi-links', icon: CreditCard }],
     },
     {
       label: 'Platform',
       items: [
-        { type: 'link', name: 'Subscriptions', path: '/admin/subscriptions', icon: ShieldCheck, allowedRoles: superAdminOnly },
+        { type: 'link', name: 'Subscriptions', path: '/admin/subscriptions', icon: ShieldCheck },
       ],
     },
   ];
 
-  const canViewItem = (item) => !item.allowedRoles || hasAnyRole(roles, item.allowedRoles);
+  const canViewItem = (item) => !item.path || canAccessPath(roles, item.path);
 
   const visibleNavSections = navSections
     .map((section) => ({
@@ -129,7 +119,9 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
             children: item.children.filter(canViewItem),
           };
         })
-        .filter((item) => canViewItem(item) && (item.type !== 'expandable' || item.children.length > 0)),
+        .filter(
+          (item) => canViewItem(item) && (item.type !== 'expandable' || item.children.length > 0)
+        ),
     }))
     .filter((section) => section.items.length > 0);
 
@@ -139,24 +131,22 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const SidebarLink = ({ item }) => {
     const Icon = item.icon;
 
-    return (     
+    return (
       <li>
         <NavLink
           to={item.path}
           className={({ isActive }) => `
             group relative flex items-center rounded-lg
             transition-all duration-200
-            ${collapsed
-              ? 'justify-center px-2 py-2.5'
-              : 'gap-3 px-3 py-2.5'
-            }
-            ${isActive
-              ? isDark
-                ? 'bg-blue-900/40 text-blue-400 font-medium'
-                : 'bg-blue-50 text-blue-700 font-medium'
-              : isDark
-                ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-100'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            ${collapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'}
+            ${
+              isActive
+                ? isDark
+                  ? 'bg-blue-900/40 text-blue-400 font-medium'
+                  : 'bg-blue-50 text-blue-700 font-medium'
+                : isDark
+                  ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-100'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }
           `}
         >
@@ -177,9 +167,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
                 }`}
               />
 
-              {!collapsed && (
-                <span className="truncate text-sm">{item.name}</span>
-              )}
+              {!collapsed && <span className="truncate text-sm">{item.name}</span>}
 
               {/* Tooltip - collapsed only */}
               {collapsed && (
@@ -190,9 +178,10 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
                     border px-3 py-1.5
                     text-xs font-medium shadow-lg
                     group-hover:visible
-                    ${isDark
-                      ? 'border-gray-600 bg-gray-800 text-gray-200'
-                      : 'border-gray-200 bg-white text-gray-700'
+                    ${
+                      isDark
+                        ? 'border-gray-600 bg-gray-800 text-gray-200'
+                        : 'border-gray-200 bg-white text-gray-700'
                     }
                   `}
                 >
@@ -212,9 +201,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const SidebarExpandable = ({ item }) => {
     const Icon = item.icon;
     const isExpanded = expandedMenus[item.menuKey];
-    const isParentActive = item.children.some((child) =>
-      location.pathname.startsWith(child.path)
-    );
+    const isParentActive = item.children.some((child) => location.pathname.startsWith(child.path));
 
     return (
       <li>
@@ -224,17 +211,15 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
           className={`
             group relative flex w-full items-center rounded-lg
             transition-all duration-200
-            ${collapsed
-              ? 'justify-center px-2 py-2.5'
-              : 'justify-between gap-3 px-3 py-2.5'
-            }
-            ${isParentActive
-              ? isDark
-                ? 'bg-blue-900/40 text-blue-400 font-medium'
-                : 'bg-blue-50 text-blue-700 font-medium'
-              : isDark
-                ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-100'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            ${collapsed ? 'justify-center px-2 py-2.5' : 'justify-between gap-3 px-3 py-2.5'}
+            ${
+              isParentActive
+                ? isDark
+                  ? 'bg-blue-900/40 text-blue-400 font-medium'
+                  : 'bg-blue-50 text-blue-700 font-medium'
+                : isDark
+                  ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-100'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }
           `}
         >
@@ -253,9 +238,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
               }`}
             />
 
-            {!collapsed && (
-              <span className="truncate text-sm">{item.name}</span>
-            )}
+            {!collapsed && <span className="truncate text-sm">{item.name}</span>}
           </div>
 
           {!collapsed && (
@@ -275,9 +258,10 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
                 border px-3 py-1.5
                 text-xs font-medium shadow-lg
                 group-hover:visible
-                ${isDark
-                  ? 'border-gray-600 bg-gray-800 text-gray-200'
-                  : 'border-gray-200 bg-white text-gray-700'
+                ${
+                  isDark
+                    ? 'border-gray-600 bg-gray-800 text-gray-200'
+                    : 'border-gray-200 bg-white text-gray-700'
                 }
               `}
             >
@@ -288,7 +272,9 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
 
         {/* Children */}
         {isExpanded && !collapsed && (
-          <ul className={`ml-4 mt-1 space-y-0.5 border-l-2 pl-3 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+          <ul
+            className={`ml-4 mt-1 space-y-0.5 border-l-2 pl-3 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+          >
             {item.children.map((child) => {
               const ChildIcon = child.icon;
               return (
@@ -298,13 +284,14 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
                     className={({ isActive }) => `
                       flex items-center gap-3 rounded-lg px-3 py-2
                       text-sm transition-all duration-200
-                      ${isActive
-                        ? isDark
-                          ? 'bg-blue-900/40 font-medium text-blue-400'
-                          : 'bg-blue-50 font-medium text-blue-700'
-                        : isDark
-                          ? 'text-gray-500 hover:bg-gray-700 hover:text-gray-300'
-                          : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                      ${
+                        isActive
+                          ? isDark
+                            ? 'bg-blue-900/40 font-medium text-blue-400'
+                            : 'bg-blue-50 font-medium text-blue-700'
+                          : isDark
+                            ? 'text-gray-500 hover:bg-gray-700 hover:text-gray-300'
+                            : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
                       }
                     `}
                   >
@@ -349,10 +336,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
           lg:static lg:translate-x-0
           ${collapsed ? 'lg:w-[80px]' : 'lg:w-72'}
 
-          ${isDark
-            ? 'border-gray-700 bg-gray-900'
-            : 'border-gray-200 bg-white'
-          }
+          ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}
         `}
       >
         {/* ================================= */}
@@ -377,8 +361,12 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
 
             {!collapsed && (
               <div>
-                <h1 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Restroly</h1>
-                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Admin Panel</p>
+                <h1 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  Restroly
+                </h1>
+                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                  Admin Panel
+                </p>
               </div>
             )}
           </div>
@@ -389,10 +377,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
             className={`
               inline-flex h-8 w-8 items-center justify-center
               rounded-lg transition-colors lg:hidden
-              ${isDark
-                ? 'text-gray-400 hover:bg-gray-700'
-                : 'text-gray-500 hover:bg-gray-100'
-              }
+              ${isDark ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}
             `}
           >
             <X className="h-5 w-5" />
@@ -407,12 +392,16 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
             <div key={section.label} className={sectionIndex > 0 ? 'mt-4' : ''}>
               {/* Section Label */}
               {!collapsed ? (
-                <p className={`mb-2 px-3 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+                <p
+                  className={`mb-2 px-3 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-600' : 'text-gray-400'}`}
+                >
                   {section.label}
                 </p>
               ) : (
                 sectionIndex > 0 && (
-                  <div className={`mx-auto my-3 w-8 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
+                  <div
+                    className={`mx-auto my-3 w-8 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+                  />
                 )
               )}
 
@@ -433,7 +422,9 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
         {/* ================================= */}
         {/* COLLAPSE TOGGLE - Desktop only    */}
         {/* ================================= */}
-        <div className={`hidden shrink-0 border-t px-3 py-3 lg:block ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div
+          className={`hidden shrink-0 border-t px-3 py-3 lg:block ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+        >
           <button
             onClick={() => setCollapsed(!collapsed)}
             className={`
@@ -441,9 +432,10 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
               text-sm font-medium
               transition-all duration-200
               ${collapsed ? 'justify-center px-2 py-2' : 'gap-2 px-3 py-2'}
-              ${isDark
-                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              ${
+                isDark
+                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }
             `}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -462,15 +454,14 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
         {/* ================================= */}
         {/* RESTAURANT INFO                   */}
         {/* ================================= */}
-        <div className={`shrink-0 border-t px-3 py-3 ${isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50'}`}>
+        <div
+          className={`shrink-0 border-t px-3 py-3 ${isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50'}`}
+        >
           <div
             className={`
               flex items-center rounded-xl border shadow-sm
               ${collapsed ? 'justify-center p-2' : 'gap-3 p-2.5'}
-              ${isDark
-                ? 'border-gray-700 bg-gray-800'
-                : 'border-gray-200 bg-white'
-              }
+              ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}
             `}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
@@ -479,10 +470,14 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
 
             {!collapsed && (
               <div className="min-w-0 flex-1">
-                <p className={`truncate text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                <p
+                  className={`truncate text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                >
                   Rajkot Dhaba
                 </p>
-                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Main Branch</p>
+                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                  Main Branch
+                </p>
               </div>
             )}
           </div>

@@ -5,23 +5,21 @@ import com.restroly.qrmenu.branch.dto.BranchResponseDTO;
 import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.mapper.BranchMapper;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
-import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.common.generic.PageResponseDTO;
+import com.restroly.qrmenu.exception.DuplicateResourceException;
+import com.restroly.qrmenu.exception.ResourceNotFoundException;
 import com.restroly.qrmenu.menu.entity.Menu;
 import com.restroly.qrmenu.menu.repository.MenuRepository;
 import com.restroly.qrmenu.restaurant.entity.Restaurant;
 import com.restroly.qrmenu.restaurant.repository.RestaurantRepository;
-
-import com.restroly.qrmenu.exception.DuplicateResourceException;
+import com.restroly.qrmenu.security.AccessGuard;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,247 +27,282 @@ import java.util.List;
 @Transactional
 public class BranchServiceImpl implements BranchService {
 
-    private final BranchRepository branchRepository;
-    private final RestaurantRepository restaurantRepository;
-    private final MenuRepository menuRepository;
-    private final BranchMapper branchMapper;
+  private final BranchRepository branchRepository;
+  private final RestaurantRepository restaurantRepository;
+  private final MenuRepository menuRepository;
+  private final BranchMapper branchMapper;
+  private final AccessGuard access;
 
-    // ========== CREATE ==========
-    @Override
-    public BranchResponseDTO createBranch(BranchRequestDTO requestDTO) {
-        log.info("Creating new branch: {}", requestDTO.getName());
+  // ========== CREATE ==========
+  @Override
+  public BranchResponseDTO createBranch(BranchRequestDTO requestDTO) {
+    log.info("Creating new branch: {}", requestDTO.getName());
 
-        // Validate restaurant exists
-        Restaurant restaurant = restaurantRepository.findById(requestDTO.getRestaurantId())
-                .orElseThrow(() ->{
-                    log.warn("Restaurant not found with ID: {}", requestDTO.getRestaurantId());
-                    return new ResourceNotFoundException(
-                        "Restaurant not found with ID: " + requestDTO.getRestaurantId());
-                    });
-
-        // Check for duplicate branch name
-        if (branchRepository.existsByNameAndRestaurant_RestId(
-                requestDTO.getName(), requestDTO.getRestaurantId())) {
-            log.warn("Branch with name '{}' already exists for restaurant ID: {}",
-                    requestDTO.getName(), requestDTO.getRestaurantId());
-            throw new DuplicateResourceException(
-                    "Branch with name '" + requestDTO.getName() + "' already exists for this restaurant");
-        }
-
-        // Get menu if provided
-        Menu menu = null;
-        if (requestDTO.getMenuId() != null) {
-            menu = menuRepository.findById(requestDTO.getMenuId())
-                    .orElseThrow(() ->{ 
-                        log.warn("Menu not found with ID: {}", requestDTO.getMenuId());
-                        return new ResourceNotFoundException(
-                                "Menu not found with ID: " + requestDTO.getMenuId());
-                    });
-        }
-
-        // Convert DTO to Entity
-        Branch branch = branchMapper.toEntity(requestDTO, restaurant, menu);
-
-        // Save and return
-        Branch savedBranch = branchRepository.save(branch);
-        log.info("Branch created successfully with ID: {}", savedBranch.getBranchId());
-
-        return branchMapper.toResponseDTO(savedBranch);
-    }
-
-    // ========== READ BY ID ==========
-    @Override
-    @Transactional(readOnly = true)
-    public BranchResponseDTO getBranchById(Long branchId) {
-        log.debug("Fetching branch with ID: {}", branchId);
-
-        Branch branch = branchRepository.findByBranchIdAndIsDeleteFalse(branchId)
-                .orElseThrow(() ->{ 
-                    log.warn("Branch not found with ID: {}", branchId);
-                    return new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId);
+    // Validate restaurant exists
+    Restaurant restaurant =
+        restaurantRepository
+            .findById(requestDTO.getRestaurantId())
+            .orElseThrow(
+                () -> {
+                  log.warn("Restaurant not found with ID: {}", requestDTO.getRestaurantId());
+                  return new ResourceNotFoundException(
+                      "Restaurant not found with ID: " + requestDTO.getRestaurantId());
                 });
 
-        return branchMapper.toResponseDTO(branch);
+    // Check for duplicate branch name
+    if (branchRepository.existsByNameAndRestaurant_RestId(
+        requestDTO.getName(), requestDTO.getRestaurantId())) {
+      log.warn(
+          "Branch with name '{}' already exists for restaurant ID: {}",
+          requestDTO.getName(),
+          requestDTO.getRestaurantId());
+      throw new DuplicateResourceException(
+          "Branch with name '" + requestDTO.getName() + "' already exists for this restaurant");
     }
 
-    // ========== READ ALL (Paginated) ==========
-    @Override
-    @Transactional(readOnly = true)
-    public PageResponseDTO<BranchResponseDTO> getAllBranches(Pageable pageable) {
-        log.debug("Fetching all branches with pagination");
-
-        Page<Branch> branchPage = branchRepository.findByIsDeleteFalse(pageable);
-
-        List<BranchResponseDTO> content = branchMapper.toSummaryDTOList(branchPage.getContent());
-
-        return PageResponseDTO.<BranchResponseDTO>builder()
-                .content(content)
-                .pageNumber(branchPage.getNumber())
-                .pageSize(branchPage.getSize())
-                .totalElements(branchPage.getTotalElements())
-                .totalPages(branchPage.getTotalPages())
-                .first(branchPage.isFirst())
-                .last(branchPage.isLast())
-                .build();
-    }
-
-    // ========== READ BY RESTAURANT (Paginated) ==========
-    @Override
-    @Transactional(readOnly = true)
-    public PageResponseDTO<BranchResponseDTO> getBranchesByRestaurantId(Long restId, Pageable pageable) {
-        log.debug("Fetching branches for restaurant ID: {}", restId);
-
-        // Validate restaurant exists
-        if (!restaurantRepository.existsById(restId)) {
-            log.warn("Restaurant not found with ID: {}", restId);
-            throw new ResourceNotFoundException("Restaurant not found with ID: " + restId);
-        }
-
-        Page<Branch> branchPage = branchRepository.findByRestaurant_RestIdAndIsDeleteFalse(restId, pageable);
-
-        List<BranchResponseDTO> content = branchMapper.toSummaryDTOList(branchPage.getContent());
-
-        return PageResponseDTO.<BranchResponseDTO>builder()
-                .content(content)
-                .pageNumber(branchPage.getNumber())
-                .pageSize(branchPage.getSize())
-                .totalElements(branchPage.getTotalElements())
-                .totalPages(branchPage.getTotalPages())
-                .first(branchPage.isFirst())
-                .last(branchPage.isLast())
-                .build();
-    }
-
-    // ========== UPDATE ==========
-    @Override
-    public BranchResponseDTO updateBranch(Long branchId, BranchRequestDTO requestDTO) {
-        log.info("Updating branch with ID: {}", branchId);
-
-        // Find existing branch
-        Branch existingBranch = branchRepository.findByBranchIdAndIsDeleteFalse(branchId)
-                .orElseThrow(() ->{
-                    log.warn("Branch not found with ID: {}", branchId);
+    // Get menu if provided
+    Menu menu = null;
+    if (requestDTO.getMenuId() != null) {
+      menu =
+          menuRepository
+              .findById(requestDTO.getMenuId())
+              .orElseThrow(
+                  () -> {
+                    log.warn("Menu not found with ID: {}", requestDTO.getMenuId());
                     return new ResourceNotFoundException(
-                            "Branch not found with ID: " + branchId);
+                        "Menu not found with ID: " + requestDTO.getMenuId());
+                  });
+    }
+
+    // Convert DTO to Entity
+    Branch branch = branchMapper.toEntity(requestDTO, restaurant, menu);
+
+    // Save and return
+    Branch savedBranch = branchRepository.save(branch);
+    log.info("Branch created successfully with ID: {}", savedBranch.getBranchId());
+
+    return branchMapper.toResponseDTO(savedBranch);
+  }
+
+  // ========== READ BY ID ==========
+  @Override
+  @Transactional(readOnly = true)
+  public BranchResponseDTO getBranchById(Long branchId) {
+    log.debug("Fetching branch with ID: {}", branchId);
+
+    Branch branch =
+        branchRepository
+            .findByBranchIdAndIsDeleteFalse(branchId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Branch not found with ID: {}", branchId);
+                  return new ResourceNotFoundException("Branch not found with ID: " + branchId);
                 });
 
-        // Check for duplicate name (excluding current branch)
-        if (branchRepository.existsByNameAndRestaurant_RestIdAndBranchIdNot(
-                requestDTO.getName(),
-                existingBranch.getRestaurant().getRestId(),
-                branchId)) {
-            log.warn("Branch with name '{}' already exists for restaurant ID: {}",
-                    requestDTO.getName(), existingBranch.getRestaurant().getRestId());
-            throw new DuplicateResourceException(
-                    "Branch with name '" + requestDTO.getName() + "' already exists for this restaurant");
-        }
+    return branchMapper.toResponseDTO(branch);
+  }
 
-        // Get menu if provided
-        Menu menu = null;
-        if (requestDTO.getMenuId() != null) {
-            menu = menuRepository.findById(requestDTO.getMenuId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Menu not found with ID: " + requestDTO.getMenuId()));
-        }
+  // ========== READ ALL (Paginated) ==========
+  @Override
+  @Transactional(readOnly = true)
+  public PageResponseDTO<BranchResponseDTO> getAllBranches(Pageable pageable) {
+    log.debug("Fetching all branches with pagination");
 
-        // Update entity from DTO
-        branchMapper.updateEntityFromDTO(existingBranch, requestDTO, menu);
+    // Tenant scope: only super admins see every restaurant's branches.
+    Page<Branch> branchPage =
+        access.isSuperAdmin()
+            ? branchRepository.findByIsDeleteFalse(pageable)
+            : branchRepository.findByRestaurant_RestIdInAndIsDeleteFalse(
+                access.restaurantIds(), pageable);
 
-        // Save and return
-        Branch updatedBranch = branchRepository.save(existingBranch);
-        log.info("Branch updated successfully with ID: {}", updatedBranch.getBranchId());
+    List<BranchResponseDTO> content = branchMapper.toSummaryDTOList(branchPage.getContent());
 
-        return branchMapper.toResponseDTO(updatedBranch);
+    return PageResponseDTO.<BranchResponseDTO>builder()
+        .content(content)
+        .pageNumber(branchPage.getNumber())
+        .pageSize(branchPage.getSize())
+        .totalElements(branchPage.getTotalElements())
+        .totalPages(branchPage.getTotalPages())
+        .first(branchPage.isFirst())
+        .last(branchPage.isLast())
+        .build();
+  }
+
+  // ========== READ BY RESTAURANT (Paginated) ==========
+  @Override
+  @Transactional(readOnly = true)
+  public PageResponseDTO<BranchResponseDTO> getBranchesByRestaurantId(
+      Long restId, Pageable pageable) {
+    log.debug("Fetching branches for restaurant ID: {}", restId);
+
+    // Validate restaurant exists
+    if (!restaurantRepository.existsById(restId)) {
+      log.warn("Restaurant not found with ID: {}", restId);
+      throw new ResourceNotFoundException("Restaurant not found with ID: " + restId);
     }
 
-    // ========== SOFT DELETE ==========
-    @Override
-    public void deleteBranch(Long branchId) {
-        log.info("Soft deleting branch with ID: {}", branchId);
+    Page<Branch> branchPage =
+        branchRepository.findByRestaurant_RestIdAndIsDeleteFalse(restId, pageable);
 
-        Branch branch = branchRepository.findByBranchIdAndIsDeleteFalse(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
+    List<BranchResponseDTO> content = branchMapper.toSummaryDTOList(branchPage.getContent());
 
-        branch.setIsDelete(true);
-        branchRepository.save(branch);
+    return PageResponseDTO.<BranchResponseDTO>builder()
+        .content(content)
+        .pageNumber(branchPage.getNumber())
+        .pageSize(branchPage.getSize())
+        .totalElements(branchPage.getTotalElements())
+        .totalPages(branchPage.getTotalPages())
+        .first(branchPage.isFirst())
+        .last(branchPage.isLast())
+        .build();
+  }
 
-        log.info("Branch soft deleted successfully with ID: {}", branchId);
+  // ========== UPDATE ==========
+  @Override
+  public BranchResponseDTO updateBranch(Long branchId, BranchRequestDTO requestDTO) {
+    log.info("Updating branch with ID: {}", branchId);
+
+    // Find existing branch
+    Branch existingBranch =
+        branchRepository
+            .findByBranchIdAndIsDeleteFalse(branchId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Branch not found with ID: {}", branchId);
+                  return new ResourceNotFoundException("Branch not found with ID: " + branchId);
+                });
+
+    // Check for duplicate name (excluding current branch)
+    if (branchRepository.existsByNameAndRestaurant_RestIdAndBranchIdNot(
+        requestDTO.getName(), existingBranch.getRestaurant().getRestId(), branchId)) {
+      log.warn(
+          "Branch with name '{}' already exists for restaurant ID: {}",
+          requestDTO.getName(),
+          existingBranch.getRestaurant().getRestId());
+      throw new DuplicateResourceException(
+          "Branch with name '" + requestDTO.getName() + "' already exists for this restaurant");
     }
 
-    // ========== HARD DELETE ==========
-    @Override
-    public void hardDeleteBranch(Long branchId) {
-        log.info("Hard deleting branch with ID: {}", branchId);
-
-        Branch branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
-
-        branchRepository.delete(branch);
-
-        log.info("Branch hard deleted successfully with ID: {}", branchId);
+    // Get menu if provided
+    Menu menu = null;
+    if (requestDTO.getMenuId() != null) {
+      menu =
+          menuRepository
+              .findById(requestDTO.getMenuId())
+              .orElseThrow(
+                  () ->
+                      new ResourceNotFoundException(
+                          "Menu not found with ID: " + requestDTO.getMenuId()));
     }
 
-    // ========== RESTORE ==========
-    @Override
-    public BranchResponseDTO restoreBranch(Long branchId) {
-        log.info("Restoring branch with ID: {}", branchId);
+    // Update entity from DTO
+    branchMapper.updateEntityFromDTO(existingBranch, requestDTO, menu);
 
-        Branch branch = branchRepository.findById(branchId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Branch not found with ID: " + branchId));
+    // Save and return
+    Branch updatedBranch = branchRepository.save(existingBranch);
+    log.info("Branch updated successfully with ID: {}", updatedBranch.getBranchId());
 
-        if (!branch.getIsDelete()) {
-            log.warn("Branch with ID: {} is already active", branchId);
-            return branchMapper.toResponseDTO(branch);
-        }
+    return branchMapper.toResponseDTO(updatedBranch);
+  }
 
-        branch.setIsDelete(false);
-        Branch restoredBranch = branchRepository.save(branch);
+  // ========== SOFT DELETE ==========
+  @Override
+  public void deleteBranch(Long branchId) {
+    log.info("Soft deleting branch with ID: {}", branchId);
 
-        log.info("Branch restored successfully with ID: {}", branchId);
+    Branch branch =
+        branchRepository
+            .findByBranchIdAndIsDeleteFalse(branchId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Branch not found with ID: " + branchId));
 
-        return branchMapper.toResponseDTO(restoredBranch);
+    branch.setIsDelete(true);
+    branchRepository.save(branch);
+
+    log.info("Branch soft deleted successfully with ID: {}", branchId);
+  }
+
+  // ========== HARD DELETE ==========
+  @Override
+  public void hardDeleteBranch(Long branchId) {
+    log.info("Hard deleting branch with ID: {}", branchId);
+
+    Branch branch =
+        branchRepository
+            .findById(branchId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Branch not found with ID: " + branchId));
+
+    branchRepository.delete(branch);
+
+    log.info("Branch hard deleted successfully with ID: {}", branchId);
+  }
+
+  // ========== RESTORE ==========
+  @Override
+  public BranchResponseDTO restoreBranch(Long branchId) {
+    log.info("Restoring branch with ID: {}", branchId);
+
+    Branch branch =
+        branchRepository
+            .findById(branchId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Branch not found with ID: " + branchId));
+
+    if (!branch.getIsDelete()) {
+      log.warn("Branch with ID: {} is already active", branchId);
+      return branchMapper.toResponseDTO(branch);
     }
 
-    // ========== SEARCH ==========
-    @Override
-    @Transactional(readOnly = true)
-    public PageResponseDTO<BranchResponseDTO> searchBranches(String keyword, Long restId,
-                                                             String city, String state, Pageable pageable) {
-        log.debug("Searching branches with filters - keyword: {}, restId: {}, city: {}, state: {}",
-                keyword, restId, city, state);
+    branch.setIsDelete(false);
+    Branch restoredBranch = branchRepository.save(branch);
 
-        Page<Branch> branchPage = branchRepository.searchBranches(keyword, restId, city, state, pageable);
+    log.info("Branch restored successfully with ID: {}", branchId);
 
-        List<BranchResponseDTO> content = branchMapper.toSummaryDTOList(branchPage.getContent());
+    return branchMapper.toResponseDTO(restoredBranch);
+  }
 
-        return PageResponseDTO.<BranchResponseDTO>builder()
-                .content(content)
-                .pageNumber(branchPage.getNumber())
-                .pageSize(branchPage.getSize())
-                .totalElements(branchPage.getTotalElements())
-                .totalPages(branchPage.getTotalPages())
-                .first(branchPage.isFirst())
-                .last(branchPage.isLast())
-                .build();
-    }
+  // ========== SEARCH ==========
+  @Override
+  @Transactional(readOnly = true)
+  public PageResponseDTO<BranchResponseDTO> searchBranches(
+      String keyword, Long restId, String city, String state, Pageable pageable) {
+    log.debug(
+        "Searching branches with filters - keyword: {}, restId: {}, city: {}, state: {}",
+        keyword,
+        restId,
+        city,
+        state);
 
-    // ========== COUNT ==========
-    @Override
-    @Transactional(readOnly = true)
-    public long countBranchesByRestaurant(Long restId) {
-        log.debug("Counting branches for restaurant ID: {}", restId);
-        return branchRepository.countByRestaurant_RestIdAndIsDeleteFalse(restId);
-    }
+    Page<Branch> branchPage =
+        branchRepository.searchBranches(keyword, restId, city, state, pageable);
 
-    // ========== EXISTS ==========
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existsByName(String name, Long restId) {
-        log.debug("Checking existence of branch with name: '{}' for restaurant ID: {}", name, restId);
-        return branchRepository.existsByNameAndRestaurant_RestId(name, restId);
-    }
+    List<BranchResponseDTO> content = branchMapper.toSummaryDTOList(branchPage.getContent());
+
+    return PageResponseDTO.<BranchResponseDTO>builder()
+        .content(content)
+        .pageNumber(branchPage.getNumber())
+        .pageSize(branchPage.getSize())
+        .totalElements(branchPage.getTotalElements())
+        .totalPages(branchPage.getTotalPages())
+        .first(branchPage.isFirst())
+        .last(branchPage.isLast())
+        .build();
+  }
+
+  // ========== COUNT ==========
+  @Override
+  @Transactional(readOnly = true)
+  public long countBranchesByRestaurant(Long restId) {
+    log.debug("Counting branches for restaurant ID: {}", restId);
+    return branchRepository.countByRestaurant_RestIdAndIsDeleteFalse(restId);
+  }
+
+  // ========== EXISTS ==========
+  @Override
+  @Transactional(readOnly = true)
+  public boolean existsByName(String name, Long restId) {
+    log.debug("Checking existence of branch with name: '{}' for restaurant ID: {}", name, restId);
+    return branchRepository.existsByNameAndRestaurant_RestId(name, restId);
+  }
 }

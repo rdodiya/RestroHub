@@ -1,47 +1,75 @@
 package com.restroly.qrmenu.template.controller;
 
+import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
+
 import com.restroly.qrmenu.template.dto.SiteConfigDTO;
 import com.restroly.qrmenu.template.dto.UpdateSiteConfigRequest;
-import com.restroly.qrmenu.template.entity.SectionType;
 import com.restroly.qrmenu.template.service.SiteConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
-
-import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
 
 @RestController
-@RequestMapping(PUBLIC_API_VERSION +"/sites")
+@RequestMapping(PUBLIC_API_VERSION + "/sites")
 @RequiredArgsConstructor
 @Tag(name = "Public Site API", description = "Public APIs for fetching site data")
 public class PublicSiteController {
 
-    private final SiteConfigService siteConfigService;
+  private final SiteConfigService siteConfigService;
 
-    @GetMapping("/{siteId}/config")
-    @Operation(summary = "Get public site configuration with all sections")
-    public ResponseEntity<SiteConfigDTO> getSiteConfig(
-            @Parameter(description = "Site ID") @PathVariable String siteId) {
-        SiteConfigDTO config = siteConfigService.getPublicSiteConfig(siteId);
-        return ResponseEntity.ok(config);
+  @GetMapping("/{siteId}/config")
+  @Operation(summary = "Get public site configuration with all sections")
+  public ResponseEntity<SiteConfigDTO> getSiteConfig(
+      @Parameter(description = "Site ID") @PathVariable String siteId, HttpServletRequest request) {
+
+    String resolvedSiteId = siteId;
+    if ("resolve".equalsIgnoreCase(siteId) || siteId == null || siteId.trim().isEmpty()) {
+      resolvedSiteId = slugFromHost(request.getHeader("X-Forwarded-Host"), request.getServerName());
+      if (resolvedSiteId == null) {
+        throw new com.restroly.qrmenu.exception.ResourceNotFoundException(
+            "No site slug could be resolved from the request host");
+      }
     }
 
-    @PatchMapping("/{siteId}/config")
-    public ResponseEntity<SiteConfigDTO> updateSiteConfig(
-            @PathVariable String siteId,
-            @RequestBody UpdateSiteConfigRequest request) {
+    SiteConfigDTO config = siteConfigService.getPublicSiteConfig(resolvedSiteId);
+    return ResponseEntity.ok(config);
+  }
 
-        return ResponseEntity.ok(
-                siteConfigService.updateSiteConfig(siteId, request));
+  /**
+   * Site slug from the first label of the request host. X-Forwarded-Host (first value) wins over
+   * the server name; the port and a leading "www." are ignored. Returns null for localhost and IP
+   * addresses, which carry no tenant slug.
+   */
+  static String slugFromHost(String forwardedHost, String serverName) {
+    String host = forwardedHost != null && !forwardedHost.isBlank() ? forwardedHost : serverName;
+    if (host == null) {
+      return null;
     }
+    host = host.split(",")[0].trim().toLowerCase().replaceFirst(":\\d+$", "");
+    if (host.startsWith("www.")) {
+      host = host.substring(4);
+    }
+    if (host.isEmpty()
+        || host.equals("localhost")
+        || host.startsWith("[")
+        || host.matches("\\d+(\\.\\d+){3}")) {
+      return null;
+    }
+    return host.split("\\.")[0];
+  }
 
+  @PatchMapping("/{siteId}/config")
+  @PreAuthorize("@access.can('RESTAURANT_SETTINGS') and @access.site(#siteId)")
+  public ResponseEntity<SiteConfigDTO> updateSiteConfig(
+      @PathVariable String siteId, @RequestBody UpdateSiteConfigRequest request) {
+
+    return ResponseEntity.ok(siteConfigService.updateSiteConfig(siteId, request));
+  }
 }
 /*
 {

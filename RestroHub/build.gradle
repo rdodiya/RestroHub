@@ -23,6 +23,10 @@ configurations {
 }
 
 repositories {
+    maven {
+        name = 'GoogleMavenCentral'
+        url = uri('https://maven-central.storage-download.googleapis.com/maven2/')
+    }
     mavenCentral()
 }
 
@@ -44,34 +48,37 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-tomcat'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    
+
     // Database
     runtimeOnly 'org.postgresql:postgresql:42.7.2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-database-postgresql'
 
     // Lombok - ORDER MATTERS!
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    
+
     // Annotation Processors - ORDER MATTERS!
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"  // ADD THIS
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    
+
     // MapStruct
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    
+
     // QR Code Generation
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.google.zxing:javase:3.5.2'
 
     implementation 'com.cloudinary:cloudinary-http44:1.39.0'
-    
+
     // Testing
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test';
     testImplementation 'org.springframework.security:spring-security-test';
+    // Integration tests against real PostgreSQL; skipped automatically when Docker is unavailable
+    testImplementation 'org.testcontainers:postgresql';
+    testImplementation 'org.testcontainers:junit-jupiter';
 
     //OpenAPI Documentation
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
@@ -113,4 +120,4 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
     }
-}
+}

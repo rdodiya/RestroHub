@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, ArrowLeft, Download, Loader2, LayoutGrid } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const TablesHeader = ({ branchId, onAddTable, totalTables = 0 }) => {
+const TablesHeader = ({ branchId, onAddTable, onGenerateCounterQR, totalTables = 0 }) => {
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async () => {
@@ -75,6 +75,17 @@ const TablesHeader = ({ branchId, onAddTable, totalTables = 0 }) => {
             <Download className="h-4 w-4" />
           )}
           <span className="hidden sm:inline">Download</span> QRs
+        </button>
+        <button
+          onClick={onGenerateCounterQR}
+          className="
+            inline-flex items-center gap-2 rounded-lg
+            border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-2.5
+            text-sm font-medium text-gray-700
+            hover:bg-gray-50 transition-colors
+          "
+        >
+          Counter QR
         </button>
         <button
           onClick={onAddTable}

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import api from '@services/common/api';
+import { useBranch } from '@context/BranchContext';
 import TablesHeader from './TablesHeader';
 import TablesStatusLegend from './TablesStatusLegend';
 import TablesGrid from './TablesGrid';
@@ -7,7 +9,11 @@ import TableFormModal from './TableFormModal';
 import TableQRModal from './TableQRModal';
 
 const Tables = () => {
-  const { branchId } = useParams();
+  const { branchId: paramBranchId } = useParams();
+  const { selectedBranchId, effectiveBranchId } = useBranch();
+  // An explicitly selected branch wins; with "all", honour the URL branch, else the first branch.
+  const branchId =
+    selectedBranchId !== 'all' ? selectedBranchId : (paramBranchId ?? effectiveBranchId);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
   const [selectedTable, setSelectedTable] = useState(null);
@@ -17,27 +23,27 @@ const Tables = () => {
   const [restaurantSlug, setRestaurantSlug] = useState('1');
 
   useEffect(() => {
-    const fetchSlug = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
-      try {
-        const response = await fetch('http://localhost:8181/restroly/secure/api/v1/users/fetchRestaurantId', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.ok) {
-          const json = await response.json();
-          if (json.data) setRestaurantSlug(String(json.data));
-        }
-      } catch (err) {
-        console.warn('Could not fetch restaurant slug:', err);
-      }
-    };
-    fetchSlug();
+    api
+      .get('/secure/api/v1/users/fetchRestaurantId')
+      .then((res) => {
+        const id = res.data?.restaurantId ?? res.data?.data;
+        if (id) setRestaurantSlug(String(id));
+      })
+      .catch((err) => console.warn('Could not fetch restaurant slug:', err));
   }, []);
 
-  const openQR = (table) => { setSelectedTable(table); setShowQR(true); };
-  const closeQR = () => { setShowQR(false); setSelectedTable(null); };
-  const closeForm = () => { setIsAddOpen(false); setEditingTable(null); };
+  const openQR = (table) => {
+    setSelectedTable(table);
+    setShowQR(true);
+  };
+  const closeQR = () => {
+    setShowQR(false);
+    setSelectedTable(null);
+  };
+  const closeForm = () => {
+    setIsAddOpen(false);
+    setEditingTable(null);
+  };
   const refreshTables = () => setRefreshKey((key) => key + 1);
 
   return (
@@ -45,6 +51,7 @@ const Tables = () => {
       <TablesHeader
         branchId={branchId}
         onAddTable={() => setIsAddOpen(true)}
+        onGenerateCounterQR={() => openQR({ id: 0, number: '0' })}
         totalTables={allTables.filter((table) => table.isActive !== false).length}
       />
 
@@ -53,7 +60,10 @@ const Tables = () => {
       <TablesGrid
         branchId={branchId}
         onShowQR={openQR}
-        onEdit={(table) => { setEditingTable(table); setIsAddOpen(true); }}
+        onEdit={(table) => {
+          setEditingTable(table);
+          setIsAddOpen(true);
+        }}
         onTablesLoaded={setAllTables}
         refreshKey={refreshKey}
       />

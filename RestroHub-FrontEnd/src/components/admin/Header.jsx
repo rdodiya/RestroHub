@@ -19,7 +19,12 @@ import profileService from '../../services/user/profileService';
 import useWebSocketNotifications from '@hooks/useWebSocketNotifications';
 import api from '../../services/common/api';
 import toast from 'react-hot-toast';
+<<<<<<< HEAD
+import { clearAuthSession } from '../../services/common/authStorage';
+import { useBranch } from '@context/BranchContext';
+=======
 import { clearAuthSession, getBranchId } from '../../services/common/authStorage';
+>>>>>>> e37c190 (fix: fetch dynamic branchId from authContext for WebSocket notifications)
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -33,26 +38,22 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [userProfile, setUserProfile] = useState({
     name: 'Admin User',
     email: 'admin@restrohub.com',
-    profileImage: null
+    profileImage: null,
   });
 
-  // Fix: Add missing logout handler to prevent React crashes
   const handleLogout = async () => {
-  try {
-    await api.post('/public/api/v1/auth/logout');  //handles logout on backend and invalidates refresh token
-  } catch (error) {
-    console.error('Logout API failed:', error);  //catches errors if API call breaks
-    toast.error('Logout API failed');
-  } finally {
-    clearAuthSession();
-
-    if (api?.defaults?.headers?.common?.Authorization) {  //cleans up axios default auth header if it exists
-      delete api.defaults.headers.common.Authorization;
+    try {
+      await api.post('/public/api/v1/auth/logout');
+    } catch (error) {
+      console.error('Logout API failed:', error);
+      toast.error('Logout API failed');
+    } finally {
+      clearAuthSession();
+      // Use window.location.href to fully clear React state/memory
+      // and prevent trailing async crashes on unmounted components
+      window.location.href = '/login';
     }
-
-    navigate('/login', { replace: true });
-  }
-};
+  };
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -76,7 +77,7 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
         setUserProfile({
           name: data.name || 'Admin User',
           email: data.email || 'admin@restrohub.com',
-          profileImage: data.profileImage || null
+          profileImage: data.profileImage || null,
         });
       } catch (error) {
         console.error('Failed to fetch user for header:', error);
@@ -87,8 +88,14 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   }, []);
 
   // Live service request notifications via WebSocket
+<<<<<<< HEAD
+  const { branches, selectedBranchId, effectiveBranchId, handleBranchChange } = useBranch();
+  const { notifications, unreadCount, completeRequest } =
+    useWebSocketNotifications(effectiveBranchId);
+=======
   const branchId = getBranchId() || localStorage.getItem('selectedBranchId') || 1;
   const { notifications, unreadCount, completeRequest } = useWebSocketNotifications(branchId);
+>>>>>>> e37c190 (fix: fetch dynamic branchId from authContext for WebSocket notifications)
 
   // Shared class helpers
   const iconBtn = `inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
@@ -100,13 +107,14 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   }`;
 
   return (
-    <header className={`sticky top-0 z-30 border-b ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+    <header
+      className={`sticky top-0 z-30 border-b ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}
+    >
       <div className="flex items-center justify-between px-4 py-3 sm:px-5 lg:px-6">
         {/* ============================= */}
         {/* LEFT                          */}
         {/* ============================= */}
         <div className="flex items-center gap-3">
-
           {/* 📱 Mobile Only: Hamburger to open drawer */}
           <button
             onClick={onMobileMenuClick}
@@ -144,9 +152,10 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
             className={`
               hidden items-center gap-2 rounded-lg border px-4 py-2
               transition-all md:flex md:w-64 lg:w-80
-              ${isDark
-                ? 'border-gray-600 bg-gray-700 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-900'
-                : 'border-gray-200 bg-gray-50 focus-within:border-blue-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100'
+              ${
+                isDark
+                  ? 'border-gray-600 bg-gray-700 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-900'
+                  : 'border-gray-200 bg-gray-50 focus-within:border-blue-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100'
               }
             `}
           >
@@ -168,13 +177,32 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
           >
             <Search className="h-5 w-5" />
           </button>
+
+          {/* Branch Selector */}
+          <div className="hidden sm:block ml-4">
+            <select
+              value={selectedBranchId}
+              onChange={(e) => handleBranchChange(e.target.value)}
+              className={`rounded-lg border px-3 py-1.5 text-sm outline-none transition-colors ${
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-gray-200 focus:border-blue-500'
+                  : 'border-gray-200 bg-gray-50 text-gray-700 focus:border-blue-300'
+              }`}
+            >
+              <option value="all">All Branches</option>
+              {branches.map((branch) => (
+                <option key={branch.branchId} value={branch.branchId}>
+                  {branch.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* ============================= */}
         {/* RIGHT                         */}
         {/* ============================= */}
         <div className="flex items-center gap-1 sm:gap-2">
-
           {/* Theme Toggle */}
           <button
             onClick={toggleAdminTheme}
@@ -214,10 +242,18 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
             {/* Notification Dropdown */}
             {notifOpen && (
               <div className={`${dropdownBase} w-[calc(100vw-2rem)] max-w-sm sm:w-80`}>
-                <div className={`flex items-center justify-between border-b px-4 py-3 ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-                  <h4 className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Notifications</h4>
+                <div
+                  className={`flex items-center justify-between border-b px-4 py-3 ${isDark ? 'border-gray-700' : 'border-gray-100'}`}
+                >
+                  <h4
+                    className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                  >
+                    Notifications
+                  </h4>
                   {unreadCount > 0 && (
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${isDark ? 'bg-blue-900/50 text-blue-400' : 'bg-blue-50 text-blue-700'}`}>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${isDark ? 'bg-blue-900/50 text-blue-400' : 'bg-blue-50 text-blue-700'}`}
+                    >
                       {unreadCount} new
                     </span>
                   )}
@@ -225,7 +261,9 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
 
                 <div className="max-h-72 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className={`px-4 py-8 text-center text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <div
+                      className={`px-4 py-8 text-center text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
+                    >
                       No active service requests
                     </div>
                   ) : (
@@ -235,9 +273,10 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                         className={`
                           flex items-start gap-3 border-b px-4 py-3
                           transition-colors
-                          ${isDark
-                            ? `border-gray-700 ${notif.unread ? 'bg-blue-900/20' : ''}`
-                            : `border-gray-50 ${notif.unread ? 'bg-blue-50/30' : ''}`
+                          ${
+                            isDark
+                              ? `border-gray-700 ${notif.unread ? 'bg-blue-900/20' : ''}`
+                              : `border-gray-50 ${notif.unread ? 'bg-blue-50/30' : ''}`
                           }
                         `}
                       >
@@ -247,9 +286,19 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                           }`}
                         />
                         <div className="min-w-0 flex-1">
-                          <p className={`truncate text-sm font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{notif.title}</p>
-                          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{notif.desc}</p>
-                          <p className={`mt-0.5 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>{notif.time}</p>
+                          <p
+                            className={`truncate text-sm font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                          >
+                            {notif.title}
+                          </p>
+                          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {notif.desc}
+                          </p>
+                          <p
+                            className={`mt-0.5 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}
+                          >
+                            {notif.time}
+                          </p>
                         </div>
                         <button
                           onClick={() => completeRequest(notif.id)}
@@ -268,7 +317,9 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                   )}
                 </div>
 
-                <div className={`border-t px-4 py-2.5 text-center ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                <div
+                  className={`border-t px-4 py-2.5 text-center ${isDark ? 'border-gray-700' : 'border-gray-100'}`}
+                >
                   <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                     Live service requests
                   </span>
@@ -278,7 +329,9 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
           </div>
 
           {/* Divider */}
-          <div className={`mx-1 hidden h-6 w-px sm:block ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
+          <div
+            className={`mx-1 hidden h-6 w-px sm:block ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}
+          />
 
           {/* Profile */}
           <div className="relative" ref={profileRef}>
@@ -293,15 +346,25 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
             >
               <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-blue-600 sm:h-9 sm:w-9">
                 {userProfile.profileImage ? (
-                  <img src={`data:image/jpeg;base64,${userProfile.profileImage}`} alt="Profile" className="h-full w-full object-cover" />
+                  <img
+                    src={`data:image/jpeg;base64,${userProfile.profileImage}`}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <User className="h-4 w-4 text-white" />
                 )}
               </div>
 
               <div className="hidden text-left sm:block">
-                <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{userProfile.name}</p>
-                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{userProfile.email}</p>
+                <p
+                  className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                >
+                  {userProfile.name}
+                </p>
+                <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                  {userProfile.email}
+                </p>
               </div>
 
               <ChevronDown
@@ -317,9 +380,17 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
             {profileOpen && (
               <div className={`${dropdownBase} w-56`}>
                 {/* Mobile user info */}
-                <div className={`border-b px-4 py-3 sm:hidden ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-                  <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{userProfile.name}</p>
-                  <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{userProfile.email}</p>
+                <div
+                  className={`border-b px-4 py-3 sm:hidden ${isDark ? 'border-gray-700' : 'border-gray-100'}`}
+                >
+                  <p
+                    className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                  >
+                    {userProfile.name}
+                  </p>
+                  <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                    {userProfile.email}
+                  </p>
                 </div>
 
                 <div className="py-1">
@@ -340,7 +411,9 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                         setProfileOpen(false);
                       }}
                     >
-                      <item.icon className={`h-4 w-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+                      <item.icon
+                        className={`h-4 w-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
+                      />
                       {item.label}
                     </button>
                   ))}
@@ -368,13 +441,16 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
       {/* MOBILE SEARCH BAR             */}
       {/* ============================= */}
       {searchOpen && (
-        <div className={`border-t px-4 py-3 md:hidden ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}>
+        <div
+          className={`border-t px-4 py-3 md:hidden ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}
+        >
           <div
             className={`
               flex items-center gap-2 rounded-lg border px-3 py-2
-              ${isDark
-                ? 'border-gray-600 bg-gray-700 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-900'
-                : 'border-gray-200 bg-gray-50 focus-within:border-blue-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100'
+              ${
+                isDark
+                  ? 'border-gray-600 bg-gray-700 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-900'
+                  : 'border-gray-200 bg-gray-50 focus-within:border-blue-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100'
               }
             `}
           >
