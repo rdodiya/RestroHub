@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import api from '@services/common/api';
 
 const CustomerOrderContext = createContext(null);
 
@@ -125,7 +126,8 @@ export const CustomerOrderProvider = ({ children }) => {
   const totalItemsCount = Object.values(cart).reduce((sum, entry) => sum + entry.quantity, 0);
 
   const totalAmount = Object.values(cart).reduce((sum, entry) => {
-    const price = typeof entry.item.price === 'number' ? entry.item.price : parseFloat(entry.item.price) || 0;
+    const price =
+      typeof entry.item.price === 'number' ? entry.item.price : parseFloat(entry.item.price) || 0;
     return sum + price * entry.quantity;
   }, 0);
 
@@ -154,20 +156,7 @@ export const CustomerOrderProvider = ({ children }) => {
         })),
       };
 
-      const res = await fetch('http://localhost:8181/restroly/public/api/v1/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server error ${res.status}`);
-      }
-
-      const orderData = await res.json();
+      const { data: orderData } = await api.post('/public/api/v1/orders', payload);
       setPlacedOrder(orderData);
       clearCart();
       setIsCartOpen(false);
@@ -175,7 +164,20 @@ export const CustomerOrderProvider = ({ children }) => {
       return orderData;
     } catch (err) {
       console.error('Order placement failed:', err);
-      toast.error(err.message || 'Failed to place order. Please try again.');
+      // Prefer the backend message (unavailable item, branch closed, duplicate); else map by status.
+      const status = err.response?.status;
+      const fallback = {
+        409: 'This order was already submitted. Please check with the staff before ordering again.',
+        404: 'An item or table is no longer available. Please refresh the menu.',
+        400: 'Some items are unavailable or the restaurant is closed right now.',
+      }[status];
+      err.message =
+        err.response?.data?.message ||
+        fallback ||
+        (err.response
+          ? 'Failed to place order. Please try again.'
+          : 'Network error. Check your connection.');
+      toast.error(err.message);
       throw err;
     } finally {
       setIsSubmitting(false);

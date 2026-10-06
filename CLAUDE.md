@@ -30,7 +30,7 @@ chmod +x gradlew            # first time on macOS/Linux
 ./gradlew clean build       # compile + test
 ./gradlew bootRun           # start API on :8181
 ./gradlew test              # tests only
-./gradlew test --tests "com.restroly.SomeTest"   # single test class
+./gradlew test --tests "com.restroly.qrmenu.table.service.TableServiceImplTest"   # single test class
 ```
 
 - If `gradle/wrapper/gradle-wrapper.jar` is missing: `gradle wrapper --gradle-version 8.7`.
@@ -46,15 +46,22 @@ npm run dev                 # http://localhost:3000 (Vite picks the next free po
 npm run build               # output in dist/
 ```
 
-### Added by the Docker / Flyway / lint setup (available once that change is merged)
+### Docker, formatting, hooks
 
 ```bash
-docker compose up -d --build            # full stack; needs .env with JWT_SECRET
+docker compose up -d --build            # full stack (repo root); needs .env with JWT_SECRET
 ./gradlew spotlessCheck                 # Java format check (backend)
 ./gradlew spotlessApply                 # Java auto-format
-npm run lint / npm run format:check     # frontend ESLint / Prettier
-git config core.hooksPath .githooks     # enable the pre-commit hook
+npm run lint / npm run lint:fix         # frontend ESLint
+npm run format:check / npm run format   # frontend Prettier
+git config core.hooksPath .githooks     # enable pre-commit hook (frontend `npm install` does this via `prepare`)
 ```
+
+`.githooks/pre-commit` blocks staged `.env` files, runs `spotlessCheck` when Java is staged, and `lint-staged` when frontend files are staged. Run `spotlessApply` before committing Java.
+
+`scripts/run_local.sh` / `scripts/run_local.bat` start both apps locally.
+
+Local test data (dev only, never in `db/migration`): start the backend once so the tables exist, then run `psql -U postgres -d RestroHub_DB -f scripts/db/01_seed_users.sql` (one login per role: `superadmin|admin.a|owner.a|manager.a|manageruser.a|staff.a|customer.a|admin.b@restroly.test`, password `Test@1234`) and `scripts/db/02_seed_demo_data.sql` (two tenants: Spice Route with 2 branches on the Pro plan, Ocean Grill with 1 branch on the Free plan). Both scripts are safe to re-run. `scripts/setup_jules.sh` runs both automatically; set `SEED_DEMO_DATA=false` to skip.
 
 ### Verify a running backend
 
@@ -64,21 +71,25 @@ git config core.hooksPath .githooks     # enable the pre-commit hook
 
 ## Backend architecture
 
-Package root `com.restroly`, layered:
+Package root `com.restroly.qrmenu`, organized **by feature** (`order/`, `menu/`, `food/`, `category/`, `restaurant/`, `branch/`, `table/`, `payment/`, `subscription/`, `auth/`, `user/`, …). Each feature package contains its own layers: `controller/`, `service/` (+ `impl/`), `repository/`, `entity/`, `dto/`, `mapper/`. Put new code in the matching feature package, not a global layer package.
 
-| Package | Role |
-|---|---|
-| `controller/` | Thin REST endpoints; no business logic |
-| `service/` | Business logic |
-| `repository/` | Spring Data JPA access |
-| `model/` | Entities |
-| `dto/` | Request/response objects (never return entities from controllers) |
-| `config/` | Spring configuration (security, CORS, Swagger, etc.) |
-| `exception/` | Custom exceptions and handlers |
+Cross-cutting packages:
+- `config/` — `SecurityConfig` (route rules), `CorsConfig`, `OpenApiConfig`, Cloudinary (image upload)
+- `security/` — `JwtAuthenticationFilter`, `JwtTokenProvider`, `CustomUserDetailsService`
+- `common/` — shared DTOs, enums, utils, `WebSocketConfig`
+- `exception/` — custom exceptions and global handler
 
-Configuration: `application.properties` → `application-dev.properties` (default active profile) / `application-prod.properties`. Server port `8181`, context path `/restroly`.
+Configuration: `application.properties` → `application-dev.properties` (default, via `SPRING_PROFILES_ACTIVE`) / `application-prod.properties` / `application-test.properties`. Server port `8181`, context path `/restroly`.
 
-Routes: public/general endpoints under `/api/v1/**` (categories, foods, orders); owner/admin endpoints under `/secure/api/v1/**` (e.g. menus) and require a JWT.
+Schema: Flyway migrations in `src/main/resources/db/migration` (`V1__baseline.sql`). Dev uses `ddl-auto=update`, prod uses `validate` — so any entity change must ship with a new `V<n>__*.sql` migration or prod will fail to start. V1 is still a placeholder (`SELECT 1`), so new migrations must not add foreign keys to Hibernate-created tables.
+
+Routes: public endpoints under `/api/v1/**`; owner/admin endpoints under `/secure/api/**`. In `SecurityConfig`, POST/PUT/PATCH/DELETE on `/secure/api/**` require role `ADMIN`, `MANAGER` or `RESTAURANT_OWNER`.
+
+Authorization: every secured endpoint uses `@PreAuthorize("@access.can('<PERMISSION>') and @access.branch(#branchId)")`. `security/AccessGuard` (bean `access`) does tenant checks (`restaurant`, `branch`, `order`, `menu`, `table`, `upiLink`, `serviceRequest`, `site`) and `security/Permission` is the only role → permission map. Don't add `hasRole(...)` lists. Role names may be stored as `ROLE_X` or `X` (`AppRole.authority` normalizes them). Sensitive actions (role changes, plan changes, UPI VPA changes) call `audit/service/AuditLogService.record(...)`. Category and Food have no tenant owner yet (role checks only).
+
+Real-time: STOMP over WebSocket, endpoint `/ws`, broker prefix `/topic`, app prefix `/app` (frontend uses `@stomp/stompjs` + `sockjs-client`, e.g. live order dashboard).
+
+Tests: JUnit 5 under `src/test/java/com/restroly/qrmenu/...`, mostly service-level unit tests. `application-test.properties` points to H2 but H2 is not a Gradle dependency, so Spring context tests need a real PostgreSQL. Web-layer security tests use `@WebMvcTest` + `@Import({SecurityConfig.class, AccessGuard.class})` (see `OrderControllerTenantIsolationTest`).
 
 Environment variables (never hard-code or commit values): `DB_USERNAME`, `DB_PASSWORD`, `SPRING_DATASOURCE_URL`, `JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION`, `GOOGLE_OAUTH_CLIENT_ID`, `CORS_ALLOWED_ORIGINS`.
 
@@ -88,13 +99,16 @@ Environment variables (never hard-code or commit values): `DB_USERNAME`, `DB_PAS
 src/
   components/{admin,customer,common}/   # UI by audience
   pages/{admin,customer,public}/
-  services/api.js                        # Axios instance + interceptors
-  services/ApiService.js                 # per-resource API functions
-  context/SiteContext.jsx                # global state (Context API)
-  styles/                                # global.css, landing.css, variables.css
+  layouts/{Admin,Customer,Public}Layout.jsx
+  routes/index.jsx, ProtectedRoute.jsx   # route table + auth guard
+  services/common/api.js                 # Axios instance + interceptors (baseURL = VITE_API_BASE_URL)
+  services/common/authStorage.js         # token storage
+  services/public/ApiService.js          # per-resource API functions
+  context/                               # SiteContext, BranchContext, CustomerOrderContext, ThemeContext, AdminThemeContext
+  styles/
 ```
 
-All HTTP calls go through `services/api.js` / `ApiService.js`, never ad-hoc `fetch`/`axios` in components. Shared state lives in `SiteContext`.
+All HTTP calls go through `services/common/api.js` / `ApiService.js`, never ad-hoc `fetch`/`axios` in components. Shared state lives in the contexts under `context/` (`SiteContext` for site-wide data, `BranchContext` for the selected branch).
 
 ## Conventions
 
@@ -128,3 +142,13 @@ All HTTP calls go through `services/api.js` / `ApiService.js`, never ad-hoc `fet
 - Compute money/order totals on the server; never trust client-supplied amounts. Use `BigDecimal` for money.
 - Before finishing a change, run the relevant build (`./gradlew build` and/or `npm run build`), and update `ReadMe.md`/Swagger if behavior or setup changed.
 - Contributors are responsible for AI-generated code: explain assumptions and untested areas in the PR description.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

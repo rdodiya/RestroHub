@@ -1,6 +1,28 @@
-import { Layout, Check, Smartphone, Monitor } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Layout, Check, Smartphone, Monitor, Lock } from 'lucide-react';
+import api from '@services/common/api';
+import toast from 'react-hot-toast';
 
 const TemplateSelector = ({ selectedTemplate, onTemplateChange }) => {
+  const [isFreePlan, setIsFreePlan] = useState(false);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const resIdRes = await api.get('/secure/api/v1/users/fetchRestaurantId');
+        if (resIdRes.data && resIdRes.data.restaurantId) {
+          const subRes = await api.get(`/secure/api/v1/restaurant/${resIdRes.data.restaurantId}/subscription`);
+          if (subRes.data && subRes.data.plan && subRes.data.plan.name) {
+            setIsFreePlan(subRes.data.plan.name.toLowerCase().includes('free'));
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch subscription for template restrictions', err);
+      }
+    };
+    fetchSubscription();
+  }, []);
+
   const templates = [
     {
       id: 'modern',
@@ -53,20 +75,31 @@ const TemplateSelector = ({ selectedTemplate, onTemplateChange }) => {
         <div className="space-y-3">
           {templates.map((template) => {
             const isSelected = selectedTemplate === template.id;
+            const isLocked = isFreePlan && template.id !== 'modern' && template.id !== 'classic';
+
             return (
-              <button
-                key={template.id}
-                onClick={() => onTemplateChange(template.id)}
-                className={`
-                  w-full rounded-xl border-2 p-3 text-left transition-all
-                  sm:p-4
-                  ${
-                    isSelected
-                      ? 'border-blue-200 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  }
-                `}
-              >
+              <div key={template.id} className="relative">
+                <button
+                  onClick={(e) => {
+                    if (isLocked) {
+                      e.preventDefault();
+                      toast.error('Upgrade to Pro to unlock this template');
+                    } else {
+                      onTemplateChange(template.id);
+                    }
+                  }}
+                  className={`
+                    w-full rounded-xl border-2 p-3 text-left transition-all
+                    sm:p-4 relative
+                    ${
+                      isSelected
+                        ? 'border-blue-200 bg-blue-50'
+                        : isLocked
+                        ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }
+                  `}
+                >
                 {/* Top Row */}
                 <div className="mb-3 flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5">
@@ -77,13 +110,20 @@ const TemplateSelector = ({ selectedTemplate, onTemplateChange }) => {
                           isSelected ? 'text-blue-700' : 'text-gray-900'
                         }`}
                       >
+                      <span className="flex items-center gap-2">
                         {template.name}
+                        {isLocked && (
+                          <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 uppercase">
+                            <Lock className="h-3 w-3" /> Pro
+                          </span>
+                        )}
+                      </span>
                       </h4>
                       <p className="text-xs text-gray-500">{template.desc}</p>
                     </div>
                   </div>
 
-                  {isSelected && (
+                {isSelected && !isLocked && (
                     <span
                       className="
                         inline-flex h-5 w-5 shrink-0 items-center justify-center
@@ -142,7 +182,8 @@ const TemplateSelector = ({ selectedTemplate, onTemplateChange }) => {
                     </span>
                   ))}
                 </div>
-              </button>
+                </button>
+              </div>
             );
           })}
         </div>

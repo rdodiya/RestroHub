@@ -1,5 +1,7 @@
 package com.restroly.qrmenu.payment.service;
 
+import com.restroly.qrmenu.audit.entity.AuditAction;
+import com.restroly.qrmenu.audit.service.AuditLogService;
 import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
 import com.restroly.qrmenu.exception.ResourceNotFoundException;
@@ -8,6 +10,7 @@ import com.restroly.qrmenu.payment.dto.UpiLinkResponseDTO;
 import com.restroly.qrmenu.payment.entity.UpiLink;
 import com.restroly.qrmenu.payment.repository.UpiLinkRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ public class UpiLinkServiceImpl implements UpiLinkService {
 
   private final UpiLinkRepository upiLinkRepository;
   private final BranchRepository branchRepository;
+  private final AuditLogService auditLog;
 
   @Override
   @Transactional(readOnly = true)
@@ -93,6 +97,7 @@ public class UpiLinkServiceImpl implements UpiLinkService {
       branch.setBranchUpiId(saved.getUpiId());
       branchRepository.save(branch);
     }
+    auditUpi("CREATED", saved.getId(), branch);
 
     return mapToResponseDTO(saved);
   }
@@ -130,6 +135,7 @@ public class UpiLinkServiceImpl implements UpiLinkService {
     branchRepository.save(branch);
 
     targetLink.setIsDefault(true);
+    auditUpi("SET_DEFAULT", targetLink.getId(), branch);
     return mapToResponseDTO(targetLink);
   }
 
@@ -147,6 +153,7 @@ public class UpiLinkServiceImpl implements UpiLinkService {
     link.setIsActive(false);
     link.setIsDefault(false);
     upiLinkRepository.save(link);
+    auditUpi("DELETED", link.getId(), link.getBranch());
 
     // If the deleted link was default, pick the next active one or clear
     if (wasDefault) {
@@ -192,5 +199,14 @@ public class UpiLinkServiceImpl implements UpiLinkService {
         .createdDate(link.getCreatedDate())
         .updatedDate(link.getUpdatedDate())
         .build();
+  }
+
+  private void auditUpi(String change, Long linkId, Branch branch) {
+    auditLog.record(
+        AuditAction.UPI_VPA_CHANGED,
+        "UPI_LINK",
+        linkId,
+        branch.getRestaurant().getRestId(),
+        Map.of("change", change, "branchId", branch.getBranchId()));
   }
 }

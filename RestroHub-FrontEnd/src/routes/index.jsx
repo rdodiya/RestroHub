@@ -8,7 +8,7 @@ import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
 import { AdminRoute } from './ProtectedRoute';
 
-import SiteProvider from "@context/SiteContext";
+import { getSubdomainSlug } from '../utils/subdomain';
 
 // Public Pages
 import Landing from '../pages/public/Landing';
@@ -37,12 +37,15 @@ import Profile from '@components/admin/profile/Profile';
 import UserRoleManagement from '@components/admin/roles/UserRoleManagement';
 import SubscriptionManagement from '@components/admin/subscriptions/SubscriptionManagement';
 
+// On royalbites.restroly.in the root path is the public site; elsewhere it is the landing page.
+const isTenantHost = !!getSubdomainSlug();
+
 const AppRoutes = () => {
   return (
     <Routes>
       {/* ========== PUBLIC ROUTES ========== */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<Landing />} />
+        {!isTenantHost && <Route path="/" element={<Landing />} />}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -53,18 +56,19 @@ const AppRoutes = () => {
 
       {/* ========== CUSTOMER ROUTES ========== */}
       <Route element={<CustomerLayout />}>
-        <Route
-          path="/Restrohub/:restaurantName/:branchId"
-          element={<RestaurantMenu />}
-        />
+        {isTenantHost && <Route path="/" element={<RestaurantMenu />} />}
+        <Route path="/Restrohub/:restaurantName/:branchId" element={<RestaurantMenu />} />
       </Route>
 
       {/* ========== ADMIN ROUTES ========== */}
-      <Route path="/admin"
+      <Route
+        path="/admin"
         element={
           <ProtectedRoute>
-              <AdminLayout />
-          </ProtectedRoute>}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="menus" element={<Menus />} />
@@ -74,12 +78,16 @@ const AppRoutes = () => {
         <Route path="marketing/website" element={<WebsiteWrapper />} />
         {/* <Route path="marketing/qr-display" element={<QRDisplay />} /> */}
         <Route path="upi-links" element={<UPILinks />} />
-        <Route
-          path="subscriptions"
-          element={<SubscriptionManagement />}
-        />
+        <Route path="subscriptions" element={<SubscriptionManagement />} />
         <Route path="kds" element={<KitchenDisplaySystem />} />
-        <Route path="role-management" element={<AdminRoute><UserRoleManagement /></AdminRoute>} />
+        <Route
+          path="role-management"
+          element={
+            <AdminRoute>
+              <UserRoleManagement />
+            </AdminRoute>
+          }
+        />
         <Route path="profile" element={<Profile />} />
       </Route>
 

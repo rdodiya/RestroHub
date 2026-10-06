@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, ClipboardList } from 'lucide-react';
 import OrderCard from './OrderCard';
-import api from "@services/common/api";
+import api from '@services/common/api';
 import AdminSkeleton from '../../AdminSkeleton';
 import toast from 'react-hot-toast';
 
@@ -47,7 +47,13 @@ const OrderCardSkeleton = () => (
 // ============================================
 // MAIN COMPONENT
 // ============================================
-const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange, refreshTrigger }) => {
+const OrdersGrid = ({
+  activeFilter,
+  searchQuery,
+  onOrdersChange,
+  refreshTrigger,
+  branchId: activeBranchId,
+}) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -65,26 +71,18 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange, refreshTrigger 
   // ------------------------------------
   useEffect(() => {
     fetchBranchIdAndOrders();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchBranchIdAndOrders, 30000);
-    return () => clearInterval(interval);
-  }, [refreshTrigger]);
+    // live refresh comes from useOrderStream (bumps refreshTrigger) in Orders.jsx
+  }, [refreshTrigger, activeBranchId]);
 
   const fetchBranchIdAndOrders = async () => {
     try {
       if (loading) setRefreshing(true);
       else setError(null);
 
-      // Get the current branch from the authenticated user's restaurant context
-      const branchRes = await api.get('/secure/api/v1/users/fetchRestaurantId');
-      const branchData = branchRes.data || {};
-      setBranchId(branchData.branchId || null);
+      const branchData = { branchId: activeBranchId };
+      setBranchId(activeBranchId || null);
 
-      if (!branchData.branchId) {
-        setError('No branch found for the current user');
-        syncOrders([]);
-        return;
-      }
+      if (!activeBranchId) return; // branch context still loading
 
       const response = await api.get(`/secure/api/v1/orders/branch/${branchData.branchId}/active`);
       const data = Array.isArray(response.data) ? response.data : [];
@@ -185,11 +183,7 @@ const OrdersGrid = ({ activeFilter, searchQuery, onOrdersChange, refreshTrigger 
       {/* Orders Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredOrders.map((order) => (
-          <OrderCard
-            key={order.orderId}
-            order={order}
-            onStatusUpdate={handleStatusUpdate}
-          />
+          <OrderCard key={order.orderId} order={order} onStatusUpdate={handleStatusUpdate} />
         ))}
       </div>
 
