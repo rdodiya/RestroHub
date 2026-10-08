@@ -1,3 +1,4 @@
+import usePageMeta from '@hooks/usePageMeta';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@context/ThemeContext';
@@ -19,13 +20,18 @@ import {
   UserPlus,
   ShoppingCart,
   Sparkles,
-  ArrowUp
+  ArrowUp,
 } from 'lucide-react';
 
 const Landing = () => {
+  usePageMeta({
+    title: 'Restroly - Digital Restaurant Ordering System',
+    description:
+      'Restroly helps restaurants manage digital menus, QR ordering, payments, and restaurant operations with a modern ordering platform.',
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // show scroll top 
+  // show scroll top
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
@@ -87,21 +93,24 @@ const Landing = () => {
     { label: 'Testimonials', href: '#testimonials' },
     { label: 'Contact', href: '#contact' },
   ];
-  
-  // active link state
-  const [activeLink, setActiveLink] = useState("#");
-  
-  useEffect(() => {
-    const ids = navLinks.map((link) => link.href.replace("#", ""));
-    const obs = new IntersectionObserver((entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setActiveLink(`#${entry.target.id}`);
-        }
-      });
-    }), { rootMargin: '-50% 0px -50% 0px' });
 
-    ids.forEach(id => {
+  // active link state
+  const [activeLink, setActiveLink] = useState('#');
+
+  useEffect(() => {
+    const ids = navLinks.map((link) => link.href.replace('#', ''));
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveLink(`#${entry.target.id}`);
+          }
+        });
+      },
+      { rootMargin: '-50% 0px -50% 0px' }
+    );
+
+    ids.forEach((id) => {
       const el = document.getElementById(id);
       if (el) obs.observe(el);
     });
@@ -161,73 +170,126 @@ const Landing = () => {
 
   // Restaurant Owner Steps
   const steps = [
-    { num: '01', icon: UserPlus, title: 'Sign Up', desc: 'Create your free account in under 2 minutes.' },
-    { num: '02', icon: QrCode, title: 'Add Your Menu', desc: 'Upload items, set prices, and generate QR codes.' },
-    { num: '03', icon: ShoppingCart, title: 'Receive Orders', desc: 'Customers scan, order, and pay from their phone.' },
-    { num: '04', icon: BarChart3, title: 'Grow Revenue', desc: 'Track analytics and optimize your business.' },
+    {
+      num: '01',
+      icon: UserPlus,
+      title: 'Sign Up',
+      desc: 'Create your free account in under 2 minutes.',
+    },
+    {
+      num: '02',
+      icon: QrCode,
+      title: 'Add Your Menu',
+      desc: 'Upload items, set prices, and generate QR codes.',
+    },
+    {
+      num: '03',
+      icon: ShoppingCart,
+      title: 'Receive Orders',
+      desc: 'Customers scan, order, and pay from their phone.',
+    },
+    {
+      num: '04',
+      icon: BarChart3,
+      title: 'Grow Revenue',
+      desc: 'Track analytics and optimize your business.',
+    },
   ];
 
   // Customer Steps
   const customerSteps = [
-    { num: '01', icon: QrCode, title: 'Scan QR Code', desc: 'Customer scans the unique QR code placed at their table.' },
-    { num: '02', icon: Smartphone, title: 'Browse Menu', desc: 'Explore the full digital menu with photos and prices.' },
-    { num: '03', icon: ShoppingCart, title: 'Add to Cart', desc: 'Select items and add them to cart with one tap.' },
-    { num: '04', icon: CheckCircle2, title: 'Place Order', desc: 'Confirm and place the order directly from their phone.' },
-    { num: '05', icon: MessageSquare, title: 'Live Updates', desc: 'Get real-time order status updates via WhatsApp.' },
-    { num: '06', icon: CreditCard, title: 'Pay via UPI', desc: 'Pay instantly using any UPI app. Zero hassle.' },
+    {
+      num: '01',
+      icon: QrCode,
+      title: 'Scan QR Code',
+      desc: 'Customer scans the unique QR code placed at their table.',
+    },
+    {
+      num: '02',
+      icon: Smartphone,
+      title: 'Browse Menu',
+      desc: 'Explore the full digital menu with photos and prices.',
+    },
+    {
+      num: '03',
+      icon: ShoppingCart,
+      title: 'Add to Cart',
+      desc: 'Select items and add them to cart with one tap.',
+    },
+    {
+      num: '04',
+      icon: CheckCircle2,
+      title: 'Place Order',
+      desc: 'Confirm and place the order directly from their phone.',
+    },
+    {
+      num: '05',
+      icon: MessageSquare,
+      title: 'Live Updates',
+      desc: 'Get real-time order status updates via WhatsApp.',
+    },
+    {
+      num: '06',
+      icon: CreditCard,
+      title: 'Pay via UPI',
+      desc: 'Pay instantly using any UPI app. Zero hassle.',
+    },
   ];
 
-const plans = [
-  {
-    name: 'Starter',
-    price: '₹499',
-    period: '/month',
-    desc: 'Perfect for small restaurants',
-    features: [
-      '2 Branches',
-      '15 Tables',
-      '500 WhatsApp/month',
-      'Basic Analytics',
-      'Email Support'
-    ],
-    popular: false,
-  },
-  {
-    name: 'Professional',
-    price: '₹999',
-    period: '/month',
-    desc: 'Best for growing businesses',
-    features: [
-      '5 Branches',
-      'Unlimited Tables',
-      '2000 WhatsApp/month',
-      'Advanced Analytics',
-      'Priority Support',
-      'Custom Domain'
-    ],
-    popular: true,
-  },
-  {
-    name: 'Enterprise',
-    price: 'Custom',
-    period: '',
-    desc: 'For restaurant chains',
-    features: [
-      'Unlimited Everything',
-      'Dedicated Manager',
-      'Custom Integrations',
-      'SLA Guarantee',
-      '24/7 Phone Support',
-      'On-site Training'
-    ],
-    popular: false,
-  },
-];
+  const plans = [
+    {
+      name: 'Starter',
+      price: '₹499',
+      period: '/month',
+      desc: 'Perfect for small restaurants',
+      features: [
+        '2 Branches',
+        '15 Tables',
+        '500 WhatsApp/month',
+        'Basic Analytics',
+        'Email Support',
+      ],
+      popular: false,
+    },
+    {
+      name: 'Professional',
+      price: '₹999',
+      period: '/month',
+      desc: 'Best for growing businesses',
+      features: [
+        '5 Branches',
+        'Unlimited Tables',
+        '2000 WhatsApp/month',
+        'Advanced Analytics',
+        'Priority Support',
+        'Custom Domain',
+      ],
+      popular: true,
+    },
+    {
+      name: 'Enterprise',
+      price: 'Custom',
+      period: '',
+      desc: 'For restaurant chains',
+      features: [
+        'Unlimited Everything',
+        'Dedicated Manager',
+        'Custom Integrations',
+        'SLA Guarantee',
+        '24/7 Phone Support',
+        'On-site Training',
+      ],
+      popular: false,
+    },
+  ];
   const [selectedPlan, setSelectedPlan] = useState(
-  plans.find(plan => plan.popular)?.name || plans[0].name
+    plans.find((plan) => plan.popular)?.name || plans[0].name
   );
-const [contactForm, setContactForm] = useState({
-    name: '', mobile: '', email: '', description: '',
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    mobile: '',
+    email: '',
+    description: '',
   });
   const [contactStatus, setContactStatus] = useState(''); // '', 'sending', 'success', 'error'
 
@@ -241,17 +303,17 @@ const [contactForm, setContactForm] = useState({
       const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({
-  service_id: "service_fgj8bx6" ,      // ← your actual Service ID
-  template_id: "template_j3k2n5c",     // ← your actual Template ID
-  user_id: "-Lly6B-CoO6THDld_",         // ← your actual Public Key
-  template_params: {
-    from_name: contactForm.name,
-    mobile: contactForm.mobile,
-    from_email: contactForm.email,
-    message: contactForm.description,
-  },
-}),
+        body: JSON.stringify({
+          service_id: 'service_fgj8bx6', // ← your actual Service ID
+          template_id: 'template_j3k2n5c', // ← your actual Template ID
+          user_id: '-Lly6B-CoO6THDld_', // ← your actual Public Key
+          template_params: {
+            from_name: contactForm.name,
+            mobile: contactForm.mobile,
+            from_email: contactForm.email,
+            message: contactForm.description,
+          },
+        }),
       });
       if (res.ok) {
         setContactStatus('success');
@@ -283,31 +345,31 @@ const [contactForm, setContactForm] = useState({
   ];
 
   const footerColumns = [
-  {
-    title: 'Product',
-    links: [
-      { label: 'Features', href: '#features' },
-      { label: 'How It Works', href: '#how-it-works' },
-      { label: 'Pricing', href: '#pricing' },
-      { label: 'Testimonials', href: '#testimonials' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'About Us', href: '#features' },
-      { label: 'Contact', href: '#testimonials' },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Privacy Policy', href: '/privacy-policy' },
-      { label: 'Terms of Service', href: '/terms-of-service' },
-      { label: 'Refund Policy', href: '/refund-policy' },
-    ],
-  },
-];
+    {
+      title: 'Product',
+      links: [
+        { label: 'Features', href: '#features' },
+        { label: 'How It Works', href: '#how-it-works' },
+        { label: 'Pricing', href: '#pricing' },
+        { label: 'Testimonials', href: '#testimonials' },
+      ],
+    },
+    {
+      title: 'Company',
+      links: [
+        { label: 'About Us', href: '#features' },
+        { label: 'Contact', href: '#testimonials' },
+      ],
+    },
+    {
+      title: 'Legal',
+      links: [
+        { label: 'Privacy Policy', href: '/privacy-policy' },
+        { label: 'Terms of Service', href: '/terms-of-service' },
+        { label: 'Refund Policy', href: '/refund-policy' },
+      ],
+    },
+  ];
 
   const stats = [
     { value: '500+', label: 'Restaurants' },
@@ -321,7 +383,6 @@ const [contactForm, setContactForm] = useState({
   // ============================
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-slate-100">
-
       {/* ---- Scroll Animation Styles ---- */}
       <style>{`
         .step-item {
@@ -351,7 +412,7 @@ const [contactForm, setContactForm] = useState({
       `}</style>
 
       {/* adding scroll-up */}
-      
+
       {showScrollTop && (
         <button
           type="button"
@@ -369,10 +430,9 @@ const [contactForm, setContactForm] = useState({
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-lg dark:border-slate-700/80 dark:bg-slate-900/80">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between sm:h-20">
-
             {/* Logo */}
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="flex items-center gap-2.5"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
@@ -409,12 +469,34 @@ const [contactForm, setContactForm] = useState({
                 className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 {isDark ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
                   </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
                   </svg>
                 )}
               </button>
@@ -479,7 +561,6 @@ const [contactForm, setContactForm] = useState({
       {/* HERO SECTION                                     */}
       {/* ================================================ */}
       <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white pt-28 pb-16 dark:from-slate-800 dark:via-slate-900 dark:to-slate-900 sm:pt-36 sm:pb-24 lg:pt-44 lg:pb-32">
-
         {/* Decorative Pattern */}
         <div
           className="absolute inset-0 -z-10 opacity-[0.03]"
@@ -506,8 +587,8 @@ const [contactForm, setContactForm] = useState({
 
             {/* Subtitle */}
             <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-slate-600 dark:text-slate-300 sm:mt-8 sm:text-xl">
-              QR code menus, instant UPI payments, WhatsApp order alerts, and
-              powerful analytics — all in one beautiful platform.
+              QR code menus, instant UPI payments, WhatsApp order alerts, and powerful analytics —
+              all in one beautiful platform.
             </p>
 
             {/* CTA Buttons */}
@@ -531,17 +612,15 @@ const [contactForm, setContactForm] = useState({
 
             {/* Social Proof */}
             <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 sm:mt-12">
-              {['No credit card required', 'Setup in 5 minutes', 'Cancel anytime'].map(
-                (text) => (
-                  <span
-                    key={text}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400"
-                  >
-                    <CheckCircle2 className="h-4 w-4 text-blue-500" />
-                    {text}
-                  </span>
-                )
-              )}
+              {['No credit card required', 'Setup in 5 minutes', 'Cancel anytime'].map((text) => (
+                <span
+                  key={text}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400"
+                >
+                  <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                  {text}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -593,7 +672,9 @@ const [contactForm, setContactForm] = useState({
                 >
                   <feature.icon className="h-7 w-7" />
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-slate-900 dark:text-white">{feature.title}</h3>
+                <h3 className="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+                  {feature.title}
+                </h3>
                 <p className="leading-relaxed text-slate-600 dark:text-slate-400">{feature.desc}</p>
               </div>
             ))}
@@ -606,7 +687,6 @@ const [contactForm, setContactForm] = useState({
       {/* ================================================ */}
       <section id="how-it-works" className="bg-slate-50 py-20 dark:bg-slate-800 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
           {/* ---- Restaurant Owner Flow ---- */}
           <div className="mx-auto max-w-2xl text-center">
             <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
@@ -640,7 +720,9 @@ const [contactForm, setContactForm] = useState({
                       {step.num}
                     </span>
                   </div>
-                  <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                  <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">
+                    {step.title}
+                  </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">{step.desc}</p>
                 </div>
               ))}
@@ -680,13 +762,14 @@ const [contactForm, setContactForm] = useState({
                       {step.num}
                     </span>
                   </div>
-                  <h3 className="mb-2 text-base font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                  <h3 className="mb-2 text-base font-bold text-slate-900 dark:text-white">
+                    {step.title}
+                  </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-400">{step.desc}</p>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
       </section>
 
@@ -706,21 +789,20 @@ const [contactForm, setContactForm] = useState({
               Start free. No credit card required. Upgrade anytime.
             </p>
           </div>
-  
+
           <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
             {plans.map((plan, i) => (
-
-          <button
-          key={i}
-          type="button"
-          onClick={() => setSelectedPlan(plan.name)}
-          className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
-          selectedPlan === plan.name
-          ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50 dark:bg-slate-800'
-          : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:shadow-slate-700/50'
-          }`}
-          >
-          {selectedPlan === plan.name && (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setSelectedPlan(plan.name)}
+                className={`relative flex flex-col rounded-2xl p-8 transition-all duration-300 ${
+                  selectedPlan === plan.name
+                    ? 'z-10 scale-105 border-2 border-blue-600 bg-white shadow-2xl shadow-blue-200/50 dark:bg-slate-800'
+                    : 'border border-slate-200 bg-white shadow-sm hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:shadow-slate-700/50'
+                }`}
+              >
+                {selectedPlan === plan.name && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="rounded-full bg-blue-600 px-4 py-1 text-xs font-bold text-white shadow-md">
                       MOST POPULAR
@@ -732,13 +814,18 @@ const [contactForm, setContactForm] = useState({
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{plan.desc}</p>
 
                 <div className="my-6">
-                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white">{plan.price}</span>
+                  <span className="text-4xl font-extrabold text-slate-900 dark:text-white">
+                    {plan.price}
+                  </span>
                   <span className="text-slate-500 dark:text-slate-400">{plan.period}</span>
                 </div>
 
                 <ul className="mb-8 flex-1 space-y-3">
                   {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300">
+                    <li
+                      key={j}
+                      className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300"
+                    >
                       <Check className="h-4 w-4 shrink-0 text-blue-500" />
                       {f}
                     </li>
@@ -791,7 +878,9 @@ const [contactForm, setContactForm] = useState({
                     ))}
                 </div>
 
-                <p className="mb-6 leading-relaxed text-slate-600 dark:text-slate-300">"{t.text}"</p>
+                <p className="mb-6 leading-relaxed text-slate-600 dark:text-slate-300">
+                  "{t.text}"
+                </p>
 
                 <div className="flex items-center gap-3 border-t border-slate-100 pt-4 dark:border-slate-600">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
@@ -819,8 +908,7 @@ const [contactForm, setContactForm] = useState({
               Ready to Digitize Your Restaurant?
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-lg text-blue-100/90">
-              Join 5+ restaurants across India already using Restroly to
-              serve customers faster.
+              Join 5+ restaurants across India already using Restroly to serve customers faster.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
@@ -968,35 +1056,35 @@ const [contactForm, setContactForm] = useState({
               </p>
             </div>
 
-         {/* Link Columns */}
-{footerColumns.map((col) => (
-  <div key={col.title}>
-    <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-300">
-      {col.title}
-    </h4>
-    <ul className="space-y-3">
-      {col.links.map((link) => (
-        <li key={link.label}>
-          {link.href.startsWith('/') ? (
-            <Link
-              to={link.href}
-              className="text-sm text-slate-400 transition-colors hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ) : (
-            <a
-              href={link.href}
-              className="text-sm text-slate-400 transition-colors hover:text-white"
-            >
-              {link.label}
-            </a>
-          )}
-        </li>
-      ))}
-    </ul>
-  </div>
-))}
+            {/* Link Columns */}
+            {footerColumns.map((col) => (
+              <div key={col.title}>
+                <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-300">
+                  {col.title}
+                </h4>
+                <ul className="space-y-3">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      {link.href.startsWith('/') ? (
+                        <Link
+                          to={link.href}
+                          className="text-sm text-slate-400 transition-colors hover:text-white"
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          className="text-sm text-slate-400 transition-colors hover:text-white"
+                        >
+                          {link.label}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
 
           {/* Bottom Bar */}

@@ -1,3 +1,4 @@
+import usePageMeta from '@hooks/usePageMeta';
 // src/pages/public/Register.jsx
 
 import { useState } from 'react';
@@ -146,6 +147,10 @@ const validationSchema = Yup.object({
 });
 
 const Register = () => {
+  usePageMeta({
+    title: 'Create your account | Restroly',
+    description: 'Start free: create digital menus, QR ordering and UPI payment links in minutes.',
+  });
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
