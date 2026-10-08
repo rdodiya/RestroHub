@@ -371,7 +371,7 @@ const Login = () => {
 
               <Link
                 to="/"
-                className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
+                className="mb-4 inline-flex items-center text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 gap-2"
               >
                 <ArrowLeft size={15} />
                 Back to Home
@@ -498,7 +498,7 @@ const Login = () => {
                 <div className="relative mb-5 flex items-center">
                   <div className="flex-grow border-t border-gray-200 dark:border-gray-600" />
 
-                  <span className="mx-4 shrink-0 text-xs uppercase text-gray-400 dark:text-gray-500">
+                  <span className="mx-4 shrink-0 text-xs uppercase text-gray-600 dark:text-gray-500">
                     Or continue with
                   </span>
 

@@ -1089,10 +1089,10 @@ const Landing = () => {
 
           {/* Bottom Bar */}
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               © {new Date().getFullYear()} Restroly. All rights reserved.
             </p>
-            <p className="text-sm text-slate-500">Made with ❤️ in India</p>
+            <p className="text-sm text-slate-400">Made with ❤️ in India</p>
           </div>
         </div>
       </footer>

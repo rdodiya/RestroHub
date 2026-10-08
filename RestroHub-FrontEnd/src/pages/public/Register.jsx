@@ -288,7 +288,7 @@ const Register = () => {
               </div>
               <Link
                 to="/"
-                className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
+                className="mb-4 inline-flex items-center text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 gap-2"
               >
                 <ArrowLeft size={15} />
                 Back to Home
