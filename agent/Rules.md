@@ -25,6 +25,7 @@
 ```
 RestroHub/               # Backend: Java 21 / Spring Boot / Gradle
 RestroHub-FrontEnd/      # Frontend: React 18 / Vite / Tailwind
+scripts/                 # run_local, setup_jules, db/ seed SQL (dev only)
 ```
 
 ### 2.2 Branch naming
@@ -105,21 +106,25 @@ Rules:
 
 ### 5.1 Architecture
 
-| Layer | Package | Responsibility | Must not |
+Code lives under `com.restroly.qrmenu`, organized **by feature** (`order/`, `menu/`, `food/`, `category/`, `restaurant/`, `branch/`, `table/`, `payment/`, `subscription/`, `auth/`, `user/`, `template/`, `notification/`, `notifications/`, `whatsapp/`, `excel/`, `address/`, `audit/`, `admin/`). Each feature package has its own layers; put new code in the matching feature package, not a global layer package.
+
+| Layer | Package (inside a feature) | Responsibility | Must not |
 |---|---|---|---|
 | Controller | `controller/` | HTTP mapping, validation trigger, delegate to service | Contain business logic or touch repositories |
-| Service | `service/` | Business rules, transactions | Return entities directly to clients |
+| Service | `service/` (+ `impl/`) | Business rules, transactions | Return entities directly to clients |
 | Repository | `repository/` | JPA data access | Contain business logic |
-| Model | `model/` | Entities / domain | Leak into API responses |
+| Entity | `entity/` | JPA entities / domain | Leak into API responses |
 | DTO | `dto/` | Request/response objects | Contain persistence annotations |
-| Config | `config/` | Spring configuration | Hold business logic |
-| Exception | `exception/` | Custom exceptions and handlers | Swallow errors silently |
+| Mapper | `mapper/` | MapStruct entity/DTO conversion | Hold business logic |
+
+Cross-cutting packages: `config/` (security route rules, CORS, OpenAPI, Cloudinary; no business logic), `security/` (JWT filter/provider, `AccessGuard`, `Permission`), `common/` (shared DTOs, enums, WebSocket config), `exception/` (custom exceptions and the global handler; never swallow errors silently).
 
 ### 5.2 Coding standards
 
 - Naming: `camelCase` methods, `PascalCase` classes, `UPPER_SNAKE_CASE` constants.
 - **MUST** use constructor injection; do not use field `@Autowired`.
 - **MUST** add Javadoc to every public service method.
+- **MUST** run `./gradlew spotlessApply` before committing Java (the pre-commit hook runs `spotlessCheck`).
 - **MUST** expose DTOs, never JPA entities, from controllers.
 - **MUST** validate input with Bean Validation (`@Valid`, `@NotBlank`, etc.).
 - **MUST** use `@Transactional` at the service layer where writes span multiple operations.
@@ -130,7 +135,7 @@ Rules:
 
 ### 5.3 API design
 
-- Base path: `/restroly/api/v1`; authenticated owner/admin routes under `/secure/api/v1`.
+- Context path `/restroly`. Public routes under `/public/api/v1/**` (a few legacy ones under `/api/v1/**`); authenticated owner/admin routes under `/secure/api/v1/**` (constants in `common/util/ApiConstants`).
 - Use plural nouns and standard verbs: `GET /foods`, `POST /foods`, `PUT /foods/{id}`, `DELETE /foods/{id}`.
 - Correct status codes: `200`, `201` (created), `204` (no content), `400`, `401`, `403`, `404`, `409`, `422`, `500`.
 - Consistent error body: `{ "code": "...", "message": "...", "details": [...] }`.
@@ -141,6 +146,9 @@ Rules:
 ### 5.4 Security
 
 - **MUST** protect owner/admin operations with JWT; verify the authenticated user owns the resource (no cross-restaurant access).
+- **MUST** authorize every secured endpoint with `@PreAuthorize("@access.can('<PERMISSION>') and @access.branch(#branchId)")`. `security/AccessGuard` (bean `access`) does the tenant checks and `security/Permission` is the only role-to-permission map; do not add `hasRole(...)` lists. Role names may be stored as `ROLE_X` or `X`.
+- **MUST** record sensitive actions (role changes, plan changes, UPI VPA changes) through `audit/service/AuditLogService.record(...)`.
+- Category and Food have no tenant owner yet (role checks only); do not assume tenant isolation there.
 - **MUST** load secrets from environment variables (`JWT_SECRET`, `DB_PASSWORD`, `GOOGLE_OAUTH_CLIENT_ID`).
 - **MUST** configure CORS via `CORS_ALLOWED_ORIGINS`; never use `*` in production.
 - **MUST** use parameterized queries / JPA; no string-concatenated SQL.
@@ -150,8 +158,9 @@ Rules:
 
 ### 5.5 Database
 
-- Schema changes **MUST** go through migrations (Flyway/Liquibase once adopted); no manual production edits.
-- Use `ddl-auto=validate` (or `none`) outside local dev.
+- Schema changes **MUST** go through Flyway migrations in `src/main/resources/db/migration` (currently `V1` to `V5`; `V1` is a placeholder baseline, so new migrations must not add foreign keys to Hibernate-created tables); no manual production edits.
+- Dev uses `ddl-auto=update`, prod uses `validate`, so any entity change **MUST** ship with a new `V<n>__*.sql` or prod will fail to start.
+- Local seed data lives in `scripts/db/*.sql` (dev only, never in `db/migration`).
 - Add indexes for foreign keys and frequent filters (restaurant/branch id, order status, created date).
 - Beware of N+1 queries; use fetch joins or projections.
 - Money values **MUST** use `BigDecimal` (or integer paise), never `double`/`float`.
@@ -159,7 +168,8 @@ Rules:
 
 ### 5.6 Testing
 
-- **MUST** add unit tests for new service logic.
+- **MUST** add unit tests for new service logic (JUnit 5 under `src/test/java/com/restroly/qrmenu/...`).
+- Web-layer security tests use `@WebMvcTest` + `@Import({SecurityConfig.class, AccessGuard.class})` (see `OrderControllerTenantIsolationTest`). Spring context tests need a real PostgreSQL (H2 is not a dependency).
 - **SHOULD** add integration tests for new endpoints (Testcontainers with PostgreSQL preferred).
 - Tests must be deterministic and not depend on a developer's local database.
 - Name tests by behavior: `shouldRejectOrderWhenMenuItemUnavailable`.
@@ -172,13 +182,13 @@ Rules:
 
 - **MUST** use functional components and hooks only; no class components.
 - **MUST** have one component per file; filename equals component name (`MenuCard.jsx`).
-- Place components correctly: `components/admin`, `components/customer`, `components/common`; pages under `pages/admin|customer|public`.
+- Place components correctly: `components/admin`, `components/customer`, `components/common`; pages under `pages/admin|customer|public`; routes in `routes/index.jsx` with `ProtectedRoute.jsx`.
 - Keep components small; extract logic into custom hooks (`useMenus`, `useOrders`).
 - **MUST NOT** prop-drill beyond 2 levels; use `SiteContext` for shared state.
 
 ### 6.2 API access
 
-- **MUST** route all HTTP calls through `services/api.js` (Axios instance) and `ApiService.js`; no ad-hoc `fetch`/`axios` in components.
+- **MUST** route all HTTP calls through `services/common/api.js` (Axios instance with interceptors) and `services/public/ApiService.js`; no ad-hoc `fetch`/`axios` in components. Shared state lives in `context/` (`SiteContext`, `BranchContext`, ...).
 - `VITE_API_BASE_URL` is `http://localhost:8181/restroly`, without trailing slash and without `/api/v1`.
 - Handle loading, error and empty states for every data-driven view.
 - Never hardcode API URLs, client IDs or secrets; use `import.meta.env.VITE_*`.
@@ -192,7 +202,7 @@ Rules:
 
 ### 6.4 Quality
 
-- ESLint and Prettier clean *(once configured)*.
+- ESLint and Prettier clean (`npm run lint`, `npm run format:check`; the `.githooks/pre-commit` hook runs `lint-staged`).
 - No `console.log` left in committed code.
 - **SHOULD** add tests (Vitest + React Testing Library) for critical flows: login, menu CRUD, ordering.
 - Use keys in lists, avoid unnecessary re-renders, lazy-load heavy routes and images.
@@ -223,7 +233,7 @@ Rules:
 
 ## 9. Documentation Rules
 
-- Update `README.md` when adding features, env variables, or setup steps.
+- Update `ReadMe.md` when adding features, env variables, or setup steps.
 - Keep Swagger annotations current.
 - Record significant technical decisions as short ADRs in `docs/adr/` *(recommended)*.
 - Keep `PRD.md`, `TechStack.md` and `ImplementationPlan.md` consistent with reality; update them in the same PR when scope changes.

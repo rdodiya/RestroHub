@@ -1,5 +1,19 @@
 # Restroly / RestroHub — Phase 1 (P0 + P1) Implementation Prompt
 
+> ## Status (as of 2026-10-08)
+> Phase 1 is partly implemented (commits `b5c7d84` §6.1, `44263f5` Sprint 1-4 gaps, `a2e1378` fixes, on `feature/phase1-6.1-tenant-rbac`). Checked against code, not against this prompt's checkboxes.
+> - **Done**
+>   - 6.1 tenant isolation + RBAC: `security/AccessGuard` (bean `access`), `security/Permission`, `@PreAuthorize("@access.can('X') and @access.branch(#branchId)")` on controllers, `AccessGuardTest`, `OrderControllerTenantIsolationTest`; audit log (`V2__create_audit_log.sql`, `audit/service/AuditLogService`).
+>   - 6.2 partly: `Idempotency-Key` stored on the order (`Order.idempotencyKey`, `V5__order_idempotency_key.sql`, `PublicOrderController`); per-line `unitPrice`/`subtotal` on `OrderItem`.
+>   - 6.3 partly: `OrderPaymentStatus` (`UNPAID`, `LINK_SENT`, `VERIFIED_BY_STAFF`) on `Order` (`V4`); `Accepted` status NOT added, as instructed (`OrderStatus` has `CONFIRMED` but no `ACCEPTED`).
+>   - 6.4: `context/BranchContext.jsx` + Header switcher, `GET /orders/history` with all filters, `OrderHistoryModal.jsx`, dashboard `stats|trends|top-items` wired in the frontend, STOMP order stream (`useOrderStream`).
+>   - 6.5 partly: free-tier template limit enforced server-side (`UPGRADE_REQUIRED` in `SiteConfigServiceImpl`, `CUSTOM_WEBSITE_TEMPLATES`).
+>   - 6.6 partly: Privacy/Terms/Refund pages, `ForgotPassword` flow (`AuthController`), `SiteConfig.isPublished` field, `ErrorBoundary` on `CustomerLayout`; subdomain host resolution.
+>   - 6.7 partly: Flyway `V1`-`V5`, `spring-boot-starter-actuator`; Testcontainers added to `build.gradle` with `OrderFlowIntegrationTest` (skipped without Docker).
+> - **Remaining / not found in code**: staff endpoint/UI to mark payment verified/unpaid (no such route in `OrderController`); customer-facing order reference (`RH-...`); WhatsApp notification status tracking and failure-isolation test; branch open/closed gating; availability recheck at checkout (not confirmed); plan limits for branches/tables/staff/monthly orders and other feature-flag checks (KDS, multi-branch, WhatsApp, Excel); manual billing activation + expiry fallback; restaurant suspension; `PENDING_APPROVAL/APPROVED/REJECTED` states; email verification; onboarding checklist; WhatsApp consent checkbox at checkout; dashboard "verified collected amount" vs gross split (unverified); backup runbook; frontend ErrorBoundary around admin layout (customer layout only). 6.1 follow-ups: Category/Food have no tenant owner yet.
+> - **Superseded by repo reality**: Spring Boot/Gradle details and "Testcontainers is not a dependency yet", "V1__baseline.sql only", "no ErrorBoundary exists", "BranchContext" as future work are now out of date; RBAC is `@access.can(...)`, not `hasAnyRole`. `agent/frontend-design.md` and root `CLAUDE.md` now describe current structure.
+> - The prompt below is the original, unedited.
+
 **How to use this file:** Paste this entire document as a single task/prompt into Claude Code, Antigravity, or an equivalent repo-aware coding agent, run from the root of the `RestroHub` monorepo (the folder containing both `RestroHub/` and `RestroHub-FrontEnd/`). The agent should have file read/write and shell access to the repo. This prompt is self-contained — it does not depend on this chat.
 
 **Required tooling (Claude Code):** the `graphify` skill (`.claude/skills/graphify`), the `ponytail`, `superpowers` and `agentmemory` plugins (§0.1), and the `fullstack-dev-skills:spring-boot-engineer` and `fullstack-dev-skills:react-expert` skills (§0.2). If a tool is missing, say so in your final summary and continue without it. Never block on it.

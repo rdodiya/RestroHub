@@ -14,6 +14,8 @@
 
 > **Sourcing Note:** This document treats `project-flow.txt` as ground truth. Where the repository README was vague or contained outdated assumptions (e.g. payment reconciliation or customer accounts), this document follows `project-flow.txt`. Items marked **`@Todo`** are explicitly unbuilt per the owner. Items marked *(assumption)* are inferences requiring confirmation. Items marked *(open — owner flagged)* are questions raised directly by the project owner.
 
+> **Implementation status (verified against code, Oct 2026):** Built: JWT login/refresh, password reset, tenant-scoped RBAC (`Permission` / `AccessGuard`, see §2.3), audit log for role/plan/UPI VPA changes (`t_audit_log`), guest ordering with idempotent checkout, manual order payment tracking (`UNPAID` / `LINK_SENT` / `VERIFIED_BY_STAFF`) and order source (`TABLE_QR` / `COUNTER_QR` / `STAFF`), order history and dashboard stats/trends/top-items APIs, service requests, UPI links, subscriptions with feature mapping, site/theme/section editor, Excel import/export, WhatsApp notification service. Partial or not built: Google sign-in (the `POST /public/api/v1/auth/google` endpoint is commented out in `AuthController`), subdomain routing, admin header branch switcher, order-history and dashboard frontend wiring, Category/Food tenant ownership, per-branch role assignment. §6 lists the paths found in the controllers.
+
 ---
 
 ## 1. Overview & Vision
@@ -326,22 +328,25 @@ Base backend path: `http://localhost:8181/restroly` (Swagger UI at `/restroly/sw
 
 | Controller Class | Base Endpoint | Primary Responsibilities |
 |---|---|---|
-| [`PublicSiteController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/template/controller/PublicSiteController.java) | `/public/api/v1/sites` | Public site configuration, dynamic template rendering, active menu lookup |
-| [`PublicOrderController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/order/controller/PublicOrderController.java) | `/api/v1/public/orders` | Diner guest order placement, order status polling |
-| [`OrderController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java) | `/api/v1/orders` | Admin live order management, status updates, order history & filtering |
-| [`ServiceRequestController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/notification/controller/ServiceRequestController.java) | `/api/v1/service-requests` | Diner waiter calls, table assistance logging and resolution |
-| [`DashboardNotificationController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/notifications/controller/DashboardNotificationController.java) | `/api/v1/notifications` | Admin notification feed, unread alerts, live bell counter |
-| [`DashboardController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/admin/dashboard/controller/DashboardController.java) | `/api/v1/admin/dashboard` | Analytical KPIs, revenue stats, sales trends, top dishes |
-| [`BranchController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java) | `/api/v1/branches` | Multi-branch CRUD, active menu binding |
-| [`TableController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/table/controller/TableController.java) | `/api/v1/tables` | Table management, QR code payload generation |
+| [`PublicSiteController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/template/controller/PublicSiteController.java) | `/public/api/v1/sites` | Public site configuration (GET and PATCH `/{siteId}/config`), dynamic template rendering, active menu lookup |
+| [`PublicOrderController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/order/controller/PublicOrderController.java) | `/public/api/v1/orders` | Diner guest order placement (idempotent via `Idempotency-Key`) |
+| [`OrderController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/order/controller/OrderController.java) | `/secure/api/v1/orders` | Admin live order management: create, branch/active lists, `/history` filters, `PATCH /{orderId}/status`, `POST /{orderId}/cancel`, mark-all-ready |
+| [`ServiceRequestController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/notification/controller/ServiceRequestController.java) | `/public/api/v1/service-requests` (POST), `/secure/api/v1/service-requests` (branch list, acknowledge, complete) | Diner waiter calls, table assistance logging and resolution |
+| [`DashboardNotificationController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/notifications/controller/DashboardNotificationController.java) | `/api/notifications/dashboard` (SSE; live orders also over STOMP `/ws`) | Admin notification feed, unread alerts, live bell counter |
+| [`DashboardController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/admin/dashboard/controller/DashboardController.java) | `/secure/api/v1/dashboard` | Analytical KPIs, revenue stats, sales trends, top dishes |
+| [`BranchController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/branch/controller/BranchController.java) | `/secure/api/v1/branches` | Multi-branch CRUD, active menu binding |
+| [`TableController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/table/controller/TableController.java) | `/secure/api/v1/branches/{branchId}/tables`, `/secure/api/v1/tables/{tableId}` | Table management, QR code payload generation |
 | [`MenuController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/menu/controller/MenuController.java) | `/secure/api/v1/menus` | Menu management and branch assignment |
-| [`CategoryController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/category/controller/CategoryController.java) | `/api/v1/categories` | Food category taxonomy |
-| [`FoodController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/food/controller/FoodController.java) | `/api/v1/foods` | Food item CRUD, availability toggle |
-| [`ExcelFeatureController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/excel/controller/ExcelFeatureController.java) | `/api/v1/excel` | Bulk menu import and export via `.xlsx` |
-| [`UpiLinkController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/payment/controller/UpiLinkController.java) | `/api/v1/upi` | Branch UPI VPA setup, test URI generation |
-| [`RoleController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/user/controller/RoleController.java) | `/api/v1/roles` | Role assignment and tenant linking by Super Admin |
-| [`SuperAdminSubscriptionController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/subscription/controller/SuperAdminSubscriptionController.java) | `/api/v1/super-admin/subscriptions` | Subscription plans, feature catalog, restaurant plan assignment |
-| [`RestaurantSubscriptionController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/subscription/controller/RestaurantSubscriptionController.java) | `/api/v1/restaurant/subscriptions` | Current plan lookup, active feature verification |
+| [`CategoryController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/category/controller/CategoryController.java) | `/secure/api/v1/categories` | Food category taxonomy |
+| [`FoodController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/food/controller/FoodController.java) | `/secure/api/v1/foods` | Food item CRUD, availability toggle |
+| [`ExcelFeatureController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/excel/controller/ExcelFeatureController.java) | `/secure/api/v1/excel` | Bulk menu import and export via `.xlsx` |
+| [`UpiLinkController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/payment/controller/UpiLinkController.java) | `/secure/api/v1/upi-links` | Branch UPI links (list, create, set default, delete) and test `/verify` |
+| [`AuthController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/auth/controller/AuthController.java) | `/public/api/v1/auth` | Register, login, refresh, logout, validate, forgot/verify/reset password (Google endpoint currently commented out) |
+| [`UserController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/user/controller/UserController.java) | `/secure/api/v1/users` | Profile (`/me`), change password, user admin (Super Admin only), role assign/remove |
+| [`RestaurantController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/restaurant/controller/RestaurantController.java) / `PublicRestaurantController` | `/secure/api/v1/restaurants`, `/public/api/v1/restaurants` | Restaurant profile CRUD; public restaurant lookup |
+| [`RoleController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/user/controller/RoleController.java) | `/api/v1/roles` | Roles CRUD (Super Admin); user-role assignment is `POST/DELETE /secure/api/v1/users/{userId}/roles` in `UserController` |
+| [`SuperAdminSubscriptionController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/subscription/controller/SuperAdminSubscriptionController.java) | `/secure/api/v1/admin/subscriptions` | Subscription plans, feature catalog, restaurant plan assignment |
+| [`RestaurantSubscriptionController.java`](/RestroHub/src/main/java/com/restroly/qrmenu/subscription/controller/RestaurantSubscriptionController.java) | `/secure/api/v1/restaurant/{restId}/subscription` | Current plan lookup, active feature verification |
 
 ---
 

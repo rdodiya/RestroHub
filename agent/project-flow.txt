@@ -13,7 +13,8 @@ this sections data will be recive from backend (spring boot api) and react will 
 
 The link of restaurant will be like restaurantname.restroly.in as restroly.in is our domain and this dynamic config is need to perform @Todo
 
-Reference Api D:\projects\gssoc_develop_restrohub\RestroHub\src\main\java\com\restroly\qrmenu\template\controller\PublicSiteController.java
+Reference Api RestroHub/src/main/java/com/restroly/qrmenu/template/controller/PublicSiteController.java (public site config under /public/api/v1/sites/{siteId}/config).
+Frontend: routes/index.jsx renders RestaurantMenu on a tenant host (subdomain, see utils/subdomain.js) or at /Restrohub/:restaurantName/:branchId.
 
 Now user can see website and add items from menu to cart then all items will be visible in cart and user can order it before
 order user need to add mobile number and name and on successfully order placed user will get notification message on whatsapp with upi payment 
@@ -40,6 +41,9 @@ Super admin will link the user, restaurant, Branch, userRole
 (Admin, Manager, Manager/User(with Read Only admin's section like restaurant, menu, fooditems, category  exclude payments,other imp stuff),
 Staff (can update order and other read only)) -- we need to think on staff and Manager/User roles for once
 
+(Implemented as AppRole: SUPER_ADMIN, ADMIN, RESTAURANT_OWNER, MANAGER, MANAGER_USER, STAFF, CUSTOMER. Permissions are defined in security/Permission.java and tenant
+checks in security/AccessGuard.java. Role/plan/UPI changes are written to the audit log.)
+
 Once admin registed user is linked by superAdmin then admin user can access the
 FoodItems, Menu, Branch, Category, Website section, Payment section
 
@@ -53,11 +57,12 @@ Manage Tables in Branch - Admin can add/edit/delete tables and a qr code will be
 
 Dropdown of branch will present in top 2nd header of admin panel - @Todo
 
-Orders - Create order and All today live order will shown with status (Pending,Preparing, Ready, Billed, Cancelled) in this section and admin can update the order status and also can cancel the order,
-this contains a history button that shows previous orders including today with filter and sorting option with pagination using backend api @Todo
+Orders - Create order and All today live order will shown with status (backend OrderStatus: Pending, Confirmed, Preparing, Ready, Served, Billed, Completed, Cancelled) in this section and admin can update the order status and also can cancel the order,
+this contains a history button that shows previous orders including today with filter and sorting option with pagination using backend api (backend GET /secure/api/v1/orders/history exists; verify the UI wiring)
 KDS(Kitchen Display System) - This section shows all live order to the staff and staff can update the order status and this section is based on 
 KDS flag in admin currently but this flag can be update by superadmin for particular restaurant
 Order status will be in (Pending, Preparing,Ready)
+Admin routes in the frontend: /admin/dashboard, menus, orders, kds, store/branches (+ /:branchId/tables), marketing/website, upi-links, subscriptions, role-management, profile.
 
 Marketing -> Website - This section will populate templates if user's subscription is free then default 2 template will be populated - @Todo
 and it contains website config like 

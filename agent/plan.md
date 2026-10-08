@@ -1,3 +1,14 @@
+# Jules task list (snapshot)
+
+## Status (as of 2026-10-08)
+All 10 implementation steps are DONE and merged on `feature/phase1-6.1-tenant-rbac` (commits `44263f5` feat(phase1) Sprint 1-4 gaps, `b5c7d84` tenant isolation + RBAC, `a2e1378` functional/UI fixes). Steps 11-13 (tests, pre-commit, submit) were process steps, not code.
+- Done: 1 `context/BranchContext.jsx` (`useBranch`, `effectiveBranchId`); 2 `AdminLayout.jsx` wraps `BranchProvider`, `Header.jsx` branch switcher; 3-4 `DashboardController` `GET /statistics/{branchId}` and `StatsSection`/`RevenueChart`/`QuickActions`/`TopItems` use `useBranch`; 5-6 `OrderController` `GET /history` (+ `OrderRepository extends JpaSpecificationExecutor`), `OrderHistoryModal.jsx` opened from `Orders.jsx`; 7 free-plan limiter in `TemplateSelector.jsx` (locks all but `modern`/`classic`); 8 `PublicSiteController` resolves the slug from host when `siteId` is `resolve`/blank (now also reads `X-Forwarded-Host`), plus frontend `utils/subdomain.js` and tenant-host route in `routes/index.jsx`; 10 counter QR (`TablesHeader` "Counter QR" button, `Tables.jsx`, `TableQRModal.jsx` `isCounter`, `&tableNumber=0`).
+- Superseded: step 9 (`@PreAuthorize("hasAnyRole(...)")` on Dashboard/Order controllers). RBAC now uses `@PreAuthorize("@access.can('<PERMISSION>') and @access.branch(#branchId)")` via `security/AccessGuard` and `security/Permission` (e.g. `OPERATIONS_READ`, `ORDER_STATUS_UPDATE`, `VIEW_FINANCIALS`); do not reintroduce `hasAnyRole` lists.
+- Remaining: none from this list. Not aggregated: branch "All" falls back to the first branch (`BranchContext` ponytail note).
+- Below is the original plan, kept unchanged.
+
+---
+
 1.  **Frontend: Create BranchContext**
     *   I've already created `BranchContext.jsx` in `RestroHub-FrontEnd/src/context/` via bash.
 2.  **Frontend: Admin Header Branch Switcher (`@Todo-2`)**

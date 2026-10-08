@@ -1,9 +1,10 @@
 # RestroHub Frontend Design System & UI Guide
 
 > **Project**: RestroHub (Restroly) Client Web Application  
-> **Source Directory**: `D:\projects\gssoc_develop_restrohub\RestroHub-FrontEnd`  
-> **Framework & Tooling**: React 18, Vite, Tailwind CSS 3, Framer Motion, Three.js / React Three Fiber, Lucide Icons, Headless UI, Formik & Yup  
-> **File Version**: 1.0.0  
+> **Source Directory**: `RestroHub-FrontEnd/src` (monorepo root `Restroly/`)  
+> **Framework & Tooling**: React 18, Vite, Tailwind CSS 3 (+ `@tailwindcss/forms`), React Router v6, Axios, Lucide Icons, Headless UI, Formik & Yup, Recharts, react-hot-toast, `@stomp/stompjs` + `sockjs-client`  
+> **Installed but not imported anywhere in `src/` (as of 2026-10-08)**: `framer-motion`, `lenis`, `three`, `@react-three/fiber`, `@react-three/drei`. Do not assume 3D scenes, Framer Motion or Lenis smooth scrolling exist; animation is CSS only.  
+> **File Version**: 1.1.0 (synced to code 2026-10-08)  
 
 ---
 
@@ -37,6 +38,7 @@
    - [Feedback, Spinners & Skeletons](#feedback-spinners--skeletons)
 6. [Animations & Motion Design](#6-animations--motion-design)
 7. [Responsive Breakpoints & Layout Constraints](#7-responsive-breakpoints--layout-constraints)
+8. [App Structure: Routes, Layouts, Contexts & Hooks](#8-app-structure-routes-layouts-contexts--hooks)
 
 ---
 
@@ -46,18 +48,18 @@ RestroHub utilizes a **Tri-Tier UI Architecture** designed to meet three fundame
 
 ```mermaid
 flowchart TD
-    App["RestroHub Web Client"] --> T1["Tier 1: Public Marketing Platform<br/>(/, /login, /register)"]
-    App --> T2["Tier 2: Customer Dining & QR Portal<br/>(/Restrohub/:slug/:branchId)"]
+    App["RestroHub Web Client"] --> T1["Tier 1: Public Marketing Platform<br/>(/, /login, /register, /forgot-password, legal pages)"]
+    App --> T2["Tier 2: Customer Dining & QR Portal<br/>(/Restrohub/:restaurantName/:branchId, or / on a tenant subdomain)"]
     App --> T3["Tier 3: Merchant & Admin Dashboard<br/>(/admin/*)"]
 
-    T1 --- T1_Style["• Space Grotesk + Inter<br/>• Cyber-Neon Dark Palette (#ff6b35)<br/>• 3D Particles, Tilt Cards, Glows<br/>• landing.css + Framer Motion"]
+    T1 --- T1_Style["• Space Grotesk + Inter<br/>• Cyber-Neon Dark Palette (#ff6b35)<br/>• Glows, gradients, CSS animations<br/>• landing.css (no 3D / Framer Motion in use)"]
     T2 --- T2_Style["• Playfair Display + Montserrat<br/>• Dynamic CSS Variables (:root)<br/>• Real-time Theme Ingestion from Backend<br/>• Luxury Hospitality Aesthetic"]
     T3 --- T3_Style["• Inter + Tailwind CSS<br/>• Brand Sky Palette (#16b9f9)<br/>• Dual Theme (Light & Admin Dark)<br/>• High Density Enterprise UX"]
 ```
 
 - **Customer QR Microsite**: Driven completely by **CSS custom properties (`--var`)** mapped dynamically via `SiteContext.jsx` and the backend `Theme` entity. Any restaurant brand can inject its custom colors, typography, and layout options seamlessly at runtime.
-- **Admin Dashboard**: Built with **Tailwind CSS 3** utility classes, custom `brand` color ramps, and automatic class toggling (`.dark`, `.admin-dark`) with strict form element normalization.
-- **Public Landing & Auth**: Styled with bespoke modern CSS (`landing.css`), 3D WebGL scenes (`@react-three/fiber`), and fluid Lenis scrolling.
+- **Admin Dashboard**: Built with **Tailwind CSS 3** utility classes, custom `brand` color ramps, and class toggling (`.dark`, `.admin-dark`, both set together by `ThemeContext`) with form element normalization in `global.css`.
+- **Public Landing & Auth**: Styled with bespoke CSS (`src/styles/landing.css`) and Tailwind. No WebGL or smooth-scroll library is wired in.
 
 ---
 
@@ -65,7 +67,7 @@ flowchart TD
 
 ### Typefaces Catalog
 
-The application loads four specialized Google Font families via `index.html` and `landing.css`:
+The application loads four Google Font families: Playfair Display and Montserrat via `index.html`, Inter and Space Grotesk via an `@import` in `src/styles/landing.css`:
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -88,7 +90,7 @@ The application loads four specialized Google Font families via `index.html` and
 
 ### Font Scale & Sizing Tokens
 
-Defined globally in `src/styles/variables.css`:
+Defined globally in `src/styles/variables.css` (`:root`):
 
 | CSS Variable | Rem Value | Pixel Equivalent | Line Height | Usage Context |
 |---|---|---|---|---|
@@ -155,7 +157,7 @@ Button Label           --> font-family: Montserrat / Inter               | font-
 
 ### Tier 1: Marketing / Landing System
 
-Designed for high-impact visual appeal to prospective restaurant owners.
+Designed for high-impact visual appeal to prospective restaurant owners. These tokens live in `src/styles/landing.css` `:root`. Names such as `--text-primary`, `--bg-card`, `--shadow-glow` and `--radius-*` overlap with other tiers but carry different values, so keep each tier's styles scoped.
 
 | Token | Hex / Value | Role & Usage |
 |---|---|---|
@@ -177,7 +179,7 @@ Designed for high-impact visual appeal to prospective restaurant owners.
 
 ### Tier 2: Customer Microsite Dynamic CSS Variable System
 
-The customer-facing digital menu and restaurant microsite uses a **fully decoupled CSS variable architecture**. When a diner loads `/Restrohub/:restaurantSlug/:branchId`, `SiteContext.jsx` downloads the active `Theme` and assigns these variables to `:root`:
+The customer-facing digital menu and restaurant microsite uses a **fully decoupled CSS variable architecture**. When a diner loads `/Restrohub/:restaurantName/:branchId` (or `/` on a `<slug>.restroly.in` host), `SiteProvider` in `context/SiteContext.jsx` loads the site config/theme and assigns these variables to `:root` via `style.setProperty`. Defaults (below) live in `src/styles/variables.css`:
 
 ```css
 :root {
@@ -203,13 +205,7 @@ The customer-facing digital menu and restaurant microsite uses a **fully decoupl
     --color-border-secondary: #1f2937;
     --color-border-accent: var(--color-primary);
     
-    /* Component Colors */
-    --color-header-bg: #0a0a0a;
-    --color-footer-bg: #0a0a0a;
-    --color-button-bg: var(--color-primary);
-    --color-button-text: #ffffff;
-    
-    /* Overlays */
+    /* Overlay Colors */
     --color-overlay-dark: rgba(0, 0, 0, 0.5);
     --color-overlay-darker: rgba(0, 0, 0, 0.6);
     --color-overlay-light: rgba(0, 0, 0, 0.2);
@@ -220,7 +216,7 @@ The customer-facing digital menu and restaurant microsite uses a **fully decoupl
 
 ### Pre-Configured Customer Theme Palettes
 
-RestroHub comes with five ready-to-use color schemes curated for different dining genres:
+`variables.css` ships a few of these only as commented-out alternatives; the live palette comes from the restaurant's saved theme (edited in `components/admin/marketing/website/ThemeSelector.jsx`). Treat the list below as design reference, not a built-in preset switcher:
 
 ```
 1. Default Amber Gold (Fine Dining & Lounge)
@@ -241,6 +237,8 @@ RestroHub comes with five ready-to-use color schemes curated for different dinin
 6. Vibrant Blue Fallback
    Primary: #3b82f6 | Hover: #60a5fa | Background: #0a0a0a | Card: #1a1a1a
 ```
+
+Template keys offered in `ThemeSelector.jsx` are `modern_v2`, `luxury_v1` (free) and `classic_v1`, `vibrant_v1` (premium); `TemplateSelector.jsx` uses ids `modern`, `classic`, `vibrant`. See section 8.
 
 ---
 
@@ -291,9 +289,9 @@ Dark mode is controlled at two levels:
    // tailwind.config.js
    darkMode: ['selector', ['.dark', '.admin-dark']]
    ```
-   - Managed via `ThemeContext.jsx` and `AdminThemeContext.jsx`.
-   - Reads preference from `localStorage.getItem('theme')` or system `prefers-color-scheme`.
-   - Toggles classes `.dark` and `.admin-dark` on `document.documentElement`.
+   - Managed by `ThemeContext.jsx` (`ThemeProvider` wraps the whole app in `App.jsx`; `useTheme` returns `{ isDark, toggle }`). `AdminThemeContext.jsx` is only a re-export alias (`AdminThemeProvider`, `useAdminTheme`).
+   - Reads `localStorage['theme']` (`'dark'`/`'light'`), falling back to system `prefers-color-scheme`.
+   - Toggles both `.dark` and `.admin-dark` on `document.documentElement` together.
    - `global.css` automatically forces high-contrast dark backgrounds and light text on all admin components:
      ```css
      .dark .admin-content .bg-white,
@@ -308,8 +306,8 @@ Dark mode is controlled at two levels:
      ```
 
 2. **Customer Microsite Level**:
-   - Evaluates `theme.isDarkMode` received from the database.
-   - Sets attribute `data-site-theme="dark"` or `data-site-theme="light"` on `<html>`.
+   - Evaluates `theme.isDarkMode` received from the backend theme.
+   - `SiteContext` sets attribute `data-site-theme="dark"` or `data-site-theme="light"` on `<html>`.
    - Adapts sticky navigation and loader transparency accordingly.
 
 ---
@@ -337,10 +335,10 @@ Defined in `src/styles/variables.css`:
 
 | Token | Radius Value | Component Targets |
 |---|---|---|
-| `--radius-sm` | `0.25rem` (`4px`) / `8px` | Tags, checkboxes, small utility badges |
-| `--radius-md` | `0.50rem` (`8px`) / `12px` | Form text fields, action buttons, table rows |
-| `--radius-lg` | `1.00rem` (`16px`) / `20px` | Dish cards, modal dialogs, drawer panels |
-| `--radius-xl` | `1.75rem` (`28px`) | Standout marketing feature cards |
+| `--radius-sm` | `0.25rem` (`4px`) in `variables.css`; `8px` in `landing.css` | Tags, checkboxes, small utility badges |
+| `--radius-md` | `0.50rem` (`8px`); `12px` in `landing.css` | Form text fields, action buttons, table rows |
+| `--radius-lg` | `1.00rem` (`16px`); `20px` in `landing.css` | Dish cards, modal dialogs, drawer panels |
+| `--radius-xl` | `28px` (defined only in `landing.css`; `ContactSection.jsx` also references it) | Standout marketing feature cards |
 | `--radius-full`| `9999px` | Circular avatar images, pill badges, scrollbar thumb, FAB button |
 
 ---
@@ -367,9 +365,11 @@ Standardized scale to avoid layering conflicts across modals, popovers, and stic
 |---|---|---|
 | `--z-dropdown` | `100` | Select dropdown menus, user profile flyout |
 | `--z-sticky` | `200` | Sticky navigation bar (`.nav-scrolled`), table sticky headers |
-| `--z-fixed` | `300` | Floating Action Button (`ServiceFAB`), Table banner |
+| `--z-fixed` | `300` | Fixed bars |
 | `--z-modal` | `400` | Customer order drawer, checkout modal, confirmation dialogs |
-| `--z-tooltip` | `500` | Toast notifications (`react-hot-toast`), tooltips |
+| `--z-tooltip` | `500` | Tooltips |
+
+Note: `ServiceFAB.jsx` uses hard-coded inline z-indexes (999, 1000, 1100) instead of these tokens, and `react-hot-toast` uses its own defaults. Prefer the tokens for new fixed UI.
 
 ---
 
@@ -502,7 +502,7 @@ Sticky headers transition from transparent to frosted glass on scroll:
 
 ### Customer Microsite Modular Sections
 
-The dining microsite renders 8 modular sections defined in `src/components/customer/`:
+`pages/customer/RestaurantMenu.jsx` wraps the page in `CustomerOrderProvider` > `SiteProvider`, shows `Loader` while loading, then renders `TableBanner`, `Navigation`, a `main` containing the sections below (plus `ServiceFAB`), `Footer` and `CustomerOrderDrawer`. Components live in `src/components/customer/`:
 
 1. **Navigation (`Navigation.jsx`)**: Brand logo, tagline, established badge, dynamic nav links, cart drawer trigger with item badge.
 2. **Hero (`HeroSection.jsx`)**: Full-height background image (`.hero-bg`), multi-line title, primary CTA (`#menu`), secondary CTA (`#reservations`).
@@ -518,11 +518,11 @@ The dining microsite renders 8 modular sections defined in `src/components/custo
 ### Floating Action Buttons & Drawers
 
 - **Service FAB (`ServiceFAB.jsx`)**:
-  - Located at bottom-right of the screen (`z-index: 300`).
+  - Located at bottom-right of the screen (inline z-index 999-1100).
   - Allows diners to trigger immediate service notifications: **"Call Waiter"** or **"Request Bill"**.
   - Animated pulsing glow to ensure discoverability.
 - **Order Drawer (`CustomerOrderDrawer.jsx`)**:
-  - Slide-in panel from the right (`z-index: 400`).
+  - Slide-in panel from the right.
   - Displays selected items, quantity increments/decrements, special notes per dish, tax/total calculations, and checkout trigger.
 
 ---
@@ -534,8 +534,20 @@ The dining microsite renders 8 modular sections defined in `src/components/custo
 - **Non-Vegetarian Badge**: Red border square with red inner triangle/dot (`#ef4444`).
 
 #### Order Lifecycle Status Badges
-| Status | Badge Background | Badge Text | Meaning |
-|---|---|---|---|
+Source of truth: `statusConfig` in `components/admin/orders/orderComponents/OrderCard.jsx` (bg / text / border, each paired with a Lucide icon). Next-action buttons follow `PENDING/CONFIRMED -> PREPARING -> READY -> BILLED -> COMPLETED`; `CANCELLED` is a manual action.
+
+| Status | Tailwind (bg / text / border) | Meaning |
+|---|---|---|
+| `PENDING` | `yellow-50 / yellow-700 / yellow-200` | Order placed, awaiting acknowledgment |
+| `CONFIRMED` | `indigo-50 / indigo-700 / indigo-200` | Accepted |
+| `PREPARING` | `blue-50 / blue-700 / blue-200` | Being cooked |
+| `READY` | `green-50 / green-700 / green-200` | Ready for delivery |
+| `SERVED` | `teal-50 / teal-700 / teal-200` | Delivered to table |
+| `BILLED` | `purple-50 / purple-700 / purple-200` | Bill generated |
+| `COMPLETED` | `gray-50 / gray-600 / gray-200` | Paid and closed |
+| `CANCELLED` | `red-50 / red-700 / red-200` | Voided or rejected |
+
+---|---|---|---|
 | `PENDING` | `bg-amber-100 text-amber-800` | Amber | Order placed, awaiting restaurant acknowledgment |
 | `CONFIRMED` | `bg-blue-100 text-blue-800` | Blue | Kitchen accepted the order |
 | `PREPARING` | `bg-indigo-100 text-indigo-800` | Indigo | Chefs are cooking the items |
@@ -560,13 +572,13 @@ The dining microsite renders 8 modular sections defined in `src/components/custo
       animation: spin 1s linear infinite;
   }
   ```
-- **Skeleton Shimmer**: Used in `AdminSkeleton.jsx` using Tailwind's `animate-pulse` and `bg-gray-200 dark:bg-gray-700` to prevent layout shift during queries.
+- **Skeleton Shimmer**: Used in `components/admin/AdminSkeleton.jsx` using Tailwind's `animate-pulse` and `bg-gray-200 dark:bg-gray-700` to prevent layout shift during queries.
 
 ---
 
 ## 6. Animations & Motion Design
 
-Micro-interactions are handled via both CSS keyframes and Framer Motion:
+Micro-interactions are CSS-only (keyframes and transitions in `global.css`/`landing.css`, plus Tailwind `animate-*`). `framer-motion` is a dependency but is not imported anywhere in `src/`.
 
 ### CSS Keyframes (`global.css`)
 ```css
@@ -587,6 +599,8 @@ Micro-interactions are handled via both CSS keyframes and Framer Motion:
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Bounce also exists in global.css */
+
 /* Pulse */
 @keyframes pulse {
     0%, 100% { opacity: 1; }
@@ -599,8 +613,8 @@ Micro-interactions are handled via both CSS keyframes and Framer Motion:
 - `--transition-normal`: `300ms ease` (Card expansions, dropdown reveals)
 - `--transition-slow`: `500ms ease` (Theme transitions, page layout shifts)
 
-### Smooth Scrolling (Lenis)
-The application leverages the `lenis` smooth scrolling library on public pages to ensure friction-free inertial scrolling on desktop and mobile browsers.
+### Smooth Scrolling
+No smooth-scroll library is in use (`lenis` is installed but not imported). Use native scrolling.
 
 ---
 
@@ -625,3 +639,37 @@ To maintain 60 FPS smooth scrolling on mobile devices, fixed hero backgrounds ar
     }
 }
 ```
+
+---
+
+## 8. App Structure: Routes, Layouts, Contexts & Hooks
+
+Import aliases (`vite.config.js`): `@`, `@components`, `@context`, `@hooks`, `@services`, `@data`, `@styles`.
+
+### Routes (`src/routes/index.jsx`)
+| Group | Layout | Paths |
+|---|---|---|
+| Public | `PublicLayout` | `/` (landing; omitted on tenant hosts), `/login`, `/register`, `/forgot-password`, `/privacy-policy`, `/terms-of-service`, `/refund-policy` |
+| Customer | `CustomerLayout` (ErrorBoundary + `min-h-screen bg-gray-50`) | `/Restrohub/:restaurantName/:branchId`; on a tenant subdomain `/` renders the same `RestaurantMenu` |
+| Admin | `AdminLayout` inside `ProtectedRoute` | `/admin` redirects to `/admin/dashboard`; `dashboard`, `menus`, `orders`, `store/branches`, `store/branches/:branchId/tables`, `marketing/website`, `upi-links`, `subscriptions`, `kds`, `role-management` (wrapped in `AdminRoute`), `profile` |
+| Fallback | none | `*` renders `NotFound` |
+
+`marketing/qr-display` (`QRDisplay`) is commented out in both the route table and `Sidebar.jsx`. Sidebar groups: Menu (Dashboard, Kitchen Display, Menus, Orders), Management (User Roles, Store > Branches, Marketing > Website), Payments (UPI Links), Platform (Subscriptions).
+
+### Subdomain resolution
+`utils/subdomain.js` `getSubdomainSlug()` extracts the tenant slug from `<slug>.restroly.in` (null for localhost, IPs, `www` and the bare domain). `routes/index.jsx` uses it to serve the public site at `/`; `SiteContext` also calls it.
+
+### Contexts (`src/context/`)
+- `ThemeContext`: global light/dark (section 3); `AdminThemeContext` is an alias.
+- `SiteContext` (`SiteProvider`, `useSiteData`, `useTheme`): customer site data and CSS-variable injection.
+- `CustomerOrderContext` (`CustomerOrderProvider`): diner cart and order state.
+- `BranchContext` (`BranchProvider`, `useBranch`): provided by `AdminLayout`. Exposes `branches`, `selectedBranchId` (persisted in `localStorage['selectedBranchId']`, default `'all'`), `effectiveBranchId` (first branch when `'all'`), `handleBranchChange`, `loading`. The branch switcher is in `components/admin/Header.jsx`; Dashboard cards, Menus, KDS and Orders read `effectiveBranchId`. Never hard-code branch IDs.
+
+### Hooks (`src/hooks/`)
+- `useOrderStream(onChange)`: STOMP over SockJS (`VITE_API_BASE_URL` + `/ws`) subscribed to `/topic/restaurant/<restaurantId>/branch/<branchId>/orders`; chimes on new `PENDING` orders and polls every 15 s while disconnected. Returns `{ connected }`. Used by `KitchenDisplaySystem` and `Orders.jsx`.
+- `useAuth` (role helpers such as `hasRole`, `isAdmin`) and `useWebSocketNotifications`.
+
+### Admin feature notes
+- **Order history**: `components/admin/orders/OrderHistoryModal.jsx`, opened from `Orders.jsx`.
+- **Free-plan template limiter**: `marketing/website/TemplateSelector.jsx` fetches the subscription and locks every template except `modern` and `classic` when the plan name contains "free"; `ThemeSelector.jsx` flags `classic_v1` and `vibrant_v1` as `premium`. Show locked options with a lock affordance rather than hiding them.
+- **HTTP**: all calls go through `services/common/api.js` (Axios, Bearer token request interceptor; on 401/403 for non-`/public/` URLs it clears the session and redirects to `/login`), `services/public/ApiService.js` and `services/user/profileService.js`; tokens live in `services/common/authStorage.js`.

@@ -9,7 +9,7 @@ This file provides guidance and environment instructions to Google's Jules and o
 **Restroly (RestroHub)** is an open-source digital menu and restaurant management platform for Indian restaurants (QR menus, UPI payments, order dashboard, analytics, JWT + Google OAuth).
 
 It is a two-app monorepo:
-- `RestroHub/` — **Backend**: Java 21, Spring Boot 3.2.6, Gradle, PostgreSQL 14+ (Flyway migrations)
+- `RestroHub/` — **Backend**: Java 21, Spring Boot 3.2.6, Gradle (wrapper 8.13), PostgreSQL 14+ (Flyway migrations)
 - `RestroHub-FrontEnd/` — **Frontend**: React 18, Vite, Tailwind CSS, React Router v6, Axios
 
 ---
@@ -25,7 +25,7 @@ In Jules, the repository is automatically cloned into `/app`.
 - **Build Tools**: Gradle wrapper (`RestroHub/gradlew`)
 
 ### Quick Setup Script
-Execute `./scripts/setup_jules.sh` from the repository root, or run:
+Execute `./scripts/setup_jules.sh` from the repository root (7 steps: system packages, Gradle mirror, Node check, PostgreSQL, backend compile and test, seed data, frontend build). The core of it is:
 ```bash
 # 1. System packages
 sudo apt-get update -y
@@ -86,6 +86,8 @@ npm install
 npm run build
 ```
 
+The script additionally runs the backend tests, boots the app once (`bootWar`, `SERVER_PORT`/`SEED_PORT` default 8181) so Hibernate/Flyway create the tables, then loads `scripts/db/01_seed_users.sql` and `scripts/db/02_seed_demo_data.sql` (test logins `<role>@restroly.test`, password `Test@1234`). Set `SEED_DEMO_DATA=false` to skip seeding.
+
 ---
 
 ## 3. Build & Test Commands
@@ -131,30 +133,34 @@ npm run dev -- --port 3000
 ## 4. Architecture & Coding Conventions
 
 ### Backend (`RestroHub/`)
-- Root package: `com.restroly`.
-- Layers:
+- Root package: `com.restroly.qrmenu`, organized **by feature**: `auth`, `user`, `restaurant`, `branch`, `table`, `menu`, `category`, `food`, `order`, `payment`, `subscription`, `template`, `notification` (service requests, email), `notifications` (SSE dashboard notifications), `whatsapp`, `excel`, `address`, `audit`, `admin/dashboard`.
+- Each feature package holds its own layers: `controller/`, `service/` (+ `impl/`), `repository/`, `entity/`, `dto/`, `mapper/` (MapStruct). Put new code in the matching feature package.
   - `controller/`: REST endpoints only. Thin layer, no business logic.
   - `service/`: Business logic and transaction management.
   - `repository/`: Spring Data JPA interfaces.
   - `dto/`: Request/Response DTOs. **Never return entities directly from controllers.**
-  - `model/`: JPA entities with Lombok and JPA annotations.
-  - `config/`: Spring Security, CORS, Swagger, WebSocket configurations.
-  - `exception/`: Custom exceptions and `@RestControllerAdvice` handlers.
-- Endpoints:
-  - Public: `/restroly/api/v1/**`
-  - Protected (JWT required): `/restroly/secure/api/v1/**`
+  - `entity/`: JPA entities with Lombok and JPA annotations.
+- Cross-cutting packages: `config/` (`SecurityConfig`, CORS, OpenAPI, Cloudinary), `security/` (JWT filter/provider, `AccessGuard`, `Permission`, `AppRole`), `common/` (shared DTOs, enums, `WebSocketConfig`), `exception/` (custom exceptions and global handler).
+- Endpoints (context path `/restroly`; constants in `common/util/ApiConstants`):
+  - Public: `/public/api/v1/**` (auth, orders, restaurants, sites). A few legacy paths remain under `/api/v1/**` (e.g. `/api/v1/roles`).
+  - Protected (JWT required): `/secure/api/v1/**`. Writes (POST/PUT/PATCH/DELETE on `/secure/api/**`) need role `ADMIN`, `MANAGER` or `RESTAURANT_OWNER`; STAFF may update order status.
+- Authorization: use `@PreAuthorize("@access.can('<PERMISSION>') and @access.branch(#branchId)")`. `security/AccessGuard` does tenant checks and `security/Permission` is the only role-to-permission map; do not add `hasRole(...)` lists. Roles (`AppRole`): `SUPER_ADMIN`, `ADMIN`, `RESTAURANT_OWNER`, `MANAGER`, `MANAGER_USER`, `STAFF`, `CUSTOMER`.
+- Sensitive actions (role, plan, UPI VPA changes) are recorded via `audit/service/AuditLogService`.
+- Schema: Flyway migrations in `src/main/resources/db/migration` (V1 to V5). Dev uses `ddl-auto=update`, prod uses `validate`, so entity changes need a new `V<n>__*.sql`.
+- Real-time: STOMP over WebSocket at `/ws` (broker `/topic`), plus SSE for dashboard notifications.
 
 ### Frontend (`RestroHub-FrontEnd/`)
 - Source root: `src/`.
-- All API calls **must** go through `services/api.js` or `services/ApiService.js` (never raw `fetch` or direct `axios` in components).
-- Global state is handled via React Context API (`context/SiteContext.jsx`).
+- All API calls **must** go through `services/common/api.js` (Axios instance, base URL `VITE_API_BASE_URL`) or `services/public/ApiService.js` (never raw `fetch` or direct `axios` in components). Token storage is `services/common/authStorage.js`.
+- Global state is handled via React Context API (`context/`: `SiteContext`, `BranchContext`, `CustomerOrderContext`, `ThemeContext`, `AdminThemeContext`).
+- Routes live in `routes/index.jsx` (with `ProtectedRoute.jsx`); layouts in `layouts/{Admin,Customer,Public}Layout.jsx`.
 
 ---
 
 ## 5. Branching & Contribution Workflow
 
 - **Base Branch**: Always branch from and open PRs against **`gssoc_develop`** (never `main`).
-- **Branch Naming**: `feat/`, `fix/`, `docs/`, `refactor/`, `test/` followed by a short description.
+- **Branch Naming**: `feature/`, `fix/`, `docs/`, `refactor/`, `test/` followed by a short description.
 - **Commit Messages**: Conventional Commits format:
   - `feat(scope): description`
   - `fix(scope): description`

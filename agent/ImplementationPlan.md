@@ -1,5 +1,12 @@
 # Implementation Plan
 
+> ## Status (as of 2026-10-08)
+> Evidence: commits `b5c7d84` (tenant isolation + RBAC), `44263f5` (Sprint 1-4 gaps), `a2e1378` (functional/UI fixes) on `feature/phase1-6.1-tenant-rbac`.
+> - **Done**: 1.1 branch switcher (`context/BranchContext.jsx`, `Header.jsx`, `AdminLayout.jsx`); 1.2 dashboard wired to `/secure/api/v1/dashboard/stats|trends` (`StatsSection`, `RevenueChart`) and `/statistics/{branchId}` exists; 1.3 `GET /orders/history` (+ `paymentStatus`, `tableNumber`, `orderSource` params) and `OrderHistoryModal.jsx`; 1.4 `TemplateSelector.jsx` lock plus server-side `UPGRADE_REQUIRED` in `SiteConfigServiceImpl`; 1.5 host/`X-Forwarded-Host` resolution in `PublicSiteController` + `utils/subdomain.js`; 1.6 backend RBAC; 1.7 counter QR (`TablesHeader`, `TableQRModal`); 2.1 `OrderEventPublisher` + `WebSocketConfig`; 2.2 `hooks/useOrderStream.js` (chime, 15 s polling fallback) used by KDS and `Orders.jsx`; 2.3 header bell via `hooks/useWebSocketNotifications.js`; 2.4 Flyway `V1`-`V5` in `db/migration`; 2.6 `OrderFlowIntegrationTest` (Testcontainers; skipped without Docker); 2.7 `components/common/ErrorBoundary.jsx` wraps `CustomerLayout`.
+> - **Superseded**: the `hasAnyRole`/`@PreAuthorize` role lists implied by 1.6 and section 5. RBAC is now `@PreAuthorize("@access.can('<PERMISSION>') and @access.branch(#branchId)")` via `security/AccessGuard` + `security/Permission`. File names `AppRoutes.jsx`, `AdminHeader.jsx` and `WebsiteWrapper.jsx`-based limiter are now `routes/index.jsx`, `components/admin/Header.jsx`, `TemplateSelector.jsx`. Free tier locks all but `modern`/`classic` rather than "Classic Cafe & Modern Dhaba".
+> - **Remaining / unverified**: frontend role-based hiding in `Sidebar.jsx` (no role checks there; only `AdminRoute` guards `role-management`); Category/Food tenant ownership, per-branch assignment (see section 2 RBAC row); 2.5 CI (no `.github/workflows` directory found; frontend has no `test` script); 2.6 not yet run against Docker; 2.2/2.3 manual verification; all of Phase 3 (no i18n `LanguageContext`, Redis, PWA, Razorpay or aggregator code found; Testcontainers is the only listed dependency present); history-modal UI for the new payment/table/source filters not confirmed; "All Branches" in the UI falls back to the first branch (no aggregate endpoint).
+> - The text below is the original 2.0 plan, left unedited.
+
 ## Restroly (RestroHub) — Digital Menu, Order & Multi-Tenant Restaurant Management Platform
 
 | Field | Value |

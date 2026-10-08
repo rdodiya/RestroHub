@@ -2,9 +2,9 @@
 
 > **Generated From**: JPA / Hibernate Entities in `com.restroly.qrmenu.*.entity`  
 > **Database Dialect**: PostgreSQL  
-> **JPA DDL Mode**: `spring.jpa.hibernate.ddl-auto=update`  
+> **JPA DDL Mode**: `spring.jpa.hibernate.ddl-auto=update` in dev; `validate` in prod (schema comes from Flyway V1-V5, see [Flyway Migration History](#flyway-migration-history))  
 > **Database Name**: `RestroHub_DB`  
-> **Total Entities**: 23 Entities + 1 Join Table  
+> **Total Entities**: 24 Entities + 1 Join Table (`t_audit_log` is documented in its own section near the end)  
 
 ---
 
@@ -235,6 +235,9 @@ erDiagram
         varchar customer_phone
         varchar special_instructions
         timestamp created_at
+        varchar payment_status "UNPAID, LINK_SENT, VERIFIED_BY_STAFF"
+        varchar order_source "TABLE_QR, COUNTER_QR, STAFF"
+        varchar idempotency_key UK
     }
 
     T_order_items {
@@ -391,6 +394,7 @@ erDiagram
 | **6. Waiter Notifications** | In-restaurant customer service triggers (e.g. Call Waiter, Request Bill) per table | `t_service_request` |
 | **7. Subscriptions (SaaS)** | Multi-tenant SaaS monetization: tiered subscription plans, feature quotas, and restaurant subscription lifecycles | `t_subscription_plan`, `t_subscription_feature`, `t_plan_feature_mapping`, `t_restaurant_subscription` |
 | **8. Template & Themes** | Public-facing website builder with customizable design tokens (palette, typography), page templates, and dynamic JSON sections | `themes`, `t_site_config`, `t_section_master` |
+| **9. Audit** | Append-only log of sensitive actions (role, plan, UPI VPA changes), no FKs | `t_audit_log` |
 
 ---
 
@@ -695,6 +699,9 @@ erDiagram
 | `customer_phone` | `customerPhone` | `String` | `VARCHAR(255)` | - | Yes | - | Guest phone (used for WhatsApp updates) |
 | `special_instructions` | `specialInstructions` | `String` | `VARCHAR(255)` | - | Yes | - | Kitchen preparation notes |
 | `created_at` | `createdAt` | `LocalDateTime` | `TIMESTAMP` | - | Yes | `now()` | Order placement timestamp |
+| `payment_status` | `paymentStatus` | `OrderPaymentStatus` | `VARCHAR(32)` | - | No (DB) | `UNPAID` | Manual payment tracking (`UNPAID`, `LINK_SENT`, `VERIFIED_BY_STAFF`); added in V4, `EnumType.STRING` |
+| `order_source` | `orderSource` | `OrderSource` | `VARCHAR(32)` | - | Yes | - | Where the order was placed (`TABLE_QR`, `COUNTER_QR`, `STAFF`); added in V4, `EnumType.STRING` |
+| `idempotency_key` | `idempotencyKey` | `String` | `VARCHAR(64)` | **UK** | Yes | - | Client-supplied `Idempotency-Key`; a repeat returns the existing order. Unique index `uq_order_idempotency_key` (V5); many NULLs allowed |
 
 #### Transient Fields (Not Stored)
 - `paymentId`: In-memory temporary payment utility identifier.
@@ -986,6 +993,15 @@ erDiagram
 
 ---
 
+### 1b. `OrderPaymentStatus` and `OrderSource`
+- **Package**: `com.restroly.qrmenu.common.enums`
+- **Used In**: `Order.paymentStatus`, `Order.orderSource` (`EnumType.STRING`)
+- **`OrderPaymentStatus`**: `UNPAID`, `LINK_SENT`, `VERIFIED_BY_STAFF`
+- **`OrderSource`**: `TABLE_QR`, `COUNTER_QR`, `STAFF`
+- **Note**: a second, unused-looking `com.restroly.qrmenu.order.entity.OrderStatus` (without `CANCELLED`) also exists in the source tree; the entity uses the `common.enums` one.
+
+---
+
 ### 2. `PaymentStatus`
 - **Package**: `com.restroly.qrmenu.payment.entity.PaymentStatus`
 - **Used In**: `PaymentVerification.status` (mapped via `@Enumerated(EnumType.STRING)`)
@@ -1083,6 +1099,9 @@ All entities use `GenerationType.IDENTITY` corresponding to PostgreSQL `BIGSERIA
 | `t_food_master` | `idx_food_available` | `isAvailable` | Fast filtering of active menu items |
 | `t_food_master` | `idx_food_category` | `category_id` | Optimized category joins and dish listing by category |
 | `themes` | `idx_theme_key` | `theme_key` | Rapid lookup of design theme tokens by key |
+| `t_order_master` | `idx_order_branch_created` | `branch_id, created_at` | Branch order lists by date (created in V4 migration, not declared on the entity) |
+| `t_order_master` | `uq_order_idempotency_key` | `idempotency_key` | Unique idempotency key (V5; also `unique = true` on the entity) |
+| `t_audit_log` | `idx_audit_log_restaurant_created`, `idx_audit_log_target` | see Audit Log section | Tenant timeline and target lookups (V2) |
 
 ---
 
@@ -1117,8 +1136,12 @@ Migrations live in `RestroHub/src/main/resources/db/migration/`. Never edit a me
 | V1 | `V1__baseline.sql` | **Placeholder** baseline (`SELECT 1`). Existing tables are still created by Hibernate in dev (`ddl-auto=update`). Replace it with a real `pg_dump --schema-only` before relying on prod `ddl-auto=validate`. Until then, new migrations must not add foreign keys to Hibernate-created tables. |
 | V2 | `V2__create_audit_log.sql` | Creates `t_audit_log` and its two indexes (Phase 1 §6.1). |
 | V3 | `V3__baseline_core_schema.sql` | Real baseline of all core tables (restaurants, branches, tables, users/roles, menus, categories, foods, orders/items, payments, UPI links, service requests, subscriptions, themes, site config, sections), derived from the entities. Every statement is `IF NOT EXISTS` and there are **no foreign keys**, so it is safe on databases Hibernate already created and gives prod `ddl-auto=validate` its tables. |
-| V4 | `V4__order_payment_status_and_source.sql` | Adds `payment_status` (default `UNPAID`) and `order_source` to `t_order_master` plus index `idx_order_branch_created (branch_id, created_at)`. |
+| V4 | `V4__order_payment_status_and_source.sql` | Adds `payment_status` (`VARCHAR(32) NOT NULL DEFAULT 'UNPAID'`) and `order_source` (`VARCHAR(32)`) to `t_order_master` plus index `idx_order_branch_created (branch_id, created_at)`. |
+| V5 | `V5__order_idempotency_key.sql` | Adds nullable `idempotency_key VARCHAR(64)` to `t_order_master` and unique index `uq_order_idempotency_key`. |
+
+> Dev databases are still built by Hibernate (`ddl-auto=update`); migrations V2-V5 use `IF NOT EXISTS` and no foreign keys, so they are safe on both. The FK columns shown in the tables above are enforced by Hibernate in dev only; V3 creates them as plain `BIGINT` columns.
 
 ### Entity changes since V2
 
 - `Order` (`T_order_master`): `payment_status` (`OrderPaymentStatus`: `UNPAID`, `LINK_SENT`, `VERIFIED_BY_STAFF`; default `UNPAID`) and `order_source` (`OrderSource`: `TABLE_QR`, `COUNTER_QR` for table number 0, `STAFF`), both `EnumType.STRING`.
+- `Order` (`T_order_master`): `idempotency_key` (`VARCHAR(64)`, unique, nullable), added in V5.

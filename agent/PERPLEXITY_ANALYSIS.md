@@ -1,3 +1,13 @@
+# Perplexity PRD analysis (external review snapshot)
+
+> ## Status (as of 2026-10-08)
+> This is an external review of the PRD, kept as written. Mapping of its six "remaining" items to the code (commits `b5c7d84`, `44263f5`, `a2e1378`):
+> - **Done**: (2) branch selector (`context/BranchContext.jsx`, `Header.jsx`; backend validates branch via `@access.branch(#branchId)`); (3) order history `GET /secure/api/v1/orders/history` with `paymentStatus`, `tableNumber`, `orderSource`, phone, dates, status, pagination, plus `OrderHistoryModal.jsx` and `OrderPaymentStatus` (`UNPAID`, `LINK_SENT`, `VERIFIED_BY_STAFF`, i.e. the manual-verification labels it recommends); (4) dashboard `stats`/`trends`/`top-items` (`DashboardController`, wired in `StatsSection`/`RevenueChart`); (5) free-tier limiting enforced server-side (`UPGRADE_REQUIRED` in `SiteConfigServiceImpl`) and in `TemplateSelector.jsx`; (6) backend RBAC + tenant isolation (`security/AccessGuard`, `security/Permission`, `@PreAuthorize("@access.can(...)")`) and `audit/service/AuditLogService`; gap E partly: checkout idempotency key (`V5__order_idempotency_key.sql`, `CreateOrderRequest`, `PublicOrderController`); gap F partly: live order stream (`useOrderStream`, `OrderEventPublisher`); gap I partly: privacy/terms/refund pages and `ForgotPassword.jsx`.
+> - **Partly done**: (1) subdomain routing: app-level host resolution (`PublicSiteController` with `X-Forwarded-Host`, frontend `utils/subdomain.js`) exists; wildcard DNS/TLS, reserved-slug protection, slug-change policy and suspended-restaurant pages not verified in code.
+> - **Superseded / differs**: its proposed KDS status model `PENDING -> ACCEPTED -> ...` was not adopted; `OrderStatus` is `PENDING, CONFIRMED, PREPARING, READY, SERVED, COMPLETED, BILLED, CANCELLED`. Its path-based fallback `restroly.in/r/<slug>` was not adopted; the path route is `/Restrohub/:restaurantName/:branchId`. Role guidance now lives in `security/Permission`.
+> - **Remaining / unverified**: a staff "mark payment verified/disputed" endpoint or UI (enum exists; no action found); frontend sidebar role hiding; server-side price calculation audit (required by CLAUDE.md, not re-verified here); WhatsApp opt-in/delivery-status tracking; menu variants/add-ons (none found in `food`/`menu`); rate limiting (none found); onboarding/approval/billing flows, observability beyond `spring-boot-starter-actuator`; all Phase 2/3 business items (pricing, validation targets, inventory, aggregators, AI translation).
+> - Original text below is unchanged.
+
 <img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
 
 ## Executive assessment

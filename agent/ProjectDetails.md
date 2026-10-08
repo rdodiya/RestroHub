@@ -40,6 +40,7 @@ This flow is designed for contactless dining, fast order handling, and real-time
 
 ```text
 rest1.restroly.in/{branchId}?tableId=1#menuId
+(frontend also serves /Restrohub/:restaurantName/:branchId; tenant subdomain handling is in `utils/subdomain.js`)
 ```
 
 ### Menu browsing and cart
@@ -51,7 +52,7 @@ rest1.restroly.in/{branchId}?tableId=1#menuId
 - Customers can browse categories, view menu items, and add items to the cart.
 - A cart button lets the customer review selected items before checkout.
 
-### Language selection and AI translation
+### Language selection and AI translation (planned; no translation code in backend or frontend yet)
 
 - The website template UI includes an AI translation button with a dropdown of available languages.
 - English is the default language.
@@ -122,23 +123,29 @@ At any point before completion, an order can also be moved to **Cancelled**.
 
 ### ✅ Implemented
 
-- Food & Category management
-- CRUD REST APIs
-- DTO-based request/response handling
-- MapStruct-based object mapping
-- PostgreSQL persistence
+- Food, Category and Menu management (with Excel import/export)
+- Restaurant, Branch and Table management (table QR codes via ZXing)
+- CRUD REST APIs with DTO-based request/response handling and MapStruct mapping
+- JWT authentication (register, login, refresh, validate, logout, password reset); Google ID-token verification exists (`GoogleAuthService`) but the `/google` endpoint is currently commented out in `AuthController`
+- Multi-tenant RBAC: roles `SUPER_ADMIN`, `ADMIN`, `RESTAURANT_OWNER`, `MANAGER`, `MANAGER_USER`, `STAFF`, `CUSTOMER`, enforced by `AccessGuard` + `Permission`
+- Audit log for sensitive actions (role, plan and UPI VPA changes)
+- Order management & tracking (status lifecycle, payment status, idempotency key, order history)
+- Live updates: STOMP/WebSocket (`/ws`) and SSE dashboard notifications; table service requests
+- UPI payment links per branch; WhatsApp order notifications (Cloud API, per-restaurant flag)
+- Website templates / theme and section editor, served through public site endpoints
+- Subscription plans and features (SuperAdmin panel, per-restaurant plan lookup)
+- Admin dashboard stats, Kitchen Display System (KDS)
+- PostgreSQL persistence with Flyway migrations (V1 to V5)
 - Validation & global exception handling
 - Swagger / OpenAPI documentation
 - Context-path aware API routing (`/restroly`)
 
 ### 🔮 Planned / Future Enhancements
 
-- JWT-based authentication & authorization
-- Role-based access (Admin, Staff)
-- Order management & tracking
-- WebSocket-based live order updates
-- Multi-restaurant (multi-tenant) support
-- Analytics & reporting dashboards
+- AI-based menu translation (backend LLM call)
+- Redis caching
+- Richer analytics & reporting dashboards
+- Zomato / Swiggy aggregator sync
 
 ---
 
@@ -154,23 +161,30 @@ DTOs ↔ MapStruct ↔ Entities
 
 ### Key Layers
 
-- **Controller Layer**
+Code is organized **by feature** under `com.restroly.qrmenu` (`auth`, `user`, `restaurant`, `branch`, `table`, `menu`, `category`, `food`, `order`, `payment`, `subscription`, `template`, `notification`, `notifications`, `whatsapp`, `excel`, `address`, `audit`, `admin`). Each feature package contains its own layers:
+
+- **Controller Layer** (`controller/`)
     - REST endpoints
     - Request validation
-- **Service Layer**
+- **Service Layer** (`service/`, `service/impl/`)
     - Business logic
     - Transaction management
-- **Repository Layer**
+- **Repository Layer** (`repository/`)
     - JPA repositories
     - Database access
-- **DTO Layer**
+- **DTO Layer** (`dto/`)
     - Request / Response models
-- **Entity Layer**
+- **Entity Layer** (`entity/`)
     - JPA entities
-- **Mapper Layer**
+- **Mapper Layer** (`mapper/`)
     - Conversion class between entity & dto
-- **Config Layer**
-    - Security, Swagger, application configs
+
+Cross-cutting packages:
+
+- `config/` - `SecurityConfig` (route rules), CORS, OpenAPI, Cloudinary
+- `security/` - JWT filter/provider, `AccessGuard` (tenant checks), `Permission` (role to permission map), `AppRole`
+- `common/` - shared DTOs, enums, `WebSocketConfig`
+- `exception/` - custom exceptions and global handler
 
 ---
 
@@ -185,7 +199,9 @@ DTOs ↔ MapStruct ↔ Entities
 | Mapper | MapStruct |
 | Build Tool | Gradle |
 | API Docs | SpringDoc OpenAPI |
-| Security | Spring Security |
+| Security | Spring Security, JWT (jjwt), method security (`@PreAuthorize`) |
+| Migrations | Flyway |
+| Frontend | React 18, Vite, Tailwind CSS (see `TechStack.md`) |
 | Validation | Jakarta Validation |
 
 ---
@@ -196,7 +212,10 @@ DTOs ↔ MapStruct ↔ Entities
 - JPA/Hibernate for ORM
 - Relationships:
     - Many-to-Many between **Food** and **Category**
-- Schema auto-managed using Hibernate (`ddl-auto=update`)
+- Dev: schema auto-managed by Hibernate (`ddl-auto=update`); prod: `ddl-auto=validate`
+- Flyway migrations in `src/main/resources/db/migration`: V1 baseline (placeholder), V2 audit log, V3 core schema baseline, V4 order payment status and source, V5 order idempotency key
+- Entity changes must ship with a new `V<n>__*.sql` migration
+- Multi-tenant model: users are linked to restaurants/branches with a role; see `RestroHub/Schema.md`
 
 ---
 
@@ -204,9 +223,12 @@ DTOs ↔ MapStruct ↔ Entities
 
 - Context Path: `/restroly`
 - API Versioning: `/api/v1`
+- Public routes: `/public/api/v1/**` (auth, orders, restaurants, sites); a few legacy ones under `/api/v1/**`
+- Owner/admin routes: `/secure/api/v1/**` (branches, menus, foods, categories, orders, restaurants, users, upi-links, excel, dashboard, subscriptions). Writes need role `ADMIN`, `MANAGER` or `RESTAURANT_OWNER` (STAFF may update order status); each endpoint is further guarded by `@access.can(...)` / `@access.branch(...)`.
 
-Example:
-```/restroly/api/v1/foods```
+Examples:
+```/restroly/public/api/v1/auth/login```
+```/restroly/secure/api/v1/foods```
 
 
 This allows:
@@ -225,7 +247,7 @@ Swagger is explicitly configured to respect the context path.
 ## AUTH APIS
 ```bash
 # 1. Login and get tokens
-curl -X POST http://localhost:8080/api/v1/auth/login \
+curl -X POST http://localhost:8181/restroly/public/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
@@ -246,8 +268,8 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 #   }
 # }
 
-# 2. Use the token to access protected endpoints
-curl -X POST http://localhost:8080/api/v1/foods \
+# 2. Use the token to access protected endpoints (body is illustrative; see Swagger for the real schema)
+curl -X POST http://localhost:8181/restroly/secure/api/v1/foods \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..." \
   -d '{
@@ -258,26 +280,27 @@ curl -X POST http://localhost:8080/api/v1/foods \
   }'
 
 # 3. Refresh the token
-curl -X POST http://localhost:8080/api/v1/auth/refresh \
+curl -X POST http://localhost:8181/restroly/public/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
   }'
 
 # 4. Validate token
-curl -X GET http://localhost:8080/api/v1/auth/validate \
+curl -X GET http://localhost:8181/restroly/public/api/v1/auth/validate \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..."
 
 # 5. Logout
-curl -X POST http://localhost:8080/api/v1/auth/logout \
+curl -X POST http://localhost:8181/restroly/public/api/v1/auth/logout \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..."
 ```
 ---
 
 ## 🧪 Testing Strategy
 
-* Unit tests with JUnit
-* Service-level testing
+* Unit tests with JUnit 5 (service-level), under `src/test/java/com/restroly/qrmenu/...`
+* Web-layer security tests with `@WebMvcTest` (e.g. `OrderControllerTenantIsolationTest`, `AccessGuardTest`)
+* Spring context tests need a real PostgreSQL (H2 is not a dependency)
 * Future scope: Integration tests with Testcontainers
 
 ---
