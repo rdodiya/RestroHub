@@ -35,7 +35,7 @@ const KitchenDisplaySystem = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 p-4 pt-20 lg:pt-4">
+    <div className="flex flex-col h-screen bg-slate-100 dark:bg-gray-900 p-4 pt-20 lg:pt-4">
       <div className="flex justify-between items-center mb-4 bg-white p-4 rounded-xl shadow-sm">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Kitchen Display System</h1>

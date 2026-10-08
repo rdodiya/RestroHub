@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,8 @@ public class OrderServiceImpl implements OrderService {
                 ? OrderSource.COUNTER_QR
                 : OrderSource.TABLE_QR);
 
+    order.setIdempotencyKey(request.getIdempotencyKey());
+
     // Save order
     Order savedOrder = orderRepository.save(order);
     log.info("Order created successfully with id: {}", savedOrder.getOrderId());
@@ -111,6 +114,12 @@ public class OrderServiceImpl implements OrderService {
     // Storing paymentId in order for better utility
     savedOrder.setPaymentId(branch.getBranchUpiId());
     return orderMapper.toResponse(savedOrder);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Optional<OrderResponse> findByIdempotencyKey(String idempotencyKey) {
+    return orderRepository.findByIdempotencyKey(idempotencyKey).map(orderMapper::toResponse);
   }
 
   @Override

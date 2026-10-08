@@ -6,6 +6,7 @@ import com.restroly.qrmenu.order.entity.Order;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,8 @@ public interface OrderRepository
     extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
   List<Order> findByBranchBranchIdOrderByCreatedAtDesc(Long branchId);
+
+  Optional<Order> findByIdempotencyKey(String idempotencyKey);
 
   List<Order> findByBranchBranchIdAndStatus(Long branchId, OrderStatus status);
 

@@ -268,7 +268,7 @@ The following architectural choices are deliberate decisions confirmed by the pr
   - Table QR: URL encodes `?tableNumber=X`. Persists table ID in session and displays sticky table banner.
   - Counter QR: Encodes `table_number = 0`. Disables waiter calls and marks order as takeaway/counter.
 - **FR-CUST-3 (Dynamic Section Rendering)**: Public site dynamically renders Hero, Description, Contact, Menu, Add-to-cart, and Language dropdown.
-- **FR-CUST-4 (Guest Ordering)**: Diners add food items to cart and check out with **Customer Name** and **Customer Mobile Number** only.
+- **FR-CUST-4 (Guest Ordering)**: Diners add food items to cart and check out with **Customer Name** and **Customer Mobile Number** only. Checkout is idempotent: the client sends an `Idempotency-Key` header on `POST /public/api/v1/orders`; a repeat of the same key (double click, network retry) returns the original order (HTTP 200) with no second order, kitchen ticket or WhatsApp message.
 - **FR-CUST-5 (Table Waiter Assistance)**: Diners at tables can trigger a "Call Waiter" request, creating a service alert in the admin notification bell.
 - **FR-CUST-6 (Multi-Language Menu)**: Frontend language dropdown allows switching menu language.
 

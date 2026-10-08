@@ -1,19 +1,19 @@
 // src/components/admin/roles/UserRoleManagement.jsx
 import React, { useState } from 'react';
 import { useAdminTheme } from '@context/AdminThemeContext';
-import { 
-  Users, 
-  Building2, 
-  ShieldCheck, 
-  Search, 
-  Filter, 
-  Plus, 
-  Trash2, 
-  Edit2, 
-  X, 
-  Check, 
+import {
+  Users,
+  Building2,
+  ShieldCheck,
+  Search,
+  Filter,
+  Plus,
+  Trash2,
+  Edit2,
+  X,
+  Check,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -27,9 +27,6 @@ const MOCK_USERS = [
   { id: 6, name: 'Diana Prince', email: 'diana.p@example.com', avatar: 'DP' },
 ];
 
-
-
-
 const MOCK_RESTAURANTS = [
   { id: 101, name: 'Rajkot Dhaba' },
   { id: 102, name: 'Restroly Cafe' },
@@ -38,10 +35,30 @@ const MOCK_RESTAURANTS = [
 ];
 
 const MOCK_ROLES = [
-  { id: 'RESTAURANT_OWNER', name: 'Restaurant Owner', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800' },
-  { id: 'BRANCH_MANAGER', name: 'Branch Manager', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' },
-  { id: 'CHEF', name: 'Chef', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200 dark:border-amber-800' },
-  { id: 'WAITER', name: 'Waiter', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border-purple-200 dark:border-purple-800' },
+  {
+    id: 'RESTAURANT_OWNER',
+    name: 'Restaurant Owner',
+    color:
+      'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+  },
+  {
+    id: 'BRANCH_MANAGER',
+    name: 'Branch Manager',
+    color:
+      'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+  },
+  {
+    id: 'CHEF',
+    name: 'Chef',
+    color:
+      'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+  },
+  {
+    id: 'WAITER',
+    name: 'Waiter',
+    color:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+  },
 ];
 
 const INITIAL_ASSIGNMENTS = [
@@ -66,7 +83,7 @@ const UserRoleManagement = () => {
     id: null, // null for new, otherwise assignment id for editing
     userId: '',
     restaurantId: '',
-    roleId: ''
+    roleId: '',
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
@@ -77,9 +94,9 @@ const UserRoleManagement = () => {
   // Handle Form Change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value ? (name === 'roleId' ? value : Number(value)) : ''
+      [name]: value ? (name === 'roleId' ? value : Number(value)) : '',
     }));
   };
 
@@ -97,10 +114,11 @@ const UserRoleManagement = () => {
       if (isEditing) {
         // Check for duplicates in other assignments
         const duplicate = assignments.find(
-          a => a.userId === formData.userId && 
-               a.restaurantId === formData.restaurantId && 
-               a.roleId === formData.roleId &&
-               a.id !== formData.id
+          (a) =>
+            a.userId === formData.userId &&
+            a.restaurantId === formData.restaurantId &&
+            a.roleId === formData.roleId &&
+            a.id !== formData.id
         );
 
         if (duplicate) {
@@ -109,20 +127,27 @@ const UserRoleManagement = () => {
           return;
         }
 
-        setAssignments(prev => prev.map(a => a.id === formData.id ? { 
-          ...a, 
-          userId: formData.userId,
-          restaurantId: formData.restaurantId,
-          roleId: formData.roleId
-        } : a));
-        
+        setAssignments((prev) =>
+          prev.map((a) =>
+            a.id === formData.id
+              ? {
+                  ...a,
+                  userId: formData.userId,
+                  restaurantId: formData.restaurantId,
+                  roleId: formData.roleId,
+                }
+              : a
+          )
+        );
+
         toast.success('Role assignment updated successfully!');
       } else {
         // Check for duplicates
         const duplicate = assignments.find(
-          a => a.userId === formData.userId && 
-               a.restaurantId === formData.restaurantId && 
-               a.roleId === formData.roleId
+          (a) =>
+            a.userId === formData.userId &&
+            a.restaurantId === formData.restaurantId &&
+            a.roleId === formData.roleId
         );
 
         if (duplicate) {
@@ -136,10 +161,10 @@ const UserRoleManagement = () => {
           userId: formData.userId,
           restaurantId: formData.restaurantId,
           roleId: formData.roleId,
-          assignedAt: new Date().toISOString().split('T')[0]
+          assignedAt: new Date().toISOString().split('T')[0],
         };
 
-        setAssignments(prev => [newAssignment, ...prev]);
+        setAssignments((prev) => [newAssignment, ...prev]);
         toast.success('Role assigned successfully!');
       }
 
@@ -155,7 +180,7 @@ const UserRoleManagement = () => {
       id: assignment.id,
       userId: assignment.userId,
       restaurantId: assignment.restaurantId,
-      roleId: assignment.roleId
+      roleId: assignment.roleId,
     });
     setIsEditing(true);
     // Smooth scroll to top of panel / form on edit
@@ -168,7 +193,7 @@ const UserRoleManagement = () => {
   };
 
   const confirmDelete = () => {
-    setAssignments(prev => prev.filter(a => a.id !== deleteConfirmId));
+    setAssignments((prev) => prev.filter((a) => a.id !== deleteConfirmId));
     toast.success('Role assignment revoked successfully');
     setDeleteConfirmId(null);
     if (formData.id === deleteConfirmId) {
@@ -182,26 +207,30 @@ const UserRoleManagement = () => {
   };
 
   // Filters logic
-  const filteredAssignments = assignments.filter(assignment => {
-    const user = MOCK_USERS.find(u => u.id === assignment.userId);
-    const restaurant = MOCK_RESTAURANTS.find(r => r.id === assignment.restaurantId);
-    
-    const matchesSearch = user && (
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const filteredAssignments = assignments.filter((assignment) => {
+    const user = MOCK_USERS.find((u) => u.id === assignment.userId);
+    const restaurant = MOCK_RESTAURANTS.find((r) => r.id === assignment.restaurantId);
 
-    const matchesRestaurant = selectedRestaurantFilter ? assignment.restaurantId === Number(selectedRestaurantFilter) : true;
+    const matchesSearch =
+      user &&
+      (user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesRestaurant = selectedRestaurantFilter
+      ? assignment.restaurantId === Number(selectedRestaurantFilter)
+      : true;
     const matchesRole = selectedRoleFilter ? assignment.roleId === selectedRoleFilter : true;
 
     return matchesSearch && matchesRestaurant && matchesRole;
   });
 
   const getRoleBadge = (roleId) => {
-    const role = MOCK_ROLES.find(r => r.id === roleId);
+    const role = MOCK_ROLES.find((r) => r.id === roleId);
     if (!role) return null;
     return (
-      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${role.color}`}>
+      <span
+        className={`inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold border ${role.color}`}
+      >
         {role.name}
       </span>
     );
@@ -209,15 +238,17 @@ const UserRoleManagement = () => {
 
   // Stats Counters
   const totalAssignments = assignments.length;
-  const uniqueUsersWithRoles = new Set(assignments.map(a => a.userId)).size;
-  const uniqueRestaurantsWithRoles = new Set(assignments.map(a => a.restaurantId)).size;
+  const uniqueUsersWithRoles = new Set(assignments.map((a) => a.userId)).size;
+  const uniqueRestaurantsWithRoles = new Set(assignments.map((a) => a.restaurantId)).size;
 
   return (
     <div className="space-y-6">
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className={`text-2xl font-bold tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>
+          <h1
+            className={`text-2xl font-bold tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-800'}`}
+          >
             User Role Management
           </h1>
           <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -229,14 +260,18 @@ const UserRoleManagement = () => {
       {/* STATS ROW */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Card 1 */}
-        <div className={`p-5 rounded-xl border flex items-center gap-4 shadow-sm ${
-          isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}>
+        <div
+          className={`p-5 rounded-xl border flex items-center gap-4 shadow-sm ${
+            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}
+        >
           <div className="p-3 rounded-lg bg-blue-500/10 text-blue-500">
             <ShieldCheck className="h-6 w-6" />
           </div>
           <div>
-            <p className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+            <p
+              className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
+            >
               Total Assignments
             </p>
             <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -246,14 +281,18 @@ const UserRoleManagement = () => {
         </div>
 
         {/* Card 2 */}
-        <div className={`p-5 rounded-xl border flex items-center gap-4 shadow-sm ${
-          isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}>
+        <div
+          className={`p-5 rounded-xl border flex items-center gap-4 shadow-sm ${
+            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}
+        >
           <div className="p-3 rounded-lg bg-emerald-500/10 text-emerald-500">
             <Users className="h-6 w-6" />
           </div>
           <div>
-            <p className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+            <p
+              className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
+            >
               Users with Roles
             </p>
             <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -263,14 +302,18 @@ const UserRoleManagement = () => {
         </div>
 
         {/* Card 3 */}
-        <div className={`p-5 rounded-xl border flex items-center gap-4 shadow-sm ${
-          isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}>
+        <div
+          className={`p-5 rounded-xl border flex items-center gap-4 shadow-sm ${
+            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}
+        >
           <div className="p-3 rounded-lg bg-amber-500/10 text-amber-500">
             <Building2 className="h-6 w-6" />
           </div>
           <div>
-            <p className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+            <p
+              className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
+            >
               Active Restaurants
             </p>
             <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -283,10 +326,14 @@ const UserRoleManagement = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: ASSIGN/EDIT FORM */}
         <div className="lg:col-span-4 space-y-6">
-          <div className={`p-6 rounded-xl border shadow-sm ${
-            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          }`}>
-            <h2 className={`text-lg font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <div
+            className={`p-6 rounded-xl border shadow-sm ${
+              isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+            }`}
+          >
+            <h2
+              className={`text-lg font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}
+            >
               {isEditing ? (
                 <>
                   <RefreshCw className="h-5 w-5 text-blue-500 animate-spin-slow" />
@@ -303,7 +350,9 @@ const UserRoleManagement = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Select User */}
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label
+                  className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                >
                   Select User
                 </label>
                 <select
@@ -312,14 +361,14 @@ const UserRoleManagement = () => {
                   onChange={handleInputChange}
                   disabled={isEditing} // Disallow changing the user when editing (revoke and re-assign is preferred)
                   className={`w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-blue-500 ${
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-gray-100 disabled:opacity-50' 
+                    isDark
+                      ? 'bg-gray-900 border-gray-700 text-gray-100 disabled:opacity-50'
                       : 'bg-gray-50 border-gray-300 text-gray-900 disabled:opacity-50'
                   }`}
                   required
                 >
                   <option value="">Choose User...</option>
-                  {MOCK_USERS.map(user => (
+                  {MOCK_USERS.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.name} ({user.email})
                     </option>
@@ -329,7 +378,9 @@ const UserRoleManagement = () => {
 
               {/* Select Restaurant */}
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label
+                  className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                >
                   Select Restaurant
                 </label>
                 <select
@@ -337,14 +388,14 @@ const UserRoleManagement = () => {
                   value={formData.restaurantId}
                   onChange={handleInputChange}
                   className={`w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-blue-500 ${
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                    isDark
+                      ? 'bg-gray-900 border-gray-700 text-gray-100'
                       : 'bg-gray-50 border-gray-300 text-gray-900'
                   }`}
                   required
                 >
                   <option value="">Choose Restaurant...</option>
-                  {MOCK_RESTAURANTS.map(rest => (
+                  {MOCK_RESTAURANTS.map((rest) => (
                     <option key={rest.id} value={rest.id}>
                       {rest.name}
                     </option>
@@ -354,7 +405,9 @@ const UserRoleManagement = () => {
 
               {/* Select Role */}
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label
+                  className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                >
                   Select Role
                 </label>
                 <select
@@ -362,14 +415,14 @@ const UserRoleManagement = () => {
                   value={formData.roleId}
                   onChange={handleInputChange}
                   className={`w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-blue-500 ${
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                    isDark
+                      ? 'bg-gray-900 border-gray-700 text-gray-100'
                       : 'bg-gray-50 border-gray-300 text-gray-900'
                   }`}
                   required
                 >
                   <option value="">Choose Role...</option>
-                  {MOCK_ROLES.map(role => (
+                  {MOCK_ROLES.map((role) => (
                     <option key={role.id} value={role.id}>
                       {role.name}
                     </option>
@@ -384,8 +437,8 @@ const UserRoleManagement = () => {
                     type="button"
                     onClick={resetForm}
                     className={`flex-1 py-2 text-sm font-medium rounded-lg border transition ${
-                      isDark 
-                        ? 'border-gray-700 text-gray-300 hover:bg-gray-700' 
+                      isDark
+                        ? 'border-gray-700 text-gray-300 hover:bg-gray-700'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-100'
                     }`}
                   >
@@ -406,9 +459,11 @@ const UserRoleManagement = () => {
 
         {/* RIGHT COLUMN: SEARCH, FILTER & LIST TABLE */}
         <div className="lg:col-span-8 space-y-6">
-          <div className={`p-6 rounded-xl border shadow-sm ${
-            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          }`}>
+          <div
+            className={`p-6 rounded-xl border shadow-sm ${
+              isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+            }`}
+          >
             {/* SEARCH & FILTERS BAR */}
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               {/* Search input */}
@@ -420,8 +475,8 @@ const UserRoleManagement = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={`w-full pl-9 pr-4 py-2 rounded-lg border text-sm outline-none transition focus:ring-2 focus:ring-blue-500 ${
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-gray-100 placeholder-gray-500' 
+                    isDark
+                      ? 'bg-gray-900 border-gray-700 text-gray-100 placeholder-gray-500'
                       : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400'
                   }`}
                 />
@@ -433,14 +488,16 @@ const UserRoleManagement = () => {
                   value={selectedRestaurantFilter}
                   onChange={(e) => setSelectedRestaurantFilter(e.target.value)}
                   className={`w-full pl-3 pr-8 py-2 rounded-lg border text-sm outline-none appearance-none transition focus:ring-2 focus:ring-blue-500 ${
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                    isDark
+                      ? 'bg-gray-900 border-gray-700 text-gray-100'
                       : 'bg-gray-50 border-gray-300 text-gray-900'
                   }`}
                 >
                   <option value="">All Restaurants</option>
-                  {MOCK_RESTAURANTS.map(r => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
+                  {MOCK_RESTAURANTS.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
                   ))}
                 </select>
                 <Filter className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
@@ -452,14 +509,16 @@ const UserRoleManagement = () => {
                   value={selectedRoleFilter}
                   onChange={(e) => setSelectedRoleFilter(e.target.value)}
                   className={`w-full pl-3 pr-8 py-2 rounded-lg border text-sm outline-none appearance-none transition focus:ring-2 focus:ring-blue-500 ${
-                    isDark 
-                      ? 'bg-gray-900 border-gray-700 text-gray-100' 
+                    isDark
+                      ? 'bg-gray-900 border-gray-700 text-gray-100'
                       : 'bg-gray-50 border-gray-300 text-gray-900'
                   }`}
                 >
                   <option value="">All Roles</option>
-                  {MOCK_ROLES.map(role => (
-                    <option key={role.id} value={role.id}>{role.name}</option>
+                  {MOCK_ROLES.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
                   ))}
                 </select>
                 <Filter className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
@@ -468,11 +527,13 @@ const UserRoleManagement = () => {
 
             {/* ROLES TABLE */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full min-w-[720px] text-left border-collapse">
                 <thead>
-                  <tr className={`border-b text-xs font-semibold uppercase tracking-wider ${
-                    isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'
-                  }`}>
+                  <tr
+                    className={`border-b text-xs font-semibold uppercase tracking-wider ${
+                      isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'
+                    }`}
+                  >
                     <th className="pb-3 pl-3">User</th>
                     <th className="pb-3">Restaurant</th>
                     <th className="pb-3">Assigned Role</th>
@@ -480,45 +541,64 @@ const UserRoleManagement = () => {
                     <th className="pb-3 pr-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className={`divide-y text-sm ${
-                  isDark ? 'divide-gray-700/60' : 'divide-gray-100'
-                }`}>
+                <tbody
+                  className={`divide-y text-sm ${
+                    isDark ? 'divide-gray-700/60' : 'divide-gray-100'
+                  }`}
+                >
                   {filteredAssignments.length > 0 ? (
                     filteredAssignments.map((assignment) => {
-                      const user = MOCK_USERS.find(u => u.id === assignment.userId) || { name: 'Unknown', email: '', avatar: '?' };
-                      const restaurant = MOCK_RESTAURANTS.find(r => r.id === assignment.restaurantId) || { name: 'Unknown' };
+                      const user = MOCK_USERS.find((u) => u.id === assignment.userId) || {
+                        name: 'Unknown',
+                        email: '',
+                        avatar: '?',
+                      };
+                      const restaurant = MOCK_RESTAURANTS.find(
+                        (r) => r.id === assignment.restaurantId
+                      ) || { name: 'Unknown' };
 
                       return (
-                        <tr key={assignment.id} className={`group hover:bg-gray-500/[0.02] transition-colors`}>
+                        <tr
+                          key={assignment.id}
+                          className={`group hover:bg-gray-500/[0.02] transition-colors`}
+                        >
                           {/* User Column */}
-                          <td className="py-3.5 pl-3 flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-blue-600/10 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
-                              {user.avatar}
-                            </div>
-                            <div className="min-w-0">
-                              <p className={`font-semibold truncate ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-                                {user.name}
-                              </p>
-                              <p className={`text-xs truncate ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                                {user.email}
-                              </p>
+                          <td className="py-3.5 pl-3 pr-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-full bg-blue-600/10 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                {user.avatar}
+                              </div>
+                              <div className="min-w-0">
+                                <p
+                                  className={`font-semibold whitespace-nowrap ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+                                >
+                                  {user.name}
+                                </p>
+                                <p
+                                  className={`text-xs whitespace-nowrap ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
+                                >
+                                  {user.email}
+                                </p>
+                              </div>
                             </div>
                           </td>
 
                           {/* Restaurant Column */}
-                          <td className="py-3.5">
-                            <span className={`font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                          <td className="py-3.5 pr-4 whitespace-nowrap">
+                            <span
+                              className={`font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                            >
                               {restaurant.name}
                             </span>
                           </td>
 
                           {/* Role Badge Column */}
-                          <td className="py-3.5">
+                          <td className="py-3.5 pr-4 whitespace-nowrap">
                             {getRoleBadge(assignment.roleId)}
                           </td>
 
                           {/* Date Column */}
-                          <td className="py-3.5 text-xs text-gray-400">
+                          <td className="py-3.5 pr-4 text-xs text-gray-400 whitespace-nowrap">
                             {assignment.assignedAt}
                           </td>
 
@@ -529,8 +609,8 @@ const UserRoleManagement = () => {
                                 onClick={() => handleEditClick(assignment)}
                                 title="Edit assignment"
                                 className={`p-1.5 rounded-lg border transition ${
-                                  isDark 
-                                    ? 'border-gray-700 text-gray-400 hover:text-blue-400 hover:border-blue-400/40 bg-gray-900/40' 
+                                  isDark
+                                    ? 'border-gray-700 text-gray-400 hover:text-blue-400 hover:border-blue-400/40 bg-gray-900/40'
                                     : 'border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 bg-gray-50'
                                 }`}
                               >
@@ -540,8 +620,8 @@ const UserRoleManagement = () => {
                                 onClick={() => handleDeleteClick(assignment.id)}
                                 title="Revoke assignment"
                                 className={`p-1.5 rounded-lg border transition ${
-                                  isDark 
-                                    ? 'border-gray-700 text-gray-400 hover:text-red-400 hover:border-red-400/40 bg-gray-900/40' 
+                                  isDark
+                                    ? 'border-gray-700 text-gray-400 hover:text-red-400 hover:border-red-400/40 bg-gray-900/40'
                                     : 'border-gray-200 text-gray-500 hover:text-red-600 hover:border-red-200 bg-gray-50'
                                 }`}
                               >
@@ -557,7 +637,9 @@ const UserRoleManagement = () => {
                       <td colSpan="5" className="py-8 text-center">
                         <div className="flex flex-col items-center justify-center text-gray-400 gap-2">
                           <AlertCircle className="h-8 w-8 text-gray-500" />
-                          <p className="text-sm">No role assignments found matching the search criteria.</p>
+                          <p className="text-sm">
+                            No role assignments found matching the search criteria.
+                          </p>
                         </div>
                       </td>
                     </tr>
@@ -572,23 +654,31 @@ const UserRoleManagement = () => {
       {/* CONFIRM REVOCATION MODAL */}
       {deleteConfirmId && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center px-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)} />
-          <div className={`relative w-full max-w-md rounded-xl border p-6 shadow-xl animate-fade-in ${
-            isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
-          }`}>
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setDeleteConfirmId(null)}
+          />
+          <div
+            className={`relative w-full max-w-md rounded-xl border p-6 shadow-xl animate-fade-in ${
+              isDark
+                ? 'bg-gray-800 border-gray-700 text-white'
+                : 'bg-white border-gray-200 text-gray-900'
+            }`}
+          >
             <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-500" />
               Revoke Role Assignment?
             </h3>
             <p className={`text-sm mb-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-              Are you sure you want to remove this role assignment? The user will immediately lose administrative access to this restaurant branch. This action cannot be undone.
+              Are you sure you want to remove this role assignment? The user will immediately lose
+              administrative access to this restaurant branch. This action cannot be undone.
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setDeleteConfirmId(null)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
-                  isDark 
-                    ? 'border-gray-700 hover:bg-gray-700 text-gray-300' 
+                  isDark
+                    ? 'border-gray-700 hover:bg-gray-700 text-gray-300'
                     : 'border-gray-300 hover:bg-gray-100 text-gray-700'
                 }`}
               >

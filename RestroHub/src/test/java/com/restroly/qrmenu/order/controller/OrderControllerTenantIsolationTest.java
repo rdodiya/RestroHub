@@ -3,6 +3,7 @@ package com.restroly.qrmenu.order.controller;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -112,6 +113,20 @@ class OrderControllerTenantIsolationTest {
         .andExpect(jsonPath("$[0].paymentLink").doesNotExist())
         .andExpect(jsonPath("$[0].items[0].unitPrice").doesNotExist())
         .andExpect(jsonPath("$[0].items[0].subtotal").doesNotExist());
+  }
+
+  @Test
+  @WithMockUser(username = "staff@rest-a.com", roles = "STAFF")
+  void staffCanAdvanceOrdersInOwnBranch() throws Exception {
+    linkToRestaurant1("staff@rest-a.com", "ROLE_STAFF");
+    mvc.perform(put(OWN_BRANCH + "/mark-all-ready")).andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(username = "mu@rest-a.com", roles = "MANAGER_USER")
+  void managerUserCannotAdvanceOrders() throws Exception {
+    mvc.perform(put(OWN_BRANCH + "/mark-all-ready")).andExpect(status().isForbidden());
+    verify(orderService, never()).markAllActiveOrdersReady(anyLong());
   }
 
   @Test
