@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { GoogleLogin } from '@react-oauth/google';
 import { ArrowLeft } from 'lucide-react';
 import api from '@services/common/api';
+import SpamGuard from '@components/common/SpamGuard';
 import {
   clearRememberedUsername,
   getRememberedUsername,
@@ -391,6 +392,7 @@ const Login = () => {
                 }}
                 noValidate
               >
+                <SpamGuard />
                 {/* Email */}
                 <div className="mb-5">
                   <label

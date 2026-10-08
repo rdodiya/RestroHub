@@ -7,6 +7,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import api from '@services/common/api';
+import SpamGuard from '@components/common/SpamGuard';
 import { ArrowLeft, Moon, Sun, Store } from 'lucide-react';
 import { useTheme } from '@context/ThemeContext';
 
@@ -303,6 +304,7 @@ const Register = () => {
                 }}
                 noValidate
               >
+                <SpamGuard />
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <div className="w-full">
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">

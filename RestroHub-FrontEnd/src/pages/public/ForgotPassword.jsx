@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import api from '@services/common/api';
+import SpamGuard from '@components/common/SpamGuard';
 import { useTheme } from '@context/ThemeContext';
 
 // Validation schemas
@@ -456,6 +457,7 @@ const ForgotPassword = () => {
               {/* ================= STEP 1: ENTER EMAIL ================= */}
               {step === 'email' && (
                 <form onSubmit={forgotPasswordFormik.handleSubmit} noValidate>
+                  <SpamGuard />
                   <div className="mb-6">
                     <label
                       htmlFor="email"
@@ -503,6 +505,7 @@ const ForgotPassword = () => {
               {/* ================= STEP 2: VERIFY CODE ================= */}
               {step === 'verify' && (
                 <form onSubmit={verifyCodeFormik.handleSubmit} noValidate>
+                  <SpamGuard />
                   <div className="mb-6">
                     <label
                       htmlFor="code"
@@ -581,6 +584,7 @@ const ForgotPassword = () => {
               {/* ================= STEP 3: RESET PASSWORD ================= */}
               {step === 'reset' && (
                 <form onSubmit={resetPasswordFormik.handleSubmit} noValidate>
+                  <SpamGuard />
                   <div className="mb-5">
                     <label
                       htmlFor="newPassword"
