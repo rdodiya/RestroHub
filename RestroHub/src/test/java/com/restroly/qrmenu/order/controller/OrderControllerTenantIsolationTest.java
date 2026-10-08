@@ -17,6 +17,7 @@ import com.restroly.qrmenu.payment.service.PaymentService;
 import com.restroly.qrmenu.restaurant.entity.Restaurant;
 import com.restroly.qrmenu.security.AccessGuard;
 import com.restroly.qrmenu.security.JwtTokenProvider;
+import com.restroly.qrmenu.security.spam.TurnstileVerifier;
 import com.restroly.qrmenu.user.entity.Role;
 import com.restroly.qrmenu.user.entity.User;
 import com.restroly.qrmenu.user.entity.UserRoleRestaurant;
@@ -58,6 +59,7 @@ class OrderControllerTenantIsolationTest {
   @MockBean private UserRepository userRepository;
   @MockBean private BranchRepository branchRepository;
   @MockBean private EntityManager entityManager;
+  @MockBean private TurnstileVerifier turnstileVerifier;
 
   @BeforeEach
   void tenants() {
