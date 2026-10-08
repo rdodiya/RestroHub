@@ -140,7 +140,7 @@ curl -sI http://app.example.com/            # expect 301 + Location: https://app
 curl -sI https://app.example.com/           # expect 200 + strict-transport-security
 curl -sI https://app.example.com/assets/<any-built-file>.js   # HSTS AND Cache-Control both present (inheritance bug check)
 curl -s https://api.example.com/restroly/actuator/health      # {"status":"UP"}
-curl -sI -H "Origin: https://app.example.com" https://api.example.com/restroly/api/v1/<public-endpoint> | grep -i access-control
+curl -sI -H "Origin: https://app.example.com" https://api.example.com/restroly/public/api/v1/<public-endpoint> | grep -i access-control
 ```
 
 - SSL Labs (https://www.ssllabs.com/ssltest/) grade A or better.
