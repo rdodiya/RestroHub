@@ -8,16 +8,18 @@ export default defineConfig(({ mode }) => ({
     react(),
     {
       name: 'site-url-default',
-      enforce: 'pre',
-      transformIndexHtml: (html) =>
-        html.replaceAll(
-          '%VITE_SITE_URL%',
-          (
-            process.env.VITE_SITE_URL ||
-            loadEnv(mode, process.cwd(), '').VITE_SITE_URL ||
-            'http://localhost:3000'
-          ).replace(/\/+$/, '')
-        ),
+      transformIndexHtml: {
+        order: 'pre',
+        handler: (html) =>
+          html.replaceAll(
+            '%VITE_SITE_URL%',
+            (
+              process.env.VITE_SITE_URL ||
+              loadEnv(mode, process.cwd(), '').VITE_SITE_URL ||
+              'http://localhost:3000'
+            ).replace(/\/+$/, '')
+          ),
+      },
     },
   ],
   define: {
