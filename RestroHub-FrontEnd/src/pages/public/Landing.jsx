@@ -507,7 +507,7 @@ const Landing = () => {
                 Log In
               </Link>
               <Link
-                to="/admin"
+                to="/register"
                 className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-200 transition-all hover:bg-blue-700 hover:shadow-lg"
               >
                 Get Started Free
@@ -547,7 +547,7 @@ const Landing = () => {
                 Log In
               </Link>
               <Link
-                to="/admin"
+                to="/register"
                 className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
               >
                 Get Started Free
@@ -594,18 +594,18 @@ const Landing = () => {
             {/* CTA Buttons */}
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:mt-10 sm:flex-row">
               <Link
-                to="/admin"
+                to="/register"
                 className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-blue-300/40 transition-all hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-300/50 sm:text-lg"
               >
-                Start Free Trial
+                Get Started Free
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
               <button
                 type="button"
                 onClick={handleWatchDemoClick}
-                className="group inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-blue-300/40 transition-all hover:scale-105 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 sm:text-lg"
+                className="group inline-flex cursor-pointer items-center gap-2 text-base font-semibold text-slate-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-slate-300 dark:hover:text-blue-400 dark:focus:ring-offset-slate-900"
               >
-                <Play className="h-5 w-5 fill-white text-white transition-transform group-hover:scale-110" />
+                <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
                 Watch Demo
               </button>
             </div>
@@ -833,7 +833,7 @@ const Landing = () => {
                 </ul>
 
                 <Link
-                  to="/admin"
+                  to={`/register?plan=${plan.name.toLowerCase()}`}
                   className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
                     selectedPlan === plan.name
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700'
@@ -912,10 +912,10 @@ const Landing = () => {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                to="/admin"
+                to="/register"
                 className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-bold text-blue-700 shadow-lg transition-all hover:shadow-xl sm:text-lg"
               >
-                Start Your Free Trial
+                Get Started Free
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
