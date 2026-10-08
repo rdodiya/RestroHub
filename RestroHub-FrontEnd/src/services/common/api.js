@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { clearAuthSession, getAccessToken } from './authStorage';
-import { spamHeaders } from '../../utils/spamState';
+import { spamHeaders, isGuardedRequest, consumeTurnstileToken } from '../../utils/spamState';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8181/restroly',
@@ -17,7 +17,7 @@ api.interceptors.request.use(
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
     }
-    if (config.method === 'post' && config.url?.includes('/public/api/v1/auth/')) {
+    if (isGuardedRequest(config)) {
       Object.assign(
         config.headers,
         spamHeaders(import.meta.env.VITE_SPAM_PROTECTION_MODE || 'honeypot')
@@ -28,9 +28,15 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+const SPAM_MODE = import.meta.env.VITE_SPAM_PROTECTION_MODE || 'honeypot';
+
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (isGuardedRequest(response.config)) consumeTurnstileToken(SPAM_MODE, window);
+    return response;
+  },
   (error) => {
+    if (isGuardedRequest(error.config)) consumeTurnstileToken(SPAM_MODE, window);
     if (error.response?.status === 401 || error.response?.status === 403) {
       if (!error.config?.url?.includes('/public/')) {
         clearAuthSession();

@@ -11,7 +11,9 @@ export default function SpamGuard() {
   useEffect(() => {
     if (MODE !== 'turnstile' || !SITE_KEY) return undefined;
     let widgetId;
+    let cancelled = false;
     const render = () => {
+      if (cancelled || !box.current || !window.turnstile) return;
       widgetId = window.turnstile.render(box.current, {
         sitekey: SITE_KEY,
         callback: setTurnstileToken,
@@ -21,13 +23,18 @@ export default function SpamGuard() {
     if (window.turnstile) {
       render();
     } else {
-      const s = document.createElement('script');
-      s.src = SCRIPT;
-      s.async = true;
-      s.onload = render;
-      document.head.appendChild(s);
+      let s = document.querySelector(`script[src="${SCRIPT}"]`);
+      if (!s) {
+        s = document.createElement('script');
+        s.src = SCRIPT;
+        s.async = true;
+        document.head.appendChild(s);
+      }
+      s.addEventListener('load', render);
     }
     return () => {
+      cancelled = true;
+      setTurnstileToken('');
       if (widgetId !== undefined && window.turnstile) window.turnstile.remove(widgetId);
     };
   }, []);
