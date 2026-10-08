@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '@services/common/api';
@@ -63,6 +63,7 @@ export const CustomerOrderProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
+  const idempotencyKeyRef = useRef(null);
 
   const addToCart = (item, quantity = 1) => {
     const foodId = item.foodId || item.id;
@@ -156,7 +157,12 @@ export const CustomerOrderProvider = ({ children }) => {
         })),
       };
 
-      const { data: orderData } = await api.post('/public/api/v1/orders', payload);
+      // Same key across retries of this attempt, so a double click / flaky-network resend yields one order.
+      if (!idempotencyKeyRef.current) idempotencyKeyRef.current = crypto.randomUUID();
+      const { data: orderData } = await api.post('/public/api/v1/orders', payload, {
+        headers: { 'Idempotency-Key': idempotencyKeyRef.current },
+      });
+      idempotencyKeyRef.current = null;
       setPlacedOrder(orderData);
       clearCart();
       setIsCartOpen(false);

@@ -68,6 +68,10 @@ public class Order {
   @Column(name = "order_source")
   private OrderSource orderSource;
 
+  /** Client-supplied key; a repeat of the same key returns this order instead of a new one. */
+  @Column(name = "idempotency_key", length = 64, unique = true)
+  private String idempotencyKey;
+
   // Not storing in database only for better payment utility
   @Transient private String paymentId;
 

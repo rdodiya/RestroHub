@@ -6,6 +6,7 @@ import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.order.dto.CreateOrderRequest;
 import com.restroly.qrmenu.order.dto.OrderResponse;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,6 +17,9 @@ public interface OrderService {
 
   /** Creates an order with an explicit source (e.g. STAFF for the secure endpoint). */
   OrderResponse createOrder(CreateOrderRequest request, OrderSource source);
+
+  /** The order previously created with this idempotency key, if any. */
+  Optional<OrderResponse> findByIdempotencyKey(String idempotencyKey);
 
   OrderResponse getOrderById(Long orderId);
 
