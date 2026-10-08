@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { readConsent, writeConsent } from '../../utils/consent';
+import { getStorage, readConsent, writeConsent } from '../../utils/consent';
 import { initAnalytics } from '../../utils/analytics';
 
 const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 export default function CookieConsent() {
-  const [choice, setChoice] = useState(() => (GA_ID ? readConsent(window.localStorage) : 'denied'));
+  const [choice, setChoice] = useState(() => (GA_ID ? readConsent(getStorage(window)) : 'denied'));
 
   if (choice === 'granted') initAnalytics(window, document, GA_ID);
   if (choice) return null;
 
   const decide = (value) => {
-    writeConsent(window.localStorage, value);
+    writeConsent(getStorage(window), value);
     setChoice(value);
   };
 
