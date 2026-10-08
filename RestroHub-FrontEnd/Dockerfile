@@ -10,8 +10,9 @@ RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install 
 COPY . .
 ARG VITE_API_BASE_URL=http://localhost:8181/restroly
 ARG VITE_GOOGLE_CLIENT_ID=
+ARG VITE_SITE_URL=http://localhost:3000
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
-    VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+    VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID \n    VITE_SITE_URL=$VITE_SITE_URL
 RUN npm run build
 
 # ---------- Stage 2: serve ----------
