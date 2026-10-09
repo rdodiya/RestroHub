@@ -1,67 +1,177 @@
 package com.restroly.qrmenu.notification.service;
 
+import com.restroly.qrmenu.exception.BusinessException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.restroly.qrmenu.exception.BusinessException;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.extern.slf4j.Slf4j;
-
 @Service
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired(required = false)
-    private JavaMailSender mailSender;
+  @Autowired(required = false)
+  private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username:}")
-    private String fromEmail;
+  @Value("${spring.mail.username:}")
+  private String fromEmail;
 
-    @Value("${spring.mail.host:}")
-    private String mailHost;
+  @Value("${spring.mail.host:}")
+  private String mailHost;
 
-    @Override
-    public void sendPasswordResetOtp(String toEmail, String otpCode, int expiryMinutes) {
-        log.info("Sending password reset verification email to: {}", toEmail);
+  @Autowired private org.springframework.core.env.Environment environment;
 
-        if (mailSender == null || fromEmail == null || fromEmail.isBlank() || "smtp.example.com".equalsIgnoreCase(mailHost)) {
-            log.warn("SMTP email server is not fully configured (mailSender={}, fromEmail={}). " +
-                     "Logging verification code for development / test verification: [{}]", 
-                     mailSender != null ? "available" : "null", fromEmail, otpCode);
-            // In dev without SMTP credentials, we gracefully log and allow flow to continue
-            return;
-        }
+  @Value("${app.frontend-url:http://localhost:3000}")
+  private String frontendUrl;
 
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+  @Override
+  public void sendEmailVerification(String toEmail, String token, int expiryHours) {
+    String link = frontendUrl + "/verify-email?token=" + token;
+    sendHtml(
+        toEmail,
+        "RestroHub - Verify your email",
+        link,
+        "<p>Welcome to RestroHub! Please <a href=\""
+            + link
+            + "\">verify your email</a>. "
+            + "The link expires in "
+            + expiryHours
+            + " hours.</p>"
+            + "<p>After verifying, your registration will be reviewed by our team.</p>");
+  }
 
-            helper.setFrom(fromEmail, "RestroHub Support");
-            helper.setTo(toEmail);
-            helper.setSubject("RestroHub - Password Reset Verification Code");
+  @Override
+  public void sendRegistrationDecision(
+      String toEmail, boolean approved, String restaurantName, String note) {
+    String body =
+        approved
+            ? "<p>Your registration for <b>"
+                + escape(restaurantName)
+                + "</b> was approved. "
+                + "You can now <a href=\""
+                + frontendUrl
+                + "/login\">log in</a> and set up your restaurant.</p>"
+            : "<p>Your registration for <b>"
+                + escape(restaurantName)
+                + "</b> was not approved."
+                + (note == null || note.isBlank() ? "" : " Reason: " + escape(note))
+                + "</p>";
+    sendHtml(toEmail, "RestroHub - Registration " + (approved ? "approved" : "update"), null, body);
+  }
 
-            String htmlContent = buildOtpHtmlTemplate(otpCode, expiryMinutes);
-            helper.setText(htmlContent, true);
+  @Override
+  public void sendRegistrationAlert(
+      String toEmail,
+      String applicantName,
+      String applicantEmail,
+      String restaurantName,
+      boolean newRestaurant) {
+    sendHtml(
+        toEmail,
+        "RestroHub - New registration request",
+        null,
+        "<p><b>"
+            + escape(applicantName)
+            + "</b> ("
+            + escape(applicantEmail)
+            + ") has requested "
+            + (newRestaurant
+                ? "to register the new restaurant "
+                : "access to the existing restaurant ")
+            + "<b>"
+            + escape(restaurantName)
+            + "</b>.</p>"
+            + "<p>Please log in to RestroHub to review the request.</p>");
+  }
 
-            mailSender.send(message);
-            log.info("Password reset verification email sent successfully to {}", toEmail);
+  private static String escape(String s) {
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+  }
 
-        } catch (MessagingException | java.io.UnsupportedEncodingException e) {
-            log.error("Failed to compose or send password reset email to {}: {}", toEmail, e.getMessage(), e);
-            throw new BusinessException("Unable to send verification email. Please check your email configuration and try again.");
-        } catch (Exception e) {
-            log.error("Unexpected error during mail dispatch to {}: {}", toEmail, e.getMessage(), e);
-            throw new BusinessException("Email dispatch failed: " + e.getMessage());
-        }
+  /** Sends HTML mail; without SMTP config it logs (dev) and returns, like the OTP mail. */
+  private void sendHtml(String toEmail, String subject, String devLogValue, String html) {
+    if (mailSender == null
+        || fromEmail == null
+        || fromEmail.isBlank()
+        || "smtp.example.com".equalsIgnoreCase(mailHost)) {
+      log.warn(
+          "SMTP not configured; skipping '{}' to {} (dev value: {})",
+          subject,
+          toEmail,
+          devLogValue);
+      return;
+    }
+    try {
+      MimeMessage message = mailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+      helper.setFrom(fromEmail, "RestroHub Support");
+      helper.setTo(toEmail);
+      helper.setSubject(subject);
+      helper.setText(html, true);
+      mailSender.send(message);
+    } catch (MessagingException
+        | java.io.UnsupportedEncodingException
+        | org.springframework.mail.MailException e) {
+      log.error("Failed to send '{}' to {}: {}", subject, toEmail, e.getMessage(), e);
+      // Outside prod, an unreachable SMTP must not block sign-up: expose the link in the log.
+      if (devLogValue != null
+          && !environment.acceptsProfiles(org.springframework.core.env.Profiles.of("prod"))) {
+        log.warn("DEV FALLBACK: link for {} is {}", toEmail, devLogValue);
+        return;
+      }
+      throw new BusinessException("Unable to send email. Please try again later.");
+    }
+  }
+
+  @Override
+  public void sendPasswordResetOtp(String toEmail, String otpCode, int expiryMinutes) {
+    log.info("Sending password reset verification email to: {}", toEmail);
+
+    if (mailSender == null
+        || fromEmail == null
+        || fromEmail.isBlank()
+        || "smtp.example.com".equalsIgnoreCase(mailHost)) {
+      log.warn(
+          "SMTP email server is not fully configured (mailSender={}, fromEmail={}). "
+              + "Logging verification code for development / test verification: [{}]",
+          mailSender != null ? "available" : "null",
+          fromEmail,
+          otpCode);
+      // In dev without SMTP credentials, we gracefully log and allow flow to continue
+      return;
     }
 
-    private String buildOtpHtmlTemplate(String otpCode, int expiryMinutes) {
-        return """
+    try {
+      MimeMessage message = mailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+      helper.setFrom(fromEmail, "RestroHub Support");
+      helper.setTo(toEmail);
+      helper.setSubject("RestroHub - Password Reset Verification Code");
+
+      String htmlContent = buildOtpHtmlTemplate(otpCode, expiryMinutes);
+      helper.setText(htmlContent, true);
+
+      mailSender.send(message);
+      log.info("Password reset verification email sent successfully to {}", toEmail);
+
+    } catch (MessagingException | java.io.UnsupportedEncodingException e) {
+      log.error(
+          "Failed to compose or send password reset email to {}: {}", toEmail, e.getMessage(), e);
+      throw new BusinessException(
+          "Unable to send verification email. Please check your email configuration and try again.");
+    } catch (Exception e) {
+      log.error("Unexpected error during mail dispatch to {}: {}", toEmail, e.getMessage(), e);
+      throw new BusinessException("Email dispatch failed: " + e.getMessage());
+    }
+  }
+
+  private String buildOtpHtmlTemplate(String otpCode, int expiryMinutes) {
+    return """
             <!DOCTYPE html>
             <html>
             <head>
@@ -89,12 +199,12 @@ public class EmailServiceImpl implements EmailService {
                 <div class="content">
                   <p>Hello,</p>
                   <p>We received a request to reset the password for your RestroHub account. Please use the verification code below to proceed:</p>
-                  
+
                   <div class="otp-box">
                     <p class="otp-code">%s</p>
                     <p class="timer-note">Expires in %d minutes &bull; Single-use only</p>
                   </div>
-                  
+
                   <p>If you did not request a password reset, please ignore this email or contact support if you have security concerns.</p>
                   <p>Best regards,<br>The RestroHub Security Team</p>
                 </div>
@@ -104,6 +214,7 @@ public class EmailServiceImpl implements EmailService {
               </div>
             </body>
             </html>
-            """.formatted(otpCode, expiryMinutes);
-    }
+            """
+        .formatted(otpCode, expiryMinutes);
+  }
 }

@@ -17,6 +17,7 @@ import {
   ChefHat,
   Users,
   ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import { canAccessPath, readStoredRoles } from '../../utils/auth';
@@ -102,6 +103,12 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
       label: 'Platform',
       items: [
         { type: 'link', name: 'Subscriptions', path: '/admin/subscriptions', icon: ShieldCheck },
+        {
+          type: 'link',
+          name: 'Registration Requests',
+          path: '/admin/registration-requests',
+          icon: UserCheck,
+        },
       ],
     },
   ];

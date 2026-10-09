@@ -14,6 +14,7 @@ import { getSubdomainSlug } from '../utils/subdomain';
 import Landing from '../pages/public/Landing';
 import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
+import VerifyEmail from '../pages/public/VerifyEmail';
 import ForgotPassword from '../pages/public/ForgotPassword';
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
 import TermsOfService from '../pages/public/TermsOfService';
@@ -36,6 +37,7 @@ import KitchenDisplaySystem from '@components/admin/kds/KitchenDisplaySystem';
 import Profile from '@components/admin/profile/Profile';
 import UserRoleManagement from '@components/admin/roles/UserRoleManagement';
 import SubscriptionManagement from '@components/admin/subscriptions/SubscriptionManagement';
+import RegistrationRequests from '@components/admin/registrations/RegistrationRequests';
 
 // On royalbites.restroly.in the root path is the public site; elsewhere it is the landing page.
 const isTenantHost = !!getSubdomainSlug();
@@ -48,6 +50,7 @@ const AppRoutes = () => {
         {!isTenantHost && <Route path="/" element={<Landing />} />}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
@@ -79,6 +82,7 @@ const AppRoutes = () => {
         {/* <Route path="marketing/qr-display" element={<QRDisplay />} /> */}
         <Route path="upi-links" element={<UPILinks />} />
         <Route path="subscriptions" element={<SubscriptionManagement />} />
+        <Route path="registration-requests" element={<RegistrationRequests />} />
         <Route path="kds" element={<KitchenDisplaySystem />} />
         <Route
           path="role-management"

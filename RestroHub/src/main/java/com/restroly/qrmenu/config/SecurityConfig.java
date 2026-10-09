@@ -72,6 +72,9 @@ public class SecurityConfig {
                     .requestMatchers(
                         HttpMethod.PUT, SECURE_API_VERSION + "/orders/branch/*/mark-all-ready")
                     .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER", "STAFF")
+                    .requestMatchers(
+                        HttpMethod.POST, SECURE_API_VERSION + "/admin/registration-requests/**")
+                    .hasRole("SUPER_ADMIN")
                     .requestMatchers(HttpMethod.POST, "/secure/api/**")
                     .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER")
                     .requestMatchers(HttpMethod.PUT, "/secure/api/**")

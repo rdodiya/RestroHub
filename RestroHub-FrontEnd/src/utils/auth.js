@@ -35,6 +35,7 @@ const ROUTE_ACCESS = [
   ['/admin/marketing', SETTINGS],
   ['/admin/upi-links', SETTINGS],
   ['/admin/subscriptions', SETTINGS],
+  ['/admin/registration-requests', ['SUPER_ADMIN']],
   ['/admin/role-management', SETTINGS],
   ['/admin/orders', EVERYONE],
   ['/admin/kds', EVERYONE],

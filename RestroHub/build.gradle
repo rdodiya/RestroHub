@@ -52,7 +52,9 @@ dependencies {
     // Database
     runtimeOnly 'org.postgresql:postgresql:42.7.2'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
     implementation 'org.flywaydb:flyway-core'
+    runtimeOnly 'org.flywaydb:flyway-sqlserver'
 
     // Lombok - ORDER MATTERS!
     compileOnly "org.projectlombok:lombok:${lombokVersion}"

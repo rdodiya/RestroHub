@@ -2,26 +2,13 @@ package com.restroly.qrmenu.auth.controller;
 
 import static com.restroly.qrmenu.common.util.ApiConstants.PUBLIC_API_VERSION;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
-import org.springframework.web.bind.annotation.RequestParam;
 import com.restroly.qrmenu.auth.dto.AuthResponse;
-import com.restroly.qrmenu.auth.dto.GoogleAuthRequest;
 import com.restroly.qrmenu.auth.dto.LoginRequest;
 import com.restroly.qrmenu.auth.dto.RefreshTokenRequest;
 import com.restroly.qrmenu.auth.dto.RegisterRequest;
 import com.restroly.qrmenu.auth.dto.ResetPasswordRequest;
 import com.restroly.qrmenu.auth.service.AuthService;
-//import com.restroly.qrmenu.auth.service.GoogleAuthService;
+// import com.restroly.qrmenu.auth.service.GoogleAuthService;
 import com.restroly.qrmenu.common.dto.ApiResponse;
 import com.restroly.qrmenu.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,8 +19,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(PUBLIC_API_VERSION + "/auth")
@@ -42,38 +40,62 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Authentication", description = "APIs for user authentication and token management")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+  @Autowired private AuthService authService;
 
-//    @Autowired
-//    private GoogleAuthService googleAuthService;
+  @Autowired private com.restroly.qrmenu.registration.RegistrationService registrationService;
 
-        //end points for register
+  /** Confirms the email; the user is NOT logged in and must wait for superadmin approval. */
+  @PostMapping("/verify-email")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> verifyEmail(@RequestParam String token) {
+    var status = registrationService.verifyEmail(token);
+    return ResponseEntity.ok(
+        ApiResponse.success(Map.of("status", status), "Email verified. Awaiting approval."));
+  }
 
-    @PostMapping("/register")
-        public ResponseEntity<ApiResponse<AuthResponse>> register(
-                @Valid @RequestBody RegisterRequest registerRequest) {
+  @PostMapping("/resend-verification")
+  public ResponseEntity<ApiResponse<Void>> resendVerification(
+      @RequestBody Map<String, String> body) {
+    registrationService.resend(body.getOrDefault("email", ""));
+    return ResponseEntity.ok(
+        ApiResponse.success(null, "If the email is awaiting verification, a new link was sent."));
+  }
 
-        AuthResponse response = authService.register(registerRequest);
+  //    @Autowired
+  //    private GoogleAuthService googleAuthService;
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response, "Registration successful")  //updated message to be more specific
-                );      
-        }
-        //end point for login
-    @PostMapping("/login")
-    @Operation(
-            summary = "Authenticate user and generate tokens",
-            description = "Authenticates user credentials and returns JWT access token and refresh token"
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "Authentication successful",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class),
-                            examples = @ExampleObject(value = """
+  // end points for register
+
+  @PostMapping("/register")
+  public ResponseEntity<ApiResponse<AuthResponse>> register(
+      @Valid @RequestBody RegisterRequest registerRequest) {
+
+    AuthResponse response = authService.register(registerRequest);
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            ApiResponse.success(
+                response, "Registration successful") // updated message to be more specific
+            );
+  }
+
+  // end point for login
+  @PostMapping("/login")
+  @Operation(
+      summary = "Authenticate user and generate tokens",
+      description = "Authenticates user credentials and returns JWT access token and refresh token")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Authentication successful",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = AuthResponse.class),
+                    examples =
+                        @ExampleObject(
+                            value =
+                                """
                                     {
                                         "success": true,
                                         "message": "Login successful",
@@ -87,24 +109,25 @@ public class AuthController {
                                         },
                                         "timestamp": "2024-01-15T10:30:00"
                                     }
-                                    """)
-                    )
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid request - validation failed",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "Authentication failed - invalid credentials",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class),
-                            examples = @ExampleObject(value = """
+                                    """))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "Invalid request - validation failed",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ApiErrorResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "Authentication failed - invalid credentials",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ApiErrorResponse.class),
+                    examples =
+                        @ExampleObject(
+                            value =
+                                """
                                     {
                                         "status": 401,
                                         "error": "UNAUTHORIZED",
@@ -113,269 +136,277 @@ public class AuthController {
                                         "timestamp": "2024-01-15T10:30:00",
                                         "traceId": "abc123"
                                     }
-                                    """)
-                    )
-            )
-    })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Login credentials",
-            required = true,
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = LoginRequest.class),
-                    examples = @ExampleObject(value = """
+                                    """)))
+      })
+  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      description = "Login credentials",
+      required = true,
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = LoginRequest.class),
+              examples =
+                  @ExampleObject(
+                      value =
+                          """
                             {
                                 "username": "admin",
                                 "password": "admin123"
                             }
-                            """)
-            )
-    )
-    public ResponseEntity<ApiResponse<AuthResponse>> login(
-            @Valid @RequestBody LoginRequest loginRequest) {
+                            """)))
+  public ResponseEntity<ApiResponse<AuthResponse>> login(
+      @Valid @RequestBody LoginRequest loginRequest) {
 
-        log.info("Login request received for user: {}", loginRequest.getUsername());
+    log.info("Login request received for user: {}", loginRequest.getUsername());
 
-        AuthResponse authResponse = authService.login(loginRequest);
+    AuthResponse authResponse = authService.login(loginRequest);
 
-        return ResponseEntity.ok(ApiResponse.success(authResponse, "Login successful"));
+    return ResponseEntity.ok(ApiResponse.success(authResponse, "Login successful"));
+  }
+
+  //    @PostMapping("/google")
+  //    @Operation(
+  //            summary = "Google OAuth authentication",
+  //            description = "Authenticates user via Google OAuth token. Creates new user if
+  // doesn't exist or updates existing user with Google info."
+  //    )
+  //    @ApiResponses(value = {
+  //            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+  //                    responseCode = "200",
+  //                    description = "Google authentication successful",
+  //                    content = @Content(
+  //                            mediaType = "application/json",
+  //                            schema = @Schema(implementation = AuthResponse.class),
+  //                            examples = @ExampleObject(value = """
+  //                                    {
+  //                                        "success": true,
+  //                                        "message": "Google authentication successful",
+  //                                        "data": {
+  //                                            "accessToken":
+  // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  //                                            "refreshToken":
+  // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  //                                            "tokenType": "Bearer",
+  //                                            "expiresIn": 86400,
+  //                                            "username": "user@example.com",
+  //                                            "roles": ["ROLE_CUSTOMER"]
+  //                                        },
+  //                                        "timestamp": "2024-01-15T10:30:00"
+  //                                    }
+  //                                    """)
+  //                    )
+  //            ),
+  //            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+  //                    responseCode = "400",
+  //                    description = "Invalid request - token missing or invalid",
+  //                    content = @Content(
+  //                            mediaType = "application/json",
+  //                            schema = @Schema(implementation = ApiErrorResponse.class)
+  //                    )
+  //            ),
+  //            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+  //                    responseCode = "401",
+  //                    description = "Google token verification failed",
+  //                    content = @Content(
+  //                            mediaType = "application/json",
+  //                            schema = @Schema(implementation = ApiErrorResponse.class)
+  //                    )
+  //            )
+  //    })
+  //    public ResponseEntity<ApiResponse<AuthResponse>> googleAuth(
+  //            @Valid @RequestBody GoogleAuthRequest googleAuthRequest) {
+  //
+  //        log.info("Google OAuth authentication request received");
+  //
+  //        AuthResponse authResponse = googleAuthService.authenticateWithGoogle(googleAuthRequest);
+  //
+  //        return ResponseEntity.ok(ApiResponse.success(authResponse, "Google authentication
+  // successful"));
+  //    }
+
+  @PostMapping("/refresh")
+  @Operation(
+      summary = "Refresh access token",
+      description = "Generates new access and refresh tokens using a valid refresh token")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Token refreshed successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = AuthResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "Invalid or expired refresh token",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ApiErrorResponse.class)))
+      })
+  public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
+      @Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+
+    log.debug("Refresh token request received");
+
+    AuthResponse authResponse = authService.refreshToken(refreshTokenRequest);
+
+    return ResponseEntity.ok(ApiResponse.success(authResponse, "Token refreshed successfully"));
+  }
+
+  @PostMapping("/logout")
+  @Operation(summary = "Logout user", description = "Invalidates the current user session")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Logout successful")
+      })
+  public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request) {
+    String token = extractToken(request);
+    authService.logout(token);
+
+    log.info("User logged out successfully");
+
+    return ResponseEntity.ok(ApiResponse.success("Logout successful"));
+  }
+
+  @GetMapping("/validate")
+  @Operation(
+      summary = "Validate token",
+      description = "Validates if the provided JWT token is valid and not expired")
+  @ApiResponses(
+      value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "Token is valid"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "Token is invalid or expired")
+      })
+  public ResponseEntity<ApiResponse<String>> validateToken(HttpServletRequest request) {
+    String token = extractToken(request);
+
+    if (token == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(ApiResponse.error("No token provided"));
     }
 
-//    @PostMapping("/google")
-//    @Operation(
-//            summary = "Google OAuth authentication",
-//            description = "Authenticates user via Google OAuth token. Creates new user if doesn't exist or updates existing user with Google info."
-//    )
-//    @ApiResponses(value = {
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-//                    responseCode = "200",
-//                    description = "Google authentication successful",
-//                    content = @Content(
-//                            mediaType = "application/json",
-//                            schema = @Schema(implementation = AuthResponse.class),
-//                            examples = @ExampleObject(value = """
-//                                    {
-//                                        "success": true,
-//                                        "message": "Google authentication successful",
-//                                        "data": {
-//                                            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-//                                            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-//                                            "tokenType": "Bearer",
-//                                            "expiresIn": 86400,
-//                                            "username": "user@example.com",
-//                                            "roles": ["ROLE_CUSTOMER"]
-//                                        },
-//                                        "timestamp": "2024-01-15T10:30:00"
-//                                    }
-//                                    """)
-//                    )
-//            ),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-//                    responseCode = "400",
-//                    description = "Invalid request - token missing or invalid",
-//                    content = @Content(
-//                            mediaType = "application/json",
-//                            schema = @Schema(implementation = ApiErrorResponse.class)
-//                    )
-//            ),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-//                    responseCode = "401",
-//                    description = "Google token verification failed",
-//                    content = @Content(
-//                            mediaType = "application/json",
-//                            schema = @Schema(implementation = ApiErrorResponse.class)
-//                    )
-//            )
-//    })
-//    public ResponseEntity<ApiResponse<AuthResponse>> googleAuth(
-//            @Valid @RequestBody GoogleAuthRequest googleAuthRequest) {
-//
-//        log.info("Google OAuth authentication request received");
-//
-//        AuthResponse authResponse = googleAuthService.authenticateWithGoogle(googleAuthRequest);
-//
-//        return ResponseEntity.ok(ApiResponse.success(authResponse, "Google authentication successful"));
-//    }
+    // Token validation happens in the security filter
+    // If we reach here, the token is valid
+    return ResponseEntity.ok(ApiResponse.success("Token is valid"));
+  }
 
-    @PostMapping("/refresh")
-    @Operation(
-            summary = "Refresh access token",
-            description = "Generates new access and refresh tokens using a valid refresh token"
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "Token refreshed successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class)
-                    )
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid or expired refresh token",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            )
-    })
-    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
-            @Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+  @PostMapping(
+      value = "/forgot-password",
+      consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+  @Operation(
+      summary = "Request password reset verification code (JSON)",
+      description =
+          "Generates a 6-digit password reset code, stores it with a 10-minute expiry, and emails it to the user")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> forgotPasswordJson(
+      @Valid @RequestBody com.restroly.qrmenu.auth.dto.ForgotPasswordRequest request) {
 
-        log.debug("Refresh token request received");
+    log.info("Password reset requested for email (JSON): {}", request.getEmail());
+    Map<String, Object> response = authService.forgotPassword(request.getEmail());
+    return ResponseEntity.ok(
+        ApiResponse.success(response, "Verification code sent to your email."));
+  }
 
-        AuthResponse authResponse = authService.refreshToken(refreshTokenRequest);
+  @PostMapping(value = "/forgot-password")
+  @Operation(
+      summary = "Request password reset verification code (Form/Query)",
+      description =
+          "Generates a 6-digit password reset code, stores it with a 10-minute expiry, and emails it to the user")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> forgotPasswordForm(
+      @RequestParam(required = false) String email) {
 
-        return ResponseEntity.ok(ApiResponse.success(authResponse, "Token refreshed successfully"));
+    log.info("Password reset requested for email (Param): {}", email);
+    Map<String, Object> response = authService.forgotPassword(email);
+    return ResponseEntity.ok(
+        ApiResponse.success(response, "Verification code sent to your email."));
+  }
+
+  @PostMapping(
+      value = "/verify-reset-code",
+      consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+  @Operation(
+      summary = "Verify password reset code (JSON)",
+      description =
+          "Verifies the 6-digit code against database, checks expiry and attempts, and returns a secure resetToken")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> verifyResetCodeJson(
+      @Valid @RequestBody com.restroly.qrmenu.auth.dto.VerifyResetCodeRequest request) {
+
+    log.info("Verification code submission for email (JSON): {}", request.getEmail());
+    Map<String, Object> response = authService.verifyResetCode(request);
+    return ResponseEntity.ok(
+        ApiResponse.success(response, "Verification code verified successfully."));
+  }
+
+  @PostMapping(value = "/verify-reset-code")
+  @Operation(
+      summary = "Verify password reset code (Form/Query)",
+      description =
+          "Verifies the 6-digit code against database, checks expiry and attempts, and returns a secure resetToken")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> verifyResetCodeForm(
+      @RequestParam String email, @RequestParam String code) {
+
+    com.restroly.qrmenu.auth.dto.VerifyResetCodeRequest request =
+        com.restroly.qrmenu.auth.dto.VerifyResetCodeRequest.builder()
+            .email(email)
+            .code(code)
+            .build();
+
+    log.info("Verification code submission for email (Param): {}", email);
+    Map<String, Object> response = authService.verifyResetCode(request);
+    return ResponseEntity.ok(
+        ApiResponse.success(response, "Verification code verified successfully."));
+  }
+
+  @PostMapping(
+      value = "/reset-password",
+      consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+  @Operation(
+      summary = "Reset password using resetToken (JSON)",
+      description =
+          "Verifies the resetToken returned from verification step and updates the user password")
+  public ResponseEntity<ApiResponse<String>> resetPasswordJson(
+      @Valid @RequestBody ResetPasswordRequest request) {
+
+    log.info("Password reset submission for email (JSON): {}", request.getEmail());
+    authService.resetPassword(request);
+    return ResponseEntity.ok(ApiResponse.success("Password reset successful"));
+  }
+
+  @PostMapping(value = "/reset-password")
+  @Operation(
+      summary = "Reset password using resetToken (Form/Query)",
+      description =
+          "Verifies the resetToken returned from verification step and updates the user password")
+  public ResponseEntity<ApiResponse<String>> resetPasswordForm(
+      @RequestParam String email,
+      @RequestParam String resetToken,
+      @RequestParam String newPassword) {
+
+    ResetPasswordRequest resetReq =
+        ResetPasswordRequest.builder()
+            .email(email)
+            .resetToken(resetToken)
+            .newPassword(newPassword)
+            .build();
+
+    log.info("Password reset submission for email (Param): {}", email);
+    authService.resetPassword(resetReq);
+
+    return ResponseEntity.ok(ApiResponse.success("Password reset successful"));
+  }
+
+  private String extractToken(HttpServletRequest request) {
+    String bearerToken = request.getHeader("Authorization");
+    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+      return bearerToken.substring(7);
     }
-
-    @PostMapping("/logout")
-    @Operation(
-            summary = "Logout user",
-            description = "Invalidates the current user session"
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "Logout successful"
-            )
-    })
-    public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request) {
-        String token = extractToken(request);
-        authService.logout(token);
-
-        log.info("User logged out successfully");
-
-        return ResponseEntity.ok(ApiResponse.success("Logout successful"));
-    }
-
-    @GetMapping("/validate")
-    @Operation(
-            summary = "Validate token",
-            description = "Validates if the provided JWT token is valid and not expired"
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "Token is valid"
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "Token is invalid or expired"
-            )
-    })
-    public ResponseEntity<ApiResponse<String>> validateToken(HttpServletRequest request) {
-        String token = extractToken(request);
-
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("No token provided"));
-        }
-
-        // Token validation happens in the security filter
-        // If we reach here, the token is valid
-        return ResponseEntity.ok(ApiResponse.success("Token is valid"));
-    }
-
-    @PostMapping(value = "/forgot-password", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            summary = "Request password reset verification code (JSON)",
-            description = "Generates a 6-digit password reset code, stores it with a 10-minute expiry, and emails it to the user"
-    )
-    public ResponseEntity<ApiResponse<Map<String, Object>>> forgotPasswordJson(
-            @Valid @RequestBody com.restroly.qrmenu.auth.dto.ForgotPasswordRequest request) {
-
-        log.info("Password reset requested for email (JSON): {}", request.getEmail());
-        Map<String, Object> response = authService.forgotPassword(request.getEmail());
-        return ResponseEntity.ok(ApiResponse.success(response, "Verification code sent to your email."));
-    }
-
-    @PostMapping(value = "/forgot-password")
-    @Operation(
-            summary = "Request password reset verification code (Form/Query)",
-            description = "Generates a 6-digit password reset code, stores it with a 10-minute expiry, and emails it to the user"
-    )
-    public ResponseEntity<ApiResponse<Map<String, Object>>> forgotPasswordForm(
-            @RequestParam(required = false) String email) {
-
-        log.info("Password reset requested for email (Param): {}", email);
-        Map<String, Object> response = authService.forgotPassword(email);
-        return ResponseEntity.ok(ApiResponse.success(response, "Verification code sent to your email."));
-    }
-
-    @PostMapping(value = "/verify-reset-code", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            summary = "Verify password reset code (JSON)",
-            description = "Verifies the 6-digit code against database, checks expiry and attempts, and returns a secure resetToken"
-    )
-    public ResponseEntity<ApiResponse<Map<String, Object>>> verifyResetCodeJson(
-            @Valid @RequestBody com.restroly.qrmenu.auth.dto.VerifyResetCodeRequest request) {
-
-        log.info("Verification code submission for email (JSON): {}", request.getEmail());
-        Map<String, Object> response = authService.verifyResetCode(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Verification code verified successfully."));
-    }
-
-    @PostMapping(value = "/verify-reset-code")
-    @Operation(
-            summary = "Verify password reset code (Form/Query)",
-            description = "Verifies the 6-digit code against database, checks expiry and attempts, and returns a secure resetToken"
-    )
-    public ResponseEntity<ApiResponse<Map<String, Object>>> verifyResetCodeForm(
-            @RequestParam String email,
-            @RequestParam String code) {
-
-        com.restroly.qrmenu.auth.dto.VerifyResetCodeRequest request = com.restroly.qrmenu.auth.dto.VerifyResetCodeRequest.builder()
-                .email(email)
-                .code(code)
-                .build();
-
-        log.info("Verification code submission for email (Param): {}", email);
-        Map<String, Object> response = authService.verifyResetCode(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Verification code verified successfully."));
-    }
-
-    @PostMapping(value = "/reset-password", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            summary = "Reset password using resetToken (JSON)",
-            description = "Verifies the resetToken returned from verification step and updates the user password"
-    )
-    public ResponseEntity<ApiResponse<String>> resetPasswordJson(
-            @Valid @RequestBody ResetPasswordRequest request) {
-
-        log.info("Password reset submission for email (JSON): {}", request.getEmail());
-        authService.resetPassword(request);
-        return ResponseEntity.ok(ApiResponse.success("Password reset successful"));
-    }
-
-    @PostMapping(value = "/reset-password")
-    @Operation(
-            summary = "Reset password using resetToken (Form/Query)",
-            description = "Verifies the resetToken returned from verification step and updates the user password"
-    )
-    public ResponseEntity<ApiResponse<String>> resetPasswordForm(
-            @RequestParam String email,
-            @RequestParam String resetToken,
-            @RequestParam String newPassword) {
-
-        ResetPasswordRequest resetReq = ResetPasswordRequest.builder()
-                .email(email)
-                .resetToken(resetToken)
-                .newPassword(newPassword)
-                .build();
-
-        log.info("Password reset submission for email (Param): {}", email);
-        authService.resetPassword(resetReq);
-
-        return ResponseEntity.ok(ApiResponse.success("Password reset successful"));
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
+    return null;
+  }
 }
