@@ -14,6 +14,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Append-only record of a sensitive action. IDs are plain columns (no FKs) so entries survive
@@ -51,7 +53,8 @@ public class AuditLogEntry {
   @Column(name = "restaurant_id")
   private Long restaurantId;
 
-  @Column(name = "metadata", columnDefinition = "TEXT")
+  @JdbcTypeCode(SqlTypes.LONG32VARCHAR)
+  @Column(name = "metadata")
   private String metadata;
 
   @Column(name = "created_at", nullable = false, updatable = false)
