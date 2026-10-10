@@ -38,6 +38,7 @@ import Profile from '@components/admin/profile/Profile';
 import UserRoleManagement from '@components/admin/roles/UserRoleManagement';
 import SubscriptionManagement from '@components/admin/subscriptions/SubscriptionManagement';
 import RegistrationRequests from '@components/admin/registrations/RegistrationRequests';
+import HelpSupport from '@components/admin/support/HelpSupport';
 
 // On royalbites.restroly.in the root path is the public site; elsewhere it is the landing page.
 const isTenantHost = !!getSubdomainSlug();
@@ -83,6 +84,7 @@ const AppRoutes = () => {
         <Route path="upi-links" element={<UPILinks />} />
         <Route path="subscriptions" element={<SubscriptionManagement />} />
         <Route path="registration-requests" element={<RegistrationRequests />} />
+        <Route path="help-support" element={<HelpSupport />} />
         <Route path="kds" element={<KitchenDisplaySystem />} />
         <Route
           path="role-management"

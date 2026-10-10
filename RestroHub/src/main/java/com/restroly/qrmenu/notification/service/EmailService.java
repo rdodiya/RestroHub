@@ -25,4 +25,13 @@ public interface EmailService {
       String applicantEmail,
       String restaurantName,
       boolean newRestaurant);
+
+  /** Tells a superadmin a user sent a Help & Support message. Informational only. */
+  void sendSupportTicketAlert(
+      String toEmail,
+      String fromName,
+      String fromEmail,
+      String restaurantName,
+      String title,
+      String message);
 }

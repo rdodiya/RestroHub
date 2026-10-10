@@ -378,11 +378,11 @@ public class UserServiceImpl implements UserService {
                             () ->
                                 new UserNotFoundException("User not found with email: " + email)));
 
-    String roleName = "Restaurant Owner";
+    String roleName = null;
     Long restaurantId = null;
     String restaurantName = null;
     String restaurantDesc = null;
-    String branches = "1";
+    String branches = "0";
 
     if (user.getUserRoleRestaurants() != null && !user.getUserRoleRestaurants().isEmpty()) {
       UserRoleRestaurant urr = user.getUserRoleRestaurants().iterator().next();
@@ -400,7 +400,7 @@ public class UserServiceImpl implements UserService {
       }
     }
 
-    String joinedDate = "Jan 2024";
+    String joinedDate = null;
     if (user.getCreatedAt() != null) {
       joinedDate =
           user.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("MMM yyyy"));

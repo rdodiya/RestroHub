@@ -20,10 +20,10 @@ const ProfileSidebar = ({ profile, activeSection, onSectionChange }) => {
   ];
 
   const stats = [
-    { label: 'Total Orders', value: profile.totalOrders || '1,234' },
-    { label: 'Revenue', value: profile.totalRevenue || '₹4.5L' },
-    { label: 'Rating', value: profile.rating || '4.8' },
-    { label: 'Branches', value: profile.branches || '3' },
+    { label: 'Total Orders', value: profile.totalOrders || '-' },
+    { label: 'Revenue', value: profile.totalRevenue || '-' },
+    { label: 'Rating', value: profile.rating || '-' },
+    { label: 'Branches', value: profile.branches || '-' },
   ];
 
   return (
@@ -36,9 +36,7 @@ const ProfileSidebar = ({ profile, activeSection, onSectionChange }) => {
         <div className="grid grid-cols-2 gap-px bg-gray-100">
           {stats.map((stat) => (
             <div key={stat.label} className="bg-white p-4 text-center">
-              <p className="text-lg font-bold text-gray-900 sm:text-xl">
-                {stat.value}
-              </p>
+              <p className="text-lg font-bold text-gray-900 sm:text-xl">{stat.value}</p>
               <p className="text-xs text-gray-500">{stat.label}</p>
             </div>
           ))}
@@ -68,11 +66,7 @@ const ProfileSidebar = ({ profile, activeSection, onSectionChange }) => {
                   }
                 `}
               >
-                <Icon
-                  className={`h-4 w-4 ${
-                    isActive ? 'text-blue-600' : 'text-gray-400'
-                  }`}
-                />
+                <Icon className={`h-4 w-4 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
                 {item.label}
               </button>
             );
@@ -92,9 +86,7 @@ const ProfileSidebar = ({ profile, activeSection, onSectionChange }) => {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-500">Email</p>
-              <p className="truncate text-sm font-medium text-gray-900">
-                {profile.email || 'admin@restrohub.com'}
-              </p>
+              <p className="truncate text-sm font-medium text-gray-900">{profile.email || '-'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -104,7 +96,7 @@ const ProfileSidebar = ({ profile, activeSection, onSectionChange }) => {
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-500">Phone</p>
               <p className="truncate text-sm font-medium text-gray-900">
-                {profile.phone || '+91 98765 43210'}
+                {profile.phoneNumber || '-'}
               </p>
             </div>
           </div>
@@ -115,7 +107,7 @@ const ProfileSidebar = ({ profile, activeSection, onSectionChange }) => {
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-500">Location</p>
               <p className="truncate text-sm font-medium text-gray-900">
-                {profile.location || 'Rajkot, Gujarat'}
+                {profile.location || profile.city || '-'}
               </p>
             </div>
           </div>

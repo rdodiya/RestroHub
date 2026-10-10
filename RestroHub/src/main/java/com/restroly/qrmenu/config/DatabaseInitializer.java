@@ -19,12 +19,12 @@ public class DatabaseInitializer implements CommandLineRunner {
     log.info("Checking database initialization...");
 
     if (restaurantRepository.count() == 0) {
-      log.info("No restaurants found. Initializing a default restaurant (Rajkot Dhaba)...");
+      log.info("No restaurants found. Initializing a default restaurant (Restroly Platform)...");
       Restaurant defaultRestaurant =
           Restaurant.builder()
-              .name("Rajkot Dhaba")
-              .description("Taste of Tradition")
-              .phoneNumber("+91-9876543210")
+              .name("Restroly Platform")
+              .description("Platform tenant for the super admin account")
+              .phoneNumber("")
               .isActive(true)
               .serviceRequestEnabled(true)
               .build();

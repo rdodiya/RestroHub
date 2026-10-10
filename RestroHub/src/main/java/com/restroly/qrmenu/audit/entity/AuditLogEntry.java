@@ -22,7 +22,7 @@ import org.hibernate.type.SqlTypes;
  * deletes of the things they describe. Table created by Flyway V2__create_audit_log.sql.
  */
 @Entity
-@Table(name = "t_audit_log")
+@Table(name = "t_audit_history")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

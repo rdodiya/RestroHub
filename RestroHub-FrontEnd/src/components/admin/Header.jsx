@@ -21,6 +21,8 @@ import api from '../../services/common/api';
 import toast from 'react-hot-toast';
 import { clearAuthSession } from '../../services/common/authStorage';
 import { useBranch } from '@context/BranchContext';
+import useSupportTickets from '@hooks/useSupportTickets';
+import { hasAnyRole, readStoredRoles } from '../../utils/auth';
 
 const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -71,8 +73,8 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
       try {
         const data = await profileService.getCurrentUserProfile();
         setUserProfile({
-          name: data.name || 'Admin User',
-          email: data.email || 'admin@restrohub.com',
+          name: data.name || '',
+          email: data.email || '',
           profileImage: data.profileImage || null,
         });
       } catch (error) {
@@ -85,8 +87,13 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
 
   // Live service request notifications via WebSocket
   const { branches, selectedBranchId, effectiveBranchId, handleBranchChange } = useBranch();
-  const { notifications, unreadCount, completeRequest } =
-    useWebSocketNotifications(effectiveBranchId);
+  const isSuperAdmin = hasAnyRole(readStoredRoles(), ['SUPER_ADMIN']);
+  const serviceRequests = useWebSocketNotifications(isSuperAdmin ? null : effectiveBranchId);
+  const supportTickets = useSupportTickets(isSuperAdmin);
+  // Superadmin's bell shows Help & Support tickets; restaurant users see live service requests.
+  const notifications = isSuperAdmin ? supportTickets.notifications : serviceRequests.notifications;
+  const unreadCount = isSuperAdmin ? supportTickets.unreadCount : serviceRequests.unreadCount;
+  const completeRequest = isSuperAdmin ? supportTickets.resolve : serviceRequests.completeRequest;
 
   // Shared class helpers
   const iconBtn = `inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
@@ -255,7 +262,7 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                     <div
                       className={`px-4 py-8 text-center text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
                     >
-                      No active service requests
+                      {isSuperAdmin ? 'No open support messages' : 'No active service requests'}
                     </div>
                   ) : (
                     notifications.map((notif) => (
@@ -285,6 +292,13 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                           <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                             {notif.desc}
                           </p>
+                          {notif.detail && (
+                            <p
+                              className={`mt-1 line-clamp-3 whitespace-pre-line text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
+                            >
+                              {notif.detail}
+                            </p>
+                          )}
                           <p
                             className={`mt-0.5 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}
                           >
@@ -312,7 +326,7 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                   className={`border-t px-4 py-2.5 text-center ${isDark ? 'border-gray-700' : 'border-gray-100'}`}
                 >
                   <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                    Live service requests
+                    {isSuperAdmin ? 'Help & Support messages' : 'Live service requests'}
                   </span>
                 </div>
               </div>
@@ -386,9 +400,11 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
 
                 <div className="py-1">
                   {[
-                    { icon: User, label: 'My Profile' },
-                    { icon: Settings, label: 'Settings' },
-                    { icon: HelpCircle, label: 'Help & Support' },
+                    { icon: User, label: 'My Profile', path: '/admin/profile' },
+                    ...(isSuperAdmin
+                      ? [{ icon: Settings, label: 'Settings', path: '/admin/subscriptions' }]
+                      : []),
+                    { icon: HelpCircle, label: 'Help & Support', path: '/admin/help-support' },
                   ].map((item) => (
                     <button
                       key={item.label}
@@ -398,7 +414,7 @@ const Header = ({ onMobileMenuClick, collapsed, onCollapseToggle }) => {
                           : 'text-gray-700 hover:bg-gray-50'
                       }`}
                       onClick={() => {
-                        if (item.label === 'My Profile') navigate('/admin/profile');
+                        navigate(item.path);
                         setProfileOpen(false);
                       }}
                     >

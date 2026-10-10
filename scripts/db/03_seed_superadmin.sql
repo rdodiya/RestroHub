@@ -40,7 +40,7 @@ DECLARE
     v_role_id BIGINT;
     v_user_id BIGINT;
 BEGIN
-    -- user_role_restaurant.restaurant_id is NOT NULL, so the superadmin hangs off a platform tenant.
+    -- t_usr_role_restaurant_rel.restaurant_id is NOT NULL, so the superadmin hangs off a platform tenant.
     SELECT rest_id INTO v_rest_id FROM t_restaurant_master WHERE name = 'Restroly Platform' ORDER BY rest_id LIMIT 1;
     IF v_rest_id IS NULL THEN
         INSERT INTO t_restaurant_master (name, description, is_active, service_request_enabled, created_at, updated_date)
@@ -66,13 +66,13 @@ BEGIN
             updated_date  = NOW()
     RETURNING user_id INTO v_user_id;
 
-    INSERT INTO user_role_restaurant (user_id, role_id, restaurant_id)
+    INSERT INTO t_usr_role_restaurant_rel (user_id, role_id, restaurant_id)
     VALUES (v_user_id, v_role_id, v_rest_id)
     ON CONFLICT (user_id, role_id, restaurant_id) DO NOTHING;
 
     -- A superadmin must not be blocked by the self-registration login gate.
-    IF to_regclass('registration_request') IS NOT NULL THEN
-        DELETE FROM registration_request WHERE user_id = v_user_id;
+    IF to_regclass('t_registration_request_master') IS NOT NULL THEN
+        DELETE FROM t_registration_request_master WHERE user_id = v_user_id;
     END IF;
 
     RAISE NOTICE 'Super admin ready: % (user_id %)', v_email, v_user_id;

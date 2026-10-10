@@ -16,7 +16,7 @@ import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(
-    name = "themes",
+    name = "t_theme_master",
     indexes = {@Index(name = "idx_theme_key", columnList = "theme_key")})
 @Data
 @NoArgsConstructor

@@ -16,22 +16,15 @@ const Branches = () => {
       try {
         const res = await api.get('/secure/api/v1/users/fetchRestaurantId');
         const data = res.data || {};
-        const fetchedRestaurantId =
-          data.restaurantId ||
-          data.data?.restaurantId ||
-          data.branchId ||
-          data.data?.branchId ||
-          localStorage.getItem('selectedBranchId') ||
-          1;
+        const fetchedRestaurantId = data.restaurantId || data.data?.restaurantId || null;
         setRestaurantId(fetchedRestaurantId);
       } catch (err) {
         console.error('Failed to fetch restaurantId:', err);
-        setRestaurantId(localStorage.getItem('selectedBranchId') || 1);
+        setRestaurantId(null);
       }
     };
     fetchRestaurantId();
   }, []);
-
 
   const openAdd = () => {
     setEditingBranch(null);

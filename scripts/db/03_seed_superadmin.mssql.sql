@@ -24,7 +24,7 @@ DECLARE @RestId BIGINT, @RoleId BIGINT, @UserId BIGINT;
 
 BEGIN TRAN;
 
--- user_role_restaurant.restaurant_id is NOT NULL, so the superadmin hangs off a platform tenant.
+-- t_usr_role_restaurant_rel.restaurant_id is NOT NULL, so the superadmin hangs off a platform tenant.
 SELECT TOP 1 @RestId = rest_id FROM t_restaurant_master WHERE name = N'Restroly Platform' ORDER BY rest_id;
 IF @RestId IS NULL
 BEGIN
@@ -55,12 +55,12 @@ ELSE
        SET user_password = @Hash, is_active = 1, is_locked = 0, updated_date = SYSDATETIME()
      WHERE user_id = @UserId;
 
-IF NOT EXISTS (SELECT 1 FROM user_role_restaurant WHERE user_id = @UserId AND role_id = @RoleId AND restaurant_id = @RestId)
-    INSERT INTO user_role_restaurant (user_id, role_id, restaurant_id) VALUES (@UserId, @RoleId, @RestId);
+IF NOT EXISTS (SELECT 1 FROM t_usr_role_restaurant_rel WHERE user_id = @UserId AND role_id = @RoleId AND restaurant_id = @RestId)
+    INSERT INTO t_usr_role_restaurant_rel (user_id, role_id, restaurant_id) VALUES (@UserId, @RoleId, @RestId);
 
 -- A superadmin must not be blocked by the self-registration login gate.
-IF OBJECT_ID(N'registration_request', N'U') IS NOT NULL
-    DELETE FROM registration_request WHERE user_id = @UserId;
+IF OBJECT_ID(N't_registration_request_master', N'U') IS NOT NULL
+    DELETE FROM t_registration_request_master WHERE user_id = @UserId;
 
 COMMIT;
 PRINT 'Super admin ready: ' + @Email + ' (user_id ' + CAST(@UserId AS VARCHAR(20)) + ')';

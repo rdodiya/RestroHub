@@ -37,7 +37,7 @@ api.interceptors.response.use(
   },
   (error) => {
     if (isGuardedRequest(error.config)) consumeTurnstileToken(SPAM_MODE, window);
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    if (error.response?.status === 401) {
       if (!error.config?.url?.includes('/public/')) {
         clearAuthSession();
         window.location.href = '/login';

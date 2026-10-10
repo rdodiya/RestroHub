@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "t_subscription_feature")
+@Table(name = "t_subscription_feature_master")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,19 +12,19 @@ import lombok.*;
 @Builder
 public class SubscriptionFeature {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "feature_key", unique = true, nullable = false)
-    private String featureKey;
+  @Column(name = "feature_key", unique = true, nullable = false)
+  private String featureKey;
 
-    @Column(name = "display_name")
-    private String displayName;
+  @Column(name = "display_name")
+  private String displayName;
 
-    private String description;
+  private String description;
 
-    @Column(name = "is_active")
-    @Builder.Default
-    private Boolean isActive = true;
+  @Column(name = "is_active")
+  @Builder.Default
+  private Boolean isActive = true;
 }

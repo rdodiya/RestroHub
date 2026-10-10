@@ -9,7 +9,7 @@ import lombok.*;
  * restaurant.
  */
 @Entity
-@Table(name = "registration_request")
+@Table(name = "t_registration_request_master")
 @Getter
 @Setter
 @Builder
@@ -19,6 +19,7 @@ public class RegistrationRequest {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "registration_request_id")
   private Long id;
 
   @Column(name = "user_id", nullable = false, unique = true)
@@ -27,7 +28,7 @@ public class RegistrationRequest {
   @Column(name = "requested_restaurant", nullable = false)
   private String requestedRestaurant;
 
-  @Column(name = "restaurant_id")
+  @Column(name = "rest_id")
   private Long restaurantId;
 
   @Enumerated(EnumType.STRING)

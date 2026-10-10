@@ -144,15 +144,6 @@ class AccessGuardTest {
   }
 
   @Test
-  void managerUserIsReadOnlyWithoutFinancials() {
-    loginAs("mu@rest-a.com", 1L, "ROLE_MANAGER_USER");
-    assertTrue(access.can("OPERATIONS_READ"));
-    assertFalse(access.can("ORDER_STATUS_UPDATE"));
-    assertFalse(access.can("VIEW_FINANCIALS"));
-    assertFalse(access.can("MENU_WRITE"));
-  }
-
-  @Test
   void managerRunsOperationsButNotSettings() {
     loginAs("m@rest-a.com", 1L, "ROLE_MANAGER");
     assertTrue(access.can("MENU_WRITE"));

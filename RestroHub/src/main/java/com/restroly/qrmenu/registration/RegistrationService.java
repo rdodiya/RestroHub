@@ -133,7 +133,7 @@ public class RegistrationService {
   }
 
   /**
-   * Approves a request. New restaurant: creates it and grants RESTAURANT_OWNER. Existing
+   * Approves a request. New restaurant: creates it and grants ADMIN (restaurant owner). Existing
    * restaurant: grants the role chosen by the superadmin (required).
    */
   @Transactional
@@ -143,7 +143,7 @@ public class RegistrationService {
     boolean isNew = req.getRestaurantId() == null;
 
     AppRole appRole =
-        AppRole.from(isNew ? AppRole.RESTAURANT_OWNER.name() : roleName)
+        AppRole.from(isNew ? AppRole.ADMIN.name() : roleName)
             .filter(r -> r != AppRole.SUPER_ADMIN)
             .orElseThrow(() -> new BusinessException("A valid roleName is required"));
 

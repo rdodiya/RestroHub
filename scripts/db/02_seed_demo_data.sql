@@ -130,10 +130,10 @@ BEGIN
         END IF;
         UPDATE t_branch_master SET menu_id = v_menu_id WHERE branch_id = v_br_id AND menu_id IS DISTINCT FROM v_menu_id;
 
-        INSERT INTO t_rel_menu_cat (menu_id, category_id)
+        INSERT INTO t_menu_category_rel (menu_id, category_id)
         SELECT v_menu_id, c.category_id FROM t_category_master c
         WHERE c.name = ANY (v_branch.categories)
-          AND NOT EXISTS (SELECT 1 FROM t_rel_menu_cat mc WHERE mc.menu_id = v_menu_id AND mc.category_id = c.category_id);
+          AND NOT EXISTS (SELECT 1 FROM t_menu_category_rel mc WHERE mc.menu_id = v_menu_id AND mc.category_id = c.category_id);
 
         -- Tables 1..N (mix of statuses)
         INSERT INTO t_table_master (table_number, capacity, status, qr_code_url, is_active, created_date, updated_date, branch_id)
@@ -144,11 +144,11 @@ BEGIN
         WHERE NOT EXISTS (SELECT 1 FROM t_table_master t WHERE t.branch_id = v_br_id AND t.table_number = n);
 
         -- UPI links: one default (matches branch_upi_id) + one spare
-        INSERT INTO t_upi_links (name, upi_id, is_default, is_active, transactions_count, total_revenue, created_date, updated_date, branch_id)
+        INSERT INTO t_upi_link_master (name, upi_id, is_default, is_active, transactions_count, total_revenue, created_date, updated_date, branch_id)
         SELECT v.name, v.upi, v.is_default, TRUE, 0, 0, NOW(), NOW(), v_br_id
         FROM (VALUES ('Primary counter', v_branch.upi, TRUE),
                      ('Backup (owner)',  replace(v_branch.upi, '@', '.owner@'), FALSE)) AS v(name, upi, is_default)
-        WHERE NOT EXISTS (SELECT 1 FROM t_upi_links u WHERE u.branch_id = v_br_id AND u.upi_id = v.upi);
+        WHERE NOT EXISTS (SELECT 1 FROM t_upi_link_master u WHERE u.branch_id = v_br_id AND u.upi_id = v.upi);
         UPDATE t_branch_master SET branch_upi_id = v_branch.upi WHERE branch_id = v_br_id;
 
         -- Orders: 10 per branch over the last 14 days, every status; totals computed from items
@@ -169,25 +169,25 @@ BEGIN
                 j := 0;
                 FOR v_food IN
                     SELECT f.food_id, f.price FROM t_food_master f
-                    JOIN t_rel_menu_cat mc ON mc.category_id = f.category_id AND mc.menu_id = v_menu_id
+                    JOIN t_menu_category_rel mc ON mc.category_id = f.category_id AND mc.menu_id = v_menu_id
                     WHERE f.is_delete = FALSE
                     ORDER BY (f.food_id * 7 + i * 13) % 97
                     LIMIT 2 + (i % 2)
                 LOOP
                     j := j + 1;
-                    INSERT INTO t_order_items (quantity, unit_price, subtotal, special_request, food_id, order_id)
+                    INSERT INTO t_order_detail (quantity, unit_price, subtotal, special_request, food_id, order_id)
                     VALUES (j, v_food.price, v_food.price * j, NULL, v_food.food_id, v_order);
                 END LOOP;
 
-                SELECT COALESCE(SUM(subtotal), 0) INTO v_total FROM t_order_items WHERE order_id = v_order;
+                SELECT COALESCE(SUM(subtotal), 0) INTO v_total FROM t_order_detail WHERE order_id = v_order;
                 UPDATE t_order_master SET total_amount = v_total WHERE order_id = v_order;
 
                 -- Billed orders get a recorded UPI payment
                 IF v_status = 'BILLED' THEN
-                    INSERT INTO payment_verification (payment_id, order_id, amount, verified, transaction_id)
+                    INSERT INTO t_payment_verification_master (payment_id, order_id, amount, verified, transaction_id)
                     VALUES ('PAY-' || v_order, v_order, v_total, 'SUCCESS', 'UPI' || lpad(v_order::TEXT, 10, '0'))
                     ON CONFLICT DO NOTHING;
-                    UPDATE t_upi_links SET transactions_count = transactions_count + 1,
+                    UPDATE t_upi_link_master SET transactions_count = transactions_count + 1,
                                            total_revenue = total_revenue + v_total
                     WHERE branch_id = v_br_id AND is_default = TRUE;
                 END IF;
@@ -195,19 +195,19 @@ BEGIN
         END IF;
 
         -- Service requests (waiter call pending, bill request acknowledged)
-        INSERT INTO t_service_request (restaurant_id, branch_id, table_number, request_type, status, created_at, resolved_at)
+        INSERT INTO t_service_request_master (restaurant_id, branch_id, table_number, request_type, status, created_at, resolved_at)
         SELECT v_branch.rest_id, v_br_id, v.table_no, v.req_type, v.status, NOW() - v.age, v.resolved
         FROM (VALUES (1, 'CALL_WAITER',  'PENDING',      INTERVAL '3 minutes',  NULL::TIMESTAMP),
                      (2, 'REQUEST_BILL', 'ACKNOWLEDGED', INTERVAL '12 minutes', NULL::TIMESTAMP),
                      (3, 'CALL_WAITER',  'COMPLETED',    INTERVAL '2 hours',    NOW() - INTERVAL '110 minutes')) AS v(table_no, req_type, status, age, resolved)
-        WHERE NOT EXISTS (SELECT 1 FROM t_service_request s
+        WHERE NOT EXISTS (SELECT 1 FROM t_service_request_master s
                           WHERE s.branch_id = v_br_id AND s.table_number = v.table_no AND s.request_type = v.req_type);
     END LOOP;
 
     -- -------------------------------------------------------------------------
     -- 4. Subscriptions: feature catalogue, plans, mappings, assignments
     -- -------------------------------------------------------------------------
-    INSERT INTO t_subscription_feature (feature_key, display_name, description, is_active)
+    INSERT INTO t_subscription_feature_master (feature_key, display_name, description, is_active)
     SELECT v.k, v.n, v.d, TRUE FROM (VALUES
         ('WHATSAPP_NOTIFICATIONS',   'WhatsApp notifications',  'Order confirmations & status updates on WhatsApp'),
         ('KDS_ACCESS',               'Kitchen Display System',  'Live kitchen order board'),
@@ -216,19 +216,19 @@ BEGIN
         ('CUSTOM_WEBSITE_TEMPLATES', 'Website templates',       'Number of website templates available'),
         ('ADVANCED_ANALYTICS',       'Advanced analytics',      'Dashboard charts and reports')
     ) AS v(k, n, d)
-    WHERE NOT EXISTS (SELECT 1 FROM t_subscription_feature f WHERE f.feature_key = v.k);
+    WHERE NOT EXISTS (SELECT 1 FROM t_subscription_feature_master f WHERE f.feature_key = v.k);
 
-    INSERT INTO t_subscription_plan (name, description, price, billing_cycle, is_active, created_at, updated_at)
+    INSERT INTO t_subscription_plan_master (name, description, price, billing_cycle, is_active, created_at, updated_at)
     SELECT v.n, v.d, v.p, 'MONTHLY', TRUE, NOW(), NOW() FROM (VALUES
         ('Free', 'Starter plan: 1 branch, 2 templates', 0.0::DOUBLE PRECISION),
         ('Pro',  'Growing restaurants: multi-branch, KDS, WhatsApp', 999.0::DOUBLE PRECISION)
     ) AS v(n, d, p)
-    WHERE NOT EXISTS (SELECT 1 FROM t_subscription_plan sp WHERE sp.name = v.n);
+    WHERE NOT EXISTS (SELECT 1 FROM t_subscription_plan_master sp WHERE sp.name = v.n);
 
-    SELECT id INTO v_plan_free FROM t_subscription_plan WHERE name = 'Free';
-    SELECT id INTO v_plan_pro  FROM t_subscription_plan WHERE name = 'Pro';
+    SELECT id INTO v_plan_free FROM t_subscription_plan_master WHERE name = 'Free';
+    SELECT id INTO v_plan_pro  FROM t_subscription_plan_master WHERE name = 'Pro';
 
-    INSERT INTO t_plan_feature_mapping (plan_id, feature_id, feature_value)
+    INSERT INTO t_plan_feature_rel (plan_id, feature_id, feature_value)
     SELECT p.id, f.id, v.val
     FROM (VALUES
         ('Free', 'WHATSAPP_NOTIFICATIONS', 'false'), ('Free', 'KDS_ACCESS', 'false'),
@@ -238,19 +238,19 @@ BEGIN
         ('Pro',  'MULTI_BRANCH', '5'),               ('Pro',  'EXCEL_IMPORT_EXPORT', 'true'),
         ('Pro',  'CUSTOM_WEBSITE_TEMPLATES', 'ALL'), ('Pro',  'ADVANCED_ANALYTICS', 'true')
     ) AS v(plan, feature, val)
-    JOIN t_subscription_plan p ON p.name = v.plan
-    JOIN t_subscription_feature f ON f.feature_key = v.feature
-    WHERE NOT EXISTS (SELECT 1 FROM t_plan_feature_mapping m WHERE m.plan_id = p.id AND m.feature_id = f.id);
+    JOIN t_subscription_plan_master p ON p.name = v.plan
+    JOIN t_subscription_feature_master f ON f.feature_key = v.feature
+    WHERE NOT EXISTS (SELECT 1 FROM t_plan_feature_rel m WHERE m.plan_id = p.id AND m.feature_id = f.id);
 
-    INSERT INTO t_restaurant_subscription (restaurant_id, plan_id, start_date, end_date, status, is_auto_renew, created_at, updated_at)
+    INSERT INTO t_restaurant_subscription_master (restaurant_id, plan_id, start_date, end_date, status, is_auto_renew, created_at, updated_at)
     SELECT v.rest_id, v.plan_id, NOW() - INTERVAL '10 days', NOW() + INTERVAL '20 days', 'ACTIVE', TRUE, NOW(), NOW()
     FROM (VALUES (v_rest_a, v_plan_pro), (v_rest_b, v_plan_free)) AS v(rest_id, plan_id)
-    WHERE NOT EXISTS (SELECT 1 FROM t_restaurant_subscription s WHERE s.restaurant_id = v.rest_id AND s.status = 'ACTIVE');
+    WHERE NOT EXISTS (SELECT 1 FROM t_restaurant_subscription_master s WHERE s.restaurant_id = v.rest_id AND s.status = 'ACTIVE');
 
     -- -------------------------------------------------------------------------
     -- 5. Website: themes (one per site — t_site_config.theme_id is unique), sites, sections
     -- -------------------------------------------------------------------------
-    INSERT INTO themes (name, theme_key, description, primary_color, color_primary_hover, color_primary_dark, secondary_color,
+    INSERT INTO t_theme_master (name, theme_key, description, primary_color, color_primary_hover, color_primary_dark, secondary_color,
                         color_accent, bg_primary, bg_secondary, bg_tertiary, primary_text_color, secondary_text_color, text_muted,
                         header_bg, footer_bg, button_bg, button_text, border_color, font_primary, font_heading, font_size_base,
                         is_active, is_default, is_dark_mode, created_at, updated_at)
@@ -264,7 +264,7 @@ BEGIN
          '#ffffff', '#9ca3af', '#6b7280', '#0a0a0a', '#0a0a0a', '#3b82f6', '#ffffff', '#374151',
          'Inter, sans-serif', 'Playfair Display, serif', '16px', TRUE, FALSE, TRUE)
     ) AS v
-    WHERE NOT EXISTS (SELECT 1 FROM themes t WHERE t.theme_key = v.column2);
+    WHERE NOT EXISTS (SELECT 1 FROM t_theme_master t WHERE t.theme_key = v.column2);
 
     FOR v_branch IN SELECT * FROM (VALUES
         (v_rest_a, 'spice-route', 'Spice Route', 'modern',  'SAFFRON_LIGHT',   'Spice Route - Andheri',
@@ -275,7 +275,7 @@ BEGIN
     LOOP
         SELECT id INTO v_site_id FROM t_site_config WHERE site_id = v_branch.site_key;
         IF v_site_id IS NULL THEN
-            SELECT id INTO v_theme_id FROM themes WHERE theme_key = v_branch.theme_key;
+            SELECT id INTO v_theme_id FROM t_theme_master WHERE theme_key = v_branch.theme_key;
             SELECT m.menu_id INTO v_menu_id FROM t_menu_master m
             JOIN t_branch_master b ON b.branch_id = m.branch_id WHERE b.name = v_branch.branch_name;
 
@@ -305,11 +305,11 @@ END $$;
 SELECT r.name AS restaurant,
        b.branch_id, b.name AS branch, b.menu_id, b.branch_upi_id,
        (SELECT COUNT(*) FROM t_table_master t WHERE t.branch_id = b.branch_id)  AS tables,
-       (SELECT COUNT(*) FROM t_rel_menu_cat mc WHERE mc.menu_id = b.menu_id)    AS categories,
-       (SELECT COUNT(*) FROM t_food_master f JOIN t_rel_menu_cat mc ON mc.category_id = f.category_id
+       (SELECT COUNT(*) FROM t_menu_category_rel mc WHERE mc.menu_id = b.menu_id)    AS categories,
+       (SELECT COUNT(*) FROM t_food_master f JOIN t_menu_category_rel mc ON mc.category_id = f.category_id
          WHERE mc.menu_id = b.menu_id)                                          AS foods,
        (SELECT COUNT(*) FROM t_order_master o WHERE o.branch_id = b.branch_id)  AS orders,
-       (SELECT COUNT(*) FROM t_service_request s WHERE s.branch_id = b.branch_id) AS service_requests
+       (SELECT COUNT(*) FROM t_service_request_master s WHERE s.branch_id = b.branch_id) AS service_requests
 FROM t_branch_master b JOIN t_restaurant_master r ON r.rest_id = b.rest_id
 WHERE r.name IN ('Spice Route', 'Ocean Grill')
 ORDER BY r.name, b.name;
@@ -318,9 +318,9 @@ SELECT r.name AS restaurant, p.name AS plan, s.status, s.end_date::DATE AS ends,
        sc.site_id, sc.template_key, t.theme_key,
        (SELECT COUNT(*) FROM t_section_master sm WHERE sm.site_config_id = sc.id) AS sections
 FROM t_restaurant_master r
-LEFT JOIN t_restaurant_subscription s ON s.restaurant_id = r.rest_id AND s.status = 'ACTIVE'
-LEFT JOIN t_subscription_plan p ON p.id = s.plan_id
+LEFT JOIN t_restaurant_subscription_master s ON s.restaurant_id = r.rest_id AND s.status = 'ACTIVE'
+LEFT JOIN t_subscription_plan_master p ON p.id = s.plan_id
 LEFT JOIN t_site_config sc ON sc.restaurant_id = r.rest_id
-LEFT JOIN themes t ON t.id = sc.theme_id
+LEFT JOIN t_theme_master t ON t.id = sc.theme_id
 WHERE r.name IN ('Spice Route', 'Ocean Grill')
 ORDER BY r.name;

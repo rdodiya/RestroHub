@@ -1,5 +1,5 @@
 // src/components/admin/roles/UserRoleManagement.jsx
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import {
   Users,
@@ -9,229 +9,163 @@ import {
   Filter,
   Plus,
   Trash2,
-  Edit2,
   X,
-  Check,
   AlertCircle,
-  RefreshCw,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '@services/common/api';
 
-// Mock Initial Data
-const MOCK_USERS = [
-  { id: 1, name: 'John Doe', email: 'john.doe@example.com', avatar: 'JD' },
-  { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', avatar: 'JS' },
-  { id: 3, name: 'Alice Johnson', email: 'alice.j@example.com', avatar: 'AJ' },
-  { id: 4, name: 'Bob Wilson', email: 'bob.wilson@example.com', avatar: 'BW' },
-  { id: 5, name: 'Charlie Brown', email: 'charlie.b@example.com', avatar: 'CB' },
-  { id: 6, name: 'Diana Prince', email: 'diana.p@example.com', avatar: 'DP' },
-];
+const ADMIN_API = '/secure/api/v1/admin';
 
-const MOCK_RESTAURANTS = [
-  { id: 101, name: 'Rajkot Dhaba' },
-  { id: 102, name: 'Restroly Cafe' },
-  { id: 103, name: 'Ocean Breeze' },
-  { id: 104, name: 'Gourmet Grill' },
-];
-
-const MOCK_ROLES = [
-  {
-    id: 'RESTAURANT_OWNER',
-    name: 'Restaurant Owner',
+// The four app roles; only these three can be assigned to a restaurant.
+const ASSIGNABLE_ROLES = {
+  ADMIN: {
+    label: 'Admin (Restaurant Owner)',
     color:
       'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
   },
-  {
-    id: 'BRANCH_MANAGER',
-    name: 'Branch Manager',
+  MANAGER: {
+    label: 'Manager',
     color:
       'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
   },
-  {
-    id: 'CHEF',
-    name: 'Chef',
-    color:
-      'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
-  },
-  {
-    id: 'WAITER',
-    name: 'Waiter',
+  STAFF: {
+    label: 'Staff',
     color:
       'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border-purple-200 dark:border-purple-800',
   },
-];
+};
 
-const INITIAL_ASSIGNMENTS = [
-  { id: 1, userId: 1, restaurantId: 101, roleId: 'RESTAURANT_OWNER', assignedAt: '2026-05-10' },
-  { id: 2, userId: 2, restaurantId: 102, roleId: 'BRANCH_MANAGER', assignedAt: '2026-05-15' },
-  { id: 3, userId: 3, restaurantId: 101, roleId: 'CHEF', assignedAt: '2026-05-20' },
-  { id: 4, userId: 4, restaurantId: 103, roleId: 'WAITER', assignedAt: '2026-06-01' },
-  { id: 5, userId: 5, restaurantId: 104, roleId: 'RESTAURANT_OWNER', assignedAt: '2026-06-05' },
-];
+const normalizeRoleName = (name) =>
+  String(name || '')
+    .replace(/^(ROLE_)+/i, '')
+    .toUpperCase();
+const initials = (name) =>
+  String(name || '?')
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
 const UserRoleManagement = () => {
   const { isDark } = useAdminTheme();
 
-  // State Management
-  const [assignments, setAssignments] = useState(INITIAL_ASSIGNMENTS);
+  // Data from the API
+  const [users, setUsers] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [roles, setRoles] = useState([]); // [{ id, key, label }]
+  const [assignments, setAssignments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRestaurantFilter, setSelectedRestaurantFilter] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('');
 
   // Form State
-  const [formData, setFormData] = useState({
-    id: null, // null for new, otherwise assignment id for editing
-    userId: '',
-    restaurantId: '',
-    roleId: '',
-  });
-  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({ userId: '', restaurantId: '', roleId: '' });
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
   // Confirm delete modal state
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
-  // Handle Form Change
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [usersRes, restaurantsRes, rolesRes, assignmentsRes] = await Promise.all([
+        api.get('/secure/api/v1/users/all'),
+        api.get(`${ADMIN_API}/restaurants`),
+        api.get('/api/v1/roles/active'),
+        api.get(`${ADMIN_API}/role-assignments`),
+      ]);
+      setUsers(
+        usersRes.data.data.map((u) => ({
+          id: u.id,
+          name: u.fullName || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email,
+          email: u.email,
+        }))
+      );
+      setRestaurants(restaurantsRes.data);
+      const seen = new Set();
+      setRoles(
+        rolesRes.data.data
+          .map((r) => ({ id: r.id, key: normalizeRoleName(r.name) }))
+          .filter((r) => ASSIGNABLE_ROLES[r.key] && !seen.has(r.key) && seen.add(r.key))
+          .map((r) => ({ ...r, label: ASSIGNABLE_ROLES[r.key].label }))
+      );
+      setAssignments(assignmentsRes.data);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to load role management data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value ? (name === 'roleId' ? value : Number(value)) : '',
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value ? Number(value) : '' }));
   };
 
-  // Form Submit (Assign or Update)
-  const handleSubmit = (e) => {
+  const resetForm = () => setFormData({ userId: '', restaurantId: '', roleId: '' });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.userId || !formData.restaurantId || !formData.roleId) {
       toast.error('Please fill in all fields');
       return;
     }
-
     setIsSubmitLoading(true);
-
-    setTimeout(() => {
-      if (isEditing) {
-        // Check for duplicates in other assignments
-        const duplicate = assignments.find(
-          (a) =>
-            a.userId === formData.userId &&
-            a.restaurantId === formData.restaurantId &&
-            a.roleId === formData.roleId &&
-            a.id !== formData.id
-        );
-
-        if (duplicate) {
-          toast.error('This user already has this role for the selected restaurant');
-          setIsSubmitLoading(false);
-          return;
-        }
-
-        setAssignments((prev) =>
-          prev.map((a) =>
-            a.id === formData.id
-              ? {
-                  ...a,
-                  userId: formData.userId,
-                  restaurantId: formData.restaurantId,
-                  roleId: formData.roleId,
-                }
-              : a
-          )
-        );
-
-        toast.success('Role assignment updated successfully!');
-      } else {
-        // Check for duplicates
-        const duplicate = assignments.find(
-          (a) =>
-            a.userId === formData.userId &&
-            a.restaurantId === formData.restaurantId &&
-            a.roleId === formData.roleId
-        );
-
-        if (duplicate) {
-          toast.error('This user already has this role for this restaurant');
-          setIsSubmitLoading(false);
-          return;
-        }
-
-        const newAssignment = {
-          id: Date.now(),
-          userId: formData.userId,
-          restaurantId: formData.restaurantId,
-          roleId: formData.roleId,
-          assignedAt: new Date().toISOString().split('T')[0],
-        };
-
-        setAssignments((prev) => [newAssignment, ...prev]);
-        toast.success('Role assigned successfully!');
-      }
-
-      // Reset Form
+    try {
+      const res = await api.post(`${ADMIN_API}/role-assignments`, formData);
+      setAssignments((prev) => [res.data, ...prev]);
+      toast.success('Role assigned successfully!');
       resetForm();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to assign role');
+    } finally {
       setIsSubmitLoading(false);
-    }, 400);
-  };
-
-  // Edit action
-  const handleEditClick = (assignment) => {
-    setFormData({
-      id: assignment.id,
-      userId: assignment.userId,
-      restaurantId: assignment.restaurantId,
-      roleId: assignment.roleId,
-    });
-    setIsEditing(true);
-    // Smooth scroll to top of panel / form on edit
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Delete/Revoke Action
-  const handleDeleteClick = (id) => {
-    setDeleteConfirmId(id);
-  };
-
-  const confirmDelete = () => {
-    setAssignments((prev) => prev.filter((a) => a.id !== deleteConfirmId));
-    toast.success('Role assignment revoked successfully');
-    setDeleteConfirmId(null);
-    if (formData.id === deleteConfirmId) {
-      resetForm();
     }
   };
 
-  const resetForm = () => {
-    setFormData({ id: null, userId: '', restaurantId: '', roleId: '' });
-    setIsEditing(false);
+  const handleDeleteClick = (id) => setDeleteConfirmId(id);
+
+  const confirmDelete = async () => {
+    try {
+      await api.delete(`${ADMIN_API}/role-assignments/${deleteConfirmId}`);
+      setAssignments((prev) => prev.filter((a) => a.id !== deleteConfirmId));
+      toast.success('Role assignment revoked successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to revoke role');
+    } finally {
+      setDeleteConfirmId(null);
+    }
   };
 
-  // Filters logic
-  const filteredAssignments = assignments.filter((assignment) => {
-    const user = MOCK_USERS.find((u) => u.id === assignment.userId);
-    const restaurant = MOCK_RESTAURANTS.find((r) => r.id === assignment.restaurantId);
-
+  const filteredAssignments = assignments.filter((a) => {
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
-      user &&
-      (user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()));
-
+      a.userName?.toLowerCase().includes(q) || a.userEmail?.toLowerCase().includes(q);
     const matchesRestaurant = selectedRestaurantFilter
-      ? assignment.restaurantId === Number(selectedRestaurantFilter)
+      ? a.restaurantId === Number(selectedRestaurantFilter)
       : true;
-    const matchesRole = selectedRoleFilter ? assignment.roleId === selectedRoleFilter : true;
-
+    const matchesRole = selectedRoleFilter ? a.roleName === selectedRoleFilter : true;
     return matchesSearch && matchesRestaurant && matchesRole;
   });
 
-  const getRoleBadge = (roleId) => {
-    const role = MOCK_ROLES.find((r) => r.id === roleId);
-    if (!role) return null;
+  const getRoleBadge = (roleName) => {
+    const role = ASSIGNABLE_ROLES[roleName];
     return (
       <span
-        className={`inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold border ${role.color}`}
+        className={`inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold border ${
+          role?.color || ''
+        }`}
       >
-        {role.name}
+        {role?.label || roleName}
       </span>
     );
   };
@@ -334,17 +268,8 @@ const UserRoleManagement = () => {
             <h2
               className={`text-lg font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}
             >
-              {isEditing ? (
-                <>
-                  <RefreshCw className="h-5 w-5 text-blue-500 animate-spin-slow" />
-                  Update Assignment
-                </>
-              ) : (
-                <>
-                  <Plus className="h-5 w-5 text-blue-500" />
-                  Assign New Role
-                </>
-              )}
+              <Plus className="h-5 w-5 text-blue-500" />
+              Assign New Role
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -359,7 +284,6 @@ const UserRoleManagement = () => {
                   name="userId"
                   value={formData.userId}
                   onChange={handleInputChange}
-                  disabled={isEditing} // Disallow changing the user when editing (revoke and re-assign is preferred)
                   className={`w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-blue-500 ${
                     isDark
                       ? 'bg-gray-900 border-gray-700 text-gray-100 disabled:opacity-50'
@@ -368,7 +292,7 @@ const UserRoleManagement = () => {
                   required
                 >
                   <option value="">Choose User...</option>
-                  {MOCK_USERS.map((user) => (
+                  {users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.name} ({user.email})
                     </option>
@@ -395,7 +319,7 @@ const UserRoleManagement = () => {
                   required
                 >
                   <option value="">Choose Restaurant...</option>
-                  {MOCK_RESTAURANTS.map((rest) => (
+                  {restaurants.map((rest) => (
                     <option key={rest.id} value={rest.id}>
                       {rest.name}
                     </option>
@@ -422,9 +346,9 @@ const UserRoleManagement = () => {
                   required
                 >
                   <option value="">Choose Role...</option>
-                  {MOCK_ROLES.map((role) => (
+                  {roles.map((role) => (
                     <option key={role.id} value={role.id}>
-                      {role.name}
+                      {role.label}
                     </option>
                   ))}
                 </select>
@@ -432,25 +356,12 @@ const UserRoleManagement = () => {
 
               {/* Submit & Cancel Buttons */}
               <div className="flex gap-3 pt-2">
-                {isEditing && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg border transition ${
-                      isDark
-                        ? 'border-gray-700 text-gray-300 hover:bg-gray-700'
-                        : 'border-gray-300 text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    Cancel
-                  </button>
-                )}
                 <button
                   type="submit"
                   disabled={isSubmitLoading}
                   className="flex-1 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-60"
                 >
-                  {isSubmitLoading ? 'Saving...' : isEditing ? 'Update Role' : 'Assign Role'}
+                  {isSubmitLoading ? 'Saving...' : 'Assign Role'}
                 </button>
               </div>
             </form>
@@ -494,7 +405,7 @@ const UserRoleManagement = () => {
                   }`}
                 >
                   <option value="">All Restaurants</option>
-                  {MOCK_RESTAURANTS.map((r) => (
+                  {restaurants.map((r) => (
                     <option key={r.id} value={r.id}>
                       {r.name}
                     </option>
@@ -515,9 +426,9 @@ const UserRoleManagement = () => {
                   }`}
                 >
                   <option value="">All Roles</option>
-                  {MOCK_ROLES.map((role) => (
-                    <option key={role.id} value={role.id}>
-                      {role.name}
+                  {roles.map((role) => (
+                    <option key={role.key} value={role.key}>
+                      {role.label}
                     </option>
                   ))}
                 </select>
@@ -537,7 +448,6 @@ const UserRoleManagement = () => {
                     <th className="pb-3 pl-3">User</th>
                     <th className="pb-3">Restaurant</th>
                     <th className="pb-3">Assigned Role</th>
-                    <th className="pb-3">Date</th>
                     <th className="pb-3 pr-3 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -548,15 +458,6 @@ const UserRoleManagement = () => {
                 >
                   {filteredAssignments.length > 0 ? (
                     filteredAssignments.map((assignment) => {
-                      const user = MOCK_USERS.find((u) => u.id === assignment.userId) || {
-                        name: 'Unknown',
-                        email: '',
-                        avatar: '?',
-                      };
-                      const restaurant = MOCK_RESTAURANTS.find(
-                        (r) => r.id === assignment.restaurantId
-                      ) || { name: 'Unknown' };
-
                       return (
                         <tr
                           key={assignment.id}
@@ -566,18 +467,18 @@ const UserRoleManagement = () => {
                           <td className="py-3.5 pl-3 pr-4">
                             <div className="flex items-center gap-3">
                               <div className="h-8 w-8 rounded-full bg-blue-600/10 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
-                                {user.avatar}
+                                {initials(assignment.userName)}
                               </div>
                               <div className="min-w-0">
                                 <p
                                   className={`font-semibold whitespace-nowrap ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
                                 >
-                                  {user.name}
+                                  {assignment.userName}
                                 </p>
                                 <p
                                   className={`text-xs whitespace-nowrap ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
                                 >
-                                  {user.email}
+                                  {assignment.userEmail}
                                 </p>
                               </div>
                             </div>
@@ -588,34 +489,18 @@ const UserRoleManagement = () => {
                             <span
                               className={`font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
                             >
-                              {restaurant.name}
+                              {assignment.restaurantName}
                             </span>
                           </td>
 
                           {/* Role Badge Column */}
                           <td className="py-3.5 pr-4 whitespace-nowrap">
-                            {getRoleBadge(assignment.roleId)}
-                          </td>
-
-                          {/* Date Column */}
-                          <td className="py-3.5 pr-4 text-xs text-gray-400 whitespace-nowrap">
-                            {assignment.assignedAt}
+                            {getRoleBadge(assignment.roleName)}
                           </td>
 
                           {/* Actions Column */}
                           <td className="py-3.5 pr-3 text-right">
                             <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => handleEditClick(assignment)}
-                                title="Edit assignment"
-                                className={`p-1.5 rounded-lg border transition ${
-                                  isDark
-                                    ? 'border-gray-700 text-gray-400 hover:text-blue-400 hover:border-blue-400/40 bg-gray-900/40'
-                                    : 'border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 bg-gray-50'
-                                }`}
-                              >
-                                <Edit2 className="h-3.5 w-3.5" />
-                              </button>
                               <button
                                 onClick={() => handleDeleteClick(assignment.id)}
                                 title="Revoke assignment"
@@ -634,11 +519,13 @@ const UserRoleManagement = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="5" className="py-8 text-center">
+                      <td colSpan="4" className="py-8 text-center">
                         <div className="flex flex-col items-center justify-center text-gray-400 gap-2">
                           <AlertCircle className="h-8 w-8 text-gray-500" />
                           <p className="text-sm">
-                            No role assignments found matching the search criteria.
+                            {isLoading
+                              ? 'Loading...'
+                              : 'No role assignments found matching the search criteria.'}
                           </p>
                         </div>
                       </td>

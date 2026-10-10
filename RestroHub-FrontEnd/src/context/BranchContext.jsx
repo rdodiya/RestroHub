@@ -37,8 +37,13 @@ export const BranchProvider = ({ children }) => {
             const isValid = list.some((b) => b.branchId.toString() === selectedBranchId);
             if (!isValid) {
               setSelectedBranchId('all');
+              localStorage.removeItem('selectedBranchId');
             }
           }
+        } else if (selectedBranchId !== 'all') {
+          // No restaurant for this account: a saved branch id can only be stale.
+          setSelectedBranchId('all');
+          localStorage.removeItem('selectedBranchId');
         }
       } catch (error) {
         console.error('Failed to fetch branches for context:', error);
@@ -61,8 +66,12 @@ export const BranchProvider = ({ children }) => {
   // Branch-scoped API calls need a real branch the user owns. "All" falls back to the first of the
   // user's branches (never a hardcoded ID — that leaked another restaurant's data).
   // ponytail: "all" is not aggregated yet; add a restaurant-wide endpoint when owners need totals.
-  const effectiveBranchId =
-    selectedBranchId === 'all' ? (branches[0]?.branchId ?? null) : selectedBranchId;
+  // null until the branch list is loaded, so a stale saved id is never sent to the API.
+  const effectiveBranchId = loading
+    ? null
+    : selectedBranchId === 'all'
+      ? (branches[0]?.branchId ?? null)
+      : selectedBranchId;
 
   return (
     <BranchContext.Provider

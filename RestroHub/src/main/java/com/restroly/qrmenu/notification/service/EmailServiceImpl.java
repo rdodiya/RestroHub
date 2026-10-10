@@ -88,6 +88,30 @@ public class EmailServiceImpl implements EmailService {
             + "<p>Please log in to RestroHub to review the request.</p>");
   }
 
+  @Override
+  public void sendSupportTicketAlert(
+      String toEmail,
+      String fromName,
+      String fromEmail,
+      String restaurantName,
+      String title,
+      String message) {
+    sendHtml(
+        toEmail,
+        "RestroHub support: " + title,
+        null,
+        "<p><b>"
+            + escape(String.valueOf(fromName))
+            + "</b> ("
+            + escape(String.valueOf(fromEmail))
+            + (restaurantName == null ? "" : ", " + escape(restaurantName))
+            + ") sent a support message:</p><p><b>"
+            + escape(title)
+            + "</b></p><p>"
+            + escape(message).replace("\n", "<br>")
+            + "</p><p>Open RestroHub to see it in your notifications.</p>");
+  }
+
   private static String escape(String s) {
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
   }
@@ -113,13 +137,14 @@ public class EmailServiceImpl implements EmailService {
       helper.setSubject(subject);
       helper.setText(html, true);
       mailSender.send(message);
-    } catch (MessagingException
-        | java.io.UnsupportedEncodingException
-        | org.springframework.mail.MailException e) {
+    } catch (Exception e) {
       log.error("Failed to send '{}' to {}: {}", subject, toEmail, e.getMessage(), e);
-      // Outside prod, an unreachable SMTP must not block sign-up: expose the link in the log.
-      if (devLogValue != null
-          && !environment.acceptsProfiles(org.springframework.core.env.Profiles.of("prod"))) {
+      // Notification mails (no link) never block the workflow, e.g. an approval must not roll back.
+      if (devLogValue == null) {
+        return;
+      }
+      // Verification mail: outside prod, expose the link in the log so sign-up can continue.
+      if (!environment.acceptsProfiles(org.springframework.core.env.Profiles.of("prod"))) {
         log.warn("DEV FALLBACK: link for {} is {}", toEmail, devLogValue);
         return;
       }
