@@ -3,6 +3,7 @@ import BranchHeader from './BranchHeader';
 import BranchesGrid from './BranchesGrid';
 import BranchFormModal from './BranchFormModal';
 import api from '@services/common/api';
+import { useBranch } from '@context/BranchContext';
 
 const Branches = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,6 +11,7 @@ const Branches = () => {
   const [totalBranches, setTotalBranches] = useState(0);
   const [restaurantId, setRestaurantId] = useState(null);
   const gridRef = useRef(null);
+  const { refreshBranches } = useBranch();
 
   useEffect(() => {
     const fetchRestaurantId = async () => {
@@ -41,6 +43,8 @@ const Branches = () => {
     setEditingBranch(null);
     // Refresh grid after create/update
     gridRef.current?.refreshBranches();
+    // Keep the shared branch list (BranchGate, branch selector) in sync.
+    refreshBranches();
   };
 
   return (

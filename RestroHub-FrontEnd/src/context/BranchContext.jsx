@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '@services/common/api';
 
 const BranchContext = createContext();
@@ -18,41 +18,42 @@ export const BranchProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBranches = async () => {
-      try {
-        setLoading(true);
-        // Assuming there is an API to get branches for the user/restaurant
-        const response = await api.get('/secure/api/v1/users/fetchRestaurantId');
-        if (response.data && response.data.restaurantId) {
-          const branchesRes = await api.get(
-            `/secure/api/v1/branches/restaurant/${response.data.restaurantId}`
-          );
-          // Endpoint returns a page ({ content: [...] }); older responses were a bare array.
-          const list = branchesRes.data?.content ?? branchesRes.data ?? [];
-          setBranches(Array.isArray(list) ? list : []);
+  const fetchBranches = useCallback(async () => {
+    try {
+      // Assuming there is an API to get branches for the user/restaurant
+      const response = await api.get('/secure/api/v1/users/fetchRestaurantId');
+      if (response.data && response.data.restaurantId) {
+        const branchesRes = await api.get(
+          `/secure/api/v1/branches/restaurant/${response.data.restaurantId}`
+        );
+        // Endpoint returns a page ({ content: [...] }); older responses were a bare array.
+        const list = branchesRes.data?.content ?? branchesRes.data ?? [];
+        const safeList = Array.isArray(list) ? list : [];
+        setBranches(safeList);
 
-          // If selectedBranchId is a specific ID but it's not in the branches, reset it
-          if (selectedBranchId !== 'all' && Array.isArray(list)) {
-            const isValid = list.some((b) => b.branchId.toString() === selectedBranchId);
-            if (!isValid) {
-              setSelectedBranchId('all');
-              localStorage.removeItem('selectedBranchId');
-            }
+        // If the selected branch is a specific ID but it's not in the branches, reset it
+        setSelectedBranchId((current) => {
+          if (current === 'all' || safeList.some((b) => b.branchId.toString() === current)) {
+            return current;
           }
-        } else if (selectedBranchId !== 'all') {
-          // No restaurant for this account: a saved branch id can only be stale.
-          setSelectedBranchId('all');
           localStorage.removeItem('selectedBranchId');
-        }
-      } catch (error) {
-        console.error('Failed to fetch branches for context:', error);
-      } finally {
-        setLoading(false);
+          return 'all';
+        });
+      } else {
+        // No restaurant for this account: a saved branch id can only be stale.
+        setSelectedBranchId('all');
+        localStorage.removeItem('selectedBranchId');
       }
-    };
-    fetchBranches();
+    } catch (error) {
+      console.error('Failed to fetch branches for context:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchBranches();
+  }, [fetchBranches]);
 
   const handleBranchChange = (branchId) => {
     setSelectedBranchId(branchId);
@@ -75,7 +76,14 @@ export const BranchProvider = ({ children }) => {
 
   return (
     <BranchContext.Provider
-      value={{ branches, selectedBranchId, effectiveBranchId, handleBranchChange, loading }}
+      value={{
+        branches,
+        selectedBranchId,
+        effectiveBranchId,
+        handleBranchChange,
+        loading,
+        refreshBranches: fetchBranches,
+      }}
     >
       {children}
     </BranchContext.Provider>
