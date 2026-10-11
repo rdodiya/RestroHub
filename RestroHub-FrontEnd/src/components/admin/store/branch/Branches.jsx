@@ -3,6 +3,7 @@ import BranchHeader from './BranchHeader';
 import BranchesGrid from './BranchesGrid';
 import BranchFormModal from './BranchFormModal';
 import api from '@services/common/api';
+import { useBranch } from '@context/BranchContext';
 
 const Branches = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,28 +11,22 @@ const Branches = () => {
   const [totalBranches, setTotalBranches] = useState(0);
   const [restaurantId, setRestaurantId] = useState(null);
   const gridRef = useRef(null);
+  const { refreshBranches } = useBranch();
 
   useEffect(() => {
     const fetchRestaurantId = async () => {
       try {
         const res = await api.get('/secure/api/v1/users/fetchRestaurantId');
         const data = res.data || {};
-        const fetchedRestaurantId =
-          data.restaurantId ||
-          data.data?.restaurantId ||
-          data.branchId ||
-          data.data?.branchId ||
-          localStorage.getItem('selectedBranchId') ||
-          1;
+        const fetchedRestaurantId = data.restaurantId || data.data?.restaurantId || null;
         setRestaurantId(fetchedRestaurantId);
       } catch (err) {
         console.error('Failed to fetch restaurantId:', err);
-        setRestaurantId(localStorage.getItem('selectedBranchId') || 1);
+        setRestaurantId(null);
       }
     };
     fetchRestaurantId();
   }, []);
-
 
   const openAdd = () => {
     setEditingBranch(null);
@@ -48,6 +43,8 @@ const Branches = () => {
     setEditingBranch(null);
     // Refresh grid after create/update
     gridRef.current?.refreshBranches();
+    // Keep the shared branch list (BranchGate, branch selector) in sync.
+    refreshBranches();
   };
 
   return (

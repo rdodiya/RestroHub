@@ -5,6 +5,7 @@ import Header from '@components/admin/Header';
 import { useAdminTheme } from '@context/AdminThemeContext';
 import { BranchProvider } from '@context/BranchContext';
 import ErrorBoundary from '@components/common/ErrorBoundary';
+import BranchGate from '@components/admin/BranchGate';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,7 +34,9 @@ const AdminLayout = () => {
           >
             <div className="mx-auto max-w-screen-2xl p-4 sm:p-5 lg:p-6 2xl:p-8">
               <ErrorBoundary>
-                <Outlet />
+                <BranchGate>
+                  <Outlet />
+                </BranchGate>
               </ErrorBoundary>
             </div>
           </main>

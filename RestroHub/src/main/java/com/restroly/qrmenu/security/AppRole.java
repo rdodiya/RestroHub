@@ -4,17 +4,15 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Roles the backend understands. Role rows in {@code t_role_master} are matched by name, with or
- * without the {@code ROLE_} prefix.
+ * The four roles of the app: SUPER_ADMIN (platform owner), ADMIN (restaurant owner), MANAGER
+ * (limited access vs ADMIN) and STAFF (kitchen display / order status). Role rows in {@code
+ * t_role_master} are matched by name, with or without the {@code ROLE_} prefix.
  */
 public enum AppRole {
   SUPER_ADMIN,
   ADMIN,
-  RESTAURANT_OWNER,
   MANAGER,
-  MANAGER_USER,
-  STAFF,
-  CUSTOMER;
+  STAFF;
 
   private static final String PREFIX = "ROLE_";
 

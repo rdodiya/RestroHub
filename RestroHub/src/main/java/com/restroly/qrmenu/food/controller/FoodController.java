@@ -248,8 +248,7 @@ public class FoodController {
   @PutMapping(value = "/{foodId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(
       summary = "Update a food item",
-      description =
-          "Updates an existing food item. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
+      description = "Updates an existing food item. Requires ADMIN or MANAGER role.",
       security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses({
     @ApiResponse(
@@ -284,7 +283,7 @@ public class FoodController {
   @Operation(
       summary = "Update food availability",
       description =
-          "Updates the availability status of a food item. Requires ADMIN, MANAGER, or RESTAURANT_OWNER role.",
+          "Updates the availability status of a food item. Requires ADMIN or MANAGER role.",
       security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Availability updated successfully"),
@@ -305,7 +304,7 @@ public class FoodController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(
       summary = "Delete a food item",
-      description = "Deletes a food item from the menu. Requires ADMIN or RESTAURANT_OWNER role.",
+      description = "Deletes a food item from the menu. Requires ADMIN role.",
       security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Food item deleted successfully"),

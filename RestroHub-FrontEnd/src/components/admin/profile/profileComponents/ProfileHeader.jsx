@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  Camera,
-  MapPin,
-  Mail,
-  Phone,
-  Calendar,
-  Edit2,
-  Loader2,
-  Check,
-} from 'lucide-react';
+import { Camera, MapPin, Mail, Phone, Calendar, Edit2, Loader2, Check } from 'lucide-react';
 
 const ProfileHeader = ({ profile, onEditAvatar }) => {
   return (
@@ -65,19 +56,16 @@ const ProfileHeader = ({ profile, onEditAvatar }) => {
 
           {/* Name + Meta */}
           <div className="mt-3 text-center sm:mt-0 sm:flex-1 sm:pb-1 sm:text-left">
-            <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
-              {profile.name || 'Admin User'}
-            </h2>
-            <p className="text-sm text-gray-500">
-              {profile.role || 'Restaurant Owner'}
-            </p>
+            <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">{profile.name}</h2>
+            <p className="text-sm text-gray-500">{profile.role}</p>
 
             {/* Quick Info Tags */}
             <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
               {(profile.location || profile.city) && (
                 <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                   <MapPin className="h-3 w-3" />
-                  {profile.location || `${profile.city}${profile.state ? ', ' + profile.state : ''}`}
+                  {profile.location ||
+                    `${profile.city}${profile.state ? ', ' + profile.state : ''}`}
                 </span>
               )}
               {profile.email && (

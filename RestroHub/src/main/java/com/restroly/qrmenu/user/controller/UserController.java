@@ -274,12 +274,13 @@ public class UserController {
       branchName = branch.getName();
     }
 
-    return ResponseEntity.ok(
-        Map.of(
-            "success", true,
-            "restaurantId", restaurantId,
-            "restaurantName", restaurantName,
-            "branchId", branchId,
-            "branchName", branchName));
+    // HashMap, not Map.of: restaurant/branch are legitimately null (no branch created yet).
+    Map<String, Object> body = new java.util.HashMap<>();
+    body.put("success", true);
+    body.put("restaurantId", restaurantId);
+    body.put("restaurantName", restaurantName);
+    body.put("branchId", branchId);
+    body.put("branchName", branchName);
+    return ResponseEntity.ok(body);
   }
 }

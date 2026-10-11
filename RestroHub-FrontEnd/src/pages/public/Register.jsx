@@ -1,3 +1,4 @@
+import usePageMeta from '@hooks/usePageMeta';
 // src/pages/public/Register.jsx
 
 import { useState } from 'react';
@@ -6,6 +7,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import api from '@services/common/api';
+import SpamGuard from '@components/common/SpamGuard';
 import { ArrowLeft, Moon, Sun, Store } from 'lucide-react';
 import { useTheme } from '@context/ThemeContext';
 
@@ -146,6 +148,10 @@ const validationSchema = Yup.object({
 });
 
 const Register = () => {
+  usePageMeta({
+    title: 'Create your account | Restroly',
+    description: 'Start free: create digital menus, QR ordering and UPI payment links in minutes.',
+  });
   const { isDark, toggle } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -282,7 +288,7 @@ const Register = () => {
               </div>
               <Link
                 to="/"
-                className="mb-4 inline-flex items-center text-sm text-gray-400 transition-colors hover:text-gray-300 gap-2"
+                className="mb-4 inline-flex items-center text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 gap-2"
               >
                 <ArrowLeft size={15} />
                 Back to Home
@@ -298,6 +304,7 @@ const Register = () => {
                 }}
                 noValidate
               >
+                <SpamGuard />
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <div className="w-full">
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">

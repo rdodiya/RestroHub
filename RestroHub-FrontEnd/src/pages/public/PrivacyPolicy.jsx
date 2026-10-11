@@ -1,39 +1,34 @@
+import usePageMeta from '@hooks/usePageMeta';
 import { Link } from 'react-router-dom';
 
 const PrivacyPolicy = () => {
+  usePageMeta({
+    title: 'Privacy Policy | Restroly',
+    description: 'How Restroly collects, uses and protects your data.',
+  });
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 py-16 px-4">
       <div className="max-w-4xl mx-auto">
-
         {/* Header */}
         <div className="mb-10">
-          <Link
-            to="/"
-            className="text-blue-600 hover:underline text-sm mb-4 inline-block"
-          >
+          <Link to="/" className="text-blue-600 hover:underline text-sm mb-4 inline-block">
             ← Back to Home
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Privacy Policy
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Last updated: June 2026
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Privacy Policy</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Last updated: June 2026</p>
         </div>
 
         {/* Content */}
         <div className="space-y-8 text-gray-700 dark:text-gray-300 leading-relaxed">
-
           {/* Section 1 */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
               1. Information We Collect
             </h2>
             <p>
-              We collect information you provide directly to us, such as when
-              you create an account, use our services, or contact us for support.
-              This includes your name, email address, phone number, and
-              restaurant details.
+              We collect information you provide directly to us, such as when you create an account,
+              use our services, or contact us for support. This includes your name, email address,
+              phone number, and restaurant details.
             </p>
           </section>
 
@@ -58,10 +53,9 @@ const PrivacyPolicy = () => {
               3. Data Storage & Security
             </h2>
             <p>
-              We take reasonable measures to help protect your personal
-              information from loss, theft, misuse, unauthorized access,
-              disclosure, alteration, and destruction. Your data is stored
-              securely on our servers located in India.
+              We take reasonable measures to help protect your personal information from loss,
+              theft, misuse, unauthorized access, disclosure, alteration, and destruction. Your data
+              is stored securely on our servers located in India.
             </p>
           </section>
 
@@ -71,10 +65,9 @@ const PrivacyPolicy = () => {
               4. Cookies
             </h2>
             <p>
-              We use cookies and similar tracking technologies to track activity
-              on our platform and hold certain information. You can instruct your
-              browser to refuse all cookies or to indicate when a cookie is being
-              sent.
+              We use cookies and similar tracking technologies to track activity on our platform and
+              hold certain information. You can instruct your browser to refuse all cookies or to
+              indicate when a cookie is being sent.
             </p>
           </section>
 
@@ -84,10 +77,9 @@ const PrivacyPolicy = () => {
               5. Sharing of Information
             </h2>
             <p>
-              We do not sell, trade, or rent your personal identification
-              information to others. We may share generic aggregated demographic
-              information not linked to any personal identification information
-              with our business partners and trusted affiliates.
+              We do not sell, trade, or rent your personal identification information to others. We
+              may share generic aggregated demographic information not linked to any personal
+              identification information with our business partners and trusted affiliates.
             </p>
           </section>
 
@@ -111,19 +103,13 @@ const PrivacyPolicy = () => {
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
               7. Contact Us
             </h2>
-            <p>
-              If you have any questions about this Privacy Policy, please
-              contact us at:
-            </p>
+            <p>If you have any questions about this Privacy Policy, please contact us at:</p>
             <div className="mt-3 p-4 bg-blue-50 dark:bg-gray-800 rounded-lg">
-              <p className="font-medium text-blue-700 dark:text-blue-400">
-                Restroly Support
-              </p>
+              <p className="font-medium text-blue-700 dark:text-blue-400">Restroly Support</p>
               <p>Email: support@restroly.com</p>
               <p>Address: India</p>
             </div>
           </section>
-
         </div>
       </div>
     </div>

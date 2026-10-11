@@ -10,9 +10,9 @@ import ProfileImageModal from './profileComponents/ProfileImageModal';
 import ProfileSkeleton from './profileComponents/ProfileSkeleton';
 
 import profileService from '../../../services/user/profileService';
+import { readStoredRoles, roleLabel } from '../../../utils/auth';
 
 const Profile = () => {
-
   // tracks which sidebar section is active
   const [activeSection, setActiveSection] = useState('personal');
 
@@ -28,18 +28,17 @@ const Profile = () => {
     email: '',
     phoneNumber: '',
 
-    // keeping some fallback static ui data for now
-    role: 'Restaurant Owner',
-    location: 'Rajkot, Gujarat',
-    joinedDate: 'Jan 2024',
+    role: roleLabel(readStoredRoles()),
+    location: '',
+    joinedDate: '',
 
     avatar: null,
 
-    restaurantName: 'Rajkot Dhaba',
-    totalOrders: '1,234',
-    totalRevenue: '₹4.5L',
-    rating: '4.8',
-    branches: '3',
+    restaurantName: '',
+    totalOrders: '',
+    totalRevenue: '',
+    rating: '',
+    branches: '',
   });
 
   // fetch current authenticated user profile
@@ -55,14 +54,14 @@ const Profile = () => {
           name: data.name || '',
           email: data.email || '',
           phoneNumber: data.phoneNumber || '',
-          role: data.role || 'Restaurant Owner',
+          role: data.role || roleLabel(readStoredRoles()),
           restaurantId: data.restaurantId || null,
           restaurantName: data.restaurantName || prev.restaurantName,
           tagline: data.restaurantDescription || prev.tagline,
           branches: data.branches || prev.branches,
           joinedDate: data.joinedDate || prev.joinedDate,
           dateOfBirth: data.dateOfBirth || '',
-          gender: data.gender || 'male',
+          gender: data.gender || '',
           address: data.address || '',
           city: data.city || '',
           state: data.state || '',
@@ -130,44 +129,28 @@ const Profile = () => {
 
   // renders different cards based on selected sidebar section
   const renderSection = () => {
-
     switch (activeSection) {
-
       case 'personal':
-
-        return (
-          <PersonalInfoCard
-            profile={profile}
-            onSave={handleSaveProfile}
-          />
-        );
+        return <PersonalInfoCard profile={profile} onSave={handleSaveProfile} />;
 
       case 'restaurant':
-
         return (
           <RestaurantInfoCard
             profile={profile}
             onSave={(data) =>
               setProfile({
                 ...profile,
-                ...data
+                ...data,
               })
             }
           />
         );
 
       case 'security':
-
         return <SecurityCard />;
 
       default:
-
-        return (
-          <PersonalInfoCard
-            profile={profile}
-            onSave={handleSaveProfile}
-          />
-        );
+        return <PersonalInfoCard profile={profile} onSave={handleSaveProfile} />;
     }
   };
 
@@ -177,26 +160,17 @@ const Profile = () => {
   }
 
   return (
-
     <div className="space-y-5 sm:space-y-6">
-
       {/* profile header */}
 
-      <ProfileHeader
-        profile={profile}
-        onEditAvatar={() =>
-          setImageModalOpen(true)
-        }
-      />
+      <ProfileHeader profile={profile} onEditAvatar={() => setImageModalOpen(true)} />
 
       {/* sidebar + main content layout */}
 
       <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-12">
-
         {/* sidebar */}
 
         <div className="lg:col-span-4 xl:col-span-3">
-
           <ProfileSidebar
             profile={profile}
             activeSection={activeSection}
@@ -206,24 +180,19 @@ const Profile = () => {
 
         {/* active section content */}
 
-        <div className="lg:col-span-8 xl:col-span-9">
-
-          {renderSection()}
-        </div>
+        <div className="lg:col-span-8 xl:col-span-9">{renderSection()}</div>
       </div>
 
       {/* profile image modal */}
 
       <ProfileImageModal
         isOpen={imageModalOpen}
-        onClose={() =>
-          setImageModalOpen(false)
-        }
+        onClose={() => setImageModalOpen(false)}
         currentImage={profile.avatar}
         onSave={(img) =>
           setProfile({
             ...profile,
-            avatar: img
+            avatar: img,
           })
         }
       />

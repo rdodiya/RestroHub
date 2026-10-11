@@ -14,13 +14,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Append-only record of a sensitive action. IDs are plain columns (no FKs) so entries survive
  * deletes of the things they describe. Table created by Flyway V2__create_audit_log.sql.
  */
 @Entity
-@Table(name = "t_audit_log")
+@Table(name = "t_audit_history")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,7 +53,8 @@ public class AuditLogEntry {
   @Column(name = "restaurant_id")
   private Long restaurantId;
 
-  @Column(name = "metadata", columnDefinition = "TEXT")
+  @JdbcTypeCode(SqlTypes.LONG32VARCHAR)
+  @Column(name = "metadata")
   private String metadata;
 
   @Column(name = "created_at", nullable = false, updatable = false)

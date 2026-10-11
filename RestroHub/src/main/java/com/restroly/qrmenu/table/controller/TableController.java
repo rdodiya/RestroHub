@@ -60,7 +60,7 @@ public class TableController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Create a table",
-      description = "Creates a new table for a branch. Requires ADMIN or RESTAURANT_OWNER Role.",
+      description = "Creates a new table for a branch. Requires ADMIN role.",
       security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses({
     @ApiResponse(
@@ -101,8 +101,7 @@ public class TableController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Update a table",
-      description =
-          "Updates table details, status, and active state. Requires ADMIN or RESTAURANT_OWNER Role.",
+      description = "Updates table details, status, and active state. Requires ADMIN role.",
       security = @SecurityRequirement(name = "bearerAuth"))
   @PreAuthorize("@access.can('MENU_WRITE') and @access.table(#tableId)")
   public ResponseEntity<TableResponseDTO> updateTable(
@@ -117,7 +116,7 @@ public class TableController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(
       summary = "Delete a table",
-      description = "Permanently deletes a table. Requires ADMIN or RESTAURANT_OWNER Role.",
+      description = "Permanently deletes a table. Requires ADMIN role.",
       security = @SecurityRequirement(name = "bearerAuth"))
   @PreAuthorize("@access.can('MENU_WRITE') and @access.table(#tableId)")
   public ResponseEntity<Void> deleteTable(

@@ -13,15 +13,15 @@ public enum Permission {
   /** Plans, features, users, restaurant assignments, suspension. */
   PLATFORM_ADMIN(SUPER_ADMIN),
   /** Restaurant profile, branches, staff roles, UPI VPA, subscription. */
-  RESTAURANT_SETTINGS(SUPER_ADMIN, ADMIN, RESTAURANT_OWNER),
+  RESTAURANT_SETTINGS(SUPER_ADMIN, ADMIN),
   /** Create/update/delete menus, categories, foods, tables; Excel import. */
-  MENU_WRITE(SUPER_ADMIN, ADMIN, RESTAURANT_OWNER, MANAGER),
+  MENU_WRITE(SUPER_ADMIN, ADMIN, MANAGER),
   /** Read menus, tables, orders, KDS. */
-  OPERATIONS_READ(SUPER_ADMIN, ADMIN, RESTAURANT_OWNER, MANAGER, MANAGER_USER, STAFF),
+  OPERATIONS_READ(SUPER_ADMIN, ADMIN, MANAGER, STAFF),
   /** Move an order through its status flow. */
-  ORDER_STATUS_UPDATE(SUPER_ADMIN, ADMIN, RESTAURANT_OWNER, MANAGER, STAFF),
+  ORDER_STATUS_UPDATE(SUPER_ADMIN, ADMIN, MANAGER, STAFF),
   /** See amounts, totals, revenue and UPI details; export data. */
-  VIEW_FINANCIALS(SUPER_ADMIN, ADMIN, RESTAURANT_OWNER, MANAGER);
+  VIEW_FINANCIALS(SUPER_ADMIN, ADMIN, MANAGER);
 
   private final Set<AppRole> roles;
 

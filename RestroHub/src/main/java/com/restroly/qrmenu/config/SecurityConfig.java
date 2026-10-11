@@ -66,20 +66,27 @@ public class SecurityConfig {
                     // STAFF advances orders (Permission.ORDER_STATUS_UPDATE); must precede the
                     // generic write rules.
                     .requestMatchers(HttpMethod.PATCH, SECURE_API_VERSION + "/orders/*/status")
-                    .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER", "STAFF")
+                    .hasAnyRole("ADMIN", "MANAGER", "STAFF")
                     .requestMatchers(HttpMethod.POST, SECURE_API_VERSION + "/orders/*/cancel")
-                    .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER", "STAFF")
+                    .hasAnyRole("ADMIN", "MANAGER", "STAFF")
                     .requestMatchers(
                         HttpMethod.PUT, SECURE_API_VERSION + "/orders/branch/*/mark-all-ready")
-                    .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER", "STAFF")
+                    .hasAnyRole("ADMIN", "MANAGER", "STAFF")
+                    .requestMatchers(HttpMethod.POST, SECURE_API_VERSION + "/support/tickets")
+                    .hasAnyRole("ADMIN", "MANAGER", "STAFF")
+                    // Platform-owner area (registration requests, role assignments): must precede
+                    // the
+                    // generic write rules, which do not include SUPER_ADMIN.
+                    .requestMatchers(SECURE_API_VERSION + "/admin/**")
+                    .hasRole("SUPER_ADMIN")
                     .requestMatchers(HttpMethod.POST, "/secure/api/**")
-                    .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER")
+                    .hasAnyRole("ADMIN", "MANAGER")
                     .requestMatchers(HttpMethod.PUT, "/secure/api/**")
-                    .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER")
+                    .hasAnyRole("ADMIN", "MANAGER")
                     .requestMatchers(HttpMethod.PATCH, "/secure/api/**")
-                    .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER")
+                    .hasAnyRole("ADMIN", "MANAGER")
                     .requestMatchers(HttpMethod.DELETE, "/secure/api/**")
-                    .hasAnyRole("ADMIN", "MANAGER", "RESTAURANT_OWNER")
+                    .hasAnyRole("ADMIN", "MANAGER")
                     // All other requests require authentication
                     .anyRequest()
                     .authenticated())

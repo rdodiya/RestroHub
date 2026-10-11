@@ -120,7 +120,7 @@ Phase 1 (§6.1) implements the matrix above as a **default** model on the backen
 - **Tenant isolation:** a user can only reach restaurants they are linked to through `UserRoleRestaurant`, and the branches, menus, tables, orders, UPI links and service requests of those restaurants. Cross-tenant requests return `403`. Super Admin reaches every tenant.
 - **Financial fields are removed server-side:** for roles without `VIEW_FINANCIALS`, order responses omit `totalAmount`, `paymentLink`, `unitPrice` and `subtotal`. Hiding them in the UI alone is not enough.
 - **Branch access** is currently derived from restaurant membership: a Manager linked to a restaurant can reach all of its branches. Per-branch assignment is an open question (§8).
-- **Role names** may be stored as `ROLE_ADMIN` or `ADMIN`; both map to the same authority. `MANAGER_USER` is the expected name for the Manager/User role.
+- **Role names** may be stored as `ROLE_ADMIN` or `ADMIN`; both map to the same authority. The app has exactly four roles: `SUPER_ADMIN`, `ADMIN` (restaurant owner), `MANAGER`, `STAFF`; the former `RESTAURANT_OWNER` and `MANAGER_USER` were folded into `ADMIN` and `STAFF` (see `V7__consolidate_roles.sql`).
 
 ---
 

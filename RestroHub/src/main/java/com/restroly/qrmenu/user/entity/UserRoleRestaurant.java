@@ -12,32 +12,24 @@ import lombok.*;
 @Getter
 @Setter
 @Table(
-        name = "user_role_restaurant",
-        uniqueConstraints = @UniqueConstraint(
-                columnNames = {
-                        "user_id",
-                        "role_id",
-                        "restaurant_id"
-                }
-        )
-)
+    name = "t_usr_role_restaurant_rel",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "role_id", "restaurant_id"}))
 public class UserRoleRestaurant {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "role_id", nullable = false)
+  private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id", nullable = false)
-    private Restaurant restaurant;
-
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "restaurant_id", nullable = false)
+  private Restaurant restaurant;
 }
