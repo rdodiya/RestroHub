@@ -3,7 +3,7 @@
 -- =============================================================================
 -- Creates one login user per role so every permission in security/Permission.java
 -- can be tested, plus the minimum restaurants those users must be linked to
--- (user_role_restaurant.restaurant_id is NOT NULL).
+-- (t_usr_role_restaurant_rel.restaurant_id is NOT NULL).
 --
 -- Prerequisite: start the backend once so Hibernate/Flyway create the tables.
 -- Run:          psql -U postgres -d RestroHub_DB -f scripts/db/01_seed_users.sql
@@ -43,18 +43,15 @@ BEGIN
     -- -------------------------------------------------------------------------
     FOR v_role IN SELECT * FROM (VALUES
         ('SUPER_ADMIN',      'Platform owner: plans, features, users, role linking'),
-        ('ADMIN',            'Restaurant admin: full access to own restaurant'),
-        ('RESTAURANT_OWNER', 'Restaurant owner: same as admin'),
+        ('ADMIN',            'Restaurant owner: full access to own restaurant'),
         ('MANAGER',          'Operations, menus, tables, KDS; no settings/UPI/billing'),
-        ('MANAGER_USER',     'Read-only operations; no financial data'),
-        ('STAFF',            'Live orders and KDS: status updates only'),
-        ('CUSTOMER',         'Default customer role')
+        ('STAFF',            'Live orders and KDS: status updates only')
     ) AS r(name, description)
     LOOP
         IF NOT EXISTS (SELECT 1 FROM t_role_master
                        WHERE regexp_replace(upper(role_name), '^(ROLE_)+', '') = v_role.name) THEN
             INSERT INTO t_role_master (role_name, role_desc, is_active)
-            VALUES (CASE WHEN v_role.name = 'CUSTOMER' THEN 'CUSTOMER' ELSE 'ROLE_' || v_role.name END,
+            VALUES ('ROLE_' || v_role.name,
                     v_role.description, TRUE);
             RAISE NOTICE 'Inserted missing role %', v_role.name;
         END IF;
@@ -68,11 +65,11 @@ BEGIN
     FOR v_user IN SELECT * FROM (VALUES
         ('superadmin@restroly.test',   'Super Admin',          'SUPER_ADMIN',      'Restroly Platform', '9100000001'),
         ('admin.a@restroly.test',      'Asha Admin (A)',       'ADMIN',            'Spice Route',       '9100000002'),
-        ('owner.a@restroly.test',      'Omkar Owner (A)',      'RESTAURANT_OWNER', 'Spice Route',       '9100000003'),
+        ('owner.a@restroly.test',      'Omkar Owner (A)',      'ADMIN',            'Spice Route',       '9100000003'),
         ('manager.a@restroly.test',    'Meera Manager (A)',    'MANAGER',          'Spice Route',       '9100000004'),
-        ('manageruser.a@restroly.test','Mohan ManagerUser (A)','MANAGER_USER',     'Spice Route',       '9100000005'),
+        ('manageruser.a@restroly.test','Mohan ManagerUser (A)','STAFF',            'Spice Route',       '9100000005'),
         ('staff.a@restroly.test',      'Sunil Staff (A)',      'STAFF',            'Spice Route',       '9100000006'),
-        ('customer.a@restroly.test',   'Chitra Customer (A)',  'CUSTOMER',         'Spice Route',       '9100000007'),
+        ('customer.a@restroly.test',   'Chitra Customer (A)',  'STAFF',            'Spice Route',       '9100000007'),
         ('admin.b@restroly.test',      'Bala Admin (B)',       'ADMIN',            'Ocean Grill',       '9100000008')
     ) AS u(email, name, role, restaurant, phone)
     LOOP
@@ -90,7 +87,7 @@ BEGIN
         SELECT role_id INTO v_role_id FROM t_role_master
         WHERE regexp_replace(upper(role_name), '^(ROLE_)+', '') = v_user.role ORDER BY role_id LIMIT 1;
 
-        INSERT INTO user_role_restaurant (user_id, role_id, restaurant_id)
+        INSERT INTO t_usr_role_restaurant_rel (user_id, role_id, restaurant_id)
         VALUES (v_user_id, v_role_id, v_rest_id)
         ON CONFLICT (user_id, role_id, restaurant_id) DO NOTHING;
     END LOOP;
@@ -107,7 +104,7 @@ SELECT u.user_email           AS login_email,
        u.is_active, u.is_locked,
        (u.user_password = crypt('Test@1234', u.user_password)) AS password_ok
 FROM t_usr_master u
-JOIN user_role_restaurant urr ON urr.user_id = u.user_id
+JOIN t_usr_role_restaurant_rel urr ON urr.user_id = u.user_id
 JOIN t_role_master r          ON r.role_id = urr.role_id
 JOIN t_restaurant_master rm   ON rm.rest_id = urr.restaurant_id
 WHERE u.user_email LIKE '%@restroly.test'

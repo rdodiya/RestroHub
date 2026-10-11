@@ -133,13 +133,8 @@ const QuickActions = () => {
         }
       }
 
-      // Simulate sending broadcast
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      toast.success(`Broadcast announcement sent to ${recipientCount} customer(s)!`, {
-        icon: '📢',
-        duration: 4000,
-      });
+      // ponytail: no backend broadcast endpoint exists yet; do not pretend the message was sent.
+      toast.error('Customer broadcast is not available yet', { duration: 4000 });
       setIsBroadcastOpen(false);
     } catch (err) {
       console.error('Failed to send broadcast:', err);

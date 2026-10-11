@@ -95,7 +95,7 @@ class OrderFlowIntegrationTest {
                 + "VALUES ('Admin A', 'admin.a@it.test', 'x', TRUE, FALSE) RETURNING user_id",
             Long.class);
     jdbc.update(
-        "INSERT INTO user_role_restaurant (user_id, role_id, restaurant_id) VALUES (?, ?, ?)",
+        "INSERT INTO t_usr_role_restaurant_rel (user_id, role_id, restaurant_id) VALUES (?, ?, ?)",
         user,
         role,
         restA);
@@ -109,8 +109,8 @@ class OrderFlowIntegrationTest {
   void clean() {
     SecurityContextHolder.clearContext();
     jdbc.execute(
-        "TRUNCATE t_order_items, t_order_master, t_food_master, t_category_master, t_table_master, "
-            + "t_branch_master, t_address_master, user_role_restaurant, t_usr_master, t_restaurant_master "
+        "TRUNCATE t_order_detail, t_order_master, t_food_master, t_category_master, t_table_master, "
+            + "t_branch_master, t_address_master, t_usr_role_restaurant_rel, t_usr_master, t_restaurant_master "
             + "RESTART IDENTITY CASCADE");
   }
 

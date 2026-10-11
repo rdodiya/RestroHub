@@ -30,7 +30,7 @@ Every scenario: record PASS/FAIL/BLOCKED/N-A/KNOWN, evidence (response/screensho
 - RBAC-04 MANAGER_USER: read-only; sidebar hides financials/UPI/Subscriptions; direct URL to `/admin/upi-links` redirects; API writes → 403; responses contain no payment/UPI/revenue fields.
 - RBAC-05 STAFF: only Orders, KDS, Profile; can move order status; no exports/menu edits; no revenue.
 - RBAC-06 Every role: direct-URL access to each `/admin/*` route matches the sidebar (no hidden-but-reachable pages).
-- RBAC-07 Audit log rows (`t_audit_log`) written on role change, plan change, UPI VPA change.
+- RBAC-07 Audit log rows (`t_audit_history`) written on role change, plan change, UPI VPA change.
 
 ## BR — Branch context (Task 1.1)
 - BR-01 Header dropdown lists branches + "All Branches"; selection persists after reload (localStorage `selectedBranchId`).

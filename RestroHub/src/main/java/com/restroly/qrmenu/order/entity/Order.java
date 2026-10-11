@@ -14,7 +14,7 @@ import java.util.List;
 import lombok.*;
 
 @Entity
-@Table(name = "T_order_master")
+@Table(name = "t_order_master")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

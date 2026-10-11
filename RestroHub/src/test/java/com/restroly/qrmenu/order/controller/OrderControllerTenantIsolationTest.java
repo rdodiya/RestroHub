@@ -66,7 +66,7 @@ class OrderControllerTenantIsolationTest {
     branch(10L, 1L);
     branch(20L, 2L);
     linkToRestaurant1("admin@rest-a.com", "ROLE_ADMIN");
-    linkToRestaurant1("mu@rest-a.com", "ROLE_MANAGER_USER");
+    linkToRestaurant1("staff@rest-a.com", "ROLE_STAFF");
 
     OrderItemResponse item =
         OrderItemResponse.builder()
@@ -106,8 +106,8 @@ class OrderControllerTenantIsolationTest {
   }
 
   @Test
-  @WithMockUser(username = "mu@rest-a.com", roles = "MANAGER_USER")
-  void managerUserGetsOrdersWithoutFinancialFields() throws Exception {
+  @WithMockUser(username = "staff@rest-a.com", roles = "STAFF")
+  void staffGetsOrdersWithoutFinancialFields() throws Exception {
     mvc.perform(get(OWN_BRANCH))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].orderId").value(100))
@@ -120,15 +120,7 @@ class OrderControllerTenantIsolationTest {
   @Test
   @WithMockUser(username = "staff@rest-a.com", roles = "STAFF")
   void staffCanAdvanceOrdersInOwnBranch() throws Exception {
-    linkToRestaurant1("staff@rest-a.com", "ROLE_STAFF");
     mvc.perform(put(OWN_BRANCH + "/mark-all-ready")).andExpect(status().isOk());
-  }
-
-  @Test
-  @WithMockUser(username = "mu@rest-a.com", roles = "MANAGER_USER")
-  void managerUserCannotAdvanceOrders() throws Exception {
-    mvc.perform(put(OWN_BRANCH + "/mark-all-ready")).andExpect(status().isForbidden());
-    verify(orderService, never()).markAllActiveOrdersReady(anyLong());
   }
 
   @Test

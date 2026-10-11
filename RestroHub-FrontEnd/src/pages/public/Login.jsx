@@ -17,6 +17,13 @@ import {
   storeAuthSession,
 } from '@services/common/authStorage';
 import { useTheme } from '@context/ThemeContext';
+import { getDefaultAdminPath } from '../../utils/auth';
+
+// Any role with admin-area access (ROLE_ prefix tolerated) goes to its home page; others to '/'.
+const postLoginPath = (roles) => {
+  const home = getDefaultAdminPath(roles || []);
+  return home === '/unauthorized' ? '/' : home;
+};
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8181/restroly';
 
@@ -233,8 +240,7 @@ const Login = () => {
           api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
           toast.success('Login successful!');
-
-          const redirectPath = roles && roles.includes('ADMIN') ? '/admin/dashboard' : '/';
+          const redirectPath = postLoginPath(roles);
           navigate(redirectPath);
         } else {
           toast.error(result.message || 'Login failed');
@@ -274,8 +280,7 @@ const Login = () => {
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
         toast.success('Google login successful!');
-
-        const redirectPath = roles && roles.includes('ADMIN') ? '/admin/dashboard' : '/';
+        const redirectPath = postLoginPath(roles);
         navigate(redirectPath);
       } else {
         toast.error(result.message || 'Google login failed');

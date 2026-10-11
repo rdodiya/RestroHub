@@ -7,7 +7,7 @@ const getNames = (nameStr) => {
   const parts = nameStr.trim().split(/\s+/);
   return {
     firstName: parts[0] || '',
-    lastName: parts.slice(1).join(' ') || ''
+    lastName: parts.slice(1).join(' ') || '',
   };
 };
 
@@ -29,7 +29,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
     lastName: initialNames.lastName,
     altPhone: profile.altPhone || '',
     dateOfBirth: profile.dateOfBirth || '',
-    gender: profile.gender || 'male',
+    gender: profile.gender || '',
     address: profile.address || '',
     city: profile.city || '',
     state: profile.state || '',
@@ -47,7 +47,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
       phoneNumber: profile.phoneNumber || '',
       altPhone: profile.altPhone || '',
       dateOfBirth: profile.dateOfBirth || '',
-      gender: profile.gender || 'male',
+      gender: profile.gender || '',
       address: profile.address || '',
       city: profile.city || '',
       state: profile.state || '',
@@ -62,7 +62,8 @@ const PersonalInfoCard = ({ profile, onSave }) => {
     const errs = {};
     if (!formData.firstName.trim()) errs.firstName = 'First name is required';
     if (!formData.phoneNumber.trim()) errs.phoneNumber = 'Phone number is required';
-    else if (!/^\+?[0-9\s-]{7,15}$/.test(formData.phoneNumber)) errs.phoneNumber = 'Enter a valid phone number';
+    else if (!/^\+?[0-9\s-]{7,15}$/.test(formData.phoneNumber))
+      errs.phoneNumber = 'Enter a valid phone number';
 
     if (Object.keys(errs).length) {
       setSaving(false);
@@ -77,7 +78,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
         name: fullName,
         phoneNumber: formData.phoneNumber?.trim() || '',
         dateOfBirth: formData.dateOfBirth || '',
-        gender: formData.gender || 'male',
+        gender: formData.gender || undefined,
         address: formData.address?.trim() || '',
         city: formData.city?.trim() || '',
         state: formData.state?.trim() || '',
@@ -108,7 +109,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
       phoneNumber: profile.phoneNumber || '',
       altPhone: profile.altPhone || '',
       dateOfBirth: profile.dateOfBirth || '',
-      gender: profile.gender || 'male',
+      gender: profile.gender || '',
       address: profile.address || '',
       city: profile.city || '',
       state: profile.state || '',
@@ -153,9 +154,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
             <h3 className="text-sm font-semibold text-gray-900 sm:text-base">
               Personal Information
             </h3>
-            <p className="text-xs text-gray-500">
-              Your personal details and contact info
-            </p>
+            <p className="text-xs text-gray-500">Your personal details and contact info</p>
           </div>
         </div>
 
@@ -198,7 +197,11 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                   aria-invalid={fieldErrors.firstName ? 'true' : 'false'}
                   aria-describedby={fieldErrors.firstName ? 'err-personal-firstname' : undefined}
                 />
-                {fieldErrors.firstName && <p id="err-personal-firstname" className="mt-1 text-xs text-red-500">{fieldErrors.firstName}</p>}
+                {fieldErrors.firstName && (
+                  <p id="err-personal-firstname" className="mt-1 text-xs text-red-500">
+                    {fieldErrors.firstName}
+                  </p>
+                )}
               </div>
               <div>
                 <label className={labelClass}>Last Name</label>
@@ -240,7 +243,11 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                   aria-invalid={fieldErrors.phoneNumber ? 'true' : 'false'}
                   aria-describedby={fieldErrors.phoneNumber ? 'err-personal-phone' : undefined}
                 />
-                {fieldErrors.phoneNumber && <p id="err-personal-phone" className="mt-1 text-xs text-red-500">{fieldErrors.phoneNumber}</p>}
+                {fieldErrors.phoneNumber && (
+                  <p id="err-personal-phone" className="mt-1 text-xs text-red-500">
+                    {fieldErrors.phoneNumber}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -262,6 +269,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                   onChange={(e) => updateField('gender', e.target.value)}
                   className={inputClass}
                 >
+                  <option value="">Select</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
@@ -327,9 +335,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                 maxLength={200}
                 placeholder="Tell us about yourself..."
               />
-              <p className="mt-1 text-xs text-gray-400">
-                {formData.bio.length}/200 characters
-              </p>
+              <p className="mt-1 text-xs text-gray-400">{formData.bio.length}/200 characters</p>
             </div>
           </div>
 
@@ -359,11 +365,7 @@ const PersonalInfoCard = ({ profile, onSave }) => {
                 transition-colors disabled:opacity-50
               "
             >
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save Changes
             </button>
           </div>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '@services/common/api';
 
 const BranchContext = createContext();
@@ -18,36 +18,42 @@ export const BranchProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBranches = async () => {
-      try {
-        setLoading(true);
-        // Assuming there is an API to get branches for the user/restaurant
-        const response = await api.get('/secure/api/v1/users/fetchRestaurantId');
-        if (response.data && response.data.restaurantId) {
-          const branchesRes = await api.get(
-            `/secure/api/v1/branches/restaurant/${response.data.restaurantId}`
-          );
-          // Endpoint returns a page ({ content: [...] }); older responses were a bare array.
-          const list = branchesRes.data?.content ?? branchesRes.data ?? [];
-          setBranches(Array.isArray(list) ? list : []);
+  const fetchBranches = useCallback(async () => {
+    try {
+      // Assuming there is an API to get branches for the user/restaurant
+      const response = await api.get('/secure/api/v1/users/fetchRestaurantId');
+      if (response.data && response.data.restaurantId) {
+        const branchesRes = await api.get(
+          `/secure/api/v1/branches/restaurant/${response.data.restaurantId}`
+        );
+        // Endpoint returns a page ({ content: [...] }); older responses were a bare array.
+        const list = branchesRes.data?.content ?? branchesRes.data ?? [];
+        const safeList = Array.isArray(list) ? list : [];
+        setBranches(safeList);
 
-          // If selectedBranchId is a specific ID but it's not in the branches, reset it
-          if (selectedBranchId !== 'all' && Array.isArray(list)) {
-            const isValid = list.some((b) => b.branchId.toString() === selectedBranchId);
-            if (!isValid) {
-              setSelectedBranchId('all');
-            }
+        // If the selected branch is a specific ID but it's not in the branches, reset it
+        setSelectedBranchId((current) => {
+          if (current === 'all' || safeList.some((b) => b.branchId.toString() === current)) {
+            return current;
           }
-        }
-      } catch (error) {
-        console.error('Failed to fetch branches for context:', error);
-      } finally {
-        setLoading(false);
+          localStorage.removeItem('selectedBranchId');
+          return 'all';
+        });
+      } else {
+        // No restaurant for this account: a saved branch id can only be stale.
+        setSelectedBranchId('all');
+        localStorage.removeItem('selectedBranchId');
       }
-    };
-    fetchBranches();
+    } catch (error) {
+      console.error('Failed to fetch branches for context:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchBranches();
+  }, [fetchBranches]);
 
   const handleBranchChange = (branchId) => {
     setSelectedBranchId(branchId);
@@ -61,12 +67,23 @@ export const BranchProvider = ({ children }) => {
   // Branch-scoped API calls need a real branch the user owns. "All" falls back to the first of the
   // user's branches (never a hardcoded ID — that leaked another restaurant's data).
   // ponytail: "all" is not aggregated yet; add a restaurant-wide endpoint when owners need totals.
-  const effectiveBranchId =
-    selectedBranchId === 'all' ? (branches[0]?.branchId ?? null) : selectedBranchId;
+  // null until the branch list is loaded, so a stale saved id is never sent to the API.
+  const effectiveBranchId = loading
+    ? null
+    : selectedBranchId === 'all'
+      ? (branches[0]?.branchId ?? null)
+      : selectedBranchId;
 
   return (
     <BranchContext.Provider
-      value={{ branches, selectedBranchId, effectiveBranchId, handleBranchChange, loading }}
+      value={{
+        branches,
+        selectedBranchId,
+        effectiveBranchId,
+        handleBranchChange,
+        loading,
+        refreshBranches: fetchBranches,
+      }}
     >
       {children}
     </BranchContext.Provider>

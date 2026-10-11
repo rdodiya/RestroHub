@@ -9,9 +9,8 @@ const TablesHeader = ({ branchId, onAddTable, onGenerateCounterQR, totalTables =
   const handleDownload = async () => {
     try {
       setDownloading(true);
-      // 🔌 API call
-      await new Promise((r) => setTimeout(r, 500));
-      console.log('Download all QRs');
+      // ponytail: no backend endpoint for bulk QR download yet; say so instead of faking success.
+      toast('Downloading all QR codes is not available yet');
     } catch (err) {
       console.error('Download failed:', err);
       toast.error('Download failed');
@@ -38,9 +37,7 @@ const TablesHeader = ({ branchId, onAddTable, onGenerateCounterQR, totalTables =
         <div>
           <div className="flex items-center gap-2">
             <LayoutGrid className="h-5 w-5 text-blue-600 hidden sm:block" />
-            <h2 className="text-lg font-bold text-gray-900 sm:text-2xl">
-              Tables
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900 sm:text-2xl">Tables</h2>
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
               Branch #{branchId}
             </span>
@@ -50,9 +47,7 @@ const TablesHeader = ({ branchId, onAddTable, onGenerateCounterQR, totalTables =
               </span>
             )}
           </div>
-          <p className="mt-0.5 text-sm text-gray-500">
-            Manage tables and QR codes
-          </p>
+          <p className="mt-0.5 text-sm text-gray-500">Manage tables and QR codes</p>
         </div>
       </div>
 

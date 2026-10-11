@@ -17,15 +17,22 @@ import {
   ChefHat,
   Users,
   ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 import { useAdminTheme } from '@context/AdminThemeContext';
-import { canAccessPath, readStoredRoles } from '../../utils/auth';
+import { useBranch } from '@context/BranchContext';
+import { canAccessPath, readStoredRoles, roleLabel } from '../../utils/auth';
 
 const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
   const location = useLocation();
   const sidebarRef = useRef(null);
   const { isDark } = useAdminTheme();
   const roles = readStoredRoles();
+  const { branches, selectedBranchId } = useBranch();
+  const restaurantName = branches[0]?.restaurant?.name || roleLabel(roles);
+  const branchLabel = branches.length
+    ? branches.find((b) => String(b.branchId) === String(selectedBranchId))?.name || 'All branches'
+    : '';
 
   const [expandedMenus, setExpandedMenus] = useState({
     store: false,
@@ -102,6 +109,12 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
       label: 'Platform',
       items: [
         { type: 'link', name: 'Subscriptions', path: '/admin/subscriptions', icon: ShieldCheck },
+        {
+          type: 'link',
+          name: 'Registration Requests',
+          path: '/admin/registration-requests',
+          icon: UserCheck,
+        },
       ],
     },
   ];
@@ -473,10 +486,10 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
                 <p
                   className={`truncate text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
                 >
-                  Rajkot Dhaba
+                  {restaurantName}
                 </p>
                 <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                  Main Branch
+                  {branchLabel}
                 </p>
               </div>
             )}
