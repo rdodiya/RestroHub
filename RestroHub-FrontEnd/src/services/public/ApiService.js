@@ -59,9 +59,10 @@ const ApiService = {
 
   /**
    * Update the site config's theme and template (admin save action).
+   * 2026-10-28 - Issue: 404 on updateSiteConfig - Reason: Path is under /public/api/v1/sites/:siteId/config
    */
   updateSiteConfig: (siteId, payload, token) =>
-    request(`/secure/api/v1/sites/${siteId}/config`, {
+    request(`/public/api/v1/sites/${siteId}/config`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify(payload),

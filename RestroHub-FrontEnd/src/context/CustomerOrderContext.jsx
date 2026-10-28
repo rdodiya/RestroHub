@@ -21,14 +21,28 @@ export const CustomerOrderProvider = ({ children }) => {
   const rawTableId = searchParams.get('tableId');
   const rawTableNumber = searchParams.get('table') || searchParams.get('tableNumber');
   const rawRestaurantId = searchParams.get('restaurantId');
+  // 2026-10-28 - Issue: Counter orders had null tableInfo - Reason: Parse table 0 / counter QR parameters properly
+  const isCounter = rawTableNumber === '0' || rawTableId === '0';
+  const effectiveTableId =
+    rawTableId !== null && rawTableId !== undefined
+      ? rawTableId
+      : isCounter
+      ? '0'
+      : null;
+  const effectiveTableNumber =
+    rawTableNumber !== null && rawTableNumber !== undefined
+      ? rawTableNumber
+      : isCounter
+      ? '0'
+      : effectiveTableId;
 
   const [tableInfo, setTableInfo] = useState(() => {
     // Check URL or fall back to sessionStorage
     const saved = sessionStorage.getItem(`table_order_session_${branchId}`);
-    if (rawTableId) {
+    if (effectiveTableId !== null && effectiveTableId !== undefined) {
       const info = {
-        tableId: rawTableId,
-        tableNumber: rawTableNumber || rawTableId,
+        tableId: effectiveTableId,
+        tableNumber: effectiveTableNumber || effectiveTableId,
         branchId,
         restaurantId: rawRestaurantId || '1',
       };
@@ -46,17 +60,17 @@ export const CustomerOrderProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    if (rawTableId) {
+    if (effectiveTableId !== null && effectiveTableId !== undefined) {
       const info = {
-        tableId: rawTableId,
-        tableNumber: rawTableNumber || rawTableId,
+        tableId: effectiveTableId,
+        tableNumber: effectiveTableNumber || effectiveTableId,
         branchId,
         restaurantId: rawRestaurantId || '1',
       };
       setTableInfo(info);
       sessionStorage.setItem(`table_order_session_${branchId}`, JSON.stringify(info));
     }
-  }, [rawTableId, rawTableNumber, rawRestaurantId, branchId]);
+  }, [effectiveTableId, effectiveTableNumber, rawRestaurantId, branchId]);
 
   // Cart state: { [foodId]: { item, quantity, specialRequest } }
   const [cart, setCart] = useState({});
@@ -133,7 +147,12 @@ export const CustomerOrderProvider = ({ children }) => {
   }, 0);
 
   const placeOrder = async ({ customerName, customerPhone, specialInstructions }) => {
-    if (!tableInfo?.tableId) {
+    // 2026-10-28 - Issue: TableId 0 failed truthiness check - Reason: Allow tableId 0 for counter takeaway orders
+    if (
+      tableInfo?.tableId === undefined ||
+      tableInfo?.tableId === null ||
+      tableInfo?.tableId === ''
+    ) {
       toast.error('Table information is missing. Please re-scan table QR.');
       return null;
     }

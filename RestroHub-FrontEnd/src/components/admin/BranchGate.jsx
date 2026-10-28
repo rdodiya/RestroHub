@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Store } from 'lucide-react';
 import { useBranch } from '@context/BranchContext';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import { hasAnyRole, readStoredRoles } from '../../utils/auth';
 
 // Pages whose data belongs to a branch. A newly approved restaurant has none until the owner adds one.
 const BRANCH_PAGES = [
@@ -18,8 +19,10 @@ const BranchGate = ({ children }) => {
   const { pathname } = useLocation();
   const { isDark } = useAdminTheme();
 
+  // 2026-10-28 - Issue: SUPER_ADMIN blocked - Reason: Platform super admin has no branches, exempt from gate
+  const isSuperAdmin = hasAnyRole(readStoredRoles(), ['SUPER_ADMIN']);
   const needsBranch = BRANCH_PAGES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-  if (loading || !needsBranch || branches.length > 0) return children;
+  if (isSuperAdmin || loading || !needsBranch || branches.length > 0) return children;
 
   return (
     <div

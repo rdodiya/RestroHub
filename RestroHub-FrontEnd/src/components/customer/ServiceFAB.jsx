@@ -429,6 +429,7 @@ const styles = {
     left: '50%',
     transform: 'translateX(-50%)',
     padding: '14px 28px',
+    // 2026-10-28 - Issue: Duplicate maxWidth object key - Reason: Removed redundant maxWidth: '90vw'
     maxWidth: 'calc(100vw - 32px)',
     borderRadius: '16px',
     color: '#fff',
@@ -437,7 +438,6 @@ const styles = {
     zIndex: 1100,
     boxShadow: '0 10px 35px rgba(0, 0, 0, 0.4)',
     animation: 'toastSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    maxWidth: '90vw',
     textAlign: 'center',
     display: 'flex',
     alignItems: 'center',

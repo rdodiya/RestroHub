@@ -7,6 +7,7 @@ import com.restroly.qrmenu.common.enums.OrderPaymentStatus;
 import com.restroly.qrmenu.common.enums.OrderSource;
 import com.restroly.qrmenu.common.enums.OrderStatus;
 import com.restroly.qrmenu.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.exception.ValidationException;
 import com.restroly.qrmenu.food.entity.Food;
 import com.restroly.qrmenu.food.repository.FoodRepository;
 import com.restroly.qrmenu.order.builder.OrderDirector;
@@ -72,14 +73,40 @@ public class OrderServiceImpl implements OrderService {
                     new ResourceNotFoundException(
                         "Branch not found with id: " + request.getBranchId()));
 
-    // Fetch table
-    Tables table =
-        tableRepository
-            .findByTableIdAndIsActiveTrue(request.getTableId())
-            .orElseThrow(
-                () ->
-                    new ResourceNotFoundException(
-                        "Table not found with id: " + request.getTableId()));
+    // 2026-10-28 - Issue: Counter orders & cross-tenant tables - Reason: Support tableId 0 and
+    // prevent ordering across branches
+    // Fetch table (support tableId = null or 0 for counter takeaway orders)
+    Tables table;
+    if (request.getTableId() == null || request.getTableId().equals(0L)) {
+      table =
+          tableRepository
+              .findByBranch_BranchIdAndTableNumber(branch.getBranchId(), 0)
+              .orElseGet(
+                  () -> {
+                    Tables counterTable =
+                        Tables.builder()
+                            .branch(branch)
+                            .tableNumber(0)
+                            .capacity(1)
+                            .status("available")
+                            .isActive(true)
+                            .build();
+                    return tableRepository.save(counterTable);
+                  });
+    } else {
+      table =
+          tableRepository
+              .findByTableIdAndIsActiveTrue(request.getTableId())
+              .orElseThrow(
+                  () ->
+                      new ResourceNotFoundException(
+                          "Table not found with id: " + request.getTableId()));
+
+      if (table.getBranch() == null
+          || !table.getBranch().getBranchId().equals(branch.getBranchId())) {
+        throw new ValidationException("Table does not belong to the specified branch");
+      }
+    }
 
     // Fetch all food items
     List<Long> foodIds =
@@ -87,9 +114,23 @@ public class OrderServiceImpl implements OrderService {
 
     List<Food> foods = foodRepository.findByFoodIdInAndIsDeleteFalse(foodIds);
 
-    if (foods.size() != foodIds.size()) {
+    // 2026-10-28 - Issue: Duplicate food customizations threw 404 - Reason: JPA IN query returns
+    // unique rows, compare distinct count
+    long distinctFoodCount = foodIds.stream().distinct().count();
+    if (foods.size() != distinctFoodCount) {
       throw new ResourceNotFoundException("One or more food items not found");
     }
+
+    // 2026-10-28 - Issue: Inactive food orderable - Reason: Reject unavailable items before order
+    // placement
+    foods.stream()
+        .filter(f -> Boolean.FALSE.equals(f.getIsAvailable()))
+        .findFirst()
+        .ifPresent(
+            f -> {
+              throw new ValidationException(
+                  "Food item '" + f.getName() + "' is currently unavailable");
+            });
 
     // Build order using Builder Pattern
     Order order = orderDirector.buildOrderFromRequest(request, branch, table, foods);

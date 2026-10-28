@@ -29,8 +29,9 @@ const PASSWORD_REGEX =
 const resetPasswordSchema = Yup.object({
   newPassword: Yup.string()
     .required('New password is required')
+    // 2026-10-28 - Issue: Password regex mismatch with backend - Reason: Use PASSWORD_REGEX matching backend constraint
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?`~]).{8,}$/,
+      PASSWORD_REGEX,
       'Password must be at least 8 characters and include uppercase, lowercase, number, and special character'
     ),
   confirmPassword: Yup.string()
