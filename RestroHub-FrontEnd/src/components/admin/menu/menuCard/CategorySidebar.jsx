@@ -46,8 +46,9 @@ const CategorySidebar = ({
     try {
       setLoading(true);
       var response = null;
+      // 2026-10-28 - Issue: Categories truncated at 10 - Reason: Increased page size to 100
       response = await api.get(
-        `/secure/api/v1/categories/getallcategories?page=0&size=10&sortBy=name&sortDirection=asc`
+        `/secure/api/v1/categories/getallcategories?page=0&size=100&sortBy=name&sortDirection=asc`
       );
       const data = [
         { categoryId: 'all', name: 'All Items', foodIds: [] },

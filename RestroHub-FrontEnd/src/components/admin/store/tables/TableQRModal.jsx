@@ -14,7 +14,8 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
 
   let qrUrl = `${window.location.origin}/Restrohub/${targetSlug}/${branchId}?restaurantId=${targetSlug}`;
   if (isCounter) {
-    qrUrl += `&tableNumber=0`;
+    // 2026-10-28 - Issue: Counter QR lacked tableId - Reason: Pass tableId=0 to identify counter takeaway order
+    qrUrl += `&tableId=0&table=0&tableNumber=0`;
   } else {
     qrUrl += `&tableId=${table.id}&table=${table.number}`;
   }

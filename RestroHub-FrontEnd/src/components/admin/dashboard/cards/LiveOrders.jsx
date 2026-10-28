@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Clock,
   ChefHat,
@@ -11,6 +12,7 @@ import {
 import api from "@services/common/api";
 import AdminSkeleton from '../../AdminSkeleton';
 import { useAdminTheme } from '@context/AdminThemeContext';
+import { useBranch } from '@context/BranchContext';
 import OrderCard from '../../orders/orderComponents/OrderCard';
 import toast from 'react-hot-toast';
 
@@ -49,36 +51,25 @@ const StatusBadge = ({ status }) => {
 };
 
 const LiveOrders = () => {
+  // 2026-10-28 - Issue: Live orders ignored branch switcher - Reason: Use effectiveBranchId from useBranch()
+  const { effectiveBranchId } = useBranch();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const { isDark } = useAdminTheme();
 
-  useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 30000);
-
-    const handleOrdersUpdated = () => {
-      fetchOrders();
-    };
-    window.addEventListener('restrohub:order-updated', handleOrdersUpdated);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('restrohub:order-updated', handleOrdersUpdated);
-    };
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setRefreshing(true);
       setError(null);
 
-      // Get branchId from authenticated user's restaurant context
-      const branchRes = await api.get('/secure/api/v1/users/fetchRestaurantId');
-      const branchData = branchRes.data || {};
-      const branchId = branchData.branchId;
+      let branchId = effectiveBranchId;
+      if (!branchId) {
+        const branchRes = await api.get('/secure/api/v1/users/fetchRestaurantId');
+        const branchData = branchRes.data || {};
+        branchId = branchData.branchId;
+      }
 
       if (!branchId) {
         setError('No branch found for current user');
@@ -116,7 +107,22 @@ const LiveOrders = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [effectiveBranchId]);
+
+  useEffect(() => {
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 30000);
+
+    const handleOrdersUpdated = () => {
+      fetchOrders();
+    };
+    window.addEventListener('restrohub:order-updated', handleOrdersUpdated);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('restrohub:order-updated', handleOrdersUpdated);
+    };
+  }, [fetchOrders]);
 
   return (
     <div className={`rounded-2xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -134,12 +140,13 @@ const LiveOrders = () => {
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
-          <a
-            href="/admin/orders"
+          {/* 2026-10-28 - Issue: Full page reload on View All - Reason: Use Link instead of raw <a> tag */}
+          <Link
+            to="/admin/orders"
             className="text-sm text-orange-500 hover:text-orange-400 font-medium"
           >
             View All →
-          </a>
+          </Link>
         </div>
       </div>
 

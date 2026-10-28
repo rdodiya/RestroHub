@@ -77,31 +77,7 @@ const Orders = () => {
   const [foodSearch, setFoodSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Fetch branch details
-  const fetchBranchId = useCallback(async () => {
-    try {
-      const res = await api.get('/secure/api/v1/users/fetchRestaurantId');
-      const data = res.data || {};
-      const branchId =
-        data.branchId ||
-        data.restaurantId ||
-        data.data?.branchId ||
-        data.data?.restaurantId ||
-        null;
-
-      if (branchId) {
-        setNewOrder((prev) => ({
-          ...prev,
-          branchId,
-        }));
-        fetchTables(branchId);
-      }
-    } catch (err) {
-      console.error('Failed to fetch branch ID:', err);
-    }
-  }, []);
-
-  const fetchTables = async (branchId) => {
+  const fetchTables = useCallback(async (branchId) => {
     if (!branchId) return;
     try {
       setLoadingTables(true);
@@ -113,7 +89,7 @@ const Orders = () => {
     } finally {
       setLoadingTables(false);
     }
-  };
+  }, []);
 
   const fetchMenuFoods = useCallback(async () => {
     try {
@@ -137,10 +113,20 @@ const Orders = () => {
     }
   }, []);
 
+  // 2026-10-28 - Issue: Create order form ignored branch switcher - Reason: Bind order creation branch and tables to branchToUse
   useEffect(() => {
-    fetchBranchId();
+    if (branchToUse) {
+      setNewOrder((prev) => ({
+        ...prev,
+        branchId: branchToUse,
+      }));
+      fetchTables(branchToUse);
+    }
+  }, [branchToUse, fetchTables]);
+
+  useEffect(() => {
     fetchMenuFoods();
-  }, [fetchBranchId, fetchMenuFoods]);
+  }, [fetchMenuFoods]);
 
   const filters = [
     { id: 'all', label: 'All' },

@@ -44,10 +44,11 @@ const RestaurantInfoCard = ({ profile, onSave }) => {
         let restId = profile.restaurantId;
         if (!restId) {
           const authRes = await api.get('/secure/api/v1/users/fetchRestaurantId');
+          // 2026-10-28 - Issue: Querying restaurant endpoint with branchId - Reason: Removed branchId fallback for restaurant endpoint
           restId =
             authRes.data?.restaurantId ||
-            authRes.data?.branchId ||
-            authRes.data?.data?.restaurantId;
+            authRes.data?.data?.restaurantId ||
+            null;
         }
 
         if (restId) {

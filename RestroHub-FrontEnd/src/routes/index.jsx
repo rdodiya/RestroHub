@@ -20,6 +20,7 @@ import PrivacyPolicy from '../pages/public/PrivacyPolicy';
 import TermsOfService from '../pages/public/TermsOfService';
 import RefundPolicy from '../pages/public/RefundPolicy';
 import NotFound from '../pages/public/NotFound';
+import Unauthorized from '../pages/public/Unauthorized';
 
 // Customer Pages
 import RestaurantMenu from '../pages/customer/RestaurantMenu';
@@ -96,6 +97,9 @@ const AppRoutes = () => {
         />
         <Route path="profile" element={<Profile />} />
       </Route>
+
+      {/* 2026-10-28 - Issue: Role guard redirect hit 404 - Reason: Register unauthorized page route */}
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* ========== 404 FALLBACK ========== */}
       <Route path="*" element={<NotFound />} />

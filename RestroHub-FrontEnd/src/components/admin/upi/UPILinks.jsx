@@ -1,32 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import UPIHeader from './UPIHeader';
 import UPIGrid from './UPIGrid';
 import UPIFormModal from './UPIFormModal';
 import UPITestModal from './UPITestModal';
-import api from '@services/common/api';
+import { useBranch } from '@context/BranchContext';
 
 const UPILinks = () => {
+  // 2026-10-28 - Issue: UPI links ignored branch switcher - Reason: Bind to effectiveBranchId from useBranch()
+  const { effectiveBranchId: branchId } = useBranch();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [testingLink, setTestingLink] = useState(null);
   const [showTest, setShowTest] = useState(false);
   const [totalLinks, setTotalLinks] = useState(0);
-  const [branchId, setBranchId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
-
-  useEffect(() => {
-    fetchBranchId();
-  }, []);
-
-  const fetchBranchId = async () => {
-    try {
-      const res = await api.get('/secure/api/v1/users/fetchRestaurantId');
-      const data = res.data || {};
-      const id = data.branchId || data.restaurantId || data.data?.branchId || null;
-      setBranchId(id);
-    } catch (err) {
-      console.error('Failed to fetch branch ID:', err);
-    }
-  };
 
   const handleLinkAdded = () => {
     setRefreshKey((prev) => prev + 1);
