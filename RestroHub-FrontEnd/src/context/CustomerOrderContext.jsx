@@ -157,8 +157,16 @@ export const CustomerOrderProvider = ({ children }) => {
         })),
       };
 
-      // Same key across retries of this attempt, so a double click / flaky-network resend yields one order.
-      if (!idempotencyKeyRef.current) idempotencyKeyRef.current = crypto.randomUUID();
+      // 2026-11-07 - crypto.randomUUID undefined on insecure HTTP / mobile contexts - Fallback safely
+      if (!idempotencyKeyRef.current) {
+        idempotencyKeyRef.current =
+          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                const r = (Math.random() * 16) | 0;
+                return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+              });
+      }
       const { data: orderData } = await api.post('/public/api/v1/orders', payload, {
         headers: { 'Idempotency-Key': idempotencyKeyRef.current },
       });

@@ -26,8 +26,9 @@ const ProtectedRoute = ({ children }) => {
  * Non-admin users are redirected to the admin dashboard.
  */
 const AdminRoute = ({ children }) => {
+  // 2026-11-07 - Broken /unauthorized redirect causes 404 - Redirect unauthorized to /admin/dashboard
   if (!hasRole('ADMIN', 'SUPER_ADMIN')) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
   return children;
 };

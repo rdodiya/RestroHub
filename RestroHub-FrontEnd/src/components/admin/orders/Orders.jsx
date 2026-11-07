@@ -78,16 +78,12 @@ const Orders = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Fetch branch details
+  // 2026-11-07 - Used restaurantId as branchId fallback - Do not use restaurantId as branchId
   const fetchBranchId = useCallback(async () => {
     try {
       const res = await api.get('/secure/api/v1/users/fetchRestaurantId');
       const data = res.data || {};
-      const branchId =
-        data.branchId ||
-        data.restaurantId ||
-        data.data?.branchId ||
-        data.data?.restaurantId ||
-        null;
+      const branchId = data.branchId || data.data?.branchId || null;
 
       if (branchId) {
         setNewOrder((prev) => ({
@@ -137,10 +133,19 @@ const Orders = () => {
     }
   }, []);
 
+  // 2026-11-07 - Switched branch in Header was ignored in new order form - Sync with effectiveBranchId
   useEffect(() => {
-    fetchBranchId();
+    if (effectiveBranchId) {
+      setNewOrder((prev) => ({
+        ...prev,
+        branchId: effectiveBranchId,
+      }));
+      fetchTables(effectiveBranchId);
+    } else {
+      fetchBranchId();
+    }
     fetchMenuFoods();
-  }, [fetchBranchId, fetchMenuFoods]);
+  }, [effectiveBranchId, fetchBranchId, fetchMenuFoods]);
 
   const filters = [
     { id: 'all', label: 'All' },

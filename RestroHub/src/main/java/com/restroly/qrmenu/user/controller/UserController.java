@@ -274,12 +274,13 @@ public class UserController {
       branchName = branch.getName();
     }
 
-    return ResponseEntity.ok(
-        Map.of(
-            "success", true,
-            "restaurantId", restaurantId,
-            "restaurantName", restaurantName,
-            "branchId", branchId,
-            "branchName", branchName));
+    // 2026-11-07 - NPE on null restaurant/branch - Map.of rejects null values so use HashMap
+    Map<String, Object> response = new java.util.HashMap<>();
+    response.put("success", true);
+    response.put("restaurantId", restaurantId);
+    response.put("restaurantName", restaurantName);
+    response.put("branchId", branchId);
+    response.put("branchName", branchName);
+    return ResponseEntity.ok(response);
   }
 }

@@ -17,10 +17,11 @@ public class OrderMapper {
     //	return null;
     return OrderResponse.builder()
         .orderId(order.getOrderId())
-        .branchId(order.getBranch().getBranchId())
-        .branchName(order.getBranch().getName())
-        .tableId(order.getTable().getTableId())
-        .tableNumber(order.getTable().getTableNumber())
+        // 2026-11-07 - NPE when branch or table is null - Add safe null checks
+        .branchId(order.getBranch() != null ? order.getBranch().getBranchId() : null)
+        .branchName(order.getBranch() != null ? order.getBranch().getName() : null)
+        .tableId(order.getTable() != null ? order.getTable().getTableId() : null)
+        .tableNumber(order.getTable() != null ? order.getTable().getTableNumber() : null)
         .customerName(order.getCustomerName())
         .customerPhone(order.getCustomerPhone())
         .specialInstructions(order.getSpecialInstructions())
