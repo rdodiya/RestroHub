@@ -210,9 +210,16 @@ const ThemeSelector = () => {
   const theme = siteData?.theme ?? {};
 
   const updateField = (field, value) => {
+    const patch = { [field]: value };
+    if (field === 'primaryDark') {
+      patch.colorPrimaryDark = value;
+    }
+    if (field === 'borderPrimary' || field === 'borderSecondary') {
+      patch.borderColor = value;
+    }
     updateTheme({
       ...theme,
-      [field]: value,
+      ...patch,
     });
   };
 

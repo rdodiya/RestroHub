@@ -95,19 +95,19 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
         <Dialog.Panel
           className="
             w-full max-w-sm overflow-hidden rounded-2xl
-            border border-gray-200 bg-white shadow-xl
+            border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl
           "
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-            <Dialog.Title className="text-lg font-bold text-gray-900">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-5 py-4">
+            <Dialog.Title className="text-lg font-bold text-gray-900 dark:text-gray-100">
               {isCounter ? 'Counter - QR Code' : `Table ${table.number} - QR Code`}
             </Dialog.Title>
             <button
               onClick={onClose}
               className="
                 inline-flex h-8 w-8 items-center justify-center
-                rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600
+                rounded-lg text-gray-400 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-200
               "
             >
               <X className="h-5 w-5" />
@@ -119,14 +119,14 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
             <div
               className="
                 mx-auto inline-flex items-center justify-center
-                rounded-2xl border border-gray-200 bg-gray-50 p-5
+                rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-5
                 shadow-sm sm:p-6
               "
             >
               <QRCode id="qr-code-svg" value={qrUrl} size={180} level="H" />
             </div>
 
-            <p className="mt-4 text-sm font-medium text-gray-700">
+            <p className="mt-4 text-sm font-medium text-gray-700 dark:text-gray-300">
               Scan to view menu & place order
             </p>
 
@@ -134,22 +134,22 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
             <div
               className="
                 mt-3 flex items-center justify-center gap-1.5
-                rounded-lg bg-gray-50 px-3 py-2
+                rounded-lg bg-gray-50 dark:bg-gray-800 px-3 py-2
               "
             >
-              <ExternalLink className="h-3 w-3 shrink-0 text-gray-400" />
-              <p className="truncate text-xs text-gray-500">{qrUrl}</p>
+              <ExternalLink className="h-3 w-3 shrink-0 text-gray-400 dark:text-gray-500" />
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">{qrUrl}</p>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center gap-3 border-t border-gray-100 px-5 py-4">
+          <div className="flex items-center gap-3 border-t border-gray-100 dark:border-gray-800 px-5 py-4">
             <button
               onClick={onClose}
               className="
-                flex-1 rounded-lg border border-gray-200 px-4 py-2.5
-                text-sm font-medium text-gray-700
-                hover:bg-gray-50 transition-colors
+                flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2.5
+                text-sm font-medium text-gray-700 dark:text-gray-300
+                hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors
               "
             >
               Close
@@ -159,10 +159,10 @@ const TableQRModal = ({ isOpen, onClose, table, branchId, restaurantSlug = '1' }
               disabled={downloading}
               className="
                 flex-1 inline-flex items-center justify-center gap-2
-                rounded-lg bg-blue-50 px-4 py-2.5
-                text-sm font-medium text-blue-700
-                border border-blue-200
-                hover:bg-blue-100 transition-colors
+                rounded-lg bg-blue-50 dark:bg-blue-950/40 px-4 py-2.5
+                text-sm font-medium text-blue-700 dark:text-blue-400
+                border border-blue-200 dark:border-blue-800
+                hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors
                 disabled:opacity-50
               "
             >

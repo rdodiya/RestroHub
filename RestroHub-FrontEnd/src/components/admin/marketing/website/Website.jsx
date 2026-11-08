@@ -14,7 +14,6 @@ const Website = () => {
   const { slug, fetchSlug } = useSiteData();
 
   const handleSave = async () => {
-    debugger
     const token =
       localStorage.getItem("accessToken") ||
       sessionStorage.getItem("accessToken");
@@ -23,7 +22,6 @@ const Website = () => {
   };
 
   useEffect(() => {
-    debugger
     fetchSlug();
   }, []);
 
@@ -83,8 +81,7 @@ export default Website;
 
 //   // Save = already in localStorage; optionally call backend API too
 //   const handleSave = useCallback(async () => {
-//     debugger
-//     const config = {
+// //     const config = {
 //       // template: selectedTemplate,
 //       palette:  selectedTheme,
 //       mode:     websiteMode,

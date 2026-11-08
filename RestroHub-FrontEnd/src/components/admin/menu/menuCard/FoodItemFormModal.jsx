@@ -194,8 +194,8 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
            aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl border
-                                 border-gray-100 max-h-[92vh] overflow-hidden flex flex-col">
+        <Dialog.Panel className="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border
+                                 border-gray-100 dark:border-gray-800 max-h-[92vh] overflow-hidden flex flex-col">
 
           {/* ========== GRADIENT HEADER ========== */}
           <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-8 py-6
@@ -232,7 +232,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
 
                 {/* Name */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <Type className="w-4 h-4 text-blue-500" />
                     Item Name
                   </label>
@@ -240,10 +240,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                     type="text"
                     value={formData.name}
                     onChange={(e) => updateField('name', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                               focus:bg-white outline-none transition-all text-gray-800
-                               placeholder:text-gray-400"
+                               focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                               placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="e.g. Paneer Tikka, Chicken Biryani"
                     required
                       aria-invalid={Boolean(errors.name)}
@@ -254,7 +254,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
 
                 {/* Price */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <IndianRupee className="w-4 h-4 text-green-500" />
                     Price (₹)
                   </label>
@@ -268,10 +268,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                       step="0.01"
                       value={formData.price}
                       onChange={(e) => updateField('price', e.target.value)}
-                      className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200
+                      className="w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700
                                  rounded-xl focus:ring-2 focus:ring-blue-500
-                                 focus:border-transparent focus:bg-white outline-none
-                                 transition-all text-gray-800 placeholder:text-gray-400"
+                                 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 outline-none
+                                 transition-all text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:placeholder:text-gray-500"
                       placeholder="250.00"
                       required
                       aria-invalid={Boolean(errors.price)}
@@ -284,7 +284,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
 
               {/* ---- ROW 2: Description (full width) ---- */}
               <div className="space-y-1.5">
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                   <FileText className="w-4 h-4 text-purple-500" />
                   Description
                 </label>
@@ -292,10 +292,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
                              focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                             focus:bg-white outline-none transition-all text-gray-800
-                             placeholder:text-gray-400 resize-none"
+                             focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                             placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
                   placeholder="Describe the food item, ingredients, taste..."
                   aria-invalid={Boolean(errors.description)}
                   aria-describedby={errors.description ? 'err-food-description' : undefined}
@@ -315,7 +315,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
 
                 {/* Category Select */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <Tag className="w-4 h-4 text-indigo-500" />
                     Category
                   </label>
@@ -323,10 +323,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                     <select
                       value={formData.categoryId}
                       onChange={(e) => updateField('categoryId', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700
                                  rounded-xl focus:ring-2 focus:ring-blue-500
-                                 focus:border-transparent focus:bg-white outline-none
-                                 transition-all text-gray-800 appearance-none cursor-pointer"
+                                 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 outline-none
+                                 transition-all text-gray-800 dark:text-gray-100 appearance-none cursor-pointer"
                       required
                         aria-invalid={Boolean(errors.categoryId)}
                         aria-describedby={errors.categoryId ? 'err-food-category' : undefined}
@@ -353,12 +353,12 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
 
                 {/* Image Upload */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <Upload className="w-4 h-4 text-blue-500" />
                     Image
                   </label>
-                  <label className="group border-2 border-dashed border-gray-200 rounded-xl
-                                    text-center hover:bg-blue-50 hover:border-blue-300
+                  <label className="group border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl
+                                    text-center hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-700
                                     cursor-pointer transition-all w-full block relative
                                     overflow-hidden h-[120px] flex items-center justify-center">
                     {formData.imageUrl ? (
@@ -399,7 +399,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
 
               {/* ---- ROW 4: Image URL fallback ---- */}
               <div className="space-y-1.5">
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                   <Link className="w-4 h-4 text-blue-500" />
                   Image URL
                 </label>
@@ -408,10 +408,10 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                   value={formData.imageFile ? '' : formData.imageUrl}
                   onChange={(e) => updateField('imageUrl', e.target.value)}
                   disabled={Boolean(formData.imageFile)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
                              focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                             focus:bg-white outline-none transition-all text-gray-800
-                             placeholder:text-gray-400 disabled:opacity-60"
+                             focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                             placeholder:text-gray-400 dark:placeholder:text-gray-500 disabled:opacity-60"
                   placeholder="https://example.com/food-image.jpg"
                   aria-invalid={Boolean(errors.imageUrl)}
                   aria-describedby={errors.imageUrl ? 'err-food-imageurl' : undefined}
@@ -427,8 +427,8 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {/* Vegetarian Toggle */}
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl
-                                border border-gray-200">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/60 rounded-xl
+                                border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center
                       ${formData.isVeg ? 'bg-green-100' : 'bg-red-100'}`}>
@@ -436,7 +436,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                         ${formData.isVeg ? 'text-green-600' : 'text-red-500'}`} />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-700">Vegetarian</p>
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Vegetarian</p>
                       <p className="text-xs text-gray-400">
                         {formData.isVeg ? 'Pure veg item' : 'Non-veg item'}
                       </p>
@@ -480,8 +480,8 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                 </div>
 
                 {/* Availability Toggle */}
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl
-                                border border-gray-200">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/60 rounded-xl
+                                border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center
                       ${formData.isAvailable ? 'bg-blue-100' : 'bg-gray-200'}`}>
@@ -489,7 +489,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                         ${formData.isAvailable ? 'text-blue-600' : 'text-gray-400'}`} />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-700">Available</p>
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Available</p>
                       <p className="text-xs text-gray-400">
                         {formData.isAvailable ? 'Visible to customers' : 'Hidden from menu'}
                       </p>
@@ -528,7 +528,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                                       duration-300
                                       ${formData.isAvailable
                                         ? 'bg-blue-100 text-blue-600'
-                                        : 'bg-gray-100 text-gray-500'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300'
                                       }`}>
                       {formData.isAvailable ? 'Yes' : 'No'}
                     </span>
@@ -546,7 +546,7 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
             </div>
 
             {/* ========== STICKY FOOTER ========== */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-5
+            <div className="sticky bottom-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 px-8 py-5
                             flex items-center justify-between">
 
               {/* Left side info */}
@@ -563,8 +563,8 @@ const MenuFormModal = ({ isOpen, onClose, editingItem, allCategories }) => {
                   type="button"
                   onClick={onClose}
                   disabled={submitting}
-                  className="flex-1 sm:flex-none px-6 py-2.5 border border-gray-200 rounded-xl
-                             hover:bg-gray-50 transition-colors font-medium text-gray-600
+                  className="flex-1 sm:flex-none px-6 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl
+                             hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium text-gray-600 dark:text-gray-300
                              disabled:opacity-50"
                 >
                   Cancel

@@ -127,8 +127,8 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
            aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border
-                                 border-gray-100 max-h-[92vh] overflow-hidden flex flex-col">
+        <Dialog.Panel className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border
+                                 border-gray-100 dark:border-gray-800 max-h-[92vh] overflow-hidden flex flex-col">
 
           {/* ========== GRADIENT HEADER ========== */}
           <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-6 py-5
@@ -162,7 +162,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
               {/* ========== BASIC INFO SECTION ========== */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider
                                flex items-center gap-2">
                   <Building2 className="w-4 h-4" />
                   Basic Information
@@ -170,7 +170,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
                 {/* Branch Name */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <Building2 className="w-4 h-4 text-blue-500" />
                     Branch Name
                     <span className="text-red-400">*</span>
@@ -182,10 +182,10 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                       updateField('name', e.target.value);
                       setFieldErrors((p) => ({ ...p, name: undefined }));
                     }}
-                    className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                    className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                               focus:bg-white outline-none transition-all text-gray-800
-                               placeholder:text-gray-400 ${fieldErrors.name ? 'border-red-500' : 'border-gray-200'}`}
+                               focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                               placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:placeholder:text-gray-500 ${fieldErrors.name ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
                     aria-required="true"
                     aria-invalid={fieldErrors.name ? 'true' : 'false'}
                     aria-describedby={fieldErrors.name ? 'err-branch-name' : undefined}
@@ -199,17 +199,17 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
                 {/* Description */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <FileText className="w-4 h-4 text-purple-500" />
                     Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => updateField('description', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                               focus:bg-white outline-none transition-all text-gray-800
-                               placeholder:text-gray-400 resize-none"
+                               focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                               placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
                     placeholder="Brief description of this branch..."
                     rows={2}
                     maxLength={500}
@@ -219,7 +219,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
               {/* ========== ADDRESS SECTION ========== */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider
                                flex items-center gap-2">
                   <MapPinned className="w-4 h-4" />
                   Address Details
@@ -227,7 +227,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
                 {/* Address Line 1 */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <MapPin className="w-4 h-4 text-red-500" />
                     Address Line 1
                     <span className="text-red-400">*</span>
@@ -239,10 +239,10 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                       updateField('add1', e.target.value);
                       setFieldErrors((p) => ({ ...p, add1: undefined }));
                     }}
-                    className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                    className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                               focus:bg-white outline-none transition-all text-gray-800
-                               placeholder:text-gray-400 ${fieldErrors.add1 ? 'border-red-500' : 'border-gray-200'}`}
+                               focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                               placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:placeholder:text-gray-500 ${fieldErrors.add1 ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
                     aria-required="true"
                     aria-invalid={fieldErrors.add1 ? 'true' : 'false'}
                     aria-describedby={fieldErrors.add1 ? 'err-branch-add1' : undefined}
@@ -255,7 +255,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
                 {/* Address Line 2 */}
                 <div className="space-y-1.5">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <MapPin className="w-4 h-4 text-orange-500" />
                     Address Line 2
                     <span className="text-gray-400 text-xs font-normal">(Optional)</span>
@@ -264,10 +264,10 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                     type="text"
                     value={formData.add2}
                     onChange={(e) => updateField('add2', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
                                focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                               focus:bg-white outline-none transition-all text-gray-800
-                               placeholder:text-gray-400"
+                               focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                               placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="Apartment, suite, floor (optional)"
                     maxLength={255}
                   />
@@ -277,7 +277,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* City */}
                   <div className="space-y-1.5">
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       <Building2 className="w-4 h-4 text-green-500" />
                       City
                       <span className="text-red-400">*</span>
@@ -289,10 +289,10 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                           updateField('city', e.target.value);
                           setFieldErrors((p) => ({ ...p, city: undefined }));
                         }}
-                        className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                        className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl
                                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                   focus:bg-white outline-none transition-all text-gray-800
-                                   placeholder:text-gray-400 ${fieldErrors.city ? 'border-red-500' : 'border-gray-200'}`}
+                                   focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                                   placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:placeholder:text-gray-500 ${fieldErrors.city ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
                         aria-required="true"
                         aria-invalid={fieldErrors.city ? 'true' : 'false'}
                         aria-describedby={fieldErrors.city ? 'err-branch-city' : undefined}
@@ -305,7 +305,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
                   {/* State */}
                   <div className="space-y-1.5">
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       <MapPinned className="w-4 h-4 text-teal-500" />
                       State
                       <span className="text-red-400">*</span>
@@ -317,10 +317,10 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                           updateField('state', e.target.value);
                           setFieldErrors((p) => ({ ...p, state: undefined }));
                         }}
-                        className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                        className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl
                                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                   focus:bg-white outline-none transition-all text-gray-800
-                                   placeholder:text-gray-400 ${fieldErrors.state ? 'border-red-500' : 'border-gray-200'}`}
+                                   focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                                   placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:placeholder:text-gray-500 ${fieldErrors.state ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
                         aria-required="true"
                         aria-invalid={fieldErrors.state ? 'true' : 'false'}
                         aria-describedby={fieldErrors.state ? 'err-branch-state' : undefined}
@@ -336,7 +336,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Postal Code */}
                   <div className="space-y-1.5">
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       <Hash className="w-4 h-4 text-indigo-500" />
                       Postal Code
                       <span className="text-red-400">*</span>
@@ -348,10 +348,10 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                           updateField('postalCode', e.target.value);
                           setFieldErrors((p) => ({ ...p, postalCode: undefined }));
                         }}
-                        className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+                        className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl
                                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                   focus:bg-white outline-none transition-all text-gray-800
-                                   placeholder:text-gray-400 ${fieldErrors.postalCode ? 'border-red-500' : 'border-gray-200'}`}
+                                   focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                                   placeholder:text-gray-400 dark:placeholder:text-gray-500 dark:placeholder:text-gray-500 ${fieldErrors.postalCode ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
                         aria-required="true"
                         aria-invalid={fieldErrors.postalCode ? 'true' : 'false'}
                         aria-describedby={fieldErrors.postalCode ? 'err-branch-postal' : undefined}
@@ -364,7 +364,7 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
                   {/* Country */}
                   <div className="space-y-1.5">
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       <Globe className="w-4 h-4 text-blue-500" />
                       Country
                       <span className="text-red-400">*</span>
@@ -373,10 +373,10 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                       type="text"
                       value={formData.country}
                       onChange={(e) => updateField('country', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
                                  focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                 focus:bg-white outline-none transition-all text-gray-800
-                                 placeholder:text-gray-400"
+                                 focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                                 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="e.g., India"
                       required
                       maxLength={100}
@@ -387,14 +387,14 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
 
               {/* ========== ADDRESS PREVIEW ========== */}
               {(formData.add1 || formData.city) && (
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl
-                                border border-blue-100">
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 rounded-xl
+                                border border-blue-100 dark:border-blue-900/40">
                   <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2
                                 flex items-center gap-1.5">
                     <MapPin className="w-3 h-3" />
                     Address Preview
                   </p>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     {[
                       formData.add1,
                       formData.add2,
@@ -410,11 +410,11 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
             </div>
 
             {/* ========== FOOTER BUTTONS ========== */}
-            <div className="bg-gray-50 border-t border-gray-100 px-6 py-4
+            <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-800 px-6 py-4
                             flex items-center justify-between">
 
               {/* Left side hint */}
-              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400">
+              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
                 <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                 {editingBranch
                   ? `Editing branch #${editingBranch.branchId}`
@@ -427,8 +427,8 @@ const BranchFormModal = ({ isOpen, onClose, editingBranch, restaurantId }) => {
                   type="button"
                   onClick={onClose}
                   disabled={submitting}
-                  className="flex-1 sm:flex-none px-5 py-2.5 border border-gray-200 rounded-xl
-                             bg-white hover:bg-gray-50 transition-colors font-medium text-gray-600
+                  className="flex-1 sm:flex-none px-5 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl
+                             bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-gray-600 dark:text-gray-300
                              disabled:opacity-50"
                 >
                   Cancel

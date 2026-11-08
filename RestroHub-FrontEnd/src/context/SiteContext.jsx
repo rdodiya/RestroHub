@@ -27,6 +27,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { defaultSiteData } from '@data/defaultData.js';
+import { defaultTheme } from '@data/defaultTheme.js';
 import { getAccessToken } from '@services/common/authStorage';
 import api from '@services/common/api';
 import toast from 'react-hot-toast';
@@ -78,64 +79,65 @@ function mapApiResponseToSiteData(apiData) {
   const apiTheme = apiData.theme || {};
   const theme = {
     // ========= Basic Info =========
-    id: apiTheme.id ?? defaultSiteData.id,
-    name: apiTheme.name || defaultSiteData.name,
-    themeKey: apiTheme.themeKey || defaultSiteData.themeKey,
-    description: apiTheme.description || defaultSiteData.description,
+    id: apiTheme.id ?? defaultTheme.id,
+    name: apiTheme.name || defaultTheme.name || 'Ocean Blue Dark',
+    themeKey: apiTheme.themeKey || defaultTheme.themeKey || 'OCEAN_BLUE_DARK',
+    description: apiTheme.description || defaultTheme.description || 'Default dark theme',
 
     // ========= Mode =========
     mode: apiTheme.isDarkMode ? 'dark' : 'light',
 
     // ========= Primary Colors =========
-    primaryColor: apiTheme.primaryColor || defaultSiteData.primary,
-    colorPrimaryHover: apiTheme.colorPrimaryHover || defaultSiteData.primaryHover,
-    primaryDark: apiTheme.colorPrimaryDark || defaultSiteData.primaryDark,
-    secondaryColor: apiTheme.secondaryColor || defaultSiteData.secondaryColor,
-    colorAccent: apiTheme.colorAccent || defaultSiteData.colorAccent,
+    primaryColor: apiTheme.primaryColor || defaultTheme.primaryColor,
+    colorPrimaryHover: apiTheme.colorPrimaryHover || defaultTheme.colorPrimaryHover,
+    primaryDark: apiTheme.colorPrimaryDark || apiTheme.primaryDark || defaultTheme.primaryDark,
+    colorPrimaryDark: apiTheme.colorPrimaryDark || apiTheme.primaryDark || defaultTheme.colorPrimaryDark,
+    secondaryColor: apiTheme.secondaryColor || defaultTheme.secondaryColor,
+    colorAccent: apiTheme.colorAccent || defaultTheme.colorAccent,
 
     // ========= Background Colors =========
-    bgPrimary: apiTheme.bgPrimary || defaultSiteData.bgPrimary,
-    bgSecondary: apiTheme.bgSecondary || defaultSiteData.bgSecondary,
-    bgTertiary: apiTheme.bgTertiary || defaultSiteData.bgTertiary,
-    bgCard: apiTheme.bgTertiary || defaultSiteData.bgCard,
+    bgPrimary: apiTheme.bgPrimary || defaultTheme.bgPrimary,
+    bgSecondary: apiTheme.bgSecondary || defaultTheme.bgSecondary,
+    bgTertiary: apiTheme.bgTertiary || defaultTheme.bgTertiary,
+    bgCard: apiTheme.bgTertiary || defaultTheme.bgCard,
 
     // ========= Text Colors =========
-    primaryTextColor: apiTheme.primaryTextColor || defaultSiteData.textPrimary,
-    secondaryTextColor: apiTheme.secondaryTextColor || defaultSiteData.textSecondary,
-    textMuted: apiTheme.textMuted || defaultSiteData.textMuted,
+    primaryTextColor: apiTheme.primaryTextColor || defaultTheme.primaryTextColor,
+    secondaryTextColor: apiTheme.secondaryTextColor || defaultTheme.secondaryTextColor,
+    textMuted: apiTheme.textMuted || defaultTheme.textMuted,
 
     // ========= Component Colors =========
-    headerBackground: apiTheme.headerBackground || defaultSiteData.headerBackground,
-    footerBackground: apiTheme.footerBackground || defaultSiteData.footerBackground,
-    buttonBackground: apiTheme.buttonBackground || defaultSiteData.buttonBackground,
-    buttonText: apiTheme.buttonText || defaultSiteData.buttonText,
+    headerBackground: apiTheme.headerBackground || defaultTheme.headerBackground,
+    footerBackground: apiTheme.footerBackground || defaultTheme.footerBackground,
+    buttonBackground: apiTheme.buttonBackground || defaultTheme.buttonBackground,
+    buttonText: apiTheme.buttonText || defaultTheme.buttonText,
 
     // ========= Borders =========
-    borderPrimary: apiTheme.borderColor || defaultSiteData.borderPrimary,
-    borderSecondary: apiTheme.borderColor || defaultSiteData.borderSecondary,
-    borderColor: apiTheme.borderColor || defaultSiteData.borderColor,
+    borderPrimary: apiTheme.borderColor || defaultTheme.borderPrimary,
+    borderSecondary: apiTheme.borderColor || defaultTheme.borderSecondary,
+    borderColor: apiTheme.borderColor || defaultTheme.borderColor,
 
     // ========= Overlay =========
-    overlayDark: defaultSiteData.overlayDark,
-    overlayDarker: defaultSiteData.overlayDarker,
-    overlayLight: defaultSiteData.overlayLight,
+    overlayDark: defaultTheme.overlayDark,
+    overlayDarker: defaultTheme.overlayDarker,
+    overlayLight: defaultTheme.overlayLight,
 
     // ========= Typography =========
-    fontPrimary: apiTheme.fontPrimary || defaultSiteData.fontPrimary,
-    fontHeading: apiTheme.fontHeading || defaultSiteData.fontHeading,
-    fontSizeBase: apiTheme.fontSizeBase || defaultSiteData.fontSizeBase,
+    fontPrimary: apiTheme.fontPrimary || defaultTheme.fontPrimary,
+    fontHeading: apiTheme.fontHeading || defaultTheme.fontHeading,
+    fontSizeBase: apiTheme.fontSizeBase || defaultTheme.fontSizeBase,
 
     // ========= Additional Styles =========
-    customStylesJson: apiTheme.customStylesJson || defaultSiteData.customStylesJson,
+    customStylesJson: apiTheme.customStylesJson || defaultTheme.customStylesJson,
 
     // ========= Status =========
-    isActive: apiTheme.isActive ?? defaultSiteData.isActive,
-    isDefault: apiTheme.isDefault ?? defaultSiteData.isDefault,
-    isDarkMode: apiTheme.isDarkMode ?? defaultSiteData.isDarkMode,
+    isActive: apiTheme.isActive ?? defaultTheme.isActive,
+    isDefault: apiTheme.isDefault ?? defaultTheme.isDefault,
+    isDarkMode: apiTheme.isDarkMode ?? defaultTheme.isDarkMode,
 
     // ========= Audit =========
-    createdAt: apiTheme.createdAt || defaultSiteData.createdAt,
-    updatedAt: apiTheme.updatedAt || defaultSiteData.updatedAt,
+    createdAt: apiTheme.createdAt || defaultTheme.createdAt,
+    updatedAt: apiTheme.updatedAt || defaultTheme.updatedAt,
   };
 
   // ============================================
@@ -462,7 +464,13 @@ export const SiteProvider = ({ children }) => {
         },
         body: JSON.stringify({
           templateKey: siteData.templateKey,
-          theme: siteData.theme,
+          theme: {
+            ...siteData.theme,
+            name: siteData.theme?.name || 'Ocean Blue Dark',
+            themeKey: siteData.theme?.themeKey || 'OCEAN_BLUE_DARK',
+            colorPrimaryDark: siteData.theme?.colorPrimaryDark || siteData.theme?.primaryDark,
+            borderColor: siteData.theme?.borderColor || siteData.theme?.borderPrimary,
+          },
           sections: buildSectionsPayload(siteData),
         }),
       });
@@ -481,7 +489,6 @@ export const SiteProvider = ({ children }) => {
   }, [siteData, slug, applyTheme]);
 
   const fetchSlug = async () => {
-    debugger;
     try {
       const response = await api.get('/secure/api/v1/users/fetchRestaurantId');
       const data = response.data || {};

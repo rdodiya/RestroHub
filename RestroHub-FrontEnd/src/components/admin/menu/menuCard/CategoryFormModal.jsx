@@ -64,8 +64,8 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
          aria-hidden="true" />
 
     <div className="fixed inset-0 flex items-center justify-center p-4">
-      <Dialog.Panel className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border
-                               border-gray-100 overflow-hidden">
+      <Dialog.Panel className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border
+                               border-gray-100 dark:border-gray-800 overflow-hidden">
 
         {/* ========== GRADIENT HEADER ========== */}
         <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-6 py-5
@@ -91,7 +91,7 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
           {/* Category Name */}
           <div className="space-y-1.5">
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
               <Type className="w-4 h-4 text-blue-500" />
               Category Name
             </label>
@@ -102,10 +102,10 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
                 updateField("name", e.target.value);
                 setFieldErrors((p) => ({ ...p, name: undefined }));
               }}
-              className={`w-full px-4 py-3 bg-gray-50 rounded-xl
+              className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                         focus:bg-white outline-none transition-all text-gray-800
-                         placeholder:text-gray-400 ${fieldErrors.name ? 'border-red-500' : 'border-gray-200'}`}
+                         focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                         placeholder:text-gray-400 dark:placeholder:text-gray-500 ${fieldErrors.name ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
               placeholder="e.g. Starters"
               aria-required="true"
               aria-invalid={fieldErrors.name ? 'true' : 'false'}
@@ -118,17 +118,17 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
 
           {/* Description */}
           <div className="space-y-1.5">
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
               <FileText className="w-4 h-4 text-purple-500" />
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => updateField("description", e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                         focus:bg-white outline-none transition-all text-gray-800
-                         placeholder:text-gray-400 resize-none"
+                         focus:bg-white dark:focus:bg-gray-800 outline-none transition-all text-gray-800 dark:text-gray-100
+                         placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
               rows={3}
               maxLength={255}
               placeholder="Describe this category..."
@@ -140,8 +140,8 @@ const CategoryFormModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl
-                         hover:bg-gray-50 transition-colors font-medium text-gray-600"
+              className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl
+                         hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium text-gray-600 dark:text-gray-300"
             >
               Cancel
             </button>

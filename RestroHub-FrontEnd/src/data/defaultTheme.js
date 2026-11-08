@@ -3,15 +3,16 @@
 export const defaultTheme = {
   // ========= Basic Info =========
   id: null,
-  name: "",
-  themeKey: "",
-  description: "",
+  name: "Ocean Blue Dark",
+  themeKey: "OCEAN_BLUE_DARK",
+  description: "Default dark theme with ocean blue accents",
 
   mode: "dark",
 
   primaryColor: "#3b82f6",
   colorPrimaryHover: "#60a5fa",
   primaryDark: "#2563eb",
+  colorPrimaryDark: "#2563eb",
   secondaryColor: "#2563eb",
   colorAccent: "#3b82f6",
 

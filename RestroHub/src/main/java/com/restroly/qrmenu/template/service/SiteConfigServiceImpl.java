@@ -62,7 +62,13 @@ public class SiteConfigServiceImpl implements SiteConfigService {
 
     applyTemplateKey(siteConfig, request.getTemplateKey());
 
-    updateTheme(siteConfig.getTheme(), request.getTheme());
+    if (request.getTheme() != null) {
+      if (siteConfig.getTheme() == null) {
+        Theme newTheme = new Theme();
+        siteConfig.setTheme(newTheme);
+      }
+      updateTheme(siteConfig.getTheme(), request.getTheme(), siteConfig);
+    }
 
     processBase64Images(request.getSections());
     updateSections(siteConfig, request.getSections());
@@ -98,48 +104,118 @@ public class SiteConfigServiceImpl implements SiteConfigService {
   }
 
   /** Update Theme */
-  private void updateTheme(Theme theme, ThemeDTO dto) {
+  private void updateTheme(Theme theme, ThemeDTO dto, SiteConfig siteConfig) {
 
     if (theme == null || dto == null) {
       return;
     }
 
-    theme.setName(dto.getName());
-    theme.setThemeKey(dto.getThemeKey());
-    theme.setDescription(dto.getDescription());
+    if (dto.getName() != null && !dto.getName().isBlank()) {
+      theme.setName(dto.getName().trim());
+    } else if (theme.getName() == null || theme.getName().isBlank()) {
+      theme.setName(
+          siteConfig != null
+                  && siteConfig.getSiteName() != null
+                  && !siteConfig.getSiteName().isBlank()
+              ? siteConfig.getSiteName() + " Theme"
+              : "Default Theme");
+    }
 
-    theme.setPrimaryColor(dto.getPrimaryColor());
-    theme.setColorPrimaryHover(dto.getColorPrimaryHover());
-    theme.setColorPrimaryDark(dto.getColorPrimaryDark());
+    if (dto.getThemeKey() != null && !dto.getThemeKey().isBlank()) {
+      theme.setThemeKey(dto.getThemeKey().trim());
+    } else if (theme.getThemeKey() == null || theme.getThemeKey().isBlank()) {
+      String keySeed =
+          (siteConfig != null && siteConfig.getSiteId() != null)
+              ? siteConfig.getSiteId().toUpperCase().replaceAll("[^A-Z0-9_]", "_")
+              : (theme.getId() != null ? String.valueOf(theme.getId()) : "DEFAULT");
+      theme.setThemeKey("THEME_" + keySeed);
+    }
 
-    theme.setSecondaryColor(dto.getSecondaryColor());
-    theme.setColorAccent(dto.getColorAccent());
+    if (dto.getDescription() != null) {
+      theme.setDescription(dto.getDescription());
+    }
 
-    theme.setBgPrimary(dto.getBgPrimary());
-    theme.setBgSecondary(dto.getBgSecondary());
-    theme.setBgTertiary(dto.getBgTertiary());
+    if (dto.getPrimaryColor() != null && !dto.getPrimaryColor().isBlank()) {
+      theme.setPrimaryColor(dto.getPrimaryColor().trim());
+    } else if (theme.getPrimaryColor() == null || theme.getPrimaryColor().isBlank()) {
+      theme.setPrimaryColor("#3b82f6");
+    }
 
-    theme.setPrimaryTextColor(dto.getPrimaryTextColor());
-    theme.setSecondaryTextColor(dto.getSecondaryTextColor());
-    theme.setTextMuted(dto.getTextMuted());
+    if (dto.getColorPrimaryHover() != null) {
+      theme.setColorPrimaryHover(dto.getColorPrimaryHover());
+    }
+    if (dto.getColorPrimaryDark() != null) {
+      theme.setColorPrimaryDark(dto.getColorPrimaryDark());
+    }
 
-    theme.setHeaderBackground(dto.getHeaderBackground());
-    theme.setFooterBackground(dto.getFooterBackground());
+    if (dto.getSecondaryColor() != null) {
+      theme.setSecondaryColor(dto.getSecondaryColor());
+    }
+    if (dto.getColorAccent() != null) {
+      theme.setColorAccent(dto.getColorAccent());
+    }
 
-    theme.setButtonBackground(dto.getButtonBackground());
-    theme.setButtonText(dto.getButtonText());
+    if (dto.getBgPrimary() != null) {
+      theme.setBgPrimary(dto.getBgPrimary());
+    }
+    if (dto.getBgSecondary() != null) {
+      theme.setBgSecondary(dto.getBgSecondary());
+    }
+    if (dto.getBgTertiary() != null) {
+      theme.setBgTertiary(dto.getBgTertiary());
+    }
 
-    theme.setBorderColor(dto.getBorderColor());
+    if (dto.getPrimaryTextColor() != null) {
+      theme.setPrimaryTextColor(dto.getPrimaryTextColor());
+    }
+    if (dto.getSecondaryTextColor() != null) {
+      theme.setSecondaryTextColor(dto.getSecondaryTextColor());
+    }
+    if (dto.getTextMuted() != null) {
+      theme.setTextMuted(dto.getTextMuted());
+    }
 
-    theme.setFontPrimary(dto.getFontPrimary());
-    theme.setFontHeading(dto.getFontHeading());
-    theme.setFontSizeBase(dto.getFontSizeBase());
+    if (dto.getHeaderBackground() != null) {
+      theme.setHeaderBackground(dto.getHeaderBackground());
+    }
+    if (dto.getFooterBackground() != null) {
+      theme.setFooterBackground(dto.getFooterBackground());
+    }
 
-    theme.setCustomStylesJson(dto.getCustomStylesJson());
+    if (dto.getButtonBackground() != null) {
+      theme.setButtonBackground(dto.getButtonBackground());
+    }
+    if (dto.getButtonText() != null) {
+      theme.setButtonText(dto.getButtonText());
+    }
 
-    theme.setIsActive(dto.getIsActive());
-    theme.setIsDefault(dto.getIsDefault());
-    theme.setIsDarkMode(dto.getIsDarkMode());
+    if (dto.getBorderColor() != null) {
+      theme.setBorderColor(dto.getBorderColor());
+    }
+
+    if (dto.getFontPrimary() != null) {
+      theme.setFontPrimary(dto.getFontPrimary());
+    }
+    if (dto.getFontHeading() != null) {
+      theme.setFontHeading(dto.getFontHeading());
+    }
+    if (dto.getFontSizeBase() != null) {
+      theme.setFontSizeBase(dto.getFontSizeBase());
+    }
+
+    if (dto.getCustomStylesJson() != null) {
+      theme.setCustomStylesJson(dto.getCustomStylesJson());
+    }
+
+    if (dto.getIsActive() != null) {
+      theme.setIsActive(dto.getIsActive());
+    }
+    if (dto.getIsDefault() != null) {
+      theme.setIsDefault(dto.getIsDefault());
+    }
+    if (dto.getIsDarkMode() != null) {
+      theme.setIsDarkMode(dto.getIsDarkMode());
+    }
   }
 
   /** Update Sections */
@@ -155,16 +231,36 @@ public class SiteConfigServiceImpl implements SiteConfigService {
     int counter = 0;
     for (SectionDTO dto : sectionDTOs) {
 
-      Section section = existingSections.get(dto.getSectionKey());
-
-      if (section == null) {
+      if (dto.getSectionKey() == null) {
         continue;
       }
 
-      section.setContent(dto.getContent());
-      section.setStyles(dto.getStyles());
+      Section section = existingSections.get(dto.getSectionKey());
+
+      if (section == null) {
+        Section newSection =
+            Section.builder()
+                .sectionKey(dto.getSectionKey())
+                .displayOrder(counter++)
+                .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : true)
+                .content(dto.getContent())
+                .styles(dto.getStyles())
+                .siteConfig(siteConfig)
+                .build();
+        siteConfig.addSection(newSection);
+        continue;
+      }
+
+      if (dto.getContent() != null) {
+        section.setContent(dto.getContent());
+      }
+      if (dto.getStyles() != null) {
+        section.setStyles(dto.getStyles());
+      }
       section.setDisplayOrder(counter++);
-      section.setIsVisible(dto.getIsVisible());
+      if (dto.getIsVisible() != null) {
+        section.setIsVisible(dto.getIsVisible());
+      }
     }
   }
 

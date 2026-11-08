@@ -70,10 +70,10 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
   };
 
   const inputClass = `
-    w-full rounded-lg border border-gray-200 bg-white
-    px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400
+    w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800
+    px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
     outline-none transition-all
-    focus:border-blue-300 focus:ring-2 focus:ring-blue-100
+    focus:border-blue-300 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40
   `;
 
   return (
@@ -83,16 +83,16 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
         <Dialog.Panel
           className="
             w-full max-w-md overflow-hidden rounded-2xl
-            border border-gray-200 bg-white shadow-xl
+            border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl
           "
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-5 py-4 sm:px-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
-                <CreditCard className="h-5 w-5 text-blue-600" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/60">
+                <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <Dialog.Title className="text-lg font-bold text-gray-900">
+              <Dialog.Title className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 Add UPI Link
               </Dialog.Title>
             </div>
@@ -100,7 +100,7 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
               onClick={handleClose}
               className="
                 inline-flex h-8 w-8 items-center justify-center
-                rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600
+                rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-200
                 transition-colors
               "
             >
@@ -120,7 +120,7 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
 
               {/* Name */}
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-800">
+                <label className="mb-1.5 block text-sm font-medium text-gray-800 dark:text-gray-200">
                   Account Name
                 </label>
                 <input
@@ -141,7 +141,7 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
 
               {/* UPI ID */}
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-800">
+                <label className="mb-1.5 block text-sm font-medium text-gray-800 dark:text-gray-200">
                   UPI ID
                 </label>
                 <input
@@ -158,14 +158,14 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
                   aria-describedby={fieldErrors.upiId ? 'err-upi-id' : undefined}
                 />
                 {fieldErrors.upiId && <p id="err-upi-id" className="mt-1.5 text-xs text-red-500">{fieldErrors.upiId}</p>}
-                <p className="mt-1.5 flex items-start gap-1.5 text-xs text-gray-500">
+                <p className="mt-1.5 flex items-start gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                   <Info className="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
                   Enter your VPA / UPI ID from GPay, PhonePe, Paytm, BHIM, etc.
                 </p>
               </div>
 
               {/* Is Default Checkbox */}
-              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer pt-1">
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer pt-1">
                 <input
                   type="checkbox"
                   checked={formData.isDefault}
@@ -180,25 +180,25 @@ const UPIFormModal = ({ isOpen, branchId, onClose, onSuccess }) => {
               {/* Info Box */}
               <div
                 className="
-                  rounded-lg border border-blue-100 bg-blue-50 p-3
+                  rounded-lg border border-blue-100 dark:border-blue-900/60 bg-blue-50 dark:bg-blue-950/40 p-3
                 "
               >
-                <p className="text-xs leading-relaxed text-blue-700">
+                <p className="text-xs leading-relaxed text-blue-700 dark:text-blue-300">
                   <strong className="font-semibold">Note:</strong> Setting as default will automatically route all table QR code customer payments to this UPI account.
                 </p>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center gap-3 border-t border-gray-100 px-5 py-4 sm:px-6">
+            <div className="flex items-center gap-3 border-t border-gray-100 dark:border-gray-800 px-5 py-4 sm:px-6">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={submitting}
                 className="
-                  flex-1 rounded-lg border border-gray-200 px-4 py-2.5
-                  text-sm font-medium text-gray-700
-                  hover:bg-gray-50 transition-colors
+                  flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2.5
+                  text-sm font-medium text-gray-700 dark:text-gray-300
+                  hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors
                   disabled:opacity-50
                 "
               >

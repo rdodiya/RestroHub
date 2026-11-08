@@ -25,7 +25,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    // 2026-11-08 - issue: 403 redirects to login - reason: only 401 unauthenticated should clear session and redirect to login, 403 is access-denied
+    if (error.response?.status === 401) {
       if (!error.config?.url?.includes("/public/")) {
         clearAuthSession();
         window.location.href = "/login";

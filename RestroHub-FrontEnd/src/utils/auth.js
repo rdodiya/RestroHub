@@ -34,7 +34,8 @@ const ROUTE_ACCESS = [
   ['/admin/store', NOT_STAFF],
   ['/admin/marketing', SETTINGS],
   ['/admin/upi-links', SETTINGS],
-  ['/admin/subscriptions', SETTINGS],
+  // 2026-11-08 - issue: subscription access - reason: backend subscriptions API requires PLATFORM_ADMIN (SUPER_ADMIN only)
+  ['/admin/subscriptions', ['SUPER_ADMIN']],
   ['/admin/role-management', SETTINGS],
   ['/admin/orders', EVERYONE],
   ['/admin/kds', EVERYONE],

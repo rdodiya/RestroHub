@@ -7,17 +7,17 @@ const BranchHeader = ({ onAddBranch, totalBranches = 0 }) => {
       <div>
         <div className="flex items-center gap-2">
           <Building2 className="h-6 w-6 text-blue-600 hidden sm:block" />
-          <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
             Branches
           </h2>
           {totalBranches > 0 && (
-            <span className="rounded-full bg-blue-100 px-2.5 py-0.5
-                             text-xs font-bold text-blue-700">
+            <span className="rounded-full bg-blue-100 dark:bg-blue-950/60 px-2.5 py-0.5
+                             text-xs font-bold text-blue-700 dark:text-blue-300 dark:border dark:border-blue-800">
               {totalBranches}
             </span>
           )}
         </div>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Manage your restaurant locations and addresses
         </p>
       </div>

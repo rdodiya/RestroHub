@@ -97,13 +97,13 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
   };
 
   const statusColors = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    CONFIRMED: 'bg-blue-100 text-blue-800',
-    PREPARING: 'bg-orange-100 text-orange-800',
-    READY: 'bg-green-100 text-green-800',
-    SERVED: 'bg-teal-100 text-teal-800',
-    BILLED: 'bg-purple-100 text-purple-800',
-    CANCELLED: 'bg-red-100 text-red-800',
+    PENDING: 'bg-yellow-100 dark:bg-yellow-950/60 text-yellow-800 dark:text-yellow-300 dark:border dark:border-yellow-800',
+    CONFIRMED: 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 dark:border dark:border-blue-800',
+    PREPARING: 'bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300 dark:border dark:border-orange-800',
+    READY: 'bg-green-100 dark:bg-green-950/60 text-green-800 dark:text-green-300 dark:border dark:border-green-800',
+    SERVED: 'bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 dark:border dark:border-teal-800',
+    BILLED: 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 dark:border dark:border-purple-800',
+    CANCELLED: 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 dark:border dark:border-red-800',
   };
 
   return (
@@ -132,32 +132,32 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all flex flex-col max-h-[90vh]">
+              <Dialog.Panel className="w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-left align-middle shadow-xl transition-all flex flex-col max-h-[90vh]">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-gray-50">
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 py-4 bg-gray-50 dark:bg-gray-850">
                   <div>
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-bold text-gray-900 flex items-center gap-2"
+                      className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2"
                     >
                       Order History
                     </Dialog.Title>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       View and filter historical orders for this branch.
                     </p>
                   </div>
                   <button
                     onClick={onClose}
-                    className="rounded-lg p-2 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
+                    className="rounded-lg p-2 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-750 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                   >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
 
                 {/* Filters */}
-                <div className="px-6 py-4 border-b border-gray-200 bg-white grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Start Date
                     </label>
                     <input
@@ -165,26 +165,26 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                       name="startDate"
                       value={filters.startDate}
                       onChange={handleFilterChange}
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">End Date</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
                     <input
                       type="date"
                       name="endDate"
                       value={filters.endDate}
                       onChange={handleFilterChange}
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                     <select
                       name="status"
                       value={filters.status}
                       onChange={handleFilterChange}
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">All Statuses</option>
                       {Object.keys(statusColors).map((status) => (
@@ -195,23 +195,23 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
                     <input
                       type="text"
                       name="phone"
                       placeholder="Customer phone"
                       value={filters.phone}
                       onChange={handleFilterChange}
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Payment</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Payment</label>
                     <select
                       name="paymentStatus"
                       value={filters.paymentStatus}
                       onChange={handleFilterChange}
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">All</option>
                       {PAYMENT_STATUSES.map((v) => (
@@ -222,7 +222,7 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Table</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Table</label>
                     <input
                       type="number"
                       min="0"
@@ -230,16 +230,16 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                       placeholder="0 = Counter"
                       value={filters.tableNumber}
                       onChange={handleFilterChange}
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Source</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Source</label>
                     <select
                       name="orderSource"
                       value={filters.orderSource}
                       onChange={handleFilterChange}
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">All</option>
                       {ORDER_SOURCES.map((v) => (
@@ -258,7 +258,7 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                     </button>
                     <button
                       onClick={handleClearFilters}
-                      className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+                      className="flex-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     >
                       Clear
                     </button>
@@ -266,7 +266,7 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                 </div>
 
                 {/* Table */}
-                <div className="flex-1 overflow-auto bg-gray-50 p-6">
+                <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
                   {loading ? (
                     <div className="flex h-32 items-center justify-center">
                       <RefreshCw className="h-6 w-6 animate-spin text-blue-600" />
@@ -277,9 +277,9 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                       <p>No orders found for the given criteria.</p>
                     </div>
                   ) : (
-                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                      <table className="min-w-full divide-y divide-gray-200 text-sm text-left">
-                        <thead className="bg-gray-50 text-gray-500 font-medium">
+                    <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 shadow-sm">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm text-left">
+                        <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium">
                           <tr>
                             <th className="px-6 py-3">Order</th>
                             <th className="px-6 py-3">Date</th>
@@ -291,29 +291,29 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                             <th className="px-6 py-3 text-right">Amount</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                           {orders.map((order) => (
-                            <tr key={order.orderId} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 font-medium text-gray-900">
+                            <tr key={order.orderId} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+                              <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
                                 {order.reference || `#${order.orderId}`}
                               </td>
-                              <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
+                              <td className="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                                 {new Date(order.createdAt).toLocaleString(undefined, {
                                   dateStyle: 'medium',
                                   timeStyle: 'short',
                                 })}
                               </td>
                               <td className="px-6 py-4">
-                                <div className="text-gray-900">{order.customerName}</div>
-                                <div className="text-xs text-gray-500">{order.customerPhone}</div>
+                                <div className="text-gray-900 dark:text-gray-100">{order.customerName}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">{order.customerPhone}</div>
                               </td>
-                              <td className="px-6 py-4 text-gray-600">
+                              <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
                                 {order.tableNumber === 0 ? 'Counter' : `Table ${order.tableNumber}`}
                               </td>
-                              <td className="px-6 py-4 text-gray-600">
+                              <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
                                 {order.orderSource || '-'}
                               </td>
-                              <td className="px-6 py-4 text-gray-600">
+                              <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
                                 {order.paymentStatus || '-'}
                               </td>
                               <td className="px-6 py-4">
@@ -323,7 +323,7 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                                   {order.status}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-right font-semibold text-gray-900">
+                              <td className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-gray-100">
                                 ₹{Number(order.totalAmount).toFixed(2)}
                               </td>
                             </tr>
@@ -335,8 +335,8 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3 bg-white">
-                  <span className="text-sm text-gray-600">
+                <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-6 py-3 bg-white dark:bg-gray-850">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
                     Page <span className="font-medium">{page + 1}</span> of{' '}
                     <span className="font-medium">{Math.max(1, totalPages)}</span>
                   </span>
@@ -344,14 +344,14 @@ const OrderHistoryModal = ({ isOpen, onClose, branchId }) => {
                     <button
                       onClick={() => fetchHistory(page - 1)}
                       disabled={page === 0 || loading}
-                      className="rounded p-1 text-gray-500 hover:bg-gray-100 disabled:opacity-50 border border-gray-200"
+                      className="rounded p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 border border-gray-200 dark:border-gray-700"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => fetchHistory(page + 1)}
                       disabled={page >= totalPages - 1 || loading}
-                      className="rounded p-1 text-gray-500 hover:bg-gray-100 disabled:opacity-50 border border-gray-200"
+                      className="rounded p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 border border-gray-200 dark:border-gray-700"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>

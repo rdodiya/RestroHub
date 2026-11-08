@@ -12,7 +12,7 @@ import {
 
 const ProfileHeader = ({ profile, onEditAvatar }) => {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
       {/* Cover Image */}
       <div className="relative h-32 sm:h-40 lg:h-48">
         <div
@@ -29,8 +29,8 @@ const ProfileHeader = ({ profile, onEditAvatar }) => {
           <div className="relative -mt-12 sm:-mt-14 lg:-mt-16">
             <div
               className="
-                h-24 w-24 overflow-hidden rounded-2xl border-4 border-white
-                bg-gray-100 shadow-lg
+                h-24 w-24 overflow-hidden rounded-2xl border-4 border-white dark:border-gray-800
+                bg-gray-100 dark:bg-gray-700 shadow-lg
                 sm:h-28 sm:w-28 lg:h-32 lg:w-32
               "
             >
@@ -41,8 +41,8 @@ const ProfileHeader = ({ profile, onEditAvatar }) => {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-blue-50">
-                  <span className="text-3xl font-bold text-blue-600 sm:text-4xl">
+                <div className="flex h-full w-full items-center justify-center bg-blue-50 dark:bg-blue-950/60">
+                  <span className="text-3xl font-bold text-blue-600 dark:text-blue-300 sm:text-4xl">
                     {profile.name?.charAt(0) || 'A'}
                   </span>
                 </div>
@@ -54,7 +54,7 @@ const ProfileHeader = ({ profile, onEditAvatar }) => {
               onClick={onEditAvatar}
               className="
                 absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center
-                rounded-lg border-2 border-white bg-blue-600 text-white
+                rounded-lg border-2 border-white dark:border-gray-800 bg-blue-600 text-white
                 shadow-sm hover:bg-blue-700 transition-colors
                 sm:h-9 sm:w-9
               "
@@ -65,29 +65,29 @@ const ProfileHeader = ({ profile, onEditAvatar }) => {
 
           {/* Name + Meta */}
           <div className="mt-3 text-center sm:mt-0 sm:flex-1 sm:pb-1 sm:text-left">
-            <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
               {profile.name || 'Admin User'}
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {profile.role || 'Restaurant Owner'}
             </p>
 
             {/* Quick Info Tags */}
             <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
               {(profile.location || profile.city) && (
-                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <MapPin className="h-3 w-3" />
                   {profile.location || `${profile.city}${profile.state ? ', ' + profile.state : ''}`}
                 </span>
               )}
               {profile.email && (
-                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <Mail className="h-3 w-3" />
                   {profile.email}
                 </span>
               )}
               {profile.joinedDate && (
-                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <Calendar className="h-3 w-3" />
                   Joined {profile.joinedDate}
                 </span>

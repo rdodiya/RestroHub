@@ -110,39 +110,39 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl border bg-white
+      className={`overflow-hidden rounded-2xl border bg-white dark:bg-gray-800
                   transition-all duration-200
                   ${isActive
-                    ? 'border-gray-200 hover:border-blue-200 hover:shadow-lg'
-                    : 'border-gray-200 opacity-60'
+                    ? 'border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-lg'
+                    : 'border-gray-200 dark:border-gray-700 opacity-60'
                   }`}
     >
       {/* ============================= */}
       {/* HEADER                        */}
       {/* ============================= */}
-      <div className="border-b border-gray-100 px-4 py-4 sm:px-6 sm:py-5">
+      <div className="border-b border-gray-100 dark:border-gray-700/60 px-4 py-4 sm:px-6 sm:py-5">
         <div className="flex items-start justify-between gap-3">
           {/* Icon + Name + Badge */}
           <div className="flex items-start gap-3">
             <div
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl
                           sm:h-12 sm:w-12
-                          ${isActive ? 'bg-blue-50' : 'bg-gray-100'}`}
+                          ${isActive ? 'bg-blue-50 dark:bg-blue-950/50' : 'bg-gray-100 dark:bg-gray-700'}`}
             >
               <MapPin
                 className={`h-5 w-5 sm:h-6 sm:w-6
-                            ${isActive ? 'text-blue-600' : 'text-gray-400'}`}
+                            ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}
               />
             </div>
 
             <div className="min-w-0">
-              <h4 className="truncate text-sm font-semibold text-gray-900 sm:text-base">
+              <h4 className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100 sm:text-base">
                 {branch.name}
               </h4>
 
               {/* Description (if exists) */}
               {branch.description && (
-                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
                   {branch.description}
                 </p>
               )}
@@ -151,8 +151,8 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
                 className={`mt-1 inline-flex items-center gap-1.5
                             rounded-full px-2 py-0.5 text-xs font-medium
                             ${isActive
-                              ? 'bg-green-50 text-green-700'
-                              : 'bg-red-50 text-red-600'
+                              ? 'bg-green-50 dark:bg-green-950/60 text-green-700 dark:text-green-300 dark:border dark:border-green-800'
+                              : 'bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-300 dark:border dark:border-red-800'
                             }`}
               >
                 <span
@@ -169,20 +169,20 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="inline-flex h-8 w-8 items-center justify-center
-                         rounded-lg text-gray-400 hover:bg-gray-100
-                         hover:text-gray-600 transition-colors"
+                         rounded-lg text-gray-400 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700
+                         hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             >
               <MoreVertical className="h-4 w-4" />
             </button>
 
             {menuOpen && (
               <div className="absolute right-0 top-full z-30 mt-1
-                              w-48 overflow-hidden rounded-xl border border-gray-200
-                              bg-white shadow-xl">
+                              w-48 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700
+                              bg-white dark:bg-gray-800 shadow-xl">
                 <button
                   onClick={() => { onEdit?.(branch); setMenuOpen(false); }}
                   className="flex w-full items-center gap-2.5 px-4 py-2.5
-                             text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                             text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Edit2 className="h-4 w-4 text-gray-400" />
                   Edit Branch
@@ -195,20 +195,20 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
                       setMenuOpen(false);
                     }}
                     className="flex w-full items-center gap-2.5 px-4 py-2.5
-                               text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                               text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <Copy className="h-4 w-4 text-gray-400" />
                     Copy Address
                   </button>
                 )}
 
-                <div className="border-t border-gray-100" />
+                <div className="border-t border-gray-100 dark:border-gray-700" />
 
                 {/* {isActive ? (
                   <button
                     onClick={() => { handleToggle(); setMenuOpen(false); }}
                     className="flex w-full items-center gap-2.5 px-4 py-2.5
-                               text-sm text-red-600 hover:bg-red-50 transition-colors"
+                               text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
                   >
                     <Power className="h-4 w-4" />
                     Deactivate
@@ -228,7 +228,7 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
                   <button
                     onClick={() => { onDelete?.(branch.branchId); setMenuOpen(false); }}
                     className="flex w-full items-center gap-2.5 px-4 py-2.5
-                               text-sm text-red-600 hover:bg-red-50 transition-colors"
+                               text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
                     Delete Branch
@@ -253,12 +253,12 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
                   <Icon className={`h-4 w-4 ${item.color}`} />
                 </span>
                 <div className="flex flex-wrap items-center gap-2 min-w-0">
-                  <span className="text-sm leading-relaxed text-gray-700 break-words">
+                  <span className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 break-words">
                     {item.value}
                   </span>
                   {item.badge && (
-                    <span className="rounded bg-blue-50 px-1.5 py-0.5
-                                     text-xs font-medium text-blue-700">
+                    <span className="rounded bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.5
+                                     text-xs font-medium text-blue-700 dark:text-blue-300 dark:border dark:border-blue-800">
                       {item.badge}
                     </span>
                   )}
@@ -270,7 +270,7 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
 
         {/* Created date */}
         {branch.createdDate && (
-          <p className="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-400
+          <p className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/60 text-xs text-gray-400 dark:text-gray-500
                         flex items-center gap-1.5">
             <Clock className="w-3 h-3" />
             Created {new Date(branch.createdDate).toLocaleDateString('en-IN', {
@@ -283,16 +283,16 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
       {/* ============================= */}
       {/* FOOTER - Actions              */}
       {/* ============================= */}
-      <div className="border-t border-gray-100 px-4 py-3 sm:px-6 sm:py-4">
+      <div className="border-t border-gray-100 dark:border-gray-700/60 px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-2">
           {/* Manage Tables - Primary */}
           <Link
             to={`/admin/store/branches/${branch.branchId}/tables`}
             className="inline-flex flex-1 items-center justify-center gap-1.5
-                       rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50
-                       border border-blue-200 px-4 py-2.5
-                       text-sm font-medium text-blue-700
-                       hover:from-blue-100 hover:to-indigo-100
+                       rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40
+                       border border-blue-200 dark:border-blue-800 px-4 py-2.5
+                       text-sm font-medium text-blue-700 dark:text-blue-300
+                       hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50
                        transition-all"
           >
             <Grid3X3 className="h-4 w-4" />
@@ -327,8 +327,8 @@ const BranchCard = ({ branch, onEdit, onDelete, onRestore }) => {
           <button
             onClick={() => onEdit?.(branch)}
             className="inline-flex h-10 w-10 shrink-0 items-center justify-center
-                       rounded-xl bg-gray-50 text-gray-600
-                       hover:bg-gray-100 transition-colors"
+                       rounded-xl bg-gray-50 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300
+                       hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title="Edit"
           >
             <Edit2 className="h-4 w-4" />

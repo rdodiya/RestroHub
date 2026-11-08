@@ -35,6 +35,9 @@ const pickData = (response) => response.data?.data || response.data || [];
 
 const SubscriptionManagement = () => {
   const roles = readStoredRoles();
+  // 2026-11-08 - issue: subscription access - reason: backend subscriptions API requires PLATFORM_ADMIN (SUPER_ADMIN only)
+  const isSuperAdmin = hasAnyRole(roles, ['SUPER_ADMIN']);
+
   const [activeTab, setActiveTab] = useState('plans');
   const [plans, setPlans] = useState([]);
   const [features, setFeatures] = useState([]);
@@ -76,7 +79,9 @@ const SubscriptionManagement = () => {
   };
 
   useEffect(() => {
-    fetchSubscriptions();
+    if (isSuperAdmin) {
+      fetchSubscriptions();
+    }
   }, []);
 
   const filteredPlans = useMemo(() => {

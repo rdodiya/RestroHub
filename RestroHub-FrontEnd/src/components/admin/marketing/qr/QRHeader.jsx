@@ -25,11 +25,11 @@ const QRHeader = () => {
       <div>
         <div className="flex items-center gap-2">
           <QrCode className="hidden h-6 w-6 text-blue-600 sm:block" />
-          <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
             QR Display Settings
           </h2>
         </div>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Customize how your QR codes look
         </p>
       </div>
@@ -40,10 +40,10 @@ const QRHeader = () => {
         disabled={downloading}
         className="
           inline-flex w-full items-center justify-center gap-2
-          rounded-lg bg-blue-50 px-5 py-2.5
-          text-sm font-medium text-blue-700
-          border border-blue-200
-          hover:bg-blue-100 transition-colors
+          rounded-lg bg-blue-50 dark:bg-blue-950/40 px-5 py-2.5
+          text-sm font-medium text-blue-700 dark:text-blue-400
+          border border-blue-200 dark:border-blue-800
+          hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors
           disabled:opacity-50
           sm:w-auto
         "
