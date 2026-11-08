@@ -96,22 +96,12 @@ const ApiService = {
    * Maps to: POST /public/api/v1/reservations  (add this endpoint on the backend)
    * Fallback: simulates a successful response if the endpoint doesn't exist yet.
    */
+  // 2026-11-08 - Table reservation - Post reservation to backend API and return real response without mock fallback
   submitReservation: async (formData) => {
-    try {
-      return await request('/public/api/v1/reservations', {
-        method: 'POST',
-        body: JSON.stringify(formData),
-      });
-    } catch (err) {
-      // Temporary simulation while backend reservation endpoint is being built
-      console.warn('Reservation API not available, simulating response:', err);
-      return {
-        success: true,
-        message: 'Reservation confirmed!',
-        confirmationNumber: `RSV-${Date.now().toString(36).toUpperCase()}`,
-        details: formData,
-      };
-    }
+    return await request('/public/api/v1/reservations', {
+      method: 'POST',
+      body: JSON.stringify(formData),
+    });
   },
 
   /**

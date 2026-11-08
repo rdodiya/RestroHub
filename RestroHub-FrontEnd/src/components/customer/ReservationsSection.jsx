@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useSiteData } from '@context/SiteContext';
 import ApiService from '@services/public/ApiService';
 
@@ -9,6 +10,7 @@ import ApiService from '@services/public/ApiService';
 
 const ReservationsSection = () => {
     const { siteData } = useSiteData();
+    const { branchId: paramBranchId } = useParams();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -60,7 +62,16 @@ const ReservationsSection = () => {
         }
 
         try {
-            const response = await ApiService.submitReservation(formData);
+            // 2026-11-08 - Table reservation - Pass branchId to link reservation and table in DB
+            const queryBranch = typeof window !== 'undefined'
+                ? new URLSearchParams(window.location.search).get('branchId')
+                : null;
+            const branchId = Number(paramBranchId || queryBranch || siteData?.branchId || 1);
+
+            const response = await ApiService.submitReservation({
+                ...formData,
+                branchId,
+            });
             
             if (response.success) {
                 setSubmitted(true);
