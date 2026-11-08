@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
 
-// 2026-11-08 - Table reservation entity - Store website reservation details and table link
+// 2026-11-08 - Table reservation entity - Store website reservation details, time range, and table
+// link
 @Entity
 @Table(name = "t_table_reservation")
 @Getter
@@ -41,6 +42,15 @@ public class TableReservation {
 
   @Column(name = "time_slot", nullable = false, length = 50)
   private String timeSlot;
+
+  @Column(name = "start_time", length = 20)
+  private String startTime;
+
+  @Column(name = "end_time", length = 20)
+  private String endTime;
+
+  @Column(name = "time_range", length = 60)
+  private String timeRange;
 
   @Column(name = "guests_count", nullable = false)
   private Integer guestsCount;

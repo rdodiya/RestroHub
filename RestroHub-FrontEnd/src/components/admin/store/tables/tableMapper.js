@@ -1,3 +1,4 @@
+// 2026-11-08 - Table normalization - Include booked time ranges for manage table view
 export const normalizeTable = (table) => ({
   id: table.tableId,
   tableId: table.tableId,
@@ -8,4 +9,5 @@ export const normalizeTable = (table) => ({
   status: table.status || 'available',
   qrCodeUrl: table.qrCodeUrl,
   isActive: table.isActive !== false,
+  bookedSlots: table.bookedSlots || [],
 });

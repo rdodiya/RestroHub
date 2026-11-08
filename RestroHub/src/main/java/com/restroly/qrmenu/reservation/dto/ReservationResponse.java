@@ -3,7 +3,7 @@ package com.restroly.qrmenu.reservation.dto;
 import java.time.LocalDateTime;
 import lombok.*;
 
-// 2026-11-08 - Table reservation response DTO - Return reservation confirmation and table info
+// 2026-11-08 - Table reservation response DTO - Return reservation confirmation and time range info
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,6 +22,9 @@ public class ReservationResponse {
   private String customerPhone;
   private String reservationDate;
   private String timeSlot;
+  private String startTime;
+  private String endTime;
+  private String timeRange;
   private Integer guestsCount;
   private String specialRequests;
   private String status;

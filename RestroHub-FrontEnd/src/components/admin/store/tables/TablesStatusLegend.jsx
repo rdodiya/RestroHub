@@ -1,3 +1,4 @@
+// 2026-11-08 - Table status legend - Show status counts and total active booked time ranges
 const TablesStatusLegend = ({ tables = [] }) => {
   const activeTables = tables.filter((table) => table.isActive !== false);
   const counts = {
@@ -5,6 +6,10 @@ const TablesStatusLegend = ({ tables = [] }) => {
     occupied: activeTables.filter((t) => t.status === 'occupied').length,
     reserved: activeTables.filter((t) => t.status === 'reserved').length,
   };
+  const totalBookedSlots = activeTables.reduce(
+    (acc, t) => acc + (t.bookedSlots ? t.bookedSlots.length : 0),
+    0
+  );
 
   const statuses = [
     { key: 'available', label: 'Available', dotColor: 'bg-green-500', count: counts.available },
@@ -30,6 +35,15 @@ const TablesStatusLegend = ({ tables = [] }) => {
           </span>
         </div>
       ))}
+
+      {totalBookedSlots > 0 && (
+        <div className="flex items-center gap-1.5 border-l border-gray-200 pl-3">
+          <span className="text-sm font-medium text-amber-700">Active Bookings:</span>
+          <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-semibold text-amber-800">
+            {totalBookedSlots}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

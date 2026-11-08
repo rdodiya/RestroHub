@@ -34,6 +34,15 @@ public class ReservationRequest {
   @JsonAlias({"time", "time_slot"})
   private String timeSlot;
 
+  @JsonAlias({"startTime", "start_time"})
+  private String startTime;
+
+  @JsonAlias({"endTime", "end_time"})
+  private String endTime;
+
+  @JsonAlias({"timeRange", "time_range"})
+  private String timeRange;
+
   @JsonAlias({"guests", "guests_count"})
   private Object guests;
 

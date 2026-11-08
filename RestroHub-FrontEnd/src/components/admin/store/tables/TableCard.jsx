@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { QrCode, Edit2, Trash2, Users, Loader2 } from 'lucide-react';
+import { QrCode, Edit2, Trash2, Users, Loader2, Clock } from 'lucide-react';
 import api from '@services/common/api';
 import toast from 'react-hot-toast';
 
@@ -97,6 +97,34 @@ const TableCard = ({ table, onShowQR, onEdit, onDelete }) => {
             {displayStatus}
           </span>
         </div>
+
+        {/* 2026-11-08 - Table booked time range - Display booked time ranges so staff see bookings and free slots */}
+        {table.bookedSlots && table.bookedSlots.length > 0 ? (
+          <div className="mt-3 border-t border-gray-100 pt-2 text-left">
+            <div className="flex items-center gap-1 text-[11px] font-semibold text-amber-700">
+              <Clock className="h-3 w-3 shrink-0" />
+              <span>Booked Time Ranges:</span>
+            </div>
+            <div className="mt-1 space-y-1 max-h-24 overflow-y-auto pr-0.5">
+              {table.bookedSlots.map((slot, idx) => (
+                <div
+                  key={slot.reservationId || idx}
+                  className="flex items-center justify-between rounded bg-amber-50/90 px-2 py-0.5 text-[10px] text-amber-900 border border-amber-200/60"
+                  title={`${slot.customerName ? `Reserved by ${slot.customerName}` : 'Reserved'}${slot.guestsCount ? ` (${slot.guestsCount} guests)` : ''}`}
+                >
+                  <span className="font-semibold">{slot.timeRange || slot.timeSlot}</span>
+                  <span className="text-amber-700 text-[9px] font-medium">{slot.reservationDate}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          table.isActive && (
+            <div className="mt-2 text-center text-[10px] text-gray-400">
+              No active bookings
+            </div>
+          )
+        )}
       </div>
 
       <div className="flex items-center justify-center gap-1 border-t border-gray-100 px-2 py-2 sm:gap-2 sm:px-3 sm:py-3">

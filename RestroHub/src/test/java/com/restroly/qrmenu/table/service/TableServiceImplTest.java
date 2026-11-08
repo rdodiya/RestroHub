@@ -1,271 +1,311 @@
 package com.restroly.qrmenu.table.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.restroly.qrmenu.branch.entity.Branch;
 import com.restroly.qrmenu.branch.repository.BranchRepository;
 import com.restroly.qrmenu.exception.ResourceAlreadyExistsException;
 import com.restroly.qrmenu.exception.ResourceNotFoundException;
+import com.restroly.qrmenu.reservation.entity.TableReservation;
+import com.restroly.qrmenu.reservation.repository.TableReservationRepository;
 import com.restroly.qrmenu.table.dto.TableRequestDTO;
 import com.restroly.qrmenu.table.dto.TableResponseDTO;
 import com.restroly.qrmenu.table.entity.Tables;
 import com.restroly.qrmenu.table.repository.TablesRepository;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class TableServiceImplTest {
 
-    @Mock
-    private TablesRepository tablesRepository;
+  @Mock private TablesRepository tablesRepository;
 
-    @Mock
-    private BranchRepository branchRepository;
+  @Mock private BranchRepository branchRepository;
 
-    @InjectMocks
-    private TableServiceImpl tableService;
+  @Mock private TableReservationRepository reservationRepository;
 
-    @Test
-    void createTableShouldPersistBranchScopedTable() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        TableRequestDTO request = TableRequestDTO.builder()
-                .tableNumber(5)
-                .capacity(4)
-                .status("available")
-                .build();
+  @InjectMocks private TableServiceImpl tableService;
 
-        when(branchRepository.findByBranchIdAndIsDeleteFalse(1L)).thenReturn(Optional.of(branch));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumber(1L, 5)).thenReturn(false);
-        when(tablesRepository.save(any(Tables.class))).thenAnswer(invocation -> {
-            Tables table = invocation.getArgument(0);
-            table.setTableId(10L);
-            return table;
-        });
+  @Test
+  void createTableShouldPersistBranchScopedTable() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    TableRequestDTO request =
+        TableRequestDTO.builder().tableNumber(5).capacity(4).status("available").build();
 
-        TableResponseDTO response = tableService.createTable(1L, request);
+    when(branchRepository.findByBranchIdAndIsDeleteFalse(1L)).thenReturn(Optional.of(branch));
+    when(tablesRepository.existsByBranch_BranchIdAndTableNumber(1L, 5)).thenReturn(false);
+    when(tablesRepository.save(any(Tables.class)))
+        .thenAnswer(
+            invocation -> {
+              Tables table = invocation.getArgument(0);
+              table.setTableId(10L);
+              return table;
+            });
 
-        assertEquals(10L, response.getTableId());
-        assertEquals(1L, response.getBranchId());
-        assertEquals(5, response.getTableNumber());
-        assertTrue(response.getIsActive());
-        verify(tablesRepository).save(any(Tables.class));
-    }
+    TableResponseDTO response = tableService.createTable(1L, request);
 
-    @Test
-    void createTableShouldApplyDefaultsWhenOptionalFieldsAreMissing() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        TableRequestDTO request = TableRequestDTO.builder()
-                .tableNumber(7)
-                .build();
+    assertEquals(10L, response.getTableId());
+    assertEquals(1L, response.getBranchId());
+    assertEquals(5, response.getTableNumber());
+    assertTrue(response.getIsActive());
+    verify(tablesRepository).save(any(Tables.class));
+  }
 
-        when(branchRepository.findByBranchIdAndIsDeleteFalse(1L)).thenReturn(Optional.of(branch));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumber(1L, 7)).thenReturn(false);
-        when(tablesRepository.save(any(Tables.class))).thenAnswer(invocation -> {
-            Tables table = invocation.getArgument(0);
-            table.setTableId(11L);
-            return table;
-        });
+  @Test
+  void createTableShouldApplyDefaultsWhenOptionalFieldsAreMissing() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    TableRequestDTO request = TableRequestDTO.builder().tableNumber(7).build();
 
-        TableResponseDTO response = tableService.createTable(1L, request);
+    when(branchRepository.findByBranchIdAndIsDeleteFalse(1L)).thenReturn(Optional.of(branch));
+    when(tablesRepository.existsByBranch_BranchIdAndTableNumber(1L, 7)).thenReturn(false);
+    when(tablesRepository.save(any(Tables.class)))
+        .thenAnswer(
+            invocation -> {
+              Tables table = invocation.getArgument(0);
+              table.setTableId(11L);
+              return table;
+            });
 
-        assertEquals(4, response.getCapacity());
-        assertEquals("available", response.getStatus());
-        assertTrue(response.getIsActive());
-    }
+    TableResponseDTO response = tableService.createTable(1L, request);
 
-    @Test
-    void createTableShouldRejectMissingBranch() {
-        TableRequestDTO request = TableRequestDTO.builder().tableNumber(5).build();
+    assertEquals(4, response.getCapacity());
+    assertEquals("available", response.getStatus());
+    assertTrue(response.getIsActive());
+  }
 
-        when(branchRepository.findByBranchIdAndIsDeleteFalse(99L)).thenReturn(Optional.empty());
+  @Test
+  void createTableShouldRejectMissingBranch() {
+    TableRequestDTO request = TableRequestDTO.builder().tableNumber(5).build();
 
-        assertThrows(ResourceNotFoundException.class, () -> tableService.createTable(99L, request));
-        verify(tablesRepository, never()).save(any(Tables.class));
-    }
+    when(branchRepository.findByBranchIdAndIsDeleteFalse(99L)).thenReturn(Optional.empty());
 
-    @Test
-    void createTableShouldRejectDuplicateTableNumberInBranch() {
-        TableRequestDTO request = TableRequestDTO.builder().tableNumber(5).build();
+    assertThrows(ResourceNotFoundException.class, () -> tableService.createTable(99L, request));
+    verify(tablesRepository, never()).save(any(Tables.class));
+  }
 
-        when(branchRepository.findByBranchIdAndIsDeleteFalse(1L))
-                .thenReturn(Optional.of(Branch.builder().branchId(1L).build()));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumber(1L, 5)).thenReturn(true);
+  @Test
+  void createTableShouldRejectDuplicateTableNumberInBranch() {
+    TableRequestDTO request = TableRequestDTO.builder().tableNumber(5).build();
 
-        assertThrows(ResourceAlreadyExistsException.class, () -> tableService.createTable(1L, request));
-        verify(tablesRepository, never()).save(any(Tables.class));
-    }
+    when(branchRepository.findByBranchIdAndIsDeleteFalse(1L))
+        .thenReturn(Optional.of(Branch.builder().branchId(1L).build()));
+    when(tablesRepository.existsByBranch_BranchIdAndTableNumber(1L, 5)).thenReturn(true);
 
-    @Test
-    void getTablesByBranchShouldRejectMissingBranch() {
-        when(branchRepository.findByBranchIdAndIsDeleteFalse(99L)).thenReturn(Optional.empty());
+    assertThrows(ResourceAlreadyExistsException.class, () -> tableService.createTable(1L, request));
+    verify(tablesRepository, never()).save(any(Tables.class));
+  }
 
-        assertThrows(ResourceNotFoundException.class, () -> tableService.getTablesByBranch(99L));
-        verify(tablesRepository, never()).findByBranch_BranchId(99L);
-    }
+  @Test
+  void getTablesByBranchShouldRejectMissingBranch() {
+    when(branchRepository.findByBranchIdAndIsDeleteFalse(99L)).thenReturn(Optional.empty());
 
-    @Test
-    void deleteTableShouldHardDeleteTable() {
-        Tables table = Tables.builder()
-                .tableId(10L)
-                .branch(Branch.builder().branchId(1L).build())
-                .tableNumber(5)
-                .isActive(true)
-                .build();
+    assertThrows(ResourceNotFoundException.class, () -> tableService.getTablesByBranch(99L));
+    verify(tablesRepository, never()).findByBranch_BranchId(99L);
+  }
 
-        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
+  @Test
+  void deleteTableShouldHardDeleteTable() {
+    Tables table =
+        Tables.builder()
+            .tableId(10L)
+            .branch(Branch.builder().branchId(1L).build())
+            .tableNumber(5)
+            .isActive(true)
+            .build();
 
-        tableService.deleteTable(10L);
+    when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
 
-        verify(tablesRepository).delete(table);
-    }
+    tableService.deleteTable(10L);
 
-    @Test
-    void deleteTableShouldRejectMissingTable() {
-        when(tablesRepository.findById(99L)).thenReturn(Optional.empty());
+    verify(tablesRepository).delete(table);
+  }
 
-        assertThrows(ResourceNotFoundException.class, () -> tableService.deleteTable(99L));
-        verify(tablesRepository, never()).delete(any(Tables.class));
-    }
+  @Test
+  void deleteTableShouldRejectMissingTable() {
+    when(tablesRepository.findById(99L)).thenReturn(Optional.empty());
 
-    @Test
-    void updateTableShouldChangeDetailsAndKeepExistingCapacityWhenMissing() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        Tables table = Tables.builder()
-                .tableId(10L)
-                .branch(branch)
-                .tableNumber(5)
-                .capacity(6)
-                .status("reserved")
-                .isActive(true)
-                .build();
-        TableRequestDTO request = TableRequestDTO.builder()
-                .tableNumber(8)
-                .status("occupied")
-                .qrCodeUrl("https://example.com/qr/table-8")
-                .build();
+    assertThrows(ResourceNotFoundException.class, () -> tableService.deleteTable(99L));
+    verify(tablesRepository, never()).delete(any(Tables.class));
+  }
 
-        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 8, 10L)).thenReturn(false);
-        when(tablesRepository.save(table)).thenReturn(table);
+  @Test
+  void updateTableShouldChangeDetailsAndKeepExistingCapacityWhenMissing() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    Tables table =
+        Tables.builder()
+            .tableId(10L)
+            .branch(branch)
+            .tableNumber(5)
+            .capacity(6)
+            .status("reserved")
+            .isActive(true)
+            .build();
+    TableRequestDTO request =
+        TableRequestDTO.builder()
+            .tableNumber(8)
+            .status("occupied")
+            .qrCodeUrl("https://example.com/qr/table-8")
+            .build();
 
-        TableResponseDTO response = tableService.updateTable(10L, request);
+    when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
+    when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 8, 10L))
+        .thenReturn(false);
+    when(tablesRepository.save(table)).thenReturn(table);
 
-        assertEquals(8, response.getTableNumber());
-        assertEquals(6, response.getCapacity());
-        assertEquals("occupied", response.getStatus());
-        assertEquals("https://example.com/qr/table-8", response.getQrCodeUrl());
-    }
+    TableResponseDTO response = tableService.updateTable(10L, request);
 
-    @Test
-    void updateTableShouldKeepExistingStatusWhenMissing() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        Tables table = Tables.builder()
-                .tableId(10L)
-                .branch(branch)
-                .tableNumber(5)
-                .capacity(6)
-                .status("reserved")
-                .isActive(true)
-                .build();
-        TableRequestDTO request = TableRequestDTO.builder()
-                .tableNumber(5)
-                .capacity(8)
-                .build();
+    assertEquals(8, response.getTableNumber());
+    assertEquals(6, response.getCapacity());
+    assertEquals("occupied", response.getStatus());
+    assertEquals("https://example.com/qr/table-8", response.getQrCodeUrl());
+  }
 
-        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 5, 10L)).thenReturn(false);
-        when(tablesRepository.save(table)).thenReturn(table);
+  @Test
+  void updateTableShouldKeepExistingStatusWhenMissing() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    Tables table =
+        Tables.builder()
+            .tableId(10L)
+            .branch(branch)
+            .tableNumber(5)
+            .capacity(6)
+            .status("reserved")
+            .isActive(true)
+            .build();
+    TableRequestDTO request = TableRequestDTO.builder().tableNumber(5).capacity(8).build();
 
-        TableResponseDTO response = tableService.updateTable(10L, request);
+    when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
+    when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 5, 10L))
+        .thenReturn(false);
+    when(tablesRepository.save(table)).thenReturn(table);
 
-        assertEquals(8, response.getCapacity());
-        assertEquals("reserved", response.getStatus());
-    }
+    TableResponseDTO response = tableService.updateTable(10L, request);
 
-    @Test
-    void updateTableShouldPersistActiveStateToggle() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        Tables table = Tables.builder()
-                .tableId(10L)
-                .branch(branch)
-                .tableNumber(5)
-                .capacity(6)
-                .status("available")
-                .isActive(true)
-                .build();
-        TableRequestDTO request = TableRequestDTO.builder()
-                .tableNumber(5)
-                .capacity(6)
-                .status("available")
-                .isActive(false)
-                .build();
+    assertEquals(8, response.getCapacity());
+    assertEquals("reserved", response.getStatus());
+  }
 
-        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 5, 10L)).thenReturn(false);
-        when(tablesRepository.save(table)).thenReturn(table);
+  @Test
+  void updateTableShouldPersistActiveStateToggle() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    Tables table =
+        Tables.builder()
+            .tableId(10L)
+            .branch(branch)
+            .tableNumber(5)
+            .capacity(6)
+            .status("available")
+            .isActive(true)
+            .build();
+    TableRequestDTO request =
+        TableRequestDTO.builder()
+            .tableNumber(5)
+            .capacity(6)
+            .status("available")
+            .isActive(false)
+            .build();
 
-        TableResponseDTO response = tableService.updateTable(10L, request);
+    when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
+    when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 5, 10L))
+        .thenReturn(false);
+    when(tablesRepository.save(table)).thenReturn(table);
 
-        assertFalse(response.getIsActive());
-    }
+    TableResponseDTO response = tableService.updateTable(10L, request);
 
-    @Test
-    void updateTableShouldRejectDuplicateTableNumberInBranch() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        Tables table = Tables.builder()
-                .tableId(10L)
-                .branch(branch)
-                .tableNumber(5)
-                .isActive(true)
-                .build();
-        TableRequestDTO request = TableRequestDTO.builder().tableNumber(8).build();
+    assertFalse(response.getIsActive());
+  }
 
-        when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
-        when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 8, 10L)).thenReturn(true);
+  @Test
+  void updateTableShouldRejectDuplicateTableNumberInBranch() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    Tables table =
+        Tables.builder().tableId(10L).branch(branch).tableNumber(5).isActive(true).build();
+    TableRequestDTO request = TableRequestDTO.builder().tableNumber(8).build();
 
-        assertThrows(ResourceAlreadyExistsException.class, () -> tableService.updateTable(10L, request));
-        verify(tablesRepository, never()).save(any(Tables.class));
-    }
+    when(tablesRepository.findById(10L)).thenReturn(Optional.of(table));
+    when(tablesRepository.existsByBranch_BranchIdAndTableNumberAndTableIdNot(1L, 8, 10L))
+        .thenReturn(true);
 
-    @Test
-    void updateTableShouldRejectMissingTable() {
-        TableRequestDTO request = TableRequestDTO.builder().tableNumber(8).build();
+    assertThrows(
+        ResourceAlreadyExistsException.class, () -> tableService.updateTable(10L, request));
+    verify(tablesRepository, never()).save(any(Tables.class));
+  }
 
-        when(tablesRepository.findById(99L)).thenReturn(Optional.empty());
+  @Test
+  void updateTableShouldRejectMissingTable() {
+    TableRequestDTO request = TableRequestDTO.builder().tableNumber(8).build();
 
-        assertThrows(ResourceNotFoundException.class, () -> tableService.updateTable(99L, request));
-    }
+    when(tablesRepository.findById(99L)).thenReturn(Optional.empty());
 
-    @Test
-    void getTablesByBranchShouldReturnAllBranchTables() {
-        Branch branch = Branch.builder().branchId(1L).build();
-        Tables activeTable = Tables.builder()
-                .tableId(10L)
-                .branch(branch)
-                .tableNumber(1)
-                .isActive(true)
-                .build();
-        Tables inactiveTable = Tables.builder()
-                .tableId(11L)
-                .branch(branch)
-                .tableNumber(2)
-                .isActive(false)
-                .build();
+    assertThrows(ResourceNotFoundException.class, () -> tableService.updateTable(99L, request));
+  }
 
-        when(branchRepository.findByBranchIdAndIsDeleteFalse(1L)).thenReturn(Optional.of(branch));
-        when(tablesRepository.findByBranch_BranchId(1L)).thenReturn(List.of(activeTable, inactiveTable));
+  @Test
+  void getTablesByBranchShouldReturnAllBranchTables() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    Tables activeTable =
+        Tables.builder().tableId(10L).branch(branch).tableNumber(1).isActive(true).build();
+    Tables inactiveTable =
+        Tables.builder().tableId(11L).branch(branch).tableNumber(2).isActive(false).build();
 
-        List<TableResponseDTO> response = tableService.getTablesByBranch(1L);
+    when(branchRepository.findByBranchIdAndIsDeleteFalse(1L)).thenReturn(Optional.of(branch));
+    when(reservationRepository.findByBranchIdAndStatusNot(1L, "CANCELLED")).thenReturn(List.of());
+    when(tablesRepository.findByBranch_BranchId(1L))
+        .thenReturn(List.of(activeTable, inactiveTable));
 
-        assertEquals(2, response.size());
-        assertFalse(response.get(1).getIsActive());
-    }
+    List<TableResponseDTO> response = tableService.getTablesByBranch(1L);
+
+    assertEquals(2, response.size());
+    assertFalse(response.get(1).getIsActive());
+  }
+
+  // 2026-11-08 - Table booked time range test - Verify booked slots are populated on branch tables
+  @Test
+  void getTablesByBranchShouldAttachBookedTimeRanges() {
+    Branch branch = Branch.builder().branchId(1L).build();
+    Tables table =
+        Tables.builder()
+            .tableId(10L)
+            .branch(branch)
+            .tableNumber(1)
+            .capacity(4)
+            .status("available")
+            .isActive(true)
+            .build();
+
+    TableReservation res =
+        TableReservation.builder()
+            .id(101L)
+            .branchId(1L)
+            .tableId(10L)
+            .tableNumber(1)
+            .customerName("Jane Doe")
+            .reservationDate("2026-11-10")
+            .timeSlot("7:00 PM")
+            .startTime("07:00 PM")
+            .endTime("08:00 PM")
+            .timeRange("07:00 PM - 08:00 PM")
+            .status("CONFIRMED")
+            .build();
+
+    when(branchRepository.findByBranchIdAndIsDeleteFalse(1L)).thenReturn(Optional.of(branch));
+    when(reservationRepository.findByBranchIdAndStatusNot(1L, "CANCELLED"))
+        .thenReturn(List.of(res));
+    when(tablesRepository.findByBranch_BranchId(1L)).thenReturn(List.of(table));
+
+    List<TableResponseDTO> response = tableService.getTablesByBranch(1L);
+
+    assertEquals(1, response.size());
+    assertNotNull(response.get(0).getBookedSlots());
+    assertEquals(1, response.get(0).getBookedSlots().size());
+    assertEquals("07:00 PM - 08:00 PM", response.get(0).getBookedSlots().get(0).getTimeRange());
+    assertEquals("2026-11-10", response.get(0).getBookedSlots().get(0).getReservationDate());
+  }
 }

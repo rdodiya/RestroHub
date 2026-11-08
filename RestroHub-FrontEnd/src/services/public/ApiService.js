@@ -107,10 +107,11 @@ const ApiService = {
   /**
    * Check table availability.
    */
-  checkAvailability: async (date, time, guests, siteId) => {
+  // 2026-11-08 - Table availability - Query backend availability endpoint with 30-min gap support
+  checkAvailability: async (date, time, guests, branchId = 1) => {
     try {
       return await request(
-        `/public/api/v1/availability?date=${date}&time=${encodeURIComponent(time)}&guests=${guests}&siteId=${siteId}`
+        `/public/api/v1/reservations/availability?branchId=${branchId}&date=${date}&time=${encodeURIComponent(time)}&guests=${guests}`
       );
     } catch {
       return { available: true, alternatives: [] };
