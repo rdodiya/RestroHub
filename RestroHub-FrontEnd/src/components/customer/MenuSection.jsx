@@ -1,3 +1,4 @@
+// 2026-11-08 - issue: anchor navigation - reason: ensure smooth scroll to sections
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSiteData } from '@context/SiteContext.jsx';
 import { useCustomerOrder } from '@context/CustomerOrderContext.jsx';
@@ -158,7 +159,7 @@ const MenuSection = () => {
     const items = getItemsForActiveCategory();
 
     return (
-        <section id="how-it-works" className="menu section relative">
+        <section id="menu" className="menu section relative">
             <div className="container">
                 {/* Header */}
                 <div className="menu-header">

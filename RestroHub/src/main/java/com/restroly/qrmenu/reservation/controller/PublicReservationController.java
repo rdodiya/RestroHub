@@ -43,7 +43,7 @@ public class PublicReservationController {
 
   @GetMapping("/availability")
   @Operation(
-      summary = "Check table availability for a specific date and time slot with 30-min buffer")
+      summary = "Check table availability for a specific date and time slot with 15-min buffer")
   public ResponseEntity<ReservationAvailabilityResponse> checkAvailability(
       @RequestParam(required = false, defaultValue = "1") Long branchId,
       @RequestParam String date,

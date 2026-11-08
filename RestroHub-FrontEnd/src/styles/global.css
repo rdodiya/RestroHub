@@ -10,6 +10,12 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+section[id],
+.section {
+  scroll-margin-top: 80px;
 }
 
 body {

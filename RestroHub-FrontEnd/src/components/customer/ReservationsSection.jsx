@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSiteData } from '@context/SiteContext';
 import ApiService from '@services/public/ApiService';
@@ -25,6 +25,36 @@ const ReservationsSection = () => {
     const [error, setError] = useState(null);
     const [confirmationNumber, setConfirmationNumber] = useState(null);
     const [fieldErrors, setFieldErrors] = useState({});
+    // 2026-11-08 - issue: availability feedback - reason: provide instant slot availability feedback
+    const [availabilityMessage, setAvailabilityMessage] = useState(null);
+
+    useEffect(() => {
+        let active = true;
+        if (formData.date && formData.time && formData.guests) {
+            const queryBranch = typeof window !== 'undefined'
+                ? new URLSearchParams(window.location.search).get('branchId')
+                : null;
+            const branchId = Number(paramBranchId || queryBranch || siteData?.branchId || 1);
+            ApiService.checkAvailability(formData.date, formData.time, formData.guests, branchId)
+                .then((res) => {
+                    if (active && res) {
+                        if (res.available === false) {
+                            setAvailabilityMessage({ type: 'warning', text: res.message || 'No tables available for this slot.' });
+                        } else {
+                            setAvailabilityMessage({ type: 'success', text: res.message || 'Table is available!' });
+                        }
+                    }
+                })
+                .catch(() => {
+                    if (active) setAvailabilityMessage(null);
+                });
+        } else {
+            setAvailabilityMessage(null);
+        }
+        return () => {
+            active = false;
+        };
+    }, [formData.date, formData.time, formData.guests, paramBranchId, siteData?.branchId]);
 
     if (!siteData) return null;
 
@@ -88,7 +118,8 @@ const ReservationsSection = () => {
                 setFieldErrors({});
             }
         } catch (err) {
-            setError('Failed to submit reservation. Please try again.');
+            // 2026-11-08 - issue: booking error message - reason: display exact reason if all tables are reserved
+            setError(err.message || 'Failed to submit reservation. Please try again.');
         } finally {
             setSubmitting(false);
         }
@@ -106,7 +137,7 @@ const ReservationsSection = () => {
     };
 
     return (
-        <section id="pricing" className="reservations section">
+        <section id="reservations" className="reservations section">
             {/* Background Image */}
             <div 
                 className="reservations-bg"
@@ -268,6 +299,16 @@ const ReservationsSection = () => {
                                 )}
                             </div>
                         </div>
+
+                        {availabilityMessage && (
+                            <div className={`p-3 rounded-lg text-xs font-medium border ${
+                                availabilityMessage.type === 'warning'
+                                    ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            }`}>
+                                {availabilityMessage.text}
+                            </div>
+                        )}
 
                         <textarea
                             name="requests"

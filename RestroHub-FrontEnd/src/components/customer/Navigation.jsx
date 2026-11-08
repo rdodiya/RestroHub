@@ -1,3 +1,4 @@
+// 2026-11-08 - issue: anchor navigation - reason: ensure smooth scroll to sections
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSiteData } from '@context/SiteContext.jsx';
@@ -21,9 +22,21 @@ const Navigation = () => {
 
     const handleLogoClick = (e) => {
         e.preventDefault();
-        navigate('/');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.history.pushState(null, '', window.location.pathname);
         setMobileMenuOpen(false);
+    };
+
+    const handleNavClick = (e, href) => {
+        if (href?.startsWith('#')) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState(null, '', href);
+            }
+            setMobileMenuOpen(false);
+        }
     };
 
     const NAV_ITEMS = [
@@ -48,7 +61,12 @@ const Navigation = () => {
 
                 <div className="nav-links">
                     {NAV_ITEMS.map(item => (
-                        <a key={item.href} href={item.href} className="nav-link">
+                        <a
+                            key={item.href}
+                            href={item.href}
+                            className="nav-link"
+                            onClick={(e) => handleNavClick(e, item.href)}
+                        >
                             {item.label}
                         </a>
                     ))}
@@ -68,7 +86,7 @@ const Navigation = () => {
                         key={item.href}
                         href={item.href}
                         className="nav-mobile-link"
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={(e) => handleNavClick(e, item.href)}
                     >
                         {item.label}
                     </a>

@@ -23,7 +23,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-// 2026-11-08 - Table reservation tests - Validate multi-time booking and 30-min buffer gap
+// 2026-11-08 - Table reservation tests - Validate 15-min gap buffer, minimum empty seat difference
+// and collision prevention
 @ExtendWith(MockitoExtension.class)
 class TableReservationServiceImplTest {
 
@@ -97,10 +98,57 @@ class TableReservationServiceImplTest {
     verify(reservationRepository).save(any(TableReservation.class));
   }
 
-  // 2026-11-08 - Table reservation test - Verify another person can book same table at different
-  // time with > 30 min gap
+  // 2026-11-08 - Table reservation test - Verify booking for 4 persons prioritises 5-seat table
+  // over 6-seat table (minimum empty seat diff)
   @Test
-  void createReservationOnSameTableWithDifferentTimeAnd30MinGapShouldSucceed() {
+  void createReservationShouldPrioritiseMinimumEmptySeatDifference() {
+    Tables table5Seats =
+        Tables.builder()
+            .tableId(10L)
+            .tableNumber(5)
+            .capacity(5)
+            .status("available")
+            .isActive(true)
+            .build();
+    Tables table6Seats =
+        Tables.builder()
+            .tableId(11L)
+            .tableNumber(6)
+            .capacity(6)
+            .status("available")
+            .isActive(true)
+            .build();
+
+    ReservationRequest request =
+        ReservationRequest.builder()
+            .branchId(1L)
+            .customerName("Rahul")
+            .customerPhone("9876543210")
+            .reservationDate("2026-11-10")
+            .timeSlot("8:00 PM")
+            .guests(4)
+            .build();
+
+    // Pass in 6-seat table first to ensure algorithm prioritises 5-seat table by smallest
+    // difference (5 - 4 = 1 vs 6 - 4 = 2)
+    when(tablesRepository.findByBranchBranchIdAndIsActiveTrue(1L))
+        .thenReturn(List.of(table6Seats, table5Seats));
+    when(reservationRepository.findByBranchIdAndReservationDateAndStatusNot(
+            1L, "2026-11-10", "CANCELLED"))
+        .thenReturn(Collections.emptyList());
+    when(reservationRepository.save(any(TableReservation.class))).thenAnswer(i -> i.getArgument(0));
+
+    ReservationResponse response = reservationService.createReservation(request);
+
+    assertNotNull(response);
+    assertEquals(10L, response.getTableId());
+    assertEquals(5, response.getTableNumber());
+  }
+
+  // 2026-11-08 - Table reservation test - Verify booking succeeds with exact 15-min gap (8-9 PM
+  // existing, next at 9:15 PM)
+  @Test
+  void createReservationOnSameTableWith15MinGapShouldSucceed() {
     Tables table1 =
         Tables.builder()
             .tableId(2L)
@@ -110,7 +158,7 @@ class TableReservationServiceImplTest {
             .isActive(true)
             .build();
 
-    // Existing booking on Table 1 from 11:00 AM to 12:00 PM
+    // Existing booking on Table 1 from 8:00 PM to 9:00 PM
     TableReservation existingRes =
         TableReservation.builder()
             .id(50L)
@@ -118,22 +166,21 @@ class TableReservationServiceImplTest {
             .tableId(2L)
             .tableNumber(1)
             .reservationDate("2026-11-10")
-            .timeSlot("11:00 AM - 12:00 PM")
-            .startTime("11:00 AM")
-            .endTime("12:00 PM")
-            .timeRange("11:00 AM - 12:00 PM")
+            .timeSlot("8:00 PM - 9:00 PM")
+            .startTime("08:00 PM")
+            .endTime("09:00 PM")
+            .timeRange("08:00 PM - 09:00 PM")
             .status("CONFIRMED")
             .build();
 
-    // New booking for same Table 1 from 1:00 PM (gap between 12:00 PM and 1:00 PM is 60 min > 30
-    // min)
+    // Next booking at 9:15 PM (gap between 9:00 PM and 9:15 PM is exactly 15 min)
     ReservationRequest request =
         ReservationRequest.builder()
             .branchId(1L)
             .customerName("Alice Smith")
             .customerPhone("9876543210")
             .reservationDate("2026-11-10")
-            .timeSlot("1:00 PM")
+            .timeSlot("9:15 PM")
             .guests(4)
             .build();
 
@@ -155,13 +202,13 @@ class TableReservationServiceImplTest {
     assertTrue(response.isSuccess());
     assertEquals(2L, response.getTableId());
     assertEquals(1, response.getTableNumber());
-    assertEquals("01:00 PM - 02:00 PM", response.getTimeRange());
+    assertEquals("09:15 PM - 10:15 PM", response.getTimeRange());
   }
 
   // 2026-11-08 - Table reservation test - Verify booking is rejected or shifts table when gap is <
-  // 30 mins
+  // 15 mins
   @Test
-  void createReservationWithConflictLessThan30MinGapShouldAllocateAlternativeTable() {
+  void createReservationWithConflictLessThan15MinGapShouldAllocateAlternativeTable() {
     Tables table1 =
         Tables.builder()
             .tableId(2L)
@@ -179,7 +226,7 @@ class TableReservationServiceImplTest {
             .isActive(true)
             .build();
 
-    // Table 1 is booked 11:00 AM - 12:00 PM
+    // Table 1 is booked 8:00 PM - 9:00 PM
     TableReservation existingRes =
         TableReservation.builder()
             .id(50L)
@@ -187,21 +234,21 @@ class TableReservationServiceImplTest {
             .tableId(2L)
             .tableNumber(1)
             .reservationDate("2026-11-10")
-            .timeSlot("11:00 AM - 12:00 PM")
-            .startTime("11:00 AM")
-            .endTime("12:00 PM")
-            .timeRange("11:00 AM - 12:00 PM")
+            .timeSlot("8:00 PM - 9:00 PM")
+            .startTime("08:00 PM")
+            .endTime("09:00 PM")
+            .timeRange("08:00 PM - 09:00 PM")
             .status("CONFIRMED")
             .build();
 
-    // New booking at 12:15 PM (gap from 12:00 PM is 15 min < 30 min buffer)
+    // New booking at 9:10 PM (gap from 9:00 PM is 10 min < 15 min buffer)
     ReservationRequest request =
         ReservationRequest.builder()
             .branchId(1L)
             .customerName("Bob")
             .customerPhone("9876543210")
             .reservationDate("2026-11-10")
-            .timeSlot("12:15 PM")
+            .timeSlot("9:10 PM")
             .guests(4)
             .build();
 
@@ -215,9 +262,60 @@ class TableReservationServiceImplTest {
     ReservationResponse response = reservationService.createReservation(request);
 
     assertNotNull(response);
-    // Table 1 had conflict (< 30 min gap), so Table 2 must be allocated!
+    // Table 1 had conflict (< 15 min gap), so Table 2 must be allocated!
     assertEquals(3L, response.getTableId());
     assertEquals(2, response.getTableNumber());
+  }
+
+  // 2026-11-08 - Table reservation test - When all tables are reserved, reject booking with clear
+  // message
+  @Test
+  void createReservationWhenAllTablesReservedShouldThrowException() {
+    Tables table1 =
+        Tables.builder()
+            .tableId(2L)
+            .tableNumber(1)
+            .capacity(4)
+            .status("available")
+            .isActive(true)
+            .build();
+
+    TableReservation existingRes =
+        TableReservation.builder()
+            .id(50L)
+            .branchId(1L)
+            .tableId(2L)
+            .tableNumber(1)
+            .reservationDate("2026-11-10")
+            .timeSlot("8:00 PM - 9:00 PM")
+            .startTime("08:00 PM")
+            .endTime("09:00 PM")
+            .timeRange("08:00 PM - 09:00 PM")
+            .status("CONFIRMED")
+            .build();
+
+    ReservationRequest request =
+        ReservationRequest.builder()
+            .branchId(1L)
+            .customerName("Bob")
+            .customerPhone("9876543210")
+            .reservationDate("2026-11-10")
+            .timeSlot("8:30 PM")
+            .guests(4)
+            .build();
+
+    when(tablesRepository.findByBranchBranchIdAndIsActiveTrue(1L)).thenReturn(List.of(table1));
+    when(reservationRepository.findByBranchIdAndReservationDateAndStatusNot(
+            1L, "2026-11-10", "CANCELLED"))
+        .thenReturn(List.of(existingRes));
+
+    ResourceAlreadyExistsException ex =
+        assertThrows(
+            ResourceAlreadyExistsException.class,
+            () -> reservationService.createReservation(request));
+
+    assertTrue(ex.getMessage().contains("All suitable tables are currently reserved"));
+    verify(reservationRepository, never()).save(any(TableReservation.class));
   }
 
   @Test
@@ -238,10 +336,10 @@ class TableReservationServiceImplTest {
             .tableId(2L)
             .tableNumber(1)
             .reservationDate("2026-11-10")
-            .timeSlot("11:00 AM - 12:00 PM")
-            .startTime("11:00 AM")
-            .endTime("12:00 PM")
-            .timeRange("11:00 AM - 12:00 PM")
+            .timeSlot("8:00 PM - 9:00 PM")
+            .startTime("08:00 PM")
+            .endTime("09:00 PM")
+            .timeRange("08:00 PM - 09:00 PM")
             .status("CONFIRMED")
             .build();
 
@@ -252,7 +350,7 @@ class TableReservationServiceImplTest {
             .customerName("Bob")
             .customerPhone("9876543210")
             .reservationDate("2026-11-10")
-            .timeSlot("12:15 PM")
+            .timeSlot("9:05 PM")
             .guests(4)
             .build();
 

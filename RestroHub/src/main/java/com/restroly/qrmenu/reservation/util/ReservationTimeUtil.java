@@ -7,12 +7,15 @@ import java.util.Locale;
 import lombok.Builder;
 import lombok.Getter;
 
-// 2026-11-08 - Table reservation time util - Parse time ranges and enforce 30-min buffer between
+// 2026-11-08 - Table reservation time util - Parse time ranges and enforce 15-min buffer between
+// bookings
 // bookings
 public final class ReservationTimeUtil {
 
   public static final int DEFAULT_DURATION_MINUTES = 60;
-  public static final int DEFAULT_BUFFER_MINUTES = 30;
+  // 2026-11-08 - issue: booking gap - reason: enforce minimum 15-min gap between bookings as
+  // requested
+  public static final int DEFAULT_BUFFER_MINUTES = 15;
 
   private static final DateTimeFormatter DISPLAY_FORMAT =
       DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);

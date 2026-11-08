@@ -23,7 +23,16 @@ const request = async (endpoint, options = {}) => {
   });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
-    throw new Error(`API ${res.status} ${res.statusText}: ${body}`);
+    let parsedMessage = '';
+    try {
+      const parsed = JSON.parse(body);
+      parsedMessage = parsed.message || parsed.error || '';
+    } catch {}
+    // 2026-11-08 - issue: error feedback - reason: expose structured API error message to caller
+    const err = new Error(parsedMessage || `API ${res.status} ${res.statusText}`);
+    err.status = res.status;
+    err.response = { status: res.status, data: parsedMessage ? { message: parsedMessage } : body };
+    throw err;
   }
   // 204 No Content
   if (res.status === 204) return null;
@@ -107,7 +116,7 @@ const ApiService = {
   /**
    * Check table availability.
    */
-  // 2026-11-08 - Table availability - Query backend availability endpoint with 30-min gap support
+  // 2026-11-08 - Table availability - Query backend availability endpoint with 15-min gap support
   checkAvailability: async (date, time, guests, branchId = 1) => {
     try {
       return await request(

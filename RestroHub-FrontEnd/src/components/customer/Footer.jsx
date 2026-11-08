@@ -1,3 +1,4 @@
+// 2026-11-08 - issue: anchor navigation - reason: ensure smooth scroll to sections
 import React from 'react';
 import { useSiteData } from '@context/SiteContext.jsx';
 
@@ -13,6 +14,17 @@ const Footer = () => {
 
     const { footer, navigation } = siteData;
     const currentYear = new Date().getFullYear();
+
+    const handleNavClick = (e, href) => {
+        if (href?.startsWith('#')) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState(null, '', href);
+            }
+        }
+    };
 
     const NAV_ITEMS = [
         { label: "Home", href: "#hero" },
@@ -30,7 +42,11 @@ const Footer = () => {
                 <div className="footer-main">
                     {/* Brand */}
                     <div className="footer-brand">
-                        <a href="/" className="footer-logo font-heading">
+                        <a
+                            href="#hero"
+                            onClick={(e) => handleNavClick(e, '#hero')}
+                            className="footer-logo font-heading"
+                        >
                             {navigation.name}
                         </a>
                         <p className="footer-tagline">{navigation.fullName}</p>
@@ -43,6 +59,7 @@ const Footer = () => {
                                 key={index}
                                 href={item.href}
                                 className="footer-nav-link"
+                                onClick={(e) => handleNavClick(e, item.href)}
                             >
                                 {item.label}
                             </a>

@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.*;
 
 // 2026-11-08 - Table reservation availability DTO - Availability response for time slots with
-// 30-min gap
+// 15-min gap
 @Data
 @Builder
 @NoArgsConstructor

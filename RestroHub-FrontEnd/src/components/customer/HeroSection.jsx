@@ -1,3 +1,4 @@
+// 2026-11-08 - issue: anchor navigation - reason: ensure smooth scroll to sections
 import React from 'react';
 import { useSiteData } from '@context/SiteContext.jsx';
 
@@ -25,8 +26,20 @@ const HeroSection = () => {
             ? hero.title.split(' ').slice(1).join(' ')
             : 'Difference';
 
+    const handleCtaClick = (e, href) => {
+        if (href?.startsWith('#')) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState(null, '', href);
+            }
+        }
+    };
+
     return (
         <section
+            id="hero"
             className="hero hero-bg"
             style={{
                 backgroundImage: `
@@ -66,12 +79,20 @@ const HeroSection = () => {
                 {/* CTA Buttons */}
                 <div className="hero-cta">
                     {hero.ctaPrimary?.label && (
-                        <a href={hero.ctaPrimary.href || '#menu'} className="btn btn-primary">
+                        <a
+                            href={hero.ctaPrimary.href || '#menu'}
+                            onClick={(e) => handleCtaClick(e, hero.ctaPrimary.href || '#menu')}
+                            className="btn btn-primary"
+                        >
                             {hero.ctaPrimary.label}
                         </a>
                     )}
                     {hero.ctaSecondary?.label && (
-                        <a href={hero.ctaSecondary.href || '#reservations'} className="btn btn-outline">
+                        <a
+                            href={hero.ctaSecondary.href || '#reservations'}
+                            onClick={(e) => handleCtaClick(e, hero.ctaSecondary.href || '#reservations')}
+                            className="btn btn-outline"
+                        >
                             {hero.ctaSecondary.label}
                         </a>
                     )}
@@ -79,11 +100,16 @@ const HeroSection = () => {
             </div>
 
             {/* Scroll Indicator */}
-            <div className="hero-scroll animate-bounce">
+            <a
+                href="#about"
+                onClick={(e) => handleCtaClick(e, '#about')}
+                className="hero-scroll animate-bounce"
+                aria-label="Scroll to About section"
+            >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
-            </div>
+            </a>
 
             <style>{`
                 .hero {

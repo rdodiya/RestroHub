@@ -19,7 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// 2026-11-08 - Table reservation service implementation - Multi-time booking with 30-min gap
+// 2026-11-08 - Table reservation service implementation - Multi-time booking with 15-min gap
+// enforcement and best-fit allocation
 // enforcement
 @Slf4j
 @Service
@@ -60,7 +61,8 @@ public class TableReservationServiceImpl implements TableReservationService {
         reservationRepository.findByBranchIdAndReservationDateAndStatusNot(
             branchId, request.getReservationDate(), "CANCELLED");
 
-    // 2. Locate and allocate an available table with 30-min gap buffer
+    // 2. Locate and allocate an available table with 15-min gap buffer and minimum empty seat
+    // difference
     Tables allocatedTable = null;
 
     if (request.getTableId() != null) {
@@ -71,6 +73,17 @@ public class TableReservationServiceImpl implements TableReservationService {
                   () ->
                       new ResourceNotFoundException(
                           "Table not found with id: " + request.getTableId()));
+
+      if (requestedTable.getCapacity() != null && requestedTable.getCapacity() < guestsCount) {
+        throw new ResourceAlreadyExistsException(
+            "Table "
+                + requestedTable.getTableNumber()
+                + " has a capacity of "
+                + requestedTable.getCapacity()
+                + ", which cannot accommodate "
+                + guestsCount
+                + " guests.");
+      }
 
       TableReservation conflicting =
           findConflictForTable(
@@ -84,60 +97,62 @@ public class TableReservationServiceImpl implements TableReservationService {
                 + requestedTable.getTableNumber()
                 + " is already booked for "
                 + conflicting.getTimeRange()
-                + ". Bookings require at least a 30-minute gap.");
+                + ". Bookings require at least a 15-minute gap.");
       }
       allocatedTable = requestedTable;
     } else {
       List<Tables> allTables =
           tablesRepository.findByBranchBranchIdAndIsActiveTrue(branchId).stream()
               .filter(t -> t.getTableNumber() == null || t.getTableNumber() > 0)
-              .sorted(Comparator.comparingInt(t -> t.getCapacity() != null ? t.getCapacity() : 4))
               .toList();
 
-      // Find first table fitting guests that has NO booking conflict with 30-min gap
+      // 2026-11-08 - issue: table booking collision - reason: filter unreserved tables fitting
+      // guest count
+      List<Tables> suitableEmptyTables = new ArrayList<>();
       for (Tables table : allTables) {
-        if (table.getCapacity() != null && table.getCapacity() >= guestsCount) {
-          if (findConflictForTable(
+        int capacity = table.getCapacity() != null ? table.getCapacity() : 4;
+        if (capacity >= guestsCount) {
+          TableReservation conflict =
+              findConflictForTable(
                   table.getTableId(),
                   existingReservations,
                   timeSlot.getStartMinutes(),
-                  timeSlot.getEndMinutes())
-              == null) {
-            allocatedTable = table;
-            break;
+                  timeSlot.getEndMinutes());
+          if (conflict == null) {
+            suitableEmptyTables.add(table);
           }
         }
       }
 
-      // If no table with exact capacity, check any table without conflict
-      if (allocatedTable == null) {
-        for (Tables table : allTables) {
-          if (findConflictForTable(
-                  table.getTableId(),
-                  existingReservations,
-                  timeSlot.getStartMinutes(),
-                  timeSlot.getEndMinutes())
-              == null) {
-            allocatedTable = table;
-            break;
-          }
-        }
+      // 2026-11-08 - issue: booking unavailable tables - reason: throw error if no table is empty
+      if (suitableEmptyTables.isEmpty()) {
+        throw new ResourceAlreadyExistsException(
+            "No tables available for "
+                + guestsCount
+                + " guest"
+                + (guestsCount > 1 ? "s" : "")
+                + " for "
+                + timeSlot.getTimeRange()
+                + " on "
+                + request.getReservationDate()
+                + ". All suitable tables are currently reserved (minimum 15-minute gap required between bookings).");
       }
+
+      // 2026-11-08 - issue: table selection - reason: prioritise empty tables with minimum empty
+      // seat difference
+      suitableEmptyTables.sort(
+          Comparator.comparingInt(
+                  (Tables t) -> (t.getCapacity() != null ? t.getCapacity() : 4) - guestsCount)
+              .thenComparing(t -> t.getTableNumber() != null ? t.getTableNumber() : 0));
+
+      allocatedTable = suitableEmptyTables.get(0);
     }
 
-    if (allocatedTable != null) {
-      log.info(
-          "Allocated Table {} (ID: {}) for time range {}",
-          allocatedTable.getTableNumber(),
-          allocatedTable.getTableId(),
-          timeSlot.getTimeRange());
-    } else {
-      log.warn(
-          "No table available for branch {} with {} guests at {}. Recording unallocated reservation.",
-          branchId,
-          guestsCount,
-          timeSlot.getTimeRange());
-    }
+    log.info(
+        "Allocated Table {} (ID: {}) for time range {}",
+        allocatedTable.getTableNumber(),
+        allocatedTable.getTableId(),
+        timeSlot.getTimeRange());
 
     // 3. Generate confirmation number
     String confirmationNumber =
@@ -231,8 +246,12 @@ public class TableReservationServiceImpl implements TableReservationService {
         available
             ? "Table is available for " + timeSlot.getTimeRange()
             : "No tables available for "
+                + guestsCount
+                + " guest"
+                + (guestsCount > 1 ? "s" : "")
+                + " for "
                 + timeSlot.getTimeRange()
-                + " (30-min gap required between bookings)";
+                + " (minimum 15-minute gap required between bookings)";
 
     return ReservationAvailabilityResponse.builder()
         .available(available)

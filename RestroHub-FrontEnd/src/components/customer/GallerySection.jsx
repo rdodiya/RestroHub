@@ -1,3 +1,4 @@
+// 2026-11-08 - issue: anchor navigation - reason: ensure smooth scroll to sections
 import React, { useState } from 'react';
 import { useSiteData } from '@context/SiteContext.jsx';
 
@@ -27,7 +28,7 @@ const GallerySection = () => {
     };
 
     return (
-        <section id="features" className="gallery section">
+        <section id="gallery" className="gallery section">
             <div className="container">
                 {/* Header */}
                 <div className="gallery-header">
